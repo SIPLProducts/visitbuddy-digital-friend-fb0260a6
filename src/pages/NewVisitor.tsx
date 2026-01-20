@@ -77,9 +77,17 @@ export default function NewVisitor() {
     if (gateRes.data) setGates(gateRes.data as Gate[]);
   };
 
+  // Generate visitor ID client-side (matches the DB trigger pattern)
+  const generateVisitorId = () => {
+    const uuid1 = crypto.randomUUID().replace(/-/g, '');
+    const uuid2 = crypto.randomUUID().replace(/-/g, '');
+    return `VIS-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
+  };
+
   const onSubmit = async (data: VisitorFormData) => {
     setLoading(true);
     const { error } = await supabase.from('visitors').insert([{
+      visitor_id: generateVisitorId(),
       name: data.name,
       email: data.email || null,
       phone: data.phone || null,
