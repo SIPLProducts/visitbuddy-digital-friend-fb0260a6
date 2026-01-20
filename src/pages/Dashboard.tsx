@@ -85,18 +85,22 @@ export default function Dashboard() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0">
-            Dashboard Overview
-          </Badge>
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            Welcome back, Admin! 👋
-          </h1>
-          <p className="text-muted-foreground">
-            Here's what's happening at your facilities today.
-          </p>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/90 via-primary to-[hsl(195,85%,45%)] p-6 text-primary-foreground">
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
+          
+          <div className="relative z-10">
+            <Badge className="bg-white/20 text-white hover:bg-white/30 border-0 mb-3">
+              Dashboard Overview
+            </Badge>
+            <h1 className="text-2xl font-bold mb-1">
+              Welcome back, Admin! 👋
+            </h1>
+            <p className="text-primary-foreground/80">
+              Here's what's happening at your facilities today.
+            </p>
+          </div>
         </div>
 
         {/* Stats Grid */}
