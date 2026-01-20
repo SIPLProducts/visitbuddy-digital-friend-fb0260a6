@@ -14,7 +14,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, User, Building2, Laptop, Phone, Mail } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
@@ -41,6 +42,7 @@ type VisitorFormData = z.infer<typeof visitorSchema>;
 export default function NewVisitor() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [gates, setGates] = useState<Gate[]>([]);
@@ -86,8 +88,10 @@ export default function NewVisitor() {
 
   const onSubmit = async (data: VisitorFormData) => {
     setLoading(true);
+    const visitorId = generateVisitorId();
+    
     const { error } = await supabase.from('visitors').insert([{
-      visitor_id: generateVisitorId(),
+      visitor_id: visitorId,
       name: data.name,
       email: data.email || null,
       phone: data.phone || null,
@@ -102,14 +106,49 @@ export default function NewVisitor() {
       status: 'scheduled' as const,
     }]);
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       toast.error('Failed to register visitor');
+      return;
+    }
+
+    // Send WhatsApp badge if enabled and phone number provided
+    if (sendWhatsApp && data.phone) {
+      try {
+        // Get host and department names for the message
+        const selectedHost = employees.find(e => e.id === data.host_id);
+        const selectedDept = departments.find(d => d.id === data.department_id);
+        const selectedGate = gates.find(g => g.id === data.gate_id);
+
+        const { data: whatsappResult, error: whatsappError } = await supabase.functions.invoke('send-whatsapp-badge', {
+          body: {
+            visitorName: data.name,
+            visitorId: visitorId,
+            phone: data.phone,
+            company: data.company,
+            purpose: data.purpose,
+            hostName: selectedHost?.name,
+            departmentName: selectedDept?.name,
+            gateName: selectedGate?.name,
+          }
+        });
+
+        if (whatsappError) {
+          console.error('WhatsApp error:', whatsappError);
+          toast.warning('Visitor registered but WhatsApp message failed to send');
+        } else {
+          toast.success('Visitor registered & badge sent to WhatsApp! 📱');
+        }
+      } catch (err) {
+        console.error('WhatsApp send error:', err);
+        toast.warning('Visitor registered but WhatsApp message failed');
+      }
     } else {
       toast.success('Visitor registered successfully');
-      navigate('/visitors');
     }
+
+    setLoading(false);
+    navigate('/visitors');
   };
 
   return (
@@ -195,6 +234,24 @@ export default function NewVisitor() {
                       {...form.register('company')}
                     />
                   </div>
+                </div>
+              </div>
+              
+              {/* WhatsApp Badge Option */}
+              <div className="flex items-center space-x-3 p-4 rounded-lg bg-accent/50 border border-accent">
+                <Checkbox 
+                  id="send-whatsapp" 
+                  checked={sendWhatsApp}
+                  onCheckedChange={(checked) => setSendWhatsApp(checked === true)}
+                />
+                <div className="flex-1">
+                  <Label htmlFor="send-whatsapp" className="flex items-center gap-2 cursor-pointer">
+                    <MessageCircle className="h-4 w-4 text-primary" />
+                    Send visitor badge via WhatsApp
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    The visitor will receive their digital badge on WhatsApp
+                  </p>
                 </div>
               </div>
             </CardContent>
