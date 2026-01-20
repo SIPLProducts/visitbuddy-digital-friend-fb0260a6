@@ -81,6 +81,14 @@ const handler = async (req: Request): Promise<Response> => {
       minute: "2-digit",
     });
 
+    // Generate QR code URL with visitor ID for quick check-in scanning
+    const qrCodeData = encodeURIComponent(JSON.stringify({
+      visitorId,
+      name: visitorName,
+      timestamp: new Date().toISOString()
+    }));
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${qrCodeData}&format=png`;
+
     const message = `
 🎫 *VisiGuard Visitor Badge*
 ━━━━━━━━━━━━━━━━━━━━
@@ -97,18 +105,22 @@ ${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
 ⏰ *Time:* ${currentTime}
 
 ━━━━━━━━━━━━━━━━━━━━
+📱 *Scan the QR code above for quick check-in*
 ✅ Please show this badge at the security desk.
 
 _Powered by VisiGuard VMS_
     `.trim();
 
-    // Send via Twilio WhatsApp API
+    console.log(`Generated QR code URL: ${qrCodeUrl}`);
+
+    // Send via Twilio WhatsApp API with QR code image
     const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
     
     const formData = new URLSearchParams();
     formData.append("To", `whatsapp:${formattedPhone}`);
     formData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
     formData.append("Body", message);
+    formData.append("MediaUrl", qrCodeUrl);
 
     const twilioResponse = await fetch(twilioUrl, {
       method: "POST",
