@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Shield, Users, Building2, CheckCircle2, Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -28,6 +27,12 @@ const signupSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 type SignupFormData = z.infer<typeof signupSchema>;
+
+const features = [
+  { icon: Shield, title: 'Secure Access Control', description: 'Enterprise-grade security for your facilities' },
+  { icon: Users, title: 'Visitor Management', description: 'Streamlined check-in and tracking' },
+  { icon: Building2, title: 'Multi-Location Support', description: 'Manage all your sites from one platform' },
+];
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -85,35 +90,102 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex">
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[hsl(220,30%,12%)] via-[hsl(220,25%,15%)] to-[hsl(195,85%,25%)] p-12 flex-col justify-between relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+        </div>
+        
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary mb-4">
-            <span className="text-primary-foreground font-bold text-2xl">V</span>
+        <div className="relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(195,85%,45%)] to-[hsl(195,85%,35%)] flex items-center justify-center shadow-lg">
+              <Shield className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">VisiGuard</h1>
+              <p className="text-sm text-white/60">Enterprise VMS</p>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">VisiGuard</h1>
-          <p className="text-muted-foreground">Enterprise Visitor Management System</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{isLogin ? 'Sign In' : 'Create Account'}</CardTitle>
-            <CardDescription>
+        {/* Features */}
+        <div className="relative z-10 space-y-8">
+          <div>
+            <h2 className="text-3xl font-bold text-white mb-2">
+              Secure Visitor Management
+            </h2>
+            <p className="text-white/70 text-lg">
+              Streamline your facility access control with our enterprise-grade solution.
+            </p>
+          </div>
+          
+          <div className="space-y-6">
+            {features.map((feature) => (
+              <div key={feature.title} className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                  <feature.icon className="w-5 h-5 text-[hsl(195,85%,55%)]" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">{feature.title}</h3>
+                  <p className="text-sm text-white/60">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 text-white/50 text-sm">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Trusted by 500+ enterprises worldwide</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Auth Form */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-background">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
+            <div className="inline-flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                <Shield className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <h1 className="text-2xl font-bold text-foreground">VisiGuard</h1>
+            </div>
+            <p className="text-muted-foreground text-sm">Enterprise Visitor Management</p>
+          </div>
+
+          {/* Form Header */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-foreground">
+              {isLogin ? 'Welcome back' : 'Create your account'}
+            </h2>
+            <p className="text-muted-foreground mt-1">
               {isLogin
-                ? 'Enter your credentials to access the dashboard'
-                : 'Fill in your details to create a new account'}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+                ? 'Enter your credentials to access your dashboard'
+                : 'Get started with VisiGuard today'}
+            </p>
+          </div>
+
+          {/* Auth Form */}
+          <div className="bg-card rounded-2xl border shadow-sm p-6 sm:p-8">
             {isLogin ? (
-              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Email address
+                  </Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@company.com"
+                    placeholder="name@company.com"
+                    className="h-11"
                     {...loginForm.register('email')}
                   />
                   {loginForm.formState.errors.email && (
@@ -123,25 +195,36 @@ export default function Auth() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-sm font-medium">
+                      Password
+                    </Label>
+                    <button
+                      type="button"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
+                      placeholder="Enter your password"
+                      className="h-11 pr-10"
                       {...loginForm.register('password')}
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-full px-3"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
                     </Button>
                   </div>
@@ -151,18 +234,28 @@ export default function Auth() {
                     </p>
                   )}
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Signing in...' : 'Sign In'}
+                <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign in'
+                  )}
                 </Button>
               </form>
             ) : (
-              <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4">
+              <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName" className="text-sm font-medium">
+                    Full name
+                  </Label>
                   <Input
                     id="fullName"
                     type="text"
                     placeholder="John Doe"
+                    className="h-11"
                     {...signupForm.register('fullName')}
                   />
                   {signupForm.formState.errors.fullName && (
@@ -172,11 +265,14 @@ export default function Auth() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email" className="text-sm font-medium">
+                    Email address
+                  </Label>
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="admin@company.com"
+                    placeholder="name@company.com"
+                    className="h-11"
                     {...signupForm.register('email')}
                   />
                   {signupForm.formState.errors.email && (
@@ -186,25 +282,28 @@ export default function Auth() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" className="text-sm font-medium">
+                    Password
+                  </Label>
                   <div className="relative">
                     <Input
                       id="signup-password"
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
+                      placeholder="Create a password"
+                      className="h-11 pr-10"
                       {...signupForm.register('password')}
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-full px-3"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
                       ) : (
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       )}
                     </Button>
                   </div>
@@ -215,11 +314,14 @@ export default function Auth() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                    Confirm password
+                  </Label>
                   <Input
                     id="confirmPassword"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder="Confirm your password"
+                    className="h-11"
                     {...signupForm.register('confirmPassword')}
                   />
                   {signupForm.formState.errors.confirmPassword && (
@@ -228,25 +330,40 @@ export default function Auth() {
                     </p>
                   )}
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Creating account...' : 'Create Account'}
+                <Button type="submit" className="w-full h-11 text-base font-medium" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create account'
+                  )}
                 </Button>
               </form>
             )}
-          </CardContent>
-          <CardFooter className="justify-center">
-            <p className="text-sm text-muted-foreground">
-              {isLogin ? "Don't have an account? " : 'Already have an account? '}
-              <button
-                type="button"
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-primary hover:underline font-medium"
-              >
-                {isLogin ? 'Sign up' : 'Sign in'}
-              </button>
-            </p>
-          </CardFooter>
-        </Card>
+          </div>
+
+          {/* Toggle Auth Mode */}
+          <p className="text-center mt-6 text-sm text-muted-foreground">
+            {isLogin ? "Don't have an account? " : 'Already have an account? '}
+            <button
+              type="button"
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-primary hover:underline font-medium"
+            >
+              {isLogin ? 'Create one' : 'Sign in'}
+            </button>
+          </p>
+
+          {/* Footer */}
+          <p className="text-center mt-8 text-xs text-muted-foreground">
+            By continuing, you agree to our{' '}
+            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            {' '}and{' '}
+            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+          </p>
+        </div>
       </div>
     </div>
   );
