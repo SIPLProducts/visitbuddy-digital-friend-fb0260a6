@@ -12,7 +12,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Settings as SettingsIcon, Bell, Shield, Palette, Upload, Save } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, Shield, Palette, Upload, Save, HelpCircle, RotateCcw } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Settings() {
   return (
@@ -27,7 +28,7 @@ export default function Settings() {
         </div>
 
         <Tabs defaultValue="general" className="space-y-6">
-          <TabsList>
+          <TabsList className="flex-wrap">
             <TabsTrigger value="general" className="gap-2">
               <SettingsIcon className="h-4 w-4" />
               General
@@ -43,6 +44,10 @@ export default function Settings() {
             <TabsTrigger value="appearance" className="gap-2">
               <Palette className="h-4 w-4" />
               Appearance
+            </TabsTrigger>
+            <TabsTrigger value="help" className="gap-2">
+              <HelpCircle className="h-4 w-4" />
+              Help
             </TabsTrigger>
           </TabsList>
 
@@ -293,6 +298,63 @@ export default function Settings() {
                   <Save className="h-4 w-4" />
                   Save Changes
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="help">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <HelpCircle className="h-5 w-5" />
+                  Help & Support
+                </CardTitle>
+                <CardDescription>
+                  Get help and learn how to use VisiGuard
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                    <div>
+                      <p className="font-medium">Product Tour</p>
+                      <p className="text-sm text-muted-foreground">
+                        Restart the onboarding tour to learn about VisiGuard features
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      onClick={() => {
+                        localStorage.removeItem('visiguard_onboarding_completed');
+                        toast.success('Tour reset! Refresh the page to start the tour.');
+                      }}
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Restart Tour
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 rounded-lg border">
+                    <div>
+                      <p className="font-medium">Documentation</p>
+                      <p className="text-sm text-muted-foreground">
+                        Read the complete user guide and FAQs
+                      </p>
+                    </div>
+                    <Button variant="outline">View Docs</Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 rounded-lg border">
+                    <div>
+                      <p className="font-medium">Contact Support</p>
+                      <p className="text-sm text-muted-foreground">
+                        Get help from our support team
+                      </p>
+                    </div>
+                    <Button variant="outline">Contact Us</Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
