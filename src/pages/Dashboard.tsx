@@ -1,0 +1,149 @@
+import { useEffect, useState } from 'react';
+import { Users, Calendar, UserCheck, Clock } from 'lucide-react';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { StatCard } from '@/components/dashboard/StatCard';
+import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
+import { QuickActions } from '@/components/dashboard/QuickActions';
+import { GateStatus } from '@/components/dashboard/GateStatus';
+import { WeeklyOverview } from '@/components/dashboard/WeeklyOverview';
+import { supabase } from '@/integrations/supabase/client';
+import { Visitor, Gate } from '@/types/database';
+import { Badge } from '@/components/ui/badge';
+
+export default function Dashboard() {
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const [gates, setGates] = useState<Gate[]>([]);
+  const [stats, setStats] = useState({
+    todaysVisitors: 0,
+    scheduledAppointments: 0,
+    activeCheckIns: 0,
+    avgVisitDuration: '0h 0m',
+    pendingApproval: 0,
+    overstayed: 0,
+  });
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Fetch visitors with related data
+    const { data: visitorsData } = await supabase
+      .from('visitors')
+      .select(`
+        *,
+        host:employees(*),
+        department:departments(*),
+        gate:gates(*)
+      `)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (visitorsData) {
+      setVisitors(visitorsData as unknown as Visitor[]);
+
+      // Calculate stats
+      const todaysVisitors = visitorsData.filter(
+        (v) => v.created_at.startsWith(today)
+      ).length;
+      const activeCheckIns = visitorsData.filter(
+        (v) => v.status === 'checked_in'
+      ).length;
+
+      setStats((prev) => ({
+        ...prev,
+        todaysVisitors,
+        activeCheckIns,
+      }));
+    }
+
+    // Fetch gates
+    const { data: gatesData } = await supabase
+      .from('gates')
+      .select('*')
+      .order('name');
+
+    if (gatesData) {
+      setGates(gatesData as Gate[]);
+    }
+
+    // Fetch appointments count
+    const { count: appointmentsCount } = await supabase
+      .from('appointments')
+      .select('*', { count: 'exact', head: true })
+      .eq('scheduled_date', today);
+
+    setStats((prev) => ({
+      ...prev,
+      scheduledAppointments: appointmentsCount || 0,
+    }));
+  };
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-0">
+            Dashboard Overview
+          </Badge>
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">
+            Welcome back, Admin! 👋
+          </h1>
+          <p className="text-muted-foreground">
+            Here's what's happening at your facilities today.
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Today's Visitors"
+            value={stats.todaysVisitors}
+            icon={<Users className="h-6 w-6" />}
+            trend={{ value: '+12% from yesterday', positive: true }}
+          />
+          <StatCard
+            title="Scheduled Appointments"
+            value={stats.scheduledAppointments}
+            subtitle={`${stats.pendingApproval} pending approval`}
+            icon={<Calendar className="h-6 w-6" />}
+          />
+          <StatCard
+            title="Active Check-ins"
+            value={stats.activeCheckIns}
+            subtitle={`${stats.overstayed} overstayed`}
+            icon={<UserCheck className="h-6 w-6" />}
+          />
+          <StatCard
+            title="Avg. Visit Duration"
+            value={stats.avgVisitDuration || '1h 24m'}
+            icon={<Clock className="h-6 w-6" />}
+            trend={{ value: '-8% from last week', positive: false }}
+          />
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Visitors - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            <RecentVisitors visitors={visitors} />
+          </div>
+
+          {/* Quick Actions */}
+          <div className="space-y-6">
+            <QuickActions />
+            <GateStatus gates={gates} />
+          </div>
+        </div>
+
+        {/* Weekly Overview Chart */}
+        <WeeklyOverview />
+      </div>
+    </MainLayout>
+  );
+}
