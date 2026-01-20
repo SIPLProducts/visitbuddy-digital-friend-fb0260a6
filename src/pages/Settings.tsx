@@ -273,11 +273,11 @@ export default function Settings() {
                       <span className="text-sm font-medium">Light</span>
                     </button>
                     <button className="p-4 rounded-lg border-2 border-border bg-card text-center hover:border-primary transition-colors">
-                      <div className="w-full h-8 bg-slate-900 rounded mb-2" />
+                      <div className="w-full h-8 bg-sidebar rounded mb-2" />
                       <span className="text-sm font-medium">Dark</span>
                     </button>
                     <button className="p-4 rounded-lg border-2 border-border bg-card text-center hover:border-primary transition-colors">
-                      <div className="w-full h-8 rounded mb-2 bg-gradient-to-r from-background to-slate-900" />
+                      <div className="w-full h-8 rounded mb-2 bg-gradient-to-r from-background to-sidebar" />
                       <span className="text-sm font-medium">System</span>
                     </button>
                   </div>
@@ -287,10 +287,10 @@ export default function Settings() {
                   <Label>Accent Color</Label>
                   <div className="flex gap-3">
                     <button className="w-10 h-10 rounded-full bg-primary border-2 border-primary" />
-                    <button className="w-10 h-10 rounded-full bg-blue-500 border-2 border-transparent hover:border-blue-500" />
-                    <button className="w-10 h-10 rounded-full bg-purple-500 border-2 border-transparent hover:border-purple-500" />
-                    <button className="w-10 h-10 rounded-full bg-rose-500 border-2 border-transparent hover:border-rose-500" />
-                    <button className="w-10 h-10 rounded-full bg-orange-500 border-2 border-transparent hover:border-orange-500" />
+                    <button className="w-10 h-10 rounded-full bg-info border-2 border-transparent hover:border-info" />
+                    <button className="w-10 h-10 rounded-full bg-[hsl(280,80%,50%)] border-2 border-transparent hover:border-[hsl(280,80%,50%)]" />
+                    <button className="w-10 h-10 rounded-full bg-destructive border-2 border-transparent hover:border-destructive" />
+                    <button className="w-10 h-10 rounded-full bg-warning border-2 border-transparent hover:border-warning" />
                   </div>
                 </div>
 

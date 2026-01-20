@@ -14,13 +14,13 @@ export function RecentVisitors({ visitors }: RecentVisitorsProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
-        return 'bg-green-100 text-green-700 border-green-200';
+        return 'bg-success-muted text-success-muted-foreground border-success/20';
       case 'checked_out':
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-neutral-muted text-neutral-muted-foreground border-neutral/20';
       case 'scheduled':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
+        return 'bg-info-muted text-info-muted-foreground border-info/20';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
+        return 'bg-neutral-muted text-neutral-muted-foreground border-neutral/20';
     }
   };
 
