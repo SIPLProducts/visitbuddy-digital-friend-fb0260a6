@@ -39,12 +39,20 @@ const trendData = [
   { month: 'Jun', visitors: 2100, scheduled: 1650 },
 ];
 
+const departmentColors = {
+  success: 'hsl(160, 84%, 39%)',
+  info: 'hsl(205, 90%, 52%)',
+  warning: 'hsl(45, 93%, 47%)',
+  destructive: 'hsl(0, 72%, 51%)',
+  primary: 'hsl(195, 85%, 35%)',
+};
+
 const departmentData = [
-  { name: 'Engineering', value: 450, color: '#10b981' },
-  { name: 'Marketing', value: 320, color: '#3b82f6' },
-  { name: 'HR', value: 280, color: '#f59e0b' },
-  { name: 'Finance', value: 150, color: '#ef4444' },
-  { name: 'Operations', value: 200, color: '#8b5cf6' },
+  { name: 'Engineering', value: 450, color: departmentColors.success },
+  { name: 'Marketing', value: 320, color: departmentColors.info },
+  { name: 'HR', value: 280, color: departmentColors.warning },
+  { name: 'Finance', value: 150, color: departmentColors.destructive },
+  { name: 'Operations', value: 200, color: departmentColors.primary },
 ];
 
 export default function Analytics() {
@@ -88,7 +96,7 @@ export default function Analytics() {
               <div>
                 <p className="text-sm text-muted-foreground">Total Visitors</p>
                 <p className="text-3xl font-bold text-foreground mt-2">12,458</p>
-                <Badge className="mt-2 bg-emerald-100 text-emerald-700 border-0">
+                <Badge className="mt-2 bg-success-muted text-success-muted-foreground border-0">
                   +18% vs. last month
                 </Badge>
               </div>
@@ -102,7 +110,7 @@ export default function Analytics() {
               <div>
                 <p className="text-sm text-muted-foreground">Avg. Visit Duration</p>
                 <p className="text-3xl font-bold text-foreground mt-2">1h 42m</p>
-                <Badge className="mt-2 bg-rose-100 text-rose-700 border-0">
+                <Badge className="mt-2 bg-destructive/10 text-destructive border-0">
                   -12% vs. last month
                 </Badge>
               </div>
@@ -130,7 +138,7 @@ export default function Analytics() {
               <div>
                 <p className="text-sm text-muted-foreground">Active Gates</p>
                 <p className="text-3xl font-bold text-foreground mt-2">4/5</p>
-                <Badge className="mt-2 bg-emerald-100 text-emerald-700 border-0">
+                <Badge className="mt-2 bg-success-muted text-success-muted-foreground border-0">
                   98% uptime this month
                 </Badge>
               </div>
@@ -205,7 +213,7 @@ export default function Analytics() {
                 <span className="text-sm text-muted-foreground">Total Visitors</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-sky-500" />
+                <div className="w-3 h-3 rounded-full bg-info" />
                 <span className="text-sm text-muted-foreground">Pre-Scheduled</span>
               </div>
             </div>

@@ -38,7 +38,7 @@ export function GateStatus({ gates }: GateStatusProps) {
                 <div
                   className={cn(
                     'w-2 h-2 rounded-full',
-                    gate.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
+                    gate.status === 'active' ? 'bg-success' : 'bg-neutral'
                   )}
                 />
                 <div>
@@ -53,8 +53,8 @@ export function GateStatus({ gates }: GateStatusProps) {
                   variant="outline"
                   className={cn(
                     gate.status === 'active'
-                      ? 'bg-green-100 text-green-700 border-green-200'
-                      : 'bg-gray-100 text-gray-700 border-gray-200'
+                      ? 'bg-success-muted text-success-muted-foreground border-success/20'
+                      : 'bg-neutral-muted text-neutral-muted-foreground border-neutral/20'
                   )}
                 >
                   {gate.status}
