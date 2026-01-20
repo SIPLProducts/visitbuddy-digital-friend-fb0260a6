@@ -25,7 +25,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
     const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const twilioWhatsAppNumber = Deno.env.get("TWILIO_WHATSAPP_NUMBER");
+    let twilioWhatsAppNumber = Deno.env.get("TWILIO_WHATSAPP_NUMBER");
 
     if (!accountSid || !authToken || !twilioWhatsAppNumber) {
       console.error("Missing Twilio credentials");
@@ -34,6 +34,11 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+
+    // Clean the WhatsApp number - remove any existing "whatsapp:" prefix to avoid duplication
+    twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
+    
+    console.log(`Using Twilio WhatsApp From number: ${twilioWhatsAppNumber}`);
 
     const { 
       visitorName, 
