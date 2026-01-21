@@ -163,7 +163,7 @@ export default function CheckInOut() {
     }
   };
 
-  const handleQrScan = async (data: { visitorId: string; name: string }) => {
+  const handleQrScan = async (data: { visitorId: string; name: string; action?: string }) => {
     toast.info(`QR scanned: ${data.name}`);
     
     const { data: visitorData } = await supabase
@@ -180,6 +180,34 @@ export default function CheckInOut() {
       const visitor = visitorData as unknown as Visitor;
       setSelectedVisitor(visitor);
       
+      // Handle checkout action from badge QR code
+      if (data.action === 'checkout') {
+        if (visitor.status === 'checked_in') {
+          // Auto check-out when QR with checkout action is scanned
+          const { error } = await supabase
+            .from('visitors')
+            .update({
+              status: 'checked_out',
+              check_out_time: new Date().toISOString(),
+            })
+            .eq('id', visitor.id);
+
+          if (error) {
+            toast.error('Failed to check out visitor');
+          } else {
+            toast.success(`${visitor.name} checked out successfully via QR scan`);
+            fetchVisitors();
+            setSelectedVisitor(null);
+          }
+        } else if (visitor.status === 'checked_out') {
+          toast.warning('Visitor has already checked out');
+        } else {
+          toast.warning('Visitor must check in first');
+        }
+        return;
+      }
+      
+      // Handle regular check-in flow
       if (visitor.status === 'scheduled') {
         // Show camera dialog for photo capture
         setShowCameraDialog(true);

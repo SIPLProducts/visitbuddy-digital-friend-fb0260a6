@@ -5,7 +5,7 @@ import { Camera, StopCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface QrScannerProps {
-  onScan: (data: { visitorId: string; name: string; timestamp: string }) => void;
+  onScan: (data: { visitorId: string; name: string; timestamp: string; action?: string }) => void;
   isScanning: boolean;
   onToggleScanning: (scanning: boolean) => void;
 }

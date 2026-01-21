@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
+import reslLogo from '@/assets/resl-logo.png';
 
 interface SafetyPermitBadgeProps {
   visitor: {
@@ -21,9 +22,14 @@ interface SafetyPermitBadgeProps {
     } | null;
   };
   companyName?: string;
+  companyLogo?: string;
 }
 
-export function SafetyPermitBadge({ visitor, companyName = 'VisiGuard' }: SafetyPermitBadgeProps) {
+export function SafetyPermitBadge({ 
+  visitor, 
+  companyName = 'Resustainability', 
+  companyLogo = reslLogo 
+}: SafetyPermitBadgeProps) {
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -47,15 +53,13 @@ export function SafetyPermitBadge({ visitor, companyName = 'VisiGuard' }: Safety
 
   return (
     <div className="bg-white border-2 border-gray-800 rounded-lg overflow-hidden w-[350px] mx-auto text-black print:border-black">
-      {/* Header */}
+      {/* Header with RESL Logo */}
       <div className="flex items-center border-b-2 border-gray-800">
         <div className="w-16 p-2 border-r-2 border-gray-800 flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">V</span>
-          </div>
+          <img src={companyLogo} alt={companyName} className="w-12 h-12 object-contain" />
         </div>
         <div className="flex-1 text-center py-1">
-          <p className="text-primary font-semibold italic text-sm">{companyName}</p>
+          <p className="text-red-600 font-semibold italic text-sm">{companyName}</p>
         </div>
       </div>
 
