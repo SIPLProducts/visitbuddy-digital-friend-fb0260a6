@@ -4,16 +4,24 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search, Printer, Laptop } from 'lucide-react';
+import { Search, Printer, Laptop, MapPin } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor } from '@/types/database';
+import { Visitor, Location } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+interface VisitorWithLocation extends Omit<Visitor, 'gate'> {
+  gate?: {
+    id: string;
+    location_id: string | null;
+    location?: Location;
+  } | null;
+}
+
 export default function BadgePrinting() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [visitors, setVisitors] = useState<Visitor[]>([]);
-  const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
+  const [visitors, setVisitors] = useState<VisitorWithLocation[]>([]);
+  const [selectedVisitor, setSelectedVisitor] = useState<VisitorWithLocation | null>(null);
 
   useEffect(() => {
     fetchCheckedInVisitors();
@@ -25,13 +33,14 @@ export default function BadgePrinting() {
       .select(`
         *,
         host:employees(*, department:departments(*)),
-        department:departments(*)
+        department:departments(*),
+        gate:gates(id, location_id, location:locations(*))
       `)
       .eq('status', 'checked_in')
       .order('check_in_time', { ascending: false });
 
     if (data) {
-      setVisitors(data as unknown as Visitor[]);
+      setVisitors(data as unknown as VisitorWithLocation[]);
     }
   };
 
@@ -185,7 +194,13 @@ export default function BadgePrinting() {
                     </code>
                   </div>
 
-                  <div className="text-center">
+                  <div className="text-center space-y-1">
+                    {selectedVisitor.gate?.location?.geo_address && (
+                      <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {selectedVisitor.gate.location.geo_address}
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       Host: {selectedVisitor.host?.name || '—'}
                     </p>
@@ -198,7 +213,7 @@ export default function BadgePrinting() {
                 {/* Print Button */}
                 <Button
                   className="w-full gap-2"
-                  onClick={() => handlePrintBadge(selectedVisitor)}
+                  onClick={() => handlePrintBadge(selectedVisitor as unknown as Visitor)}
                 >
                   <Printer className="h-4 w-4" />
                   {selectedVisitor.badge_printed ? 'Reprint Badge' : 'Print Badge'}
