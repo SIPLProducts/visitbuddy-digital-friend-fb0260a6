@@ -20,6 +20,7 @@ import {
   ChevronRight,
   UserCog,
   Truck,
+  UserRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +34,7 @@ const menuItems = [
   { icon: Printer, label: 'Badge Printing', path: '/badge-printing' },
   { icon: FileText, label: 'Visitor Report', path: '/visitor-report' },
   { icon: Building2, label: 'Departments', path: '/departments' },
+  { icon: UserRound, label: 'Employees', path: '/employees' },
   { icon: MapPin, label: 'Locations', path: '/locations' },
   { icon: DoorOpen, label: 'Gates', path: '/gates' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },

@@ -15,6 +15,7 @@ import CheckInOut from "./pages/CheckInOut";
 import BadgePrinting from "./pages/BadgePrinting";
 import VisitorReport from "./pages/VisitorReport";
 import Departments from "./pages/Departments";
+import Employees from "./pages/Employees";
 import Locations from "./pages/Locations";
 import Gates from "./pages/Gates";
 import Analytics from "./pages/Analytics";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="/badge-printing" element={<ProtectedRoute><BadgePrinting /></ProtectedRoute>} />
             <Route path="/visitor-report" element={<ProtectedRoute><VisitorReport /></ProtectedRoute>} />
             <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
+            <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
             <Route path="/locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
             <Route path="/gates" element={<ProtectedRoute><Gates /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
