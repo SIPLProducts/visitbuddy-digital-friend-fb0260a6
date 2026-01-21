@@ -496,6 +496,67 @@ export type Database = {
           },
         ]
       }
+      vehicle_entries: {
+        Row: {
+          created_at: string
+          entry_time: string
+          exit_time: string | null
+          gate_id: string | null
+          id: string
+          location_id: string | null
+          purpose: string | null
+          remarks: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_time?: string
+          exit_time?: string | null
+          gate_id?: string | null
+          id?: string
+          location_id?: string | null
+          purpose?: string | null
+          remarks?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_time?: string
+          exit_time?: string | null
+          gate_id?: string | null
+          id?: string
+          location_id?: string | null
+          purpose?: string | null
+          remarks?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_entries_gate_id_fkey"
+            columns: ["gate_id"]
+            isOneToOne: false
+            referencedRelation: "gates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_entries_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_entries_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           check_in_time: string | null

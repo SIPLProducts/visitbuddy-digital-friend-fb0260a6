@@ -18,25 +18,37 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Truck, Plus, Search, MoreVertical, LogIn, LogOut, Trash2, QrCode, FileText } from 'lucide-react';
+import { Truck, Plus, Search, MoreVertical, LogIn, LogOut, Trash2, QrCode, FileText, History, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Vehicle } from '@/types/vehicle';
+import { Vehicle, VehicleEntry } from '@/types/vehicle';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 
 export default function Vehicles() {
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [vehicleEntries, setVehicleEntries] = useState<VehicleEntry[]>([]);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   useEffect(() => {
     fetchVehicles();
   }, []);
 
   const fetchVehicles = async () => {
-    const { data, error } = await supabase
+    // Fetch vehicles with their active entry (entry without exit_time)
+    const { data: vehiclesData, error: vehiclesError } = await supabase
       .from('vehicles')
       .select(`
         *,
@@ -45,43 +57,92 @@ export default function Vehicles() {
       `)
       .order('created_at', { ascending: false });
 
-    if (error) {
+    if (vehiclesError) {
       toast.error('Failed to fetch vehicles');
-    } else {
-      setVehicles(data as unknown as Vehicle[]);
+      setLoading(false);
+      return;
     }
+
+    // Fetch active entries (inside premises)
+    const { data: activeEntries } = await supabase
+      .from('vehicle_entries')
+      .select('*')
+      .is('exit_time', null);
+
+    // Fetch entry counts per vehicle
+    const { data: entryCounts } = await supabase
+      .from('vehicle_entries')
+      .select('vehicle_id');
+
+    // Map vehicles with their active entry and count
+    const vehiclesWithEntries = (vehiclesData || []).map((vehicle: any) => {
+      const activeEntry = activeEntries?.find(e => e.vehicle_id === vehicle.id);
+      const count = entryCounts?.filter(e => e.vehicle_id === vehicle.id).length || 0;
+      return {
+        ...vehicle,
+        active_entry: activeEntry || null,
+        entry_count: count,
+        // Update status based on active entry
+        status: activeEntry ? 'checked_in' : (count > 0 ? 'checked_out' : 'registered'),
+      };
+    });
+
+    setVehicles(vehiclesWithEntries as unknown as Vehicle[]);
     setLoading(false);
   };
 
   const handleCheckIn = async (vehicle: Vehicle) => {
+    // Create a new entry record
     const { error } = await supabase
-      .from('vehicles')
-      .update({
-        status: 'checked_in',
-        check_in_time: new Date().toISOString(),
-      })
-      .eq('id', vehicle.id);
+      .from('vehicle_entries')
+      .insert({
+        vehicle_id: vehicle.id,
+        gate_id: vehicle.gate_id,
+        location_id: vehicle.location_id,
+        entry_time: new Date().toISOString(),
+        purpose: vehicle.purpose,
+      });
 
     if (error) {
       toast.error('Failed to check in vehicle');
     } else {
+      // Update vehicle status
+      await supabase
+        .from('vehicles')
+        .update({
+          status: 'checked_in',
+          check_in_time: new Date().toISOString(),
+          check_out_time: null,
+        })
+        .eq('id', vehicle.id);
+
       toast.success(`${vehicle.vehicle_number} checked in`);
       fetchVehicles();
     }
   };
 
   const handleCheckOut = async (vehicle: Vehicle) => {
+    // Find and update the active entry
     const { error } = await supabase
-      .from('vehicles')
+      .from('vehicle_entries')
       .update({
-        status: 'checked_out',
-        check_out_time: new Date().toISOString(),
+        exit_time: new Date().toISOString(),
       })
-      .eq('id', vehicle.id);
+      .eq('vehicle_id', vehicle.id)
+      .is('exit_time', null);
 
     if (error) {
       toast.error('Failed to check out vehicle');
     } else {
+      // Update vehicle status
+      await supabase
+        .from('vehicles')
+        .update({
+          status: 'checked_out',
+          check_out_time: new Date().toISOString(),
+        })
+        .eq('id', vehicle.id);
+
       toast.success(`${vehicle.vehicle_number} checked out`);
       fetchVehicles();
     }
@@ -101,15 +162,50 @@ export default function Vehicles() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'checked_in':
-        return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Checked In</Badge>;
-      case 'checked_out':
-        return <Badge className="bg-slate-500/10 text-slate-600 border-slate-500/20">Checked Out</Badge>;
-      default:
-        return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">Registered</Badge>;
+  const handleViewHistory = async (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setShowHistoryDialog(true);
+    setLoadingHistory(true);
+
+    const { data, error } = await supabase
+      .from('vehicle_entries')
+      .select(`
+        *,
+        gate:gates(name),
+        location:locations(name)
+      `)
+      .eq('vehicle_id', vehicle.id)
+      .order('entry_time', { ascending: false });
+
+    if (error) {
+      toast.error('Failed to load entry history');
+    } else {
+      setVehicleEntries(data as unknown as VehicleEntry[]);
     }
+    setLoadingHistory(false);
+  };
+
+  const getStatusBadge = (vehicle: Vehicle) => {
+    if (vehicle.active_entry) {
+      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Inside</Badge>;
+    }
+    if (vehicle.entry_count && vehicle.entry_count > 0) {
+      return <Badge className="bg-slate-500/10 text-slate-600 border-slate-500/20">Outside</Badge>;
+    }
+    return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">Registered</Badge>;
+  };
+
+  const formatDuration = (entry: VehicleEntry) => {
+    if (!entry.exit_time) {
+      return formatDistanceToNow(new Date(entry.entry_time), { addSuffix: false });
+    }
+    const start = new Date(entry.entry_time);
+    const end = new Date(entry.exit_time);
+    const diffMs = end.getTime() - start.getTime();
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
   };
 
   const filteredVehicles = vehicles.filter(
@@ -121,8 +217,8 @@ export default function Vehicles() {
 
   const stats = {
     total: vehicles.length,
-    checkedIn: vehicles.filter((v) => v.status === 'checked_in').length,
-    checkedOut: vehicles.filter((v) => v.status === 'checked_out').length,
+    inside: vehicles.filter((v) => v.active_entry).length,
+    totalEntries: vehicles.reduce((sum, v) => sum + (v.entry_count || 0), 0),
   };
 
   return (
@@ -136,7 +232,7 @@ export default function Vehicles() {
               Vehicle Management
             </h1>
             <p className="text-muted-foreground">
-              Track and manage commercial vehicles
+              Track and manage commercial vehicles with entry history
             </p>
           </div>
           <div className="flex gap-2">
@@ -170,15 +266,15 @@ export default function Vehicles() {
               <CardTitle className="text-sm font-medium text-muted-foreground">Currently Inside</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-emerald-600">{stats.checkedIn}</p>
+              <p className="text-2xl font-bold text-emerald-600">{stats.inside}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Checked Out Today</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Entries</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-slate-600">{stats.checkedOut}</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.totalEntries}</p>
             </CardContent>
           </Card>
         </div>
@@ -206,7 +302,7 @@ export default function Vehicles() {
                   <TableHead>Driver</TableHead>
                   <TableHead>Company</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Check-in Time</TableHead>
+                  <TableHead>Entries</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -238,11 +334,17 @@ export default function Vehicles() {
                         </div>
                       </TableCell>
                       <TableCell>{vehicle.company || '-'}</TableCell>
-                      <TableCell>{getStatusBadge(vehicle.status)}</TableCell>
+                      <TableCell>{getStatusBadge(vehicle)}</TableCell>
                       <TableCell>
-                        {vehicle.check_in_time
-                          ? format(new Date(vehicle.check_in_time), 'dd MMM, hh:mm a')
-                          : '-'}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="gap-1 text-muted-foreground hover:text-foreground"
+                          onClick={() => handleViewHistory(vehicle)}
+                        >
+                          <History className="h-3 w-3" />
+                          {vehicle.entry_count || 0}
+                        </Button>
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -252,13 +354,17 @@ export default function Vehicles() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            {vehicle.status !== 'checked_in' && (
+                            <DropdownMenuItem onClick={() => handleViewHistory(vehicle)}>
+                              <History className="h-4 w-4 mr-2" />
+                              View History
+                            </DropdownMenuItem>
+                            {!vehicle.active_entry && (
                               <DropdownMenuItem onClick={() => handleCheckIn(vehicle)}>
                                 <LogIn className="h-4 w-4 mr-2" />
                                 Check In
                               </DropdownMenuItem>
                             )}
-                            {vehicle.status === 'checked_in' && (
+                            {vehicle.active_entry && (
                               <DropdownMenuItem onClick={() => handleCheckOut(vehicle)}>
                                 <LogOut className="h-4 w-4 mr-2" />
                                 Check Out
@@ -281,6 +387,100 @@ export default function Vehicles() {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Entry History Dialog */}
+        <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5" />
+                Entry History - {selectedVehicle?.vehicle_number}
+              </DialogTitle>
+              <DialogDescription>
+                {selectedVehicle?.driver_name} • {selectedVehicle?.company || 'No company'}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex-1 overflow-auto">
+              {loadingHistory ? (
+                <div className="text-center py-8 text-muted-foreground">Loading history...</div>
+              ) : vehicleEntries.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                  <p>No entry records found</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {vehicleEntries.map((entry, index) => (
+                    <div
+                      key={entry.id}
+                      className={`p-4 rounded-lg border ${!entry.exit_time ? 'border-emerald-500/50 bg-emerald-500/5' : 'bg-muted/30'}`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Entry #{vehicleEntries.length - index}
+                          </span>
+                          {!entry.exit_time && (
+                            <Badge className="bg-emerald-500/10 text-emerald-600 text-xs">
+                              Currently Inside
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Clock className="h-3 w-3" />
+                          {formatDuration(entry)}
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Entry Time</p>
+                          <p className="font-medium">
+                            {format(new Date(entry.entry_time), 'dd MMM yyyy, hh:mm a')}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Exit Time</p>
+                          <p className="font-medium">
+                            {entry.exit_time
+                              ? format(new Date(entry.exit_time), 'dd MMM yyyy, hh:mm a')
+                              : '—'}
+                          </p>
+                        </div>
+                        {entry.location && (
+                          <div>
+                            <p className="text-muted-foreground">Location</p>
+                            <p className="font-medium">{(entry.location as any).name}</p>
+                          </div>
+                        )}
+                        {entry.gate && (
+                          <div>
+                            <p className="text-muted-foreground">Gate</p>
+                            <p className="font-medium">{(entry.gate as any).name}</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {entry.purpose && (
+                        <div className="mt-2 text-sm">
+                          <p className="text-muted-foreground">Purpose</p>
+                          <p>{entry.purpose}</p>
+                        </div>
+                      )}
+                      {entry.remarks && (
+                        <div className="mt-2 text-sm">
+                          <p className="text-muted-foreground">Remarks</p>
+                          <p>{entry.remarks}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </MainLayout>
   );
