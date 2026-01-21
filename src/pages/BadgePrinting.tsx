@@ -179,53 +179,200 @@ export default function BadgePrinting() {
   };
 
   const printBadgeContent = (badgeHtml: string, visitorName: string) => {
-    const printFrame = document.createElement('iframe');
-    printFrame.style.position = 'absolute';
-    printFrame.style.top = '-9999px';
-    printFrame.style.left = '-9999px';
-    printFrame.style.width = '0';
-    printFrame.style.height = '0';
-    printFrame.style.border = 'none';
-    document.body.appendChild(printFrame);
-
-    const printDocument = printFrame.contentDocument || printFrame.contentWindow?.document;
-    if (!printDocument) {
-      toast.error('Could not create print document');
-      document.body.removeChild(printFrame);
+    // Create a new window for printing - more reliable than iframe
+    const printWindow = window.open('', '_blank', 'width=450,height=700,scrollbars=yes');
+    
+    if (!printWindow) {
+      // Fallback: try iframe if popup is blocked
+      toast.error('Please allow popups for printing, or use Ctrl+P');
+      window.print();
       return;
     }
 
-    printDocument.open();
-    printDocument.write(`
+    // Write complete HTML with inline styles (no Tailwind dependency)
+    printWindow.document.write(`
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Visitor Badge - ${visitorName}</title>
+        <meta charset="UTF-8">
+        <title>Safety Permit - ${visitorName}</title>
         <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-          body { padding: 10px; background: white; }
-          @page { size: 100mm 150mm; margin: 5mm; }
-          @media print { body { padding: 0; } }
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { 
+            font-family: Arial, Helvetica, sans-serif; 
+            background: white; 
+            color: black;
+            padding: 10px;
+          }
+          @page { 
+            size: 100mm 150mm; 
+            margin: 5mm; 
+          }
+          @media print {
+            body { padding: 0; }
+          }
+          /* Badge container styles */
+          .badge-container {
+            background: white;
+            border: 2px solid #1f2937;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 350px;
+            margin: 0 auto;
+          }
+          /* Header styles */
+          .badge-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #1f2937;
+          }
+          .logo-section {
+            width: 64px;
+            padding: 8px;
+            border-right: 2px solid #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .logo-section img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+          }
+          .company-name {
+            flex: 1;
+            text-align: center;
+            padding: 4px 0;
+            color: #dc2626;
+            font-weight: 600;
+            font-style: italic;
+            font-size: 14px;
+          }
+          /* Title section */
+          .title-section {
+            display: flex;
+            border-bottom: 2px solid #1f2937;
+          }
+          .title-text {
+            flex: 1;
+            background: #1f2937;
+            color: white;
+            padding: 8px;
+          }
+          .title-text h2 {
+            font-size: 18px;
+            font-weight: bold;
+          }
+          .title-text p {
+            font-size: 14px;
+            font-weight: 600;
+          }
+          .photo-section {
+            width: 96px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+          }
+          .photo-section img, .photo-placeholder {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+          }
+          .photo-placeholder {
+            background: #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #374151;
+            font-size: 24px;
+            font-weight: bold;
+          }
+          /* Details grid */
+          .details-grid {
+            font-size: 11px;
+          }
+          .detail-row {
+            display: flex;
+            padding: 6px;
+            border-bottom: 1px solid #d1d5db;
+          }
+          .detail-label {
+            width: 96px;
+            font-weight: 600;
+          }
+          .detail-value {
+            flex: 1;
+          }
+          /* Signatures */
+          .signatures-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-top: 2px solid #1f2937;
+            text-align: center;
+            font-size: 11px;
+          }
+          .signature-box {
+            padding: 8px;
+            border-right: 1px solid #d1d5db;
+          }
+          .signature-box:last-child {
+            border-right: none;
+          }
+          .signature-line {
+            height: 32px;
+            border-bottom: 1px dashed #9ca3af;
+            margin-bottom: 4px;
+          }
+          .signature-label {
+            font-weight: 600;
+            font-style: italic;
+          }
+          /* Safety guidelines */
+          .guidelines-section {
+            display: flex;
+            border-top: 2px solid #1f2937;
+            background: #f3f4f6;
+          }
+          .guidelines-text {
+            flex: 1;
+            padding: 8px;
+            font-size: 10px;
+            line-height: 1.3;
+          }
+          .guidelines-text p {
+            margin-bottom: 2px;
+          }
+          .qr-section {
+            width: 96px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 1px solid #d1d5db;
+          }
+          .qr-section img {
+            width: 80px;
+            height: 80px;
+          }
         </style>
       </head>
-      <body>${badgeHtml}</body>
+      <body>
+        ${badgeHtml}
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            }, 300);
+          };
+        </script>
+      </body>
       </html>
     `);
-    printDocument.close();
-
-    setTimeout(() => {
-      try {
-        printFrame.contentWindow?.focus();
-        printFrame.contentWindow?.print();
-        toast.success(`Badge sent to printer`);
-      } catch (e) {
-        console.error('Print error:', e);
-        toast.error('Print failed. Try Ctrl+P to print manually');
-      }
-      setTimeout(() => {
-        document.body.removeChild(printFrame);
-      }, 1000);
-    }, 500);
+    printWindow.document.close();
+    toast.success('Print dialog opening...');
   };
 
   const handlePrintBadge = async (visitor: VisitorWithLocation) => {
