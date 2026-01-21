@@ -1,0 +1,162 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { format } from 'date-fns';
+
+interface SafetyPermitBadgeProps {
+  visitor: {
+    visitor_id: string;
+    name: string;
+    phone?: string | null;
+    company?: string | null;
+    purpose?: string | null;
+    has_laptop?: boolean | null;
+    photo_url?: string | null;
+    check_in_time?: string | null;
+    host?: {
+      name?: string;
+      department?: { name?: string } | null;
+    } | null;
+    department?: { name?: string } | null;
+    gate?: {
+      location?: { name?: string; geo_address?: string | null } | null;
+    } | null;
+  };
+  companyName?: string;
+}
+
+export function SafetyPermitBadge({ visitor, companyName = 'VisiGuard' }: SafetyPermitBadgeProps) {
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const currentDate = new Date();
+  const checkInTime = visitor.check_in_time ? new Date(visitor.check_in_time) : currentDate;
+  
+  // Generate QR code URL for check-out scanning
+  const qrData = encodeURIComponent(JSON.stringify({
+    visitorId: visitor.visitor_id,
+    name: visitor.name,
+    action: 'checkout',
+    timestamp: currentDate.toISOString()
+  }));
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}&format=png`;
+
+  return (
+    <div className="bg-white border-2 border-gray-800 rounded-lg overflow-hidden w-[350px] mx-auto text-black print:border-black">
+      {/* Header */}
+      <div className="flex items-center border-b-2 border-gray-800">
+        <div className="w-16 p-2 border-r-2 border-gray-800 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-sm">V</span>
+          </div>
+        </div>
+        <div className="flex-1 text-center py-1">
+          <p className="text-primary font-semibold italic text-sm">{companyName}</p>
+        </div>
+      </div>
+
+      {/* Safety Permit Title with Photo */}
+      <div className="flex border-b-2 border-gray-800">
+        <div className="flex-1 bg-gray-800 text-white p-2">
+          <h2 className="text-lg font-bold">SAFETY PERMIT</h2>
+          <p className="text-sm font-semibold">VISITOR</p>
+        </div>
+        <div className="w-24 p-1 flex items-center justify-center bg-gray-100">
+          <Avatar className="h-20 w-20 rounded-none">
+            {visitor.photo_url ? (
+              <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />
+            ) : null}
+            <AvatarFallback className="bg-gray-300 text-gray-700 text-xl font-bold rounded-none">
+              {getInitials(visitor.name)}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+      </div>
+
+      {/* Details Grid */}
+      <div className="text-xs divide-y divide-gray-300">
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Serial No</span>
+          <span className="flex-1">: {visitor.visitor_id}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Date</span>
+          <span className="flex-1">: {format(checkInTime, 'dd/MM/yyyy')}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Time</span>
+          <span className="flex-1">: {format(checkInTime, 'HH:mm')}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Name</span>
+          <span className="flex-1 font-medium">: {visitor.name}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Mobile</span>
+          <span className="flex-1">: {visitor.phone || 'N/A'}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Company</span>
+          <span className="flex-1">: {visitor.company || 'N/A'}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Dept. To Meet</span>
+          <span className="flex-1">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Host</span>
+          <span className="flex-1">: {visitor.host?.name || 'N/A'}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Purpose</span>
+          <span className="flex-1">: {visitor.purpose || 'N/A'}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">IT Asset</span>
+          <span className="flex-1">: {visitor.has_laptop ? 'Laptop' : 'NA'}</span>
+        </div>
+        <div className="flex p-1.5">
+          <span className="w-24 font-semibold">Validity</span>
+          <span className="flex-1">: {format(checkInTime, 'dd/MM/yyyy')}</span>
+        </div>
+      </div>
+
+      {/* Signatures Section */}
+      <div className="grid grid-cols-3 border-t-2 border-gray-800 text-center text-xs">
+        <div className="p-2 border-r border-gray-300">
+          <div className="h-8 border-b border-dashed border-gray-400 mb-1"></div>
+          <p className="font-semibold italic">Security Signature</p>
+        </div>
+        <div className="p-2 border-r border-gray-300">
+          <div className="h-8 border-b border-dashed border-gray-400 mb-1"></div>
+          <p className="font-semibold italic">Visitor Signature</p>
+        </div>
+        <div className="p-2">
+          <div className="h-8 border-b border-dashed border-gray-400 mb-1"></div>
+          <p className="font-semibold italic">Officer Signature</p>
+        </div>
+      </div>
+
+      {/* Safety Guidelines with QR */}
+      <div className="flex border-t-2 border-gray-800 bg-gray-100">
+        <div className="flex-1 p-2 text-[10px] leading-tight">
+          <p className="mb-0.5">1. Your safety is your responsibility.</p>
+          <p className="mb-0.5">2. Always follow the safety procedures.</p>
+          <p className="mb-0.5">3. Always keep company work place clean.</p>
+          <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
+        </div>
+        <div className="w-24 p-1 flex items-center justify-center border-l border-gray-300">
+          <img 
+            src={qrCodeUrl} 
+            alt="Check-out QR Code" 
+            className="w-20 h-20"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

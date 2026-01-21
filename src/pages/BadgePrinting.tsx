@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,9 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Printer, Laptop, MapPin, UserCheck, Camera } from 'lucide-react';
+import { Search, Printer, Laptop, UserCheck, Camera, Bell } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor, Location } from '@/types/database';
+import { Visitor, Location, Employee } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
@@ -24,10 +24,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
+import { SafetyPermitBadge } from '@/components/badge/SafetyPermitBadge';
 
-interface VisitorWithLocation extends Omit<Visitor, 'gate'> {
+interface VisitorWithLocation extends Omit<Visitor, 'gate' | 'host'> {
+  host?: (Employee & { phone?: string | null }) | null;
   gate?: {
     id: string;
+    name?: string;
     location_id: string | null;
     location?: Location;
   } | null;
@@ -35,13 +38,14 @@ interface VisitorWithLocation extends Omit<Visitor, 'gate'> {
 
 export default function BadgePrinting() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const badgeRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'checked_in' | 'scheduled' | 'all'>('all');
   const [visitors, setVisitors] = useState<VisitorWithLocation[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<VisitorWithLocation | null>(null);
   const [showCameraDialog, setShowCameraDialog] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isNotifying, setIsNotifying] = useState(false);
 
   useEffect(() => {
     fetchVisitors();
@@ -63,9 +67,9 @@ export default function BadgePrinting() {
       .from('visitors')
       .select(`
         *,
-        host:employees(*, department:departments(*)),
+        host:employees(*, department:departments(*), phone),
         department:departments(*),
-        gate:gates(id, location_id, location:locations(*))
+        gate:gates(id, name, location_id, location:locations(*))
       `)
       .order('created_at', { ascending: false });
 
@@ -173,7 +177,42 @@ export default function BadgePrinting() {
       toast.error('Failed to update badge status');
     } else {
       toast.success(`Badge printed for ${visitor.name}`);
+      // Trigger browser print dialog
+      window.print();
       fetchVisitors();
+    }
+  };
+
+  const handleNotifyHost = async (visitor: VisitorWithLocation) => {
+    if (!visitor.host?.phone) {
+      toast.error('Host phone number not available');
+      return;
+    }
+
+    setIsNotifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('notify-host', {
+        body: {
+          visitorName: visitor.name,
+          visitorId: visitor.visitor_id,
+          visitorPhone: visitor.phone,
+          visitorCompany: visitor.company,
+          purpose: visitor.purpose,
+          hostName: visitor.host?.name || 'Host',
+          hostPhone: visitor.host?.phone,
+          departmentName: visitor.host?.department?.name || visitor.department?.name,
+          gateName: visitor.gate?.name,
+          photoUrl: visitor.photo_url,
+        },
+      });
+
+      if (error) throw error;
+      toast.success('Host notified via WhatsApp');
+    } catch (error: any) {
+      console.error('Notify host error:', error);
+      toast.error(error.message || 'Failed to notify host');
+    } finally {
+      setIsNotifying(false);
     }
   };
 
@@ -301,64 +340,21 @@ export default function BadgePrinting() {
           <div className="bg-card rounded-xl border border-border p-6">
             <h3 className="font-semibold text-foreground mb-6 flex items-center gap-2">
               <Printer className="h-5 w-5" />
-              Badge Preview
+              Safety Permit Preview
             </h3>
 
             {selectedVisitor ? (
               <div className="space-y-6">
-                {/* Badge Card */}
-                <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-border rounded-xl p-6 aspect-[3/4] max-w-xs mx-auto flex flex-col">
-                  <div className="text-center mb-4">
-                    <div className="w-10 h-10 rounded-full bg-primary mx-auto flex items-center justify-center mb-2">
-                      <span className="text-primary-foreground font-bold text-sm">V</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground font-medium">VisiGuard</p>
-                  </div>
-
-                  <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <Avatar className="h-20 w-20 mb-4">
-                      {selectedVisitor.photo_url ? (
-                        <AvatarImage src={selectedVisitor.photo_url} alt={selectedVisitor.name} />
-                      ) : null}
-                      <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-                        {getInitials(selectedVisitor.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <h3 className="text-lg font-bold text-foreground mb-1">
-                      {selectedVisitor.name}
-                    </h3>
-                    {selectedVisitor.company && (
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {selectedVisitor.company}
-                      </p>
-                    )}
-                    <Badge className="mb-4">VISITOR</Badge>
-                    <code className="text-xs bg-muted px-2 py-1 rounded">
-                      {selectedVisitor.visitor_id}
-                    </code>
-                  </div>
-
-                  <div className="text-center space-y-1">
-                    {selectedVisitor.gate?.location?.geo_address && (
-                      <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {selectedVisitor.gate.location.geo_address}
-                      </p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Host: {selectedVisitor.host?.name || '—'}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date().toLocaleDateString()}
-                    </p>
-                  </div>
+                {/* Safety Permit Badge */}
+                <div ref={badgeRef} className="print:block">
+                  <SafetyPermitBadge visitor={selectedVisitor} />
                 </div>
 
                 {/* Photo Capture Button */}
                 {!selectedVisitor.photo_url && (
                   <Button
                     variant="outline"
-                    className="w-full gap-2"
+                    className="w-full gap-2 print:hidden"
                     onClick={() => setShowCameraDialog(true)}
                   >
                     <Camera className="h-4 w-4" />
@@ -366,8 +362,21 @@ export default function BadgePrinting() {
                   </Button>
                 )}
 
+                {/* Notify Host Button */}
+                {selectedVisitor.host?.phone && (
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 print:hidden"
+                    onClick={() => handleNotifyHost(selectedVisitor)}
+                    disabled={isNotifying}
+                  >
+                    <Bell className="h-4 w-4" />
+                    {isNotifying ? 'Notifying...' : 'Notify Host via WhatsApp'}
+                  </Button>
+                )}
+
                 {/* Action Buttons */}
-                <div className="space-y-2">
+                <div className="space-y-2 print:hidden">
                   {selectedVisitor.status === 'scheduled' ? (
                     <>
                       <Button

@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.send-vehicle-whatsapp]
 verify_jwt = false
+
+[functions.notify-host]
+verify_jwt = false
