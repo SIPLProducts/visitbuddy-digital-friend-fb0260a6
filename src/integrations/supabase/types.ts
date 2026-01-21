@@ -94,6 +94,7 @@ export type Database = {
           employee_count: number | null
           id: string
           location: string | null
+          location_id: string | null
           name: string
           updated_at: string
         }
@@ -104,6 +105,7 @@ export type Database = {
           employee_count?: number | null
           id?: string
           location?: string | null
+          location_id?: string | null
           name: string
           updated_at?: string
         }
@@ -114,10 +116,19 @@ export type Database = {
           employee_count?: number | null
           id?: string
           location?: string | null
+          location_id?: string | null
           name?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "departments_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       employees: {
         Row: {
@@ -127,6 +138,7 @@ export type Database = {
           employee_id: string
           id: string
           is_host: boolean | null
+          location_id: string | null
           name: string
           position: string | null
           updated_at: string
@@ -138,6 +150,7 @@ export type Database = {
           employee_id: string
           id?: string
           is_host?: boolean | null
+          location_id?: string | null
           name: string
           position?: string | null
           updated_at?: string
@@ -149,6 +162,7 @@ export type Database = {
           employee_id?: string
           id?: string
           is_host?: boolean | null
+          location_id?: string | null
           name?: string
           position?: string | null
           updated_at?: string
@@ -159,6 +173,13 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]
