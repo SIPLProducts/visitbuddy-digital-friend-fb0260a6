@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,22 +20,26 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Search, Filter, Plus, MoreVertical, Building2, Laptop, Mail } from 'lucide-react';
+import { Search, Filter, Plus, Building2, Laptop, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { VisitorDetailsDialog } from '@/components/visitors/VisitorDetailsDialog';
+import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
+import { VisitorActions } from '@/components/visitors/VisitorActions';
 
 export default function Visitors() {
+  const navigate = useNavigate();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  
+  // Dialog states
+  const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchVisitors();
@@ -57,6 +61,54 @@ export default function Visitors() {
       setVisitors(data as unknown as Visitor[]);
     }
     setLoading(false);
+  };
+
+  const handleViewDetails = (visitor: Visitor) => {
+    setSelectedVisitor(visitor);
+    setDetailsDialogOpen(true);
+  };
+
+  const handleEdit = (visitor: Visitor) => {
+    setSelectedVisitor(visitor);
+    setEditDialogOpen(true);
+  };
+
+  const handlePrintBadge = (visitor: Visitor) => {
+    navigate(`/badge-printing?visitorId=${visitor.id}`);
+  };
+
+  const handleCheckIn = async (visitor: Visitor) => {
+    const { error } = await supabase
+      .from('visitors')
+      .update({
+        status: 'checked_in',
+        check_in_time: new Date().toISOString(),
+      })
+      .eq('id', visitor.id);
+
+    if (error) {
+      toast.error('Failed to check in visitor');
+    } else {
+      toast.success(`${visitor.name} checked in successfully`);
+      fetchVisitors();
+    }
+  };
+
+  const handleCheckOut = async (visitor: Visitor) => {
+    const { error } = await supabase
+      .from('visitors')
+      .update({
+        status: 'checked_out',
+        check_out_time: new Date().toISOString(),
+      })
+      .eq('id', visitor.id);
+
+    if (error) {
+      toast.error('Failed to check out visitor');
+    } else {
+      toast.success(`${visitor.name} checked out successfully`);
+      fetchVisitors();
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -115,6 +167,7 @@ export default function Visitors() {
 
     return matchesSearch && matchesStatus;
   });
+
 
   return (
     <MainLayout>
@@ -274,24 +327,14 @@ export default function Visitors() {
                         : '—'}
                     </TableCell>
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>View Details</DropdownMenuItem>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>Print Badge</DropdownMenuItem>
-                          {visitor.status === 'checked_in' && (
-                            <DropdownMenuItem>Check Out</DropdownMenuItem>
-                          )}
-                          {visitor.status === 'scheduled' && (
-                            <DropdownMenuItem>Check In</DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <VisitorActions
+                        visitor={visitor}
+                        onViewDetails={handleViewDetails}
+                        onEdit={handleEdit}
+                        onPrintBadge={handlePrintBadge}
+                        onCheckIn={handleCheckIn}
+                        onCheckOut={handleCheckOut}
+                      />
                     </TableCell>
                   </TableRow>
                 ))
@@ -300,6 +343,19 @@ export default function Visitors() {
           </Table>
         </div>
       </div>
+
+      {/* Dialogs */}
+      <VisitorDetailsDialog
+        visitor={selectedVisitor}
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
+      />
+      <VisitorEditDialog
+        visitor={selectedVisitor}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSave={fetchVisitors}
+      />
     </MainLayout>
   );
 }
