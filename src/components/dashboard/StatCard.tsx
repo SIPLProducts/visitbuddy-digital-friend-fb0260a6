@@ -11,9 +11,17 @@ interface StatCardProps {
     positive?: boolean;
   };
   className?: string;
+  iconColor?: 'blue' | 'teal' | 'emerald' | 'indigo';
 }
 
-export function StatCard({ title, value, subtitle, icon, trend, className }: StatCardProps) {
+const iconColorClasses = {
+  blue: 'bg-[#3b82f6] text-white',
+  teal: 'bg-[#14b8a6] text-white',
+  emerald: 'bg-[#10b981] text-white',
+  indigo: 'bg-[#6366f1] text-white',
+};
+
+export function StatCard({ title, value, subtitle, icon, trend, className, iconColor = 'blue' }: StatCardProps) {
   return (
     <div className={cn('bg-card rounded-xl border border-border p-6', className)}>
       <div className="flex items-start justify-between">
@@ -27,14 +35,14 @@ export function StatCard({ title, value, subtitle, icon, trend, className }: Sta
             <p
               className={cn(
                 'text-sm mt-2 font-medium',
-                trend.positive ? 'text-success' : 'text-warning'
+                trend.positive ? 'text-[#10b981]' : 'text-[#f59e0b]'
               )}
             >
               {trend.positive ? '↑' : '↓'} {trend.value}
             </p>
           )}
         </div>
-        <div className="p-3 rounded-lg bg-primary/10 text-primary">{icon}</div>
+        <div className={cn('p-3 rounded-xl', iconColorClasses[iconColor])}>{icon}</div>
       </div>
     </div>
   );

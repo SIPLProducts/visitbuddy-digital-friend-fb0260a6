@@ -14,13 +14,13 @@ export function RecentVisitors({ visitors }: RecentVisitorsProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
-        return 'bg-success-muted text-success-muted-foreground border-success/20';
+        return 'bg-[#dcfce7] text-[#16a34a] border-[#16a34a]/20';
       case 'checked_out':
-        return 'bg-neutral-muted text-neutral-muted-foreground border-neutral/20';
+        return 'bg-gray-100 text-gray-600 border-gray-300/20';
       case 'scheduled':
-        return 'bg-info-muted text-info-muted-foreground border-info/20';
+        return 'bg-gray-100 text-gray-600 border-gray-300/20';
       default:
-        return 'bg-neutral-muted text-neutral-muted-foreground border-neutral/20';
+        return 'bg-gray-100 text-gray-600 border-gray-300/20';
     }
   };
 
@@ -75,7 +75,7 @@ export function RecentVisitors({ visitors }: RecentVisitorsProps) {
             <div key={visitor.id} className="p-4 hover:bg-accent/50 transition-colors">
               <div className="flex items-start gap-4">
                 <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                  <AvatarFallback className="bg-[#0891b2] text-white font-medium">
                     {getInitials(visitor.name)}
                   </AvatarFallback>
                 </Avatar>
