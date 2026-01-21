@@ -41,6 +41,7 @@ import {
   Mail,
   Edit,
   Trash2,
+  LocateFixed,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Location } from '@/types/database';
@@ -274,23 +275,50 @@ export default function Locations() {
           onChange={(e) => setFormData({ ...formData, geo_address: e.target.value })}
         />
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Latitude</Label>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label>Coordinates</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1 h-7 text-xs"
+            onClick={() => {
+              if (!navigator.geolocation) {
+                toast.error('Geolocation is not supported by your browser');
+                return;
+              }
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  setFormData({
+                    ...formData,
+                    latitude: position.coords.latitude.toFixed(8),
+                    longitude: position.coords.longitude.toFixed(8),
+                  });
+                  toast.success('Location detected');
+                },
+                (error) => {
+                  toast.error('Unable to retrieve your location');
+                }
+              );
+            }}
+          >
+            <LocateFixed className="h-3 w-3" />
+            Get Current Location
+          </Button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           <Input
             type="number"
             step="any"
-            placeholder="e.g., 12.9716"
+            placeholder="Latitude (e.g., 12.9716)"
             value={formData.latitude}
             onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
           />
-        </div>
-        <div className="space-y-2">
-          <Label>Longitude</Label>
           <Input
             type="number"
             step="any"
-            placeholder="e.g., 77.5946"
+            placeholder="Longitude (e.g., 77.5946)"
             value={formData.longitude}
             onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
           />
