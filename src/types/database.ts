@@ -30,10 +30,12 @@ export interface Employee {
   email: string | null;
   position: string | null;
   department_id: string | null;
+  location_id: string | null;
   is_host: boolean;
   created_at: string;
   updated_at: string;
   department?: Department;
+  location?: Location;
 }
 
 export interface Location {
