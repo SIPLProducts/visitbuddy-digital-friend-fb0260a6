@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Truck, Plus, Search, MoreVertical, LogIn, LogOut, Trash2, QrCode } from 'lucide-react';
+import { Truck, Plus, Search, MoreVertical, LogIn, LogOut, Trash2, QrCode, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle } from '@/types/vehicle';
 import { toast } from 'sonner';
@@ -140,7 +140,11 @@ export default function Vehicles() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => navigate('/vehicles/gate')}>
+            <Button variant="outline" onClick={() => navigate('/vehicles/report')}>
+              <FileText className="h-4 w-4 mr-2" />
+              Report
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/vehicles/gate')}>
               <QrCode className="h-4 w-4 mr-2" />
               Gate Entry
             </Button>

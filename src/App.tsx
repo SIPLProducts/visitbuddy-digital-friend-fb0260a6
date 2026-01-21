@@ -24,6 +24,7 @@ import Help from "./pages/Help";
 import Vehicles from "./pages/Vehicles";
 import NewVehicle from "./pages/NewVehicle";
 import VehicleGate from "./pages/VehicleGate";
+import VehicleReport from "./pages/VehicleReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -89,6 +90,7 @@ const App = () => (
             <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
             <Route path="/vehicles/new" element={<ProtectedRoute><NewVehicle /></ProtectedRoute>} />
             <Route path="/vehicles/gate" element={<ProtectedRoute><VehicleGate /></ProtectedRoute>} />
+            <Route path="/vehicles/report" element={<ProtectedRoute><VehicleReport /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
