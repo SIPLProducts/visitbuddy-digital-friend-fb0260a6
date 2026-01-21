@@ -3,21 +3,28 @@ import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Search, Truck, LogIn, LogOut, QrCode, Clock, Building2 } from 'lucide-react';
+import { ArrowLeft, Search, Truck, LogIn, LogOut, Clock, History, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Vehicle } from '@/types/vehicle';
+import { Vehicle, VehicleEntry } from '@/types/vehicle';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { QrScanner } from '@/components/checkin/QrScanner';
 
 export default function VehicleGate() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [activeEntry, setActiveEntry] = useState<VehicleEntry | null>(null);
+  const [recentEntries, setRecentEntries] = useState<VehicleEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
+  const [purpose, setPurpose] = useState('');
+  const [remarks, setRemarks] = useState('');
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
@@ -33,10 +40,35 @@ export default function VehicleGate() {
     if (error || !data) {
       toast.error('Vehicle not found');
       setSelectedVehicle(null);
+      setActiveEntry(null);
+      setRecentEntries([]);
     } else {
       setSelectedVehicle(data as unknown as Vehicle);
+      await fetchVehicleEntries(data.id);
     }
     setLoading(false);
+  };
+
+  const fetchVehicleEntries = async (vehicleId: string) => {
+    // Fetch active entry
+    const { data: active } = await supabase
+      .from('vehicle_entries')
+      .select('*')
+      .eq('vehicle_id', vehicleId)
+      .is('exit_time', null)
+      .single();
+
+    setActiveEntry(active as VehicleEntry | null);
+
+    // Fetch recent entries (last 5)
+    const { data: recent } = await supabase
+      .from('vehicle_entries')
+      .select(`*, gate:gates(name), location:locations(name)`)
+      .eq('vehicle_id', vehicleId)
+      .order('entry_time', { ascending: false })
+      .limit(5);
+
+    setRecentEntries((recent as unknown as VehicleEntry[]) || []);
   };
 
   const handleQrScan = async (data: { visitorId: string; name: string; timestamp: string }) => {
@@ -59,6 +91,7 @@ export default function VehicleGate() {
       toast.error('Vehicle not found');
     } else {
       setSelectedVehicle(vehicleData as unknown as Vehicle);
+      await fetchVehicleEntries(vehicleData.id);
       toast.success(`Found: ${vehicleData.vehicle_number}`);
     }
     setLoading(false);
@@ -67,51 +100,76 @@ export default function VehicleGate() {
   const handleCheckIn = async () => {
     if (!selectedVehicle) return;
 
+    setProcessing(true);
+    
+    // Create a new entry record
     const { error } = await supabase
-      .from('vehicles')
-      .update({
-        status: 'checked_in',
-        check_in_time: new Date().toISOString(),
-        check_out_time: null,
-      })
-      .eq('id', selectedVehicle.id);
+      .from('vehicle_entries')
+      .insert({
+        vehicle_id: selectedVehicle.id,
+        gate_id: selectedVehicle.gate_id,
+        location_id: selectedVehicle.location_id,
+        entry_time: new Date().toISOString(),
+        purpose: purpose || selectedVehicle.purpose,
+        remarks: remarks || null,
+      });
 
     if (error) {
       toast.error('Failed to check in vehicle');
     } else {
-      toast.success(`${selectedVehicle.vehicle_number} checked in successfully`);
-      setSelectedVehicle({ ...selectedVehicle, status: 'checked_in', check_in_time: new Date().toISOString() });
+      // Update vehicle status
+      await supabase
+        .from('vehicles')
+        .update({
+          status: 'checked_in',
+          check_in_time: new Date().toISOString(),
+          check_out_time: null,
+        })
+        .eq('id', selectedVehicle.id);
+
+      toast.success(`${selectedVehicle.vehicle_number} checked in successfully!`);
+      await fetchVehicleEntries(selectedVehicle.id);
+      setPurpose('');
+      setRemarks('');
     }
+    setProcessing(false);
   };
 
   const handleCheckOut = async () => {
-    if (!selectedVehicle) return;
+    if (!selectedVehicle || !activeEntry) return;
 
+    setProcessing(true);
+
+    // Update the active entry with exit time
     const { error } = await supabase
-      .from('vehicles')
+      .from('vehicle_entries')
       .update({
-        status: 'checked_out',
-        check_out_time: new Date().toISOString(),
+        exit_time: new Date().toISOString(),
+        remarks: remarks || activeEntry.remarks,
       })
-      .eq('id', selectedVehicle.id);
+      .eq('id', activeEntry.id);
 
     if (error) {
       toast.error('Failed to check out vehicle');
     } else {
-      toast.success(`${selectedVehicle.vehicle_number} checked out successfully`);
-      setSelectedVehicle({ ...selectedVehicle, status: 'checked_out', check_out_time: new Date().toISOString() });
+      // Update vehicle status
+      await supabase
+        .from('vehicles')
+        .update({
+          status: 'checked_out',
+          check_out_time: new Date().toISOString(),
+        })
+        .eq('id', selectedVehicle.id);
+
+      toast.success(`${selectedVehicle.vehicle_number} checked out successfully!`);
+      await fetchVehicleEntries(selectedVehicle.id);
+      setRemarks('');
     }
+    setProcessing(false);
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'checked_in':
-        return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Inside Premises</Badge>;
-      case 'checked_out':
-        return <Badge className="bg-slate-500/10 text-slate-600 border-slate-500/20">Checked Out</Badge>;
-      default:
-        return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">Registered</Badge>;
-    }
+  const formatDuration = (entryTime: string) => {
+    return formatDistanceToNow(new Date(entryTime), { addSuffix: false });
   };
 
   return (
@@ -128,7 +186,7 @@ export default function VehicleGate() {
               Vehicle Gate Entry
             </h1>
             <p className="text-muted-foreground">
-              Check-in/out vehicles at the gate
+              Check-in/out vehicles - tracks multiple entries
             </p>
           </div>
         </div>
@@ -176,6 +234,48 @@ export default function VehicleGate() {
                 />
               </CardContent>
             </Card>
+
+            {/* Recent Entries */}
+            {selectedVehicle && recentEntries.length > 0 && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <History className="h-4 w-4" />
+                    Recent Entries
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {recentEntries.slice(0, 3).map((entry) => (
+                    <div
+                      key={entry.id}
+                      className={`p-3 rounded-lg text-sm ${
+                        !entry.exit_time
+                          ? 'border border-emerald-500/50 bg-emerald-500/5'
+                          : 'bg-muted/30'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">
+                          {format(new Date(entry.entry_time), 'dd MMM, hh:mm a')}
+                        </span>
+                        {!entry.exit_time ? (
+                          <Badge className="bg-emerald-500/10 text-emerald-600 text-xs">
+                            Inside
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(entry.exit_time), 'hh:mm a')}
+                          </span>
+                        )}
+                      </div>
+                      {entry.purpose && (
+                        <p className="text-xs text-muted-foreground mt-1">{entry.purpose}</p>
+                      )}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Vehicle Details Section */}
@@ -188,7 +288,15 @@ export default function VehicleGate() {
                       <Truck className="h-5 w-5" />
                       {selectedVehicle.vehicle_number}
                     </CardTitle>
-                    {getStatusBadge(selectedVehicle.status)}
+                    {activeEntry ? (
+                      <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                        Inside Premises
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-slate-500/10 text-slate-600 border-slate-500/20">
+                        Outside
+                      </Badge>
+                    )}
                   </div>
                   <CardDescription className="font-mono">
                     {selectedVehicle.vehicle_id}
@@ -218,36 +326,77 @@ export default function VehicleGate() {
                     )}
                   </div>
 
-                  {selectedVehicle.check_in_time && (
-                    <div className="flex items-center gap-2 text-sm p-3 rounded-lg bg-muted/50">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Checked in:</span>
-                      <span className="font-medium">
-                        {format(new Date(selectedVehicle.check_in_time), 'dd MMM yyyy, hh:mm a')}
+                  {activeEntry && (
+                    <div className="flex items-center gap-2 text-sm p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <Clock className="h-4 w-4 text-emerald-600" />
+                      <span className="text-emerald-700">Inside for:</span>
+                      <span className="font-medium text-emerald-700">
+                        {formatDuration(activeEntry.entry_time)}
+                      </span>
+                      <span className="text-xs text-emerald-600 ml-auto">
+                        Since {format(new Date(activeEntry.entry_time), 'hh:mm a')}
                       </span>
                     </div>
                   )}
 
-                  {selectedVehicle.check_out_time && (
-                    <div className="flex items-center gap-2 text-sm p-3 rounded-lg bg-muted/50">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Checked out:</span>
-                      <span className="font-medium">
-                        {format(new Date(selectedVehicle.check_out_time), 'dd MMM yyyy, hh:mm a')}
-                      </span>
+                  {/* Entry Form */}
+                  {!activeEntry && (
+                    <div className="space-y-3 border-t pt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="purpose">Purpose of Visit</Label>
+                        <Input
+                          id="purpose"
+                          placeholder="e.g., Material delivery, Pickup"
+                          value={purpose}
+                          onChange={(e) => setPurpose(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="remarks">Remarks (Optional)</Label>
+                        <Textarea
+                          id="remarks"
+                          placeholder="Any additional notes..."
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          rows={2}
+                        />
+                      </div>
                     </div>
                   )}
 
-                  <div className="flex gap-2 pt-4">
-                    {selectedVehicle.status !== 'checked_in' && (
-                      <Button className="flex-1" onClick={handleCheckIn}>
-                        <LogIn className="h-4 w-4 mr-2" />
+                  {/* Exit Remarks */}
+                  {activeEntry && (
+                    <div className="space-y-3 border-t pt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="exitRemarks">Exit Remarks (Optional)</Label>
+                        <Textarea
+                          id="exitRemarks"
+                          placeholder="Any notes for this exit..."
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-2">
+                    {!activeEntry ? (
+                      <Button className="flex-1" onClick={handleCheckIn} disabled={processing}>
+                        {processing ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <LogIn className="h-4 w-4 mr-2" />
+                        )}
                         Check In
                       </Button>
-                    )}
-                    {selectedVehicle.status === 'checked_in' && (
-                      <Button className="flex-1" variant="outline" onClick={handleCheckOut}>
-                        <LogOut className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Button className="flex-1" variant="outline" onClick={handleCheckOut} disabled={processing}>
+                        {processing ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <LogOut className="h-4 w-4 mr-2" />
+                        )}
                         Check Out
                       </Button>
                     )}

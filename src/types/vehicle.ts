@@ -22,4 +22,24 @@ export interface Vehicle {
   // Relations
   gate?: Gate;
   location?: Location;
+  // Entry count for display
+  entry_count?: number;
+  active_entry?: VehicleEntry | null;
+}
+
+export interface VehicleEntry {
+  id: string;
+  vehicle_id: string;
+  gate_id: string | null;
+  location_id: string | null;
+  entry_time: string;
+  exit_time: string | null;
+  purpose: string | null;
+  remarks: string | null;
+  created_at: string;
+  updated_at: string;
+  // Relations
+  vehicle?: Vehicle;
+  gate?: Gate;
+  location?: Location;
 }
