@@ -36,6 +36,7 @@ import { Building2, Search, Plus, Users, MapPin, Edit, Trash2, Upload, Download 
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Location } from '@/types/database';
 import { toast } from 'sonner';
+import { CsvImportResult, ImportResult, ImportError, validateRequired } from '@/components/shared/CsvImportResult';
 
 export default function Departments() {
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -50,6 +51,8 @@ export default function Departments() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isImportResultOpen, setIsImportResultOpen] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   
   // Form state
@@ -192,6 +195,9 @@ export default function Departments() {
       return;
     }
     setUploading(true);
+    const errors: ImportError[] = [];
+    const departmentsToInsert: any[] = [];
+    
     try {
       const text = await file.text();
       const lines = text.split('\n').filter(line => line.trim());
@@ -200,30 +206,56 @@ export default function Departments() {
         setUploading(false);
         return;
       }
-      const departmentsToInsert = [];
+      
       for (let i = 1; i < lines.length; i++) {
+        const rowNum = i + 1;
         const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-        if (values.length < 1 || !values[0]) continue;
+        
+        // Validate required fields
+        const nameError = validateRequired(values[0], 'Name');
+        if (nameError) {
+          errors.push({ row: rowNum, field: 'Name', message: nameError, value: values[0] });
+          continue;
+        }
+        
+        // Check location exists
         const locationName = values[2]?.toLowerCase();
         const matchedLocation = locations.find(l => l.name.toLowerCase() === locationName);
+        if (values[2] && !matchedLocation) {
+          errors.push({ row: rowNum, field: 'Location', message: `Location "${values[2]}" not found. Please add the location first.`, value: values[2] });
+        }
+        
         departmentsToInsert.push({
-          name: values[0] || 'Unknown',
+          name: values[0],
           description: values[1] || null,
           location: matchedLocation?.name || null,
           location_id: matchedLocation?.id || null,
         });
       }
-      if (departmentsToInsert.length === 0) {
-        toast.error('No valid data rows found');
-        setUploading(false);
-        return;
+      
+      let successCount = 0;
+      let failedCount = errors.filter(e => e.field === 'Name').length;
+      
+      if (departmentsToInsert.length > 0) {
+        const { error, data } = await supabase.from('departments').insert(departmentsToInsert).select();
+        if (error) {
+          errors.push({ row: 0, field: 'Database', message: error.message });
+          failedCount = departmentsToInsert.length;
+        } else {
+          successCount = data?.length || departmentsToInsert.length;
+          fetchData();
+        }
       }
-      const { error } = await supabase.from('departments').insert(departmentsToInsert);
-      if (error) {
-        toast.error('Failed to import departments: ' + error.message);
-      } else {
-        toast.success(`Successfully imported ${departmentsToInsert.length} departments`);
-        fetchData();
+      
+      setImportResult({
+        success: successCount,
+        failed: failedCount,
+        errors: errors,
+      });
+      setIsImportResultOpen(true);
+      
+      if (successCount > 0) {
+        toast.success(`Imported ${successCount} departments`);
       }
     } catch (err) {
       toast.error('Failed to parse CSV file');
@@ -500,6 +532,14 @@ export default function Departments() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Import Result Dialog */}
+      <CsvImportResult
+        open={isImportResultOpen}
+        onOpenChange={setIsImportResultOpen}
+        result={importResult}
+        entityName="Departments"
+      />
     </MainLayout>
   );
 }

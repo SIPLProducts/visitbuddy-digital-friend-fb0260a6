@@ -48,6 +48,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Gate, Location } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { CsvImportResult, ImportResult, ImportError, validateRequired, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
 
 export default function Gates() {
   const [gates, setGates] = useState<Gate[]>([]);
@@ -66,6 +67,8 @@ export default function Gates() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isImportResultOpen, setIsImportResultOpen] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [selectedGate, setSelectedGate] = useState<Gate | null>(null);
 
   // Form state
@@ -249,6 +252,9 @@ export default function Gates() {
       return;
     }
     setUploading(true);
+    const errors: ImportError[] = [];
+    const gatesToInsert: any[] = [];
+    
     try {
       const text = await file.text();
       const lines = text.split('\n').filter(line => line.trim());
@@ -257,34 +263,78 @@ export default function Gates() {
         setUploading(false);
         return;
       }
-      const gatesToInsert = [];
+      
       for (let i = 1; i < lines.length; i++) {
+        const rowNum = i + 1;
         const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-        if (values.length < 1 || !values[0]) continue;
+        
+        // Validate required fields
+        const nameError = validateRequired(values[0], 'Name');
+        if (nameError) {
+          errors.push({ row: rowNum, field: 'Name', message: nameError, value: values[0] });
+          continue;
+        }
+        
+        // Validate capacity
+        const capacityError = validateNumber(values[4], 'Capacity');
+        if (capacityError) {
+          errors.push({ row: rowNum, field: 'Capacity', message: capacityError, value: values[4] });
+        }
+        
+        // Validate status
+        const statusError = validateStatus(values[7], ['active', 'inactive']);
+        if (statusError) {
+          errors.push({ row: rowNum, field: 'Status', message: statusError, value: values[7] });
+        }
+        
+        // Check location exists
         const locationName = values[2]?.toLowerCase();
         const matchedLocation = locations.find(l => l.name.toLowerCase() === locationName);
+        if (values[2] && !matchedLocation) {
+          errors.push({ row: rowNum, field: 'Location', message: `Location "${values[2]}" not found`, value: values[2] });
+        }
+        
+        // Validate gate type
+        const validGateTypes = ['entry & exit', 'entry only', 'exit only'];
+        if (values[3] && !validGateTypes.includes(values[3].toLowerCase())) {
+          errors.push({ row: rowNum, field: 'Gate Type', message: 'Must be: Entry & Exit, Entry Only, or Exit Only', value: values[3] });
+        }
+        
         gatesToInsert.push({
-          name: values[0] || 'Unknown',
+          name: values[0],
           building: values[1] || null,
           location_id: matchedLocation?.id || null,
           gate_type: values[3] || 'Entry & Exit',
-          capacity: parseInt(values[4]) || 100,
+          capacity: capacityError ? 100 : (parseInt(values[4]) || 100),
           operating_hours: values[5] || '06:00 - 22:00',
           has_qr: values[6]?.toLowerCase() === 'yes' || values[6]?.toLowerCase() === 'true',
           status: (values[7]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
         });
       }
-      if (gatesToInsert.length === 0) {
-        toast.error('No valid data rows found');
-        setUploading(false);
-        return;
+      
+      let successCount = 0;
+      let failedCount = errors.filter(e => e.field === 'Name').length;
+      
+      if (gatesToInsert.length > 0) {
+        const { error, data } = await supabase.from('gates').insert(gatesToInsert).select();
+        if (error) {
+          errors.push({ row: 0, field: 'Database', message: error.message });
+          failedCount = gatesToInsert.length;
+        } else {
+          successCount = data?.length || gatesToInsert.length;
+          fetchData();
+        }
       }
-      const { error } = await supabase.from('gates').insert(gatesToInsert);
-      if (error) {
-        toast.error('Failed to import gates: ' + error.message);
-      } else {
-        toast.success(`Successfully imported ${gatesToInsert.length} gates`);
-        fetchData();
+      
+      setImportResult({
+        success: successCount,
+        failed: failedCount,
+        errors: errors,
+      });
+      setIsImportResultOpen(true);
+      
+      if (successCount > 0) {
+        toast.success(`Imported ${successCount} gates`);
       }
     } catch (err) {
       toast.error('Failed to parse CSV file');
@@ -603,6 +653,14 @@ export default function Gates() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Import Result Dialog */}
+      <CsvImportResult
+        open={isImportResultOpen}
+        onOpenChange={setIsImportResultOpen}
+        result={importResult}
+        entityName="Gates"
+      />
     </MainLayout>
   );
 }

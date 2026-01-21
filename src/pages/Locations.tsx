@@ -49,6 +49,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Location } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail, validatePhone, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
 
 export default function Locations() {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -66,6 +67,8 @@ export default function Locations() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isImportResultOpen, setIsImportResultOpen] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   // Form state
@@ -224,6 +227,9 @@ export default function Locations() {
       return;
     }
     setUploading(true);
+    const errors: ImportError[] = [];
+    const locationsToInsert: any[] = [];
+    
     try {
       const text = await file.text();
       const lines = text.split('\n').filter(line => line.trim());
@@ -232,34 +238,88 @@ export default function Locations() {
         setUploading(false);
         return;
       }
-      const locationsToInsert = [];
+      
       for (let i = 1; i < lines.length; i++) {
+        const rowNum = i + 1;
         const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-        if (values.length < 1 || !values[0]) continue;
+        
+        // Validate required fields
+        const nameError = validateRequired(values[0], 'Name');
+        if (nameError) {
+          errors.push({ row: rowNum, field: 'Name', message: nameError, value: values[0] });
+          continue;
+        }
+        
+        // Validate email if provided
+        const emailError = validateEmail(values[4]);
+        if (emailError) {
+          errors.push({ row: rowNum, field: 'Email', message: emailError, value: values[4] });
+        }
+        
+        // Validate phone if provided
+        const phoneError = validatePhone(values[5]);
+        if (phoneError) {
+          errors.push({ row: rowNum, field: 'Phone', message: phoneError, value: values[5] });
+        }
+        
+        // Validate status if provided
+        const statusError = validateStatus(values[6], ['active', 'inactive']);
+        if (statusError) {
+          errors.push({ row: rowNum, field: 'Status', message: statusError, value: values[6] });
+        }
+        
+        // Validate latitude if provided
+        const latError = validateNumber(values[7], 'Latitude');
+        if (latError) {
+          errors.push({ row: rowNum, field: 'Latitude', message: latError, value: values[7] });
+        }
+        
+        // Validate longitude if provided
+        const lngError = validateNumber(values[8], 'Longitude');
+        if (lngError) {
+          errors.push({ row: rowNum, field: 'Longitude', message: lngError, value: values[8] });
+        }
+        
+        // Skip row if it has critical errors
+        if (nameError) continue;
+        
         locationsToInsert.push({
-          name: values[0] || 'Unknown',
+          name: values[0],
           address: values[1] || null,
           city: values[2] || null,
           country: values[3] || 'India',
-          email: values[4] || null,
-          phone: values[5] || null,
+          email: emailError ? null : (values[4] || null),
+          phone: phoneError ? null : (values[5] || null),
           status: (values[6]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
-          latitude: values[7] ? parseFloat(values[7]) : null,
-          longitude: values[8] ? parseFloat(values[8]) : null,
+          latitude: latError ? null : (values[7] ? parseFloat(values[7]) : null),
+          longitude: lngError ? null : (values[8] ? parseFloat(values[8]) : null),
           geo_address: values[9] || null,
         });
       }
-      if (locationsToInsert.length === 0) {
-        toast.error('No valid data rows found');
-        setUploading(false);
-        return;
+      
+      let successCount = 0;
+      let failedCount = errors.filter(e => e.field === 'Name').length;
+      
+      if (locationsToInsert.length > 0) {
+        const { error, data } = await supabase.from('locations').insert(locationsToInsert).select();
+        if (error) {
+          errors.push({ row: 0, field: 'Database', message: error.message });
+          failedCount = locationsToInsert.length;
+        } else {
+          successCount = data?.length || locationsToInsert.length;
+          fetchLocations();
+        }
       }
-      const { error } = await supabase.from('locations').insert(locationsToInsert);
-      if (error) {
-        toast.error('Failed to import locations: ' + error.message);
-      } else {
-        toast.success(`Successfully imported ${locationsToInsert.length} locations`);
-        fetchLocations();
+      
+      setImportResult({
+        success: successCount,
+        failed: failedCount,
+        errors: errors,
+      });
+      setIsImportResultOpen(true);
+      
+      if (successCount > 0) {
+        toast.success(`Imported ${successCount} locations`);
       }
     } catch (err) {
       toast.error('Failed to parse CSV file');
@@ -653,6 +713,14 @@ export default function Locations() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Import Result Dialog */}
+      <CsvImportResult
+        open={isImportResultOpen}
+        onOpenChange={setIsImportResultOpen}
+        result={importResult}
+        entityName="Locations"
+      />
     </MainLayout>
   );
 }
