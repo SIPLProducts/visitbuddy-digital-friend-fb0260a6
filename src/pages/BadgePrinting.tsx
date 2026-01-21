@@ -153,7 +153,7 @@ export default function BadgePrinting() {
       return;
     }
 
-    // Then print badge
+    // Then update badge_printed status
     const { error: badgeError } = await supabase
       .from('visitors')
       .update({ badge_printed: true })
@@ -163,6 +163,36 @@ export default function BadgePrinting() {
       toast.error('Failed to update badge status');
     } else {
       toast.success(`${visitor.name} checked in and badge printed`);
+      
+      // Trigger print after a short delay to allow UI to update
+      setTimeout(() => {
+        const badgeElement = document.getElementById('printable-badge');
+        if (badgeElement) {
+          const printWindow = window.open('', '_blank', 'width=400,height=600');
+          if (printWindow) {
+            printWindow.document.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Visitor Badge - ${visitor.name}</title>
+                <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body { font-family: Arial, sans-serif; padding: 10px; }
+                  @page { size: 100mm 150mm; margin: 5mm; }
+                </style>
+              </head>
+              <body>${badgeElement.innerHTML}</body>
+              </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => {
+              printWindow.focus();
+              printWindow.print();
+            }, 300);
+          }
+        }
+      }, 100);
+      
       fetchVisitors();
     }
   };
@@ -175,12 +205,76 @@ export default function BadgePrinting() {
 
     if (error) {
       toast.error('Failed to update badge status');
-    } else {
-      toast.success(`Badge printed for ${visitor.name}`);
-      // Trigger browser print dialog
-      window.print();
-      fetchVisitors();
+      return;
     }
+    
+    toast.success(`Badge printed for ${visitor.name}`);
+    
+    // Get the badge HTML content
+    const badgeElement = document.getElementById('printable-badge');
+    if (!badgeElement) {
+      toast.error('Badge element not found');
+      return;
+    }
+
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    if (!printWindow) {
+      toast.error('Please allow popups to print the badge');
+      return;
+    }
+
+    // Write the badge content to the print window
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Visitor Badge - ${visitor.name}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+          }
+          @page {
+            size: 100mm 150mm;
+            margin: 5mm;
+          }
+          @media print {
+            body {
+              padding: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        ${badgeElement.innerHTML}
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for content to load then print
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    };
+    
+    // Fallback for browsers that don't trigger onload
+    setTimeout(() => {
+      if (!printWindow.closed) {
+        printWindow.focus();
+        printWindow.print();
+      }
+    }, 500);
+
+    fetchVisitors();
   };
 
   const handleNotifyHost = async (visitor: VisitorWithLocation) => {
