@@ -3,20 +3,32 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { QrCode, Search, UserCheck, UserX } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { QrCode, Search, UserCheck, UserX, Camera, Printer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { QrScanner } from '@/components/checkin/QrScanner';
+import { CameraCapture } from '@/components/checkin/CameraCapture';
+import { useNavigate } from 'react-router-dom';
 
 export default function CheckInOut() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+  const [showCameraDialog, setShowCameraDialog] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [stats, setStats] = useState({
     checkedIn: 0,
     checkedOut: 0,
@@ -53,6 +65,57 @@ export default function CheckInOut() {
     }
   };
 
+  const uploadPhoto = async (blob: Blob, visitorId: string): Promise<string | null> => {
+    const fileName = `${visitorId}-${Date.now()}.jpg`;
+    const filePath = `photos/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('visitor-photos')
+      .upload(filePath, blob, {
+        contentType: 'image/jpeg',
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      return null;
+    }
+
+    const { data } = supabase.storage
+      .from('visitor-photos')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
+  const handlePhotoCapture = async (blob: Blob) => {
+    if (!selectedVisitor) return;
+
+    setIsUploading(true);
+    const photoUrl = await uploadPhoto(blob, selectedVisitor.id);
+    
+    if (photoUrl) {
+      // Update visitor with photo URL
+      const { error } = await supabase
+        .from('visitors')
+        .update({ photo_url: photoUrl })
+        .eq('id', selectedVisitor.id);
+
+      if (error) {
+        toast.error('Failed to save photo');
+      } else {
+        toast.success('Photo captured successfully');
+        setSelectedVisitor({ ...selectedVisitor, photo_url: photoUrl });
+        fetchVisitors();
+      }
+    } else {
+      toast.error('Failed to upload photo');
+    }
+
+    setIsUploading(false);
+    setShowCameraDialog(false);
+  };
+
   const handleCheckIn = async (visitor: Visitor) => {
     const { error } = await supabase
       .from('visitors')
@@ -69,6 +132,11 @@ export default function CheckInOut() {
       fetchVisitors();
       setSelectedVisitor(null);
     }
+  };
+
+  const handleCheckInWithPhoto = async () => {
+    if (!selectedVisitor) return;
+    setShowCameraDialog(true);
   };
 
   const handleCheckOut = async (visitor: Visitor) => {
@@ -89,10 +157,15 @@ export default function CheckInOut() {
     }
   };
 
+  const handlePrintBadge = () => {
+    if (selectedVisitor) {
+      navigate(`/badge-printing?visitorId=${selectedVisitor.id}`);
+    }
+  };
+
   const handleQrScan = async (data: { visitorId: string; name: string }) => {
     toast.info(`QR scanned: ${data.name}`);
     
-    // Find visitor by visitor_id
     const { data: visitorData } = await supabase
       .from('visitors')
       .select(`
@@ -107,9 +180,9 @@ export default function CheckInOut() {
       const visitor = visitorData as unknown as Visitor;
       setSelectedVisitor(visitor);
       
-      // Auto check-in if scheduled, or show for check-out if already checked in
       if (visitor.status === 'scheduled') {
-        handleCheckIn(visitor);
+        // Show camera dialog for photo capture
+        setShowCameraDialog(true);
       } else if (visitor.status === 'checked_in') {
         toast.info('Visitor already checked in. Ready for check-out.');
       } else {
@@ -118,6 +191,34 @@ export default function CheckInOut() {
     } else {
       toast.error('Visitor not found');
     }
+  };
+
+  const handlePhotoCaptureAndCheckIn = async (blob: Blob) => {
+    if (!selectedVisitor) return;
+
+    setIsUploading(true);
+    const photoUrl = await uploadPhoto(blob, selectedVisitor.id);
+    
+    // Update visitor with photo and check in
+    const { error } = await supabase
+      .from('visitors')
+      .update({
+        photo_url: photoUrl,
+        status: 'checked_in',
+        check_in_time: new Date().toISOString(),
+      })
+      .eq('id', selectedVisitor.id);
+
+    if (error) {
+      toast.error('Failed to check in visitor');
+    } else {
+      toast.success(`${selectedVisitor.name} checked in with photo`);
+      fetchVisitors();
+      setSelectedVisitor(null);
+    }
+
+    setIsUploading(false);
+    setShowCameraDialog(false);
   };
 
   const getInitials = (name: string) => {
@@ -192,6 +293,9 @@ export default function CheckInOut() {
                         )}
                       >
                         <Avatar className="h-10 w-10">
+                          {visitor.photo_url ? (
+                            <AvatarImage src={visitor.photo_url} alt={visitor.name} />
+                          ) : null}
                           <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {getInitials(visitor.name)}
                           </AvatarFallback>
@@ -231,7 +335,10 @@ export default function CheckInOut() {
               {selectedVisitor ? (
                 <div className="space-y-6">
                   <div className="text-center">
-                    <Avatar className="h-20 w-20 mx-auto mb-4">
+                    <Avatar className="h-24 w-24 mx-auto mb-4">
+                      {selectedVisitor.photo_url ? (
+                        <AvatarImage src={selectedVisitor.photo_url} alt={selectedVisitor.name} />
+                      ) : null}
                       <AvatarFallback className="bg-primary/10 text-primary text-2xl font-medium">
                         {getInitials(selectedVisitor.name)}
                       </AvatarFallback>
@@ -270,24 +377,56 @@ export default function CheckInOut() {
                     )}
                   </div>
 
-                  <div className="flex gap-4">
+                  {/* Photo Capture Button */}
+                  {selectedVisitor.status === 'checked_in' && !selectedVisitor.photo_url && (
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2"
+                      onClick={() => setShowCameraDialog(true)}
+                    >
+                      <Camera className="h-4 w-4" />
+                      Capture Photo
+                    </Button>
+                  )}
+
+                  <div className="flex gap-2 flex-wrap">
                     {selectedVisitor.status === 'scheduled' ? (
-                      <Button
-                        className="flex-1 gap-2"
-                        onClick={() => handleCheckIn(selectedVisitor)}
-                      >
-                        <UserCheck className="h-4 w-4" />
-                        Check In
-                      </Button>
+                      <>
+                        <Button
+                          className="flex-1 gap-2"
+                          onClick={() => handleCheckIn(selectedVisitor)}
+                        >
+                          <UserCheck className="h-4 w-4" />
+                          Check In
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          className="gap-2"
+                          onClick={handleCheckInWithPhoto}
+                        >
+                          <Camera className="h-4 w-4" />
+                          Check In with Photo
+                        </Button>
+                      </>
                     ) : (
-                      <Button
-                        variant="outline"
-                        className="flex-1 gap-2"
-                        onClick={() => handleCheckOut(selectedVisitor)}
-                      >
-                        <UserX className="h-4 w-4" />
-                        Check Out
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          className="flex-1 gap-2"
+                          onClick={() => handleCheckOut(selectedVisitor)}
+                        >
+                          <UserX className="h-4 w-4" />
+                          Check Out
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          className="gap-2"
+                          onClick={handlePrintBadge}
+                        >
+                          <Printer className="h-4 w-4" />
+                          Print Badge
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -323,6 +462,27 @@ export default function CheckInOut() {
           </div>
         </div>
       </div>
+
+      {/* Camera Capture Dialog */}
+      <Dialog open={showCameraDialog} onOpenChange={setShowCameraDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Capture Visitor Photo
+            </DialogTitle>
+          </DialogHeader>
+          <CameraCapture
+            onCapture={selectedVisitor?.status === 'scheduled' ? handlePhotoCaptureAndCheckIn : handlePhotoCapture}
+            onCancel={() => setShowCameraDialog(false)}
+          />
+          {isUploading && (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">Uploading photo...</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
