@@ -5,16 +5,18 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { QrCode, Search, Camera, UserCheck, UserX, Clock } from 'lucide-react';
+import { QrCode, Search, UserCheck, UserX } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { QrScanner } from '@/components/checkin/QrScanner';
 
 export default function CheckInOut() {
   const [searchQuery, setSearchQuery] = useState('');
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
   const [stats, setStats] = useState({
     checkedIn: 0,
     checkedOut: 0,
@@ -87,6 +89,37 @@ export default function CheckInOut() {
     }
   };
 
+  const handleQrScan = async (data: { visitorId: string; name: string }) => {
+    toast.info(`QR scanned: ${data.name}`);
+    
+    // Find visitor by visitor_id
+    const { data: visitorData } = await supabase
+      .from('visitors')
+      .select(`
+        *,
+        host:employees(*, department:departments(*)),
+        department:departments(*)
+      `)
+      .eq('visitor_id', data.visitorId)
+      .single();
+
+    if (visitorData) {
+      const visitor = visitorData as unknown as Visitor;
+      setSelectedVisitor(visitor);
+      
+      // Auto check-in if scheduled, or show for check-out if already checked in
+      if (visitor.status === 'scheduled') {
+        handleCheckIn(visitor);
+      } else if (visitor.status === 'checked_in') {
+        toast.info('Visitor already checked in. Ready for check-out.');
+      } else {
+        toast.warning('Visitor has already checked out');
+      }
+    } else {
+      toast.error('Visitor not found');
+    }
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -130,19 +163,11 @@ export default function CheckInOut() {
               </TabsList>
 
               <TabsContent value="scan" className="mt-4">
-                <div className="bg-card rounded-xl border border-border p-8 text-center">
-                  <div className="w-48 h-48 mx-auto bg-muted rounded-lg flex items-center justify-center mb-6">
-                    <Camera className="h-16 w-16 text-muted-foreground" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">Ready to Scan</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Click the button below to activate the camera and scan a visitor's QR code
-                  </p>
-                  <Button className="gap-2">
-                    <Camera className="h-4 w-4" />
-                    Start Scanning
-                  </Button>
-                </div>
+                <QrScanner 
+                  onScan={handleQrScan}
+                  isScanning={isScanning}
+                  onToggleScanning={setIsScanning}
+                />
               </TabsContent>
 
               <TabsContent value="search" className="mt-4">
