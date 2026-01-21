@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -29,6 +30,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 import { 
   Users, 
   UserPlus, 
@@ -37,7 +44,10 @@ import {
   MapPin,
   Trash2,
   Edit,
-  Crown
+  Crown,
+  Mail,
+  Lock,
+  Search
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -66,9 +76,9 @@ interface UserRoleEntry {
 }
 
 const roleColors: Record<AppRole, string> = {
-  admin: 'bg-[#ef4444] text-white',
-  manager: 'bg-[#3b82f6] text-white',
-  operator: 'bg-[#10b981] text-white',
+  admin: 'bg-destructive text-destructive-foreground',
+  manager: 'bg-info text-info-foreground',
+  operator: 'bg-success text-success-foreground',
 };
 
 const roleLabels: Record<AppRole, string> = {
@@ -84,12 +94,23 @@ export default function UserManagement() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [creatingUser, setCreatingUser] = useState(false);
   
-  // Form state
+  // Form state for role assignment
   const [selectedUserId, setSelectedUserId] = useState('');
   const [selectedLocationId, setSelectedLocationId] = useState('');
   const [selectedRole, setSelectedRole] = useState<AppRole>('operator');
   const [isHoAdminFlag, setIsHoAdminFlag] = useState(false);
+
+  // Form state for user creation
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserFullName, setNewUserFullName] = useState('');
+  const [newUserLocationId, setNewUserLocationId] = useState('');
+  const [newUserRole, setNewUserRole] = useState<AppRole>('operator');
+  const [newUserIsHoAdmin, setNewUserIsHoAdmin] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -214,6 +235,92 @@ export default function UserManagement() {
     setIsHoAdminFlag(false);
   };
 
+  const resetCreateUserForm = () => {
+    setNewUserEmail('');
+    setNewUserPassword('');
+    setNewUserFullName('');
+    setNewUserLocationId('');
+    setNewUserRole('operator');
+    setNewUserIsHoAdmin(false);
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUserEmail || !newUserPassword || !newUserFullName) {
+      toast.error('Please fill in email, password, and full name');
+      return;
+    }
+
+    if (newUserPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setCreatingUser(true);
+    try {
+      // Create the user using Supabase Auth admin API via edge function
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: newUserPassword,
+        options: {
+          data: {
+            full_name: newUserFullName,
+          },
+        },
+      });
+
+      if (authError) throw authError;
+
+      if (!authData.user) {
+        throw new Error('Failed to create user');
+      }
+
+      // Wait a moment for the profile trigger to create the profile
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // If location and role are selected, assign the role
+      if (newUserLocationId) {
+        const { error: roleError } = await supabase
+          .from('user_location_roles')
+          .insert({
+            user_id: authData.user.id,
+            location_id: newUserLocationId,
+            role: newUserRole,
+            is_ho_admin: newUserIsHoAdmin,
+          });
+
+        if (roleError) {
+          console.error('Error assigning role:', roleError);
+          toast.warning('User created but role assignment failed. You can assign manually.');
+        }
+      }
+
+      toast.success(`User ${newUserFullName} created successfully!`);
+      setIsCreateUserDialogOpen(false);
+      resetCreateUserForm();
+      fetchData();
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      if (error.message?.includes('already registered')) {
+        toast.error('A user with this email already exists');
+      } else {
+        toast.error(error.message || 'Failed to create user');
+      }
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
+  // Filter user roles based on search
+  const filteredUserRoles = userRoles.filter((role) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      role.profile?.full_name?.toLowerCase().includes(query) ||
+      role.location?.name?.toLowerCase().includes(query) ||
+      role.role?.toLowerCase().includes(query)
+    );
+  });
+
   // Group roles by user
   const userGroups = userRoles.reduce((acc, role) => {
     const userId = role.user_id;
@@ -263,105 +370,235 @@ export default function UserManagement() {
               User Management
             </h1>
             <p className="text-muted-foreground">
-              Manage user roles and location access permissions
+              Create users and manage roles and location access permissions
             </p>
           </div>
           
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <UserPlus className="h-4 w-4" />
-                Assign Role
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Assign User Role</DialogTitle>
-                <DialogDescription>
-                  Assign a role to a user at a specific location
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>User</Label>
-                  <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select user" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {profiles.map((profile) => (
-                        <SelectItem key={profile.user_id} value={profile.user_id}>
-                          {profile.full_name || 'Unnamed User'}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          <div className="flex gap-2">
+            {/* Create User Dialog */}
+            <Dialog open={isCreateUserDialogOpen} onOpenChange={setIsCreateUserDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Create User
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>Create New User</DialogTitle>
+                  <DialogDescription>
+                    Create a new user account and optionally assign a role
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Input
+                      id="fullName"
+                      placeholder="John Doe"
+                      value={newUserFullName}
+                      onChange={(e) => setNewUserFullName(e.target.value)}
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label>Location</Label>
-                  <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations.map((location) => (
-                        <SelectItem key={location.id} value={location.id}>
-                          {location.name} {location.city && `(${location.city})`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email *</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="user@example.com"
+                        value={newUserEmail}
+                        onChange={(e) => setNewUserEmail(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label>Role</Label>
-                  <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AppRole)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Admin - Full access</SelectItem>
-                      <SelectItem value="manager">Manager - Manage visitors</SelectItem>
-                      <SelectItem value="operator">Operator - Basic operations</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password *</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Minimum 6 characters"
+                        value={newUserPassword}
+                        onChange={(e) => setNewUserPassword(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
-                  <input
-                    type="checkbox"
-                    id="ho_admin"
-                    checked={isHoAdminFlag}
-                    onChange={(e) => setIsHoAdminFlag(e.target.checked)}
-                    className="h-4 w-4"
-                  />
-                  <div>
-                    <Label htmlFor="ho_admin" className="font-medium">HO Admin</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Can access all locations and manage user roles
-                    </p>
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-medium mb-3">Assign Role (Optional)</p>
+                    
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Location</Label>
+                        <Select value={newUserLocationId} onValueChange={setNewUserLocationId}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select location" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover border border-border z-50">
+                            {locations.map((location) => (
+                              <SelectItem key={location.id} value={location.id}>
+                                {location.name} {location.city && `(${location.city})`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Role</Label>
+                        <Select value={newUserRole} onValueChange={(v) => setNewUserRole(v as AppRole)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover border border-border z-50">
+                            <SelectItem value="admin">Admin - Full access</SelectItem>
+                            <SelectItem value="manager">Manager - Manage visitors</SelectItem>
+                            <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                        <Checkbox
+                          id="newUserHoAdmin"
+                          checked={newUserIsHoAdmin}
+                          onCheckedChange={(checked) => setNewUserIsHoAdmin(checked === true)}
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <label
+                            htmlFor="newUserHoAdmin"
+                            className="text-sm font-medium cursor-pointer"
+                          >
+                            HO Admin
+                          </label>
+                          <p className="text-xs text-muted-foreground">
+                            Can access all locations and manage user roles
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancel
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsCreateUserDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCreateUser} disabled={creatingUser}>
+                    {creatingUser ? 'Creating...' : 'Create User'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Assign Role Dialog */}
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Shield className="h-4 w-4" />
+                  Assign Role
                 </Button>
-                <Button onClick={handleAddRole}>Assign Role</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Assign User Role</DialogTitle>
+                  <DialogDescription>
+                    Assign a role to an existing user at a specific location
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>User</Label>
+                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select user" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        {profiles.map((profile) => (
+                          <SelectItem key={profile.user_id} value={profile.user_id}>
+                            {profile.full_name || 'Unnamed User'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Location</Label>
+                    <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        {locations.map((location) => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.name} {location.city && `(${location.city})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AppRole)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        <SelectItem value="admin">Admin - Full access</SelectItem>
+                        <SelectItem value="manager">Manager - Manage visitors</SelectItem>
+                        <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                    <Checkbox
+                      id="ho_admin"
+                      checked={isHoAdminFlag}
+                      onCheckedChange={(checked) => setIsHoAdminFlag(checked === true)}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label
+                        htmlFor="ho_admin"
+                        className="text-sm font-medium cursor-pointer"
+                      >
+                        HO Admin
+                      </label>
+                      <p className="text-xs text-muted-foreground">
+                        Can access all locations and manage user roles
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleAddRole}>Assign Role</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-[#3b82f6] text-white">
+                <div className="p-3 rounded-lg bg-primary/10 text-primary">
                   <Users className="h-6 w-6" />
                 </div>
                 <div>
@@ -375,7 +612,7 @@ export default function UserManagement() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-[#10b981] text-white">
+                <div className="p-3 rounded-lg bg-success/10 text-success">
                   <MapPin className="h-6 w-6" />
                 </div>
                 <div>
@@ -389,7 +626,7 @@ export default function UserManagement() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-[#f59e0b] text-white">
+                <div className="p-3 rounded-lg bg-warning/10 text-warning">
                   <Crown className="h-6 w-6" />
                 </div>
                 <div>
@@ -401,6 +638,31 @@ export default function UserManagement() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-lg bg-info/10 text-info">
+                  <Shield className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Role Assignments</p>
+                  <p className="text-2xl font-bold">{userRoles.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search users, locations, or roles..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
         </div>
 
         {/* User Roles Table */}
@@ -423,14 +685,16 @@ export default function UserManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {userRoles.length === 0 ? (
+                {filteredUserRoles.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      No user roles assigned yet. Click "Assign Role" to get started.
+                      {searchQuery
+                        ? 'No users found matching your search'
+                        : 'No user roles assigned yet. Click "Create User" or "Assign Role" to get started.'}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  userRoles.map((role) => (
+                  filteredUserRoles.map((role) => (
                     <TableRow key={role.id}>
                       <TableCell>
                         <div className="flex items-center gap-2">
