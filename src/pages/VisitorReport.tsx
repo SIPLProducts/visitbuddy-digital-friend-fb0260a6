@@ -68,7 +68,8 @@ export default function VisitorReport() {
       .select(`
         *,
         host:employees(*, department:departments(*)),
-        department:departments(*)
+        department:departments(*),
+        gate:gates(*, location:locations(*))
       `)
       .order('created_at', { ascending: false });
 
@@ -98,7 +99,7 @@ export default function VisitorReport() {
   };
 
   const exportToCsv = () => {
-    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Status', 'Check In', 'Check Out'];
+    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Location', 'Status', 'Check In', 'Check Out'];
     const rows = visitors.map((v) => [
       v.name,
       v.visitor_id,
@@ -107,6 +108,7 @@ export default function VisitorReport() {
       v.company || '',
       v.purpose || '',
       v.host?.name || '',
+      v.gate?.location?.name || '',
       v.status,
       v.check_in_time ? format(new Date(v.check_in_time), 'yyyy-MM-dd HH:mm:ss') : '',
       v.check_out_time ? format(new Date(v.check_out_time), 'yyyy-MM-dd HH:mm:ss') : '',
@@ -444,6 +446,7 @@ export default function VisitorReport() {
                 <TableHead>Visitor</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead>Host</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Check In</TableHead>
                 <TableHead>Check Out</TableHead>
@@ -453,13 +456,13 @@ export default function VisitorReport() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={8} className="text-center py-8">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     No visitors found matching your criteria
                   </TableCell>
                 </TableRow>
@@ -481,6 +484,16 @@ export default function VisitorReport() {
                         <p className="text-xs text-muted-foreground">
                           {visitor.department?.name}
                         </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{visitor.gate?.location?.name || '—'}</p>
+                        {visitor.gate?.name && (
+                          <p className="text-xs text-muted-foreground">
+                            {visitor.gate.name}
+                          </p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>

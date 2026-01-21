@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Building2, User, MapPin, Clock } from 'lucide-react';
+import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -100,6 +100,12 @@ export function RecentVisitors({ visitors }: RecentVisitorsProps) {
                       <span className="flex items-center gap-1">
                         <User className="h-3 w-3" />
                         {visitor.host.name}
+                      </span>
+                    )}
+                    {visitor.gate?.location && (
+                      <span className="flex items-center gap-1">
+                        <Navigation className="h-3 w-3" />
+                        {visitor.gate.location.name}
                       </span>
                     )}
                     {visitor.gate && (
