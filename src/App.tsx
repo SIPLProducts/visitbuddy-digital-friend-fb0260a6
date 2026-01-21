@@ -19,6 +19,7 @@ import Locations from "./pages/Locations";
 import Gates from "./pages/Gates";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
+import UserManagement from "./pages/UserManagement";
 import Help from "./pages/Help";
 import NotFound from "./pages/NotFound";
 
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/gates" element={<ProtectedRoute><Gates /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
