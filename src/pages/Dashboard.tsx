@@ -6,6 +6,7 @@ import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { GateStatus } from '@/components/dashboard/GateStatus';
 import { WeeklyOverview } from '@/components/dashboard/WeeklyOverview';
+import { CombinedStats } from '@/components/dashboard/CombinedStats';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
@@ -148,6 +149,9 @@ export default function Dashboard() {
             <GateStatus gates={gates} />
           </div>
         </div>
+
+        {/* Combined Visitor & Vehicle Stats */}
+        <CombinedStats />
 
         {/* Weekly Overview Chart */}
         <WeeklyOverview />
