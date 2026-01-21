@@ -301,6 +301,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          default_location_id: string | null
           full_name: string | null
           id: string
           updated_at: string
@@ -309,6 +310,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          default_location_id?: string | null
           full_name?: string | null
           id?: string
           updated_at?: string
@@ -317,12 +319,59 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          default_location_id?: string | null
           full_name?: string | null
           id?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_default_location_id_fkey"
+            columns: ["default_location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_location_roles: {
+        Row: {
+          created_at: string
+          id: string
+          is_ho_admin: boolean
+          location_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_ho_admin?: boolean
+          location_id: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_ho_admin?: boolean
+          location_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_location_roles_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       visitors: {
         Row: {
@@ -423,9 +472,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_access_location: {
+        Args: { _location_id: string; _user_id: string }
+        Returns: boolean
+      }
+      get_user_location_ids: { Args: { _user_id: string }; Returns: string[] }
+      has_role_at_location: {
+        Args: {
+          _location_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_ho_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
+      app_role: "admin" | "manager" | "operator"
       appointment_status: "pending" | "confirmed" | "cancelled" | "completed"
       gate_status: "active" | "inactive"
       location_status: "active" | "inactive"
@@ -557,6 +620,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "manager", "operator"],
       appointment_status: ["pending", "confirmed", "cancelled", "completed"],
       gate_status: ["active", "inactive"],
       location_status: ["active", "inactive"],
