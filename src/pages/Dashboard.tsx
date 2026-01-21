@@ -85,7 +85,7 @@ export default function Dashboard() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/90 via-primary to-[hsl(195,85%,45%)] p-6 text-primary-foreground">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1e3a8a] via-[#0891b2] to-[#10b981] p-6 text-white">
           {/* Background decoration */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
@@ -110,24 +110,28 @@ export default function Dashboard() {
             value={stats.todaysVisitors}
             icon={<Users className="h-6 w-6" />}
             trend={{ value: '+12% from yesterday', positive: true }}
+            iconColor="blue"
           />
           <StatCard
             title="Scheduled Appointments"
             value={stats.scheduledAppointments}
             subtitle={`${stats.pendingApproval} pending approval`}
             icon={<Calendar className="h-6 w-6" />}
+            iconColor="teal"
           />
           <StatCard
             title="Active Check-ins"
             value={stats.activeCheckIns}
             subtitle={`${stats.overstayed} overstayed`}
             icon={<UserCheck className="h-6 w-6" />}
+            iconColor="emerald"
           />
           <StatCard
             title="Avg. Visit Duration"
             value={stats.avgVisitDuration || '1h 24m'}
             icon={<Clock className="h-6 w-6" />}
             trend={{ value: '-8% from last week', positive: false }}
+            iconColor="indigo"
           />
         </div>
 

@@ -15,38 +15,42 @@ const actions = [
     label: 'Pre-Register',
     description: 'Add new visitor',
     path: '/visitors/new',
-    primary: true,
+    colorClass: 'bg-[#3b82f6] text-white hover:bg-[#2563eb]',
   },
   {
     icon: QrCode,
     label: 'Scan QR',
     description: 'Quick check-in',
     path: '/check-in-out',
-    primary: true,
+    colorClass: 'bg-[#14b8a6] text-white hover:bg-[#0d9488]',
   },
   {
     icon: CalendarPlus,
-    label: 'New appointment',
-    description: '',
+    label: 'Schedule',
+    description: 'New appointment',
     path: '/appointments/new',
+    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
   },
   {
     icon: Video,
-    label: 'Create meeting',
-    description: '',
+    label: 'Teams Meet',
+    description: 'Create meeting',
     path: '/appointments/new?meeting=true',
+    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
   },
   {
     icon: Mail,
     label: 'Send Invite',
     description: 'Email invitation',
     path: '/visitors/invite',
+    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
   },
   {
     icon: FileText,
     label: 'Reports',
     description: 'Generate report',
     path: '/visitor-report',
+    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
   },
 ];
 
@@ -61,18 +65,13 @@ export function QuickActions() {
             to={action.path}
             className={cn(
               'flex flex-col items-center justify-center p-4 rounded-lg transition-colors text-center',
-              action.primary
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'bg-accent hover:bg-accent/80 text-foreground'
+              action.colorClass
             )}
           >
             <action.icon className="h-5 w-5 mb-2" />
             <span className="text-sm font-medium">{action.label}</span>
             {action.description && (
-              <span className={cn(
-                'text-xs mt-0.5',
-                action.primary ? 'text-primary-foreground/80' : 'text-muted-foreground'
-              )}>
+              <span className="text-xs mt-0.5 opacity-80">
                 {action.description}
               </span>
             )}
