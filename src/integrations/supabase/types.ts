@@ -448,6 +448,78 @@ export type Database = {
           },
         ]
       }
+      vehicles: {
+        Row: {
+          check_in_time: string | null
+          check_out_time: string | null
+          company: string | null
+          created_at: string
+          driver_name: string
+          driver_phone: string | null
+          gate_id: string | null
+          id: string
+          location_id: string | null
+          purpose: string | null
+          qr_code: string | null
+          status: string | null
+          updated_at: string
+          vehicle_id: string
+          vehicle_number: string
+          vehicle_type: string
+        }
+        Insert: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          company?: string | null
+          created_at?: string
+          driver_name: string
+          driver_phone?: string | null
+          gate_id?: string | null
+          id?: string
+          location_id?: string | null
+          purpose?: string | null
+          qr_code?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_id: string
+          vehicle_number: string
+          vehicle_type?: string
+        }
+        Update: {
+          check_in_time?: string | null
+          check_out_time?: string | null
+          company?: string | null
+          created_at?: string
+          driver_name?: string
+          driver_phone?: string | null
+          gate_id?: string | null
+          id?: string
+          location_id?: string | null
+          purpose?: string | null
+          qr_code?: string | null
+          status?: string | null
+          updated_at?: string
+          vehicle_id?: string
+          vehicle_number?: string
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_gate_id_fkey"
+            columns: ["gate_id"]
+            isOneToOne: false
+            referencedRelation: "gates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visitors: {
         Row: {
           accompanying_count: number | null
