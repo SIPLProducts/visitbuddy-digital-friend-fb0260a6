@@ -176,19 +176,19 @@
     visibility: hidden;
   }
   
-  .print\\:block,
-  .print\\:block * {
+  #printable-badge,
+  #printable-badge * {
     visibility: visible;
   }
   
-  .print\\:block {
+  #printable-badge {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    left: 0;
+    top: 0;
+    width: 100mm;
   }
   
-  .print\\:hidden {
+  .no-print {
     display: none !important;
   }
   

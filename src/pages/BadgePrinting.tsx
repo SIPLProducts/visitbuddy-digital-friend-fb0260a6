@@ -345,8 +345,8 @@ export default function BadgePrinting() {
 
             {selectedVisitor ? (
               <div className="space-y-6">
-                {/* Safety Permit Badge */}
-                <div ref={badgeRef} className="print:block">
+                {/* Safety Permit Badge - Printable area */}
+                <div id="printable-badge" ref={badgeRef}>
                   <SafetyPermitBadge visitor={selectedVisitor} />
                 </div>
 
@@ -354,7 +354,7 @@ export default function BadgePrinting() {
                 {!selectedVisitor.photo_url && (
                   <Button
                     variant="outline"
-                    className="w-full gap-2 print:hidden"
+                    className="w-full gap-2 no-print"
                     onClick={() => setShowCameraDialog(true)}
                   >
                     <Camera className="h-4 w-4" />
@@ -366,7 +366,7 @@ export default function BadgePrinting() {
                 {selectedVisitor.host?.phone && (
                   <Button
                     variant="outline"
-                    className="w-full gap-2 print:hidden"
+                    className="w-full gap-2 no-print"
                     onClick={() => handleNotifyHost(selectedVisitor)}
                     disabled={isNotifying}
                   >
@@ -376,7 +376,7 @@ export default function BadgePrinting() {
                 )}
 
                 {/* Action Buttons */}
-                <div className="space-y-2 print:hidden">
+                <div className="space-y-2 no-print">
                   {selectedVisitor.status === 'scheduled' ? (
                     <>
                       <Button
