@@ -18,6 +18,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +34,7 @@ const menuItems = [
   { icon: MapPin, label: 'Locations', path: '/locations' },
   { icon: DoorOpen, label: 'Gates', path: '/gates' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+  { icon: UserCog, label: 'User Management', path: '/users' },
   { icon: Settings, label: 'Settings', path: '/settings' },
   { icon: HelpCircle, label: 'Help & Support', path: '/help' },
 ];
