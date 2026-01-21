@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle } from 'lucide-react';
+import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
@@ -35,6 +35,7 @@ const visitorSchema = z.object({
   has_laptop: z.boolean().default(false),
   laptop_brand: z.string().optional(),
   laptop_serial: z.string().optional(),
+  accompanying_count: z.number().min(0).max(50).default(0),
 });
 
 type VisitorFormData = z.infer<typeof visitorSchema>;
@@ -58,6 +59,7 @@ export default function NewVisitor() {
       has_laptop: false,
       laptop_brand: '',
       laptop_serial: '',
+      accompanying_count: 0,
     },
   });
 
@@ -103,6 +105,7 @@ export default function NewVisitor() {
       has_laptop: data.has_laptop,
       laptop_brand: data.has_laptop ? data.laptop_brand : null,
       laptop_serial: data.has_laptop ? data.laptop_serial : null,
+      accompanying_count: data.accompanying_count || 0,
       status: 'scheduled' as const,
     }]);
 
@@ -252,6 +255,34 @@ export default function NewVisitor() {
                   <p className="text-xs text-muted-foreground mt-1">
                     The visitor will receive their digital badge on WhatsApp
                   </p>
+                </div>
+              </div>
+
+              {/* Accompanying Visitors */}
+              <div className="p-4 rounded-lg bg-muted/50 border">
+                <div className="flex items-center gap-3 mb-3">
+                  <Users className="h-5 w-5 text-primary" />
+                  <div>
+                    <Label className="text-base font-medium">Accompanying Visitors</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Number of additional people with the main visitor
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={50}
+                    className="w-24"
+                    {...form.register('accompanying_count', { valueAsNumber: true })}
+                  />
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">
+                      Total: {1 + (form.watch('accompanying_count') || 0)}
+                    </span>
+                    {' '}visitor(s)
+                  </div>
                 </div>
               </div>
             </CardContent>

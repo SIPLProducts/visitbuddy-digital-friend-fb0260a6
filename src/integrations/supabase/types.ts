@@ -450,6 +450,7 @@ export type Database = {
       }
       visitors: {
         Row: {
+          accompanying_count: number | null
           badge_printed: boolean | null
           check_in_time: string | null
           check_out_time: string | null
@@ -473,6 +474,7 @@ export type Database = {
           visitor_id: string
         }
         Insert: {
+          accompanying_count?: number | null
           badge_printed?: boolean | null
           check_in_time?: string | null
           check_out_time?: string | null
@@ -496,6 +498,7 @@ export type Database = {
           visitor_id: string
         }
         Update: {
+          accompanying_count?: number | null
           badge_printed?: boolean | null
           check_in_time?: string | null
           check_out_time?: string | null
