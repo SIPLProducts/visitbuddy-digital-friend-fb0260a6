@@ -27,10 +27,11 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { 
   FileText, Search, Download, Truck, LogIn, LogOut, Clock, 
-  CalendarIcon, Upload, FileDown 
+  CalendarIcon, Upload, FileDown, MapPin 
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle } from '@/types/vehicle';
+import { Location } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { format, differenceInMinutes, subDays } from 'date-fns';
 import { toast } from 'sonner';
@@ -38,10 +39,12 @@ import { DateRange } from 'react-day-picker';
 
 export default function VehicleReport() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 7),
     to: new Date(),
@@ -55,10 +58,24 @@ export default function VehicleReport() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    fetchLocations();
+  }, []);
+
+  useEffect(() => {
     if (dateRange?.from) {
       fetchVehicles();
     }
   }, [dateRange]);
+
+  const fetchLocations = async () => {
+    const { data } = await supabase
+      .from('locations')
+      .select('*')
+      .order('name');
+    if (data) {
+      setLocations(data as Location[]);
+    }
+  };
 
   const fetchVehicles = async () => {
     setLoading(true);
@@ -289,7 +306,10 @@ export default function VehicleReport() {
     const matchesStatus =
       statusFilter === 'all' || vehicle.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const matchesLocation =
+      locationFilter === 'all' || vehicle.location?.id === locationFilter;
+
+    return matchesSearch && matchesStatus && matchesLocation;
   });
 
   const getStatusBadge = (status: string) => {
@@ -442,11 +462,26 @@ export default function VehicleReport() {
             <SelectTrigger className="w-40">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover border border-border z-50">
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="registered">Registered</SelectItem>
               <SelectItem value="checked_in">Checked In</SelectItem>
               <SelectItem value="checked_out">Checked Out</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={locationFilter} onValueChange={setLocationFilter}>
+            <SelectTrigger className="w-48">
+              <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+              <SelectValue placeholder="All Locations" />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border border-border z-50">
+              <SelectItem value="all">All Locations</SelectItem>
+              {locations.map((location) => (
+                <SelectItem key={location.id} value={location.id}>
+                  {location.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           

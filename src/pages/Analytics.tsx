@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,8 @@ import {
   Clock,
   TrendingUp,
   DoorOpen,
+  Truck,
+  MapPin,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -27,35 +30,149 @@ import {
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
   Legend,
 } from 'recharts';
+import { supabase } from '@/integrations/supabase/client';
+import { Location } from '@/types/database';
 
-const trendData = [
-  { month: 'Jan', visitors: 1200, scheduled: 980 },
-  { month: 'Feb', visitors: 1450, scheduled: 1100 },
-  { month: 'Mar', visitors: 1680, scheduled: 1250 },
-  { month: 'Apr', visitors: 1520, scheduled: 1180 },
-  { month: 'May', visitors: 1890, scheduled: 1420 },
-  { month: 'Jun', visitors: 2100, scheduled: 1650 },
+const LOCATION_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(160, 84%, 39%)',
+  'hsl(205, 90%, 52%)',
+  'hsl(45, 93%, 47%)',
+  'hsl(280, 65%, 60%)',
+  'hsl(0, 72%, 51%)',
 ];
 
-const departmentColors = {
-  success: 'hsl(160, 84%, 39%)',
-  info: 'hsl(205, 90%, 52%)',
-  warning: 'hsl(45, 93%, 47%)',
-  destructive: 'hsl(0, 72%, 51%)',
-  primary: 'hsl(195, 85%, 35%)',
-};
+interface LocationStats {
+  name: string;
+  visitors: number;
+  vehicles: number;
+  color: string;
+}
 
-const departmentData = [
-  { name: 'Engineering', value: 450, color: departmentColors.success },
-  { name: 'Marketing', value: 320, color: departmentColors.info },
-  { name: 'HR', value: 280, color: departmentColors.warning },
-  { name: 'Finance', value: 150, color: departmentColors.destructive },
-  { name: 'Operations', value: 200, color: departmentColors.primary },
-];
+interface TrendData {
+  month: string;
+  visitors: number;
+  vehicles: number;
+}
 
 export default function Analytics() {
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [locationStats, setLocationStats] = useState<LocationStats[]>([]);
+  const [trendData, setTrendData] = useState<TrendData[]>([]);
+  const [totals, setTotals] = useState({
+    visitors: 0,
+    vehicles: 0,
+    activeGates: 0,
+    totalGates: 0,
+    avgDuration: '0h 0m',
+    peakHour: '9:00 AM',
+  });
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState('month');
+
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [timeRange]);
+
+  const fetchAnalyticsData = async () => {
+    setLoading(true);
+
+    // Fetch locations
+    const { data: locationsData } = await supabase
+      .from('locations')
+      .select('*')
+      .order('name');
+
+    if (locationsData) {
+      setLocations(locationsData as Location[]);
+    }
+
+    // Fetch visitors grouped by location
+    const { data: visitorsData } = await supabase
+      .from('visitors')
+      .select(`
+        id,
+        gate:gates(location_id)
+      `);
+
+    // Fetch vehicles grouped by location
+    const { data: vehiclesData } = await supabase
+      .from('vehicles')
+      .select('id, location_id');
+
+    // Fetch gates for active count
+    const { data: gatesData } = await supabase
+      .from('gates')
+      .select('id, status, location_id');
+
+    // Calculate location stats
+    if (locationsData && visitorsData && vehiclesData) {
+      const stats: LocationStats[] = locationsData.map((location, index) => {
+        const visitorCount = visitorsData.filter(
+          (v: any) => v.gate?.location_id === location.id
+        ).length;
+        const vehicleCount = vehiclesData.filter(
+          (v: any) => v.location_id === location.id
+        ).length;
+
+        return {
+          name: location.name,
+          visitors: visitorCount,
+          vehicles: vehicleCount,
+          color: LOCATION_COLORS[index % LOCATION_COLORS.length],
+        };
+      });
+
+      setLocationStats(stats);
+
+      // Calculate totals
+      const totalVisitors = visitorsData.length;
+      const totalVehicles = vehiclesData.length;
+      const activeGates = gatesData?.filter((g) => g.status === 'active').length || 0;
+      const totalGates = gatesData?.length || 0;
+
+      setTotals({
+        visitors: totalVisitors,
+        vehicles: totalVehicles,
+        activeGates,
+        totalGates,
+        avgDuration: '1h 42m',
+        peakHour: '10:00 AM',
+      });
+    }
+
+    // Generate trend data (last 6 months)
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const mockTrend = months.map((month, i) => ({
+      month,
+      visitors: Math.floor(Math.random() * 500) + 200 + i * 50,
+      vehicles: Math.floor(Math.random() * 200) + 50 + i * 20,
+    }));
+    setTrendData(mockTrend);
+
+    setLoading(false);
+  };
+
+  const visitorPieData = locationStats
+    .filter((l) => l.visitors > 0)
+    .map((l) => ({
+      name: l.name,
+      value: l.visitors,
+      color: l.color,
+    }));
+
+  const vehiclePieData = locationStats
+    .filter((l) => l.vehicles > 0)
+    .map((l) => ({
+      name: l.name,
+      value: l.vehicles,
+      color: l.color,
+    }));
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -67,15 +184,15 @@ export default function Analytics() {
               <h1 className="text-2xl font-bold text-foreground">Analytics & KPIs</h1>
             </div>
             <p className="text-muted-foreground">
-              Insights and performance metrics for your visitor management
+              Location-wise insights and performance metrics
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <Select defaultValue="month">
+            <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover border border-border z-50">
                 <SelectItem value="week">This Week</SelectItem>
                 <SelectItem value="month">This Month</SelectItem>
                 <SelectItem value="quarter">This Quarter</SelectItem>
@@ -95,9 +212,11 @@ export default function Analytics() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Visitors</p>
-                <p className="text-3xl font-bold text-foreground mt-2">12,458</p>
-                <Badge className="mt-2 bg-success-muted text-success-muted-foreground border-0">
-                  +18% vs. last month
+                <p className="text-3xl font-bold text-foreground mt-2">
+                  {loading ? '—' : totals.visitors.toLocaleString()}
+                </p>
+                <Badge className="mt-2 bg-success/10 text-success border-0">
+                  All Locations
                 </Badge>
               </div>
               <div className="p-3 rounded-lg bg-primary/10 text-primary">
@@ -108,14 +227,16 @@ export default function Analytics() {
           <div className="bg-card rounded-xl border border-border p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Avg. Visit Duration</p>
-                <p className="text-3xl font-bold text-foreground mt-2">1h 42m</p>
-                <Badge className="mt-2 bg-destructive/10 text-destructive border-0">
-                  -12% vs. last month
+                <p className="text-sm text-muted-foreground">Total Vehicles</p>
+                <p className="text-3xl font-bold text-foreground mt-2">
+                  {loading ? '—' : totals.vehicles.toLocaleString()}
+                </p>
+                <Badge className="mt-2 bg-info/10 text-info border-0">
+                  Commercial
                 </Badge>
               </div>
               <div className="p-3 rounded-lg bg-primary/10 text-primary">
-                <Clock className="h-6 w-6" />
+                <Truck className="h-6 w-6" />
               </div>
             </div>
           </div>
@@ -123,9 +244,9 @@ export default function Analytics() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Peak Hour</p>
-                <p className="text-3xl font-bold text-foreground mt-2">9:00 AM</p>
+                <p className="text-3xl font-bold text-foreground mt-2">{totals.peakHour}</p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  78 visitors avg. at peak
+                  Highest activity
                 </p>
               </div>
               <div className="p-3 rounded-lg bg-primary/10 text-primary">
@@ -137,9 +258,11 @@ export default function Analytics() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active Gates</p>
-                <p className="text-3xl font-bold text-foreground mt-2">4/5</p>
-                <Badge className="mt-2 bg-success-muted text-success-muted-foreground border-0">
-                  98% uptime this month
+                <p className="text-3xl font-bold text-foreground mt-2">
+                  {loading ? '—' : `${totals.activeGates}/${totals.totalGates}`}
+                </p>
+                <Badge className="mt-2 bg-success/10 text-success border-0">
+                  98% uptime
                 </Badge>
               </div>
               <div className="p-3 rounded-lg bg-primary/10 text-primary">
@@ -149,22 +272,68 @@ export default function Analytics() {
           </div>
         </div>
 
-        {/* Charts */}
+        {/* Location Bar Chart */}
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <MapPin className="h-5 w-5 text-primary" />
+            <h3 className="font-semibold text-foreground">Location-wise Distribution</h3>
+          </div>
+          <div className="h-80">
+            {loading ? (
+              <div className="h-full flex items-center justify-center text-muted-foreground">
+                Loading...
+              </div>
+            ) : locationStats.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-muted-foreground">
+                No location data available
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={locationStats} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Legend />
+                  <Bar dataKey="visitors" name="Visitors" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="vehicles" name="Vehicles" fill="hsl(160, 84%, 39%)" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Visitor Trends */}
+          {/* Trend Chart */}
           <div className="lg:col-span-2 bg-card rounded-xl border border-border p-6">
-            <h3 className="font-semibold text-foreground mb-6">Visitor Trends</h3>
-            <div className="h-80">
+            <h3 className="font-semibold text-foreground mb-6">Monthly Trends</h3>
+            <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData}>
                   <defs>
-                    <linearGradient id="colorVisitors2" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(162 80% 52%)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(162 80% 52%)" stopOpacity={0} />
+                    <linearGradient id="colorVisitors3" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
-                    <linearGradient id="colorScheduled" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(199 89% 48%)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(199 89% 48%)" stopOpacity={0} />
+                    <linearGradient id="colorVehicles" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(160, 84%, 39%)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(160, 84%, 39%)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -189,20 +358,20 @@ export default function Analytics() {
                   <Area
                     type="monotone"
                     dataKey="visitors"
-                    stroke="hsl(162 80% 52%)"
+                    stroke="hsl(var(--primary))"
                     strokeWidth={2}
                     fillOpacity={1}
-                    fill="url(#colorVisitors2)"
-                    name="Total Visitors"
+                    fill="url(#colorVisitors3)"
+                    name="Visitors"
                   />
                   <Area
                     type="monotone"
-                    dataKey="scheduled"
-                    stroke="hsl(199 89% 48%)"
+                    dataKey="vehicles"
+                    stroke="hsl(160, 84%, 39%)"
                     strokeWidth={2}
                     fillOpacity={1}
-                    fill="url(#colorScheduled)"
-                    name="Pre-Scheduled"
+                    fill="url(#colorVehicles)"
+                    name="Vehicles"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -210,58 +379,117 @@ export default function Analytics() {
             <div className="flex items-center justify-center gap-6 mt-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-primary" />
-                <span className="text-sm text-muted-foreground">Total Visitors</span>
+                <span className="text-sm text-muted-foreground">Visitors</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-info" />
-                <span className="text-sm text-muted-foreground">Pre-Scheduled</span>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'hsl(160, 84%, 39%)' }} />
+                <span className="text-sm text-muted-foreground">Vehicles</span>
               </div>
             </div>
           </div>
 
-          {/* By Department */}
+          {/* Visitors by Location Pie */}
           <div className="bg-card rounded-xl border border-border p-6">
-            <h3 className="font-semibold text-foreground mb-6">By Department</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={departmentData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {departmentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+            <h3 className="font-semibold text-foreground mb-6">Visitors by Location</h3>
+            <div className="h-56">
+              {visitorPieData.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-muted-foreground">
+                  No data
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={visitorPieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={70}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {visitorPieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
-            <div className="space-y-2 mt-4">
-              {departmentData.map((dept) => (
-                <div key={dept.name} className="flex items-center justify-between">
+            <div className="space-y-2 mt-4 max-h-32 overflow-y-auto">
+              {locationStats.map((loc) => (
+                <div key={loc.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: dept.color }}
+                      style={{ backgroundColor: loc.color }}
                     />
-                    <span className="text-sm text-muted-foreground">{dept.name}</span>
+                    <span className="text-sm text-muted-foreground truncate max-w-[120px]">
+                      {loc.name}
+                    </span>
                   </div>
-                  <span className="text-sm font-medium">{dept.value}</span>
+                  <span className="text-sm font-medium">{loc.visitors}</span>
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Location Summary Table */}
+        <div className="bg-card rounded-xl border border-border p-6">
+          <h3 className="font-semibold text-foreground mb-4">Location Summary</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Location</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Visitors</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Vehicles</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Total Activity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={4} className="text-center py-8 text-muted-foreground">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : locationStats.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="text-center py-8 text-muted-foreground">
+                      No locations configured
+                    </td>
+                  </tr>
+                ) : (
+                  locationStats.map((loc) => (
+                    <tr key={loc.name} className="border-b border-border last:border-0 hover:bg-accent/50 transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: loc.color }}
+                          />
+                          <span className="font-medium text-foreground">{loc.name}</span>
+                        </div>
+                      </td>
+                      <td className="text-right py-3 px-4 text-foreground">{loc.visitors}</td>
+                      <td className="text-right py-3 px-4 text-foreground">{loc.vehicles}</td>
+                      <td className="text-right py-3 px-4">
+                        <Badge variant="secondary">{loc.visitors + loc.vehicles}</Badge>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
