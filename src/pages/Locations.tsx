@@ -72,6 +72,9 @@ export default function Locations() {
     email: '',
     phone: '',
     status: 'active' as 'active' | 'inactive',
+    latitude: '',
+    longitude: '',
+    geo_address: '',
   });
 
   useEffect(() => {
@@ -103,6 +106,9 @@ export default function Locations() {
       email: '',
       phone: '',
       status: 'active',
+      latitude: '',
+      longitude: '',
+      geo_address: '',
     });
   };
 
@@ -121,6 +127,9 @@ export default function Locations() {
       email: formData.email || null,
       phone: formData.phone || null,
       status: formData.status,
+      latitude: formData.latitude ? parseFloat(formData.latitude) : null,
+      longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+      geo_address: formData.geo_address || null,
     });
 
     setLoading(false);
@@ -148,6 +157,9 @@ export default function Locations() {
         email: formData.email || null,
         phone: formData.phone || null,
         status: formData.status,
+        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
+        longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+        geo_address: formData.geo_address || null,
       })
       .eq('id', selectedLocation.id);
 
@@ -192,6 +204,9 @@ export default function Locations() {
       email: location.email || '',
       phone: location.phone || '',
       status: location.status,
+      latitude: location.latitude?.toString() || '',
+      longitude: location.longitude?.toString() || '',
+      geo_address: location.geo_address || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -248,6 +263,36 @@ export default function Locations() {
             placeholder="Country"
             value={formData.country}
             onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label>Geo Address (for Badge)</Label>
+        <Input
+          placeholder="e.g., Tech Park, Whitefield, Bengaluru"
+          value={formData.geo_address}
+          onChange={(e) => setFormData({ ...formData, geo_address: e.target.value })}
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Latitude</Label>
+          <Input
+            type="number"
+            step="any"
+            placeholder="e.g., 12.9716"
+            value={formData.latitude}
+            onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Longitude</Label>
+          <Input
+            type="number"
+            step="any"
+            placeholder="e.g., 77.5946"
+            value={formData.longitude}
+            onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
           />
         </div>
       </div>
