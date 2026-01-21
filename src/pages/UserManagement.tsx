@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,15 +43,25 @@ import {
   Shield, 
   MapPin,
   Trash2,
-  Edit,
   Crown,
   Mail,
   Lock,
-  Search
+  Search,
+  KeyRound,
+  Upload,
+  Download,
+  Monitor,
+  Eye,
+  Edit,
+  Loader2,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useUserRoles, AppRole } from '@/hooks/useUserRoles';
+import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail } from '@/components/shared/CsvImportResult';
+import { parseCsvFile, downloadCsvTemplate } from '@/components/shared/CsvImport';
 
 interface Location {
   id: string;
@@ -63,6 +73,26 @@ interface Profile {
   id: string;
   user_id: string;
   full_name: string | null;
+}
+
+interface Screen {
+  id: string;
+  name: string;
+  path: string;
+  category: string | null;
+  icon: string | null;
+  display_order: number;
+}
+
+interface RoleScreenPermission {
+  id: string;
+  location_id: string;
+  role: AppRole;
+  screen_id: string;
+  can_view: boolean;
+  can_edit: boolean;
+  screen?: Screen;
+  location?: Location;
 }
 
 interface UserRoleEntry {
@@ -92,18 +122,19 @@ export default function UserManagement() {
   const [userRoles, setUserRoles] = useState<UserRoleEntry[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [screens, setScreens] = useState<Screen[]>([]);
+  const [rolePermissions, setRolePermissions] = useState<RoleScreenPermission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
+  const [isPasswordResetDialogOpen, setIsPasswordResetDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
+  const [sendingReset, setSendingReset] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [showImportResult, setShowImportResult] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Form state for role assignment
-  const [selectedUserId, setSelectedUserId] = useState('');
-  const [selectedLocationId, setSelectedLocationId] = useState('');
-  const [selectedRole, setSelectedRole] = useState<AppRole>('operator');
-  const [isHoAdminFlag, setIsHoAdminFlag] = useState(false);
-
   // Form state for user creation
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
@@ -112,48 +143,54 @@ export default function UserManagement() {
   const [newUserRole, setNewUserRole] = useState<AppRole>('operator');
   const [newUserIsHoAdmin, setNewUserIsHoAdmin] = useState(false);
 
+  // Password reset state
+  const [resetEmail, setResetEmail] = useState('');
+
+  // Role permissions state
+  const [selectedPermLocation, setSelectedPermLocation] = useState('');
+  const [selectedPermRole, setSelectedPermRole] = useState<AppRole>('operator');
+  const [permissionChanges, setPermissionChanges] = useState<Record<string, { can_view: boolean; can_edit: boolean }>>({});
+  const [savingPermissions, setSavingPermissions] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (selectedPermLocation && selectedPermRole) {
+      fetchRolePermissions();
+    }
+  }, [selectedPermLocation, selectedPermRole]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch all user roles with location details
-      const { data: rolesData, error: rolesError } = await supabase
-        .from('user_location_roles')
-        .select(`
-          *,
-          location:locations(id, name, city)
-        `)
-        .order('created_at', { ascending: false });
+      const [rolesRes, locationsRes, profilesRes, screensRes] = await Promise.all([
+        supabase.from('user_location_roles').select('*, location:locations(id, name, city)').order('created_at', { ascending: false }),
+        supabase.from('locations').select('id, name, city').order('name'),
+        supabase.from('profiles').select('id, user_id, full_name'),
+        supabase.from('screens').select('*').eq('is_active', true).order('display_order'),
+      ]);
 
-      if (rolesError) throw rolesError;
+      if (rolesRes.error) throw rolesRes.error;
+      if (locationsRes.error) throw locationsRes.error;
+      if (profilesRes.error) throw profilesRes.error;
+      if (screensRes.error) throw screensRes.error;
 
-      // Fetch all locations
-      const { data: locationsData, error: locationsError } = await supabase
-        .from('locations')
-        .select('id, name, city')
-        .order('name');
-
-      if (locationsError) throw locationsError;
-
-      // Fetch all profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, user_id, full_name');
-
-      if (profilesError) throw profilesError;
-
-      // Map profiles to roles
-      const rolesWithProfiles = (rolesData || []).map((role: any) => ({
+      const rolesWithProfiles = (rolesRes.data || []).map((role: any) => ({
         ...role,
-        profile: profilesData?.find((p: Profile) => p.user_id === role.user_id),
+        profile: profilesRes.data?.find((p: Profile) => p.user_id === role.user_id),
       }));
 
       setUserRoles(rolesWithProfiles);
-      setLocations(locationsData || []);
-      setProfiles(profilesData || []);
+      setLocations(locationsRes.data || []);
+      setProfiles(profilesRes.data || []);
+      setScreens(screensRes.data || []);
+
+      // Set default location for permissions
+      if (locationsRes.data && locationsRes.data.length > 0 && !selectedPermLocation) {
+        setSelectedPermLocation(locationsRes.data[0].id);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Failed to load user management data');
@@ -162,35 +199,30 @@ export default function UserManagement() {
     }
   };
 
-  const handleAddRole = async () => {
-    if (!selectedUserId || !selectedLocationId || !selectedRole) {
-      toast.error('Please fill all required fields');
-      return;
-    }
-
+  const fetchRolePermissions = async () => {
     try {
-      const { error } = await supabase
-        .from('user_location_roles')
-        .insert({
-          user_id: selectedUserId,
-          location_id: selectedLocationId,
-          role: selectedRole,
-          is_ho_admin: isHoAdminFlag,
-        });
+      const { data, error } = await supabase
+        .from('role_screen_permissions')
+        .select('*, screen:screens(*), location:locations(id, name, city)')
+        .eq('location_id', selectedPermLocation)
+        .eq('role', selectedPermRole);
 
       if (error) throw error;
 
-      toast.success('User role added successfully');
-      setIsAddDialogOpen(false);
-      resetForm();
-      fetchData();
-    } catch (error: any) {
-      if (error.code === '23505') {
-        toast.error('User already has a role at this location');
-      } else {
-        console.error('Error adding role:', error);
-        toast.error('Failed to add user role');
-      }
+      setRolePermissions(data || []);
+      
+      // Initialize permission changes
+      const changes: Record<string, { can_view: boolean; can_edit: boolean }> = {};
+      screens.forEach(screen => {
+        const existing = data?.find(p => p.screen_id === screen.id);
+        changes[screen.id] = {
+          can_view: existing?.can_view ?? true,
+          can_edit: existing?.can_edit ?? false,
+        };
+      });
+      setPermissionChanges(changes);
+    } catch (error) {
+      console.error('Error fetching role permissions:', error);
     }
   };
 
@@ -209,30 +241,6 @@ export default function UserManagement() {
       console.error('Error deleting role:', error);
       toast.error('Failed to remove user role');
     }
-  };
-
-  const handleUpdateRole = async (roleId: string, newRole: AppRole, newIsHoAdmin: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('user_location_roles')
-        .update({ role: newRole, is_ho_admin: newIsHoAdmin })
-        .eq('id', roleId);
-
-      if (error) throw error;
-
-      toast.success('User role updated');
-      fetchData();
-    } catch (error) {
-      console.error('Error updating role:', error);
-      toast.error('Failed to update user role');
-    }
-  };
-
-  const resetForm = () => {
-    setSelectedUserId('');
-    setSelectedLocationId('');
-    setSelectedRole('operator');
-    setIsHoAdminFlag(false);
   };
 
   const resetCreateUserForm = () => {
@@ -257,7 +265,6 @@ export default function UserManagement() {
 
     setCreatingUser(true);
     try {
-      // Create the user using Supabase Auth admin API via edge function
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: newUserEmail,
         password: newUserPassword,
@@ -274,10 +281,8 @@ export default function UserManagement() {
         throw new Error('Failed to create user');
       }
 
-      // Wait a moment for the profile trigger to create the profile
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // If location and role are selected, assign the role
       if (newUserLocationId) {
         const { error: roleError } = await supabase
           .from('user_location_roles')
@@ -310,7 +315,210 @@ export default function UserManagement() {
     }
   };
 
-  // Filter user roles based on search
+  const handlePasswordReset = async () => {
+    if (!resetEmail) {
+      toast.error('Please enter an email address');
+      return;
+    }
+
+    setSendingReset(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) throw error;
+
+      toast.success('Password reset email sent successfully!');
+      setIsPasswordResetDialogOpen(false);
+      setResetEmail('');
+    } catch (error: any) {
+      console.error('Error sending password reset:', error);
+      toast.error(error.message || 'Failed to send password reset email');
+    } finally {
+      setSendingReset(false);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    downloadCsvTemplate(
+      ['email', 'full_name', 'password', 'location_name', 'role', 'is_ho_admin'],
+      [
+        ['user@example.com', 'John Doe', 'password123', 'Main Office', 'operator', 'false'],
+        ['admin@example.com', 'Jane Smith', 'securepass', 'Branch Office', 'admin', 'true'],
+      ],
+      'user_import_template.csv'
+    );
+  };
+
+  const handleBulkImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const errors: ImportError[] = [];
+    let successCount = 0;
+    let failedCount = 0;
+
+    try {
+      const text = await file.text();
+      const { headers, rows } = parseCsvFile(text);
+
+      const emailIdx = headers.indexOf('email');
+      const nameIdx = headers.indexOf('full_name');
+      const passwordIdx = headers.indexOf('password');
+      const locationIdx = headers.indexOf('location_name');
+      const roleIdx = headers.indexOf('role');
+      const hoAdminIdx = headers.indexOf('is_ho_admin');
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const rowNum = i + 2;
+
+        const email = row[emailIdx]?.trim();
+        const fullName = row[nameIdx]?.trim();
+        const password = row[passwordIdx]?.trim();
+        const locationName = row[locationIdx]?.trim();
+        const role = row[roleIdx]?.trim().toLowerCase() as AppRole;
+        const isHoAdmin = row[hoAdminIdx]?.trim().toLowerCase() === 'true';
+
+        // Validate
+        const emailError = validateEmail(email);
+        if (emailError) {
+          errors.push({ row: rowNum, field: 'email', message: emailError, value: email });
+          failedCount++;
+          continue;
+        }
+
+        const nameError = validateRequired(fullName, 'Full Name');
+        if (nameError) {
+          errors.push({ row: rowNum, field: 'full_name', message: nameError, value: fullName });
+          failedCount++;
+          continue;
+        }
+
+        if (!password || password.length < 6) {
+          errors.push({ row: rowNum, field: 'password', message: 'Password must be at least 6 characters' });
+          failedCount++;
+          continue;
+        }
+
+        if (!['admin', 'manager', 'operator'].includes(role)) {
+          errors.push({ row: rowNum, field: 'role', message: 'Invalid role (use admin, manager, or operator)', value: role });
+          failedCount++;
+          continue;
+        }
+
+        // Find location
+        const location = locations.find(l => l.name.toLowerCase() === locationName?.toLowerCase());
+        if (locationName && !location) {
+          errors.push({ row: rowNum, field: 'location_name', message: 'Location not found', value: locationName });
+          failedCount++;
+          continue;
+        }
+
+        try {
+          // Create user
+          const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: fullName } },
+          });
+
+          if (authError) {
+            errors.push({ row: rowNum, field: 'email', message: authError.message, value: email });
+            failedCount++;
+            continue;
+          }
+
+          if (authData.user && location) {
+            await new Promise(r => setTimeout(r, 500));
+            
+            await supabase.from('user_location_roles').insert({
+              user_id: authData.user.id,
+              location_id: location.id,
+              role,
+              is_ho_admin: isHoAdmin,
+            });
+          }
+
+          successCount++;
+        } catch (error: any) {
+          errors.push({ row: rowNum, field: 'email', message: error.message, value: email });
+          failedCount++;
+        }
+      }
+
+      setImportResult({ success: successCount, failed: failedCount, errors });
+      setShowImportResult(true);
+      
+      if (successCount > 0) {
+        fetchData();
+      }
+    } catch (error) {
+      console.error('Error importing users:', error);
+      toast.error('Failed to process CSV file');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handlePermissionChange = (screenId: string, field: 'can_view' | 'can_edit', value: boolean) => {
+    setPermissionChanges(prev => ({
+      ...prev,
+      [screenId]: {
+        ...prev[screenId],
+        [field]: value,
+        // If removing view, also remove edit
+        ...(field === 'can_view' && !value ? { can_edit: false } : {}),
+      },
+    }));
+  };
+
+  const handleSavePermissions = async () => {
+    if (!selectedPermLocation || !selectedPermRole) return;
+
+    setSavingPermissions(true);
+    try {
+      // Delete existing permissions for this location/role
+      await supabase
+        .from('role_screen_permissions')
+        .delete()
+        .eq('location_id', selectedPermLocation)
+        .eq('role', selectedPermRole);
+
+      // Insert new permissions
+      const permissionsToInsert = Object.entries(permissionChanges)
+        .filter(([_, perm]) => perm.can_view || perm.can_edit)
+        .map(([screenId, perm]) => ({
+          location_id: selectedPermLocation,
+          role: selectedPermRole,
+          screen_id: screenId,
+          can_view: perm.can_view,
+          can_edit: perm.can_edit,
+        }));
+
+      if (permissionsToInsert.length > 0) {
+        const { error } = await supabase
+          .from('role_screen_permissions')
+          .insert(permissionsToInsert);
+
+        if (error) throw error;
+      }
+
+      toast.success('Role permissions saved successfully!');
+      fetchRolePermissions();
+    } catch (error) {
+      console.error('Error saving permissions:', error);
+      toast.error('Failed to save permissions');
+    } finally {
+      setSavingPermissions(false);
+    }
+  };
+
   const filteredUserRoles = userRoles.filter((role) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -321,25 +529,28 @@ export default function UserManagement() {
     );
   });
 
-  // Group roles by user
   const userGroups = userRoles.reduce((acc, role) => {
     const userId = role.user_id;
     if (!acc[userId]) {
-      acc[userId] = {
-        user_id: userId,
-        profile: role.profile,
-        roles: [],
-      };
+      acc[userId] = { user_id: userId, profile: role.profile, roles: [] };
     }
     acc[userId].roles.push(role);
     return acc;
   }, {} as Record<string, { user_id: string; profile?: Profile; roles: UserRoleEntry[] }>);
 
+  // Group screens by category
+  const screensByCategory = screens.reduce((acc, screen) => {
+    const cat = screen.category || 'Other';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(screen);
+    return acc;
+  }, {} as Record<string, Screen[]>);
+
   if (rolesLoading || loading) {
     return (
       <MainLayout>
         <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Loading...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </MainLayout>
     );
@@ -363,18 +574,92 @@ export default function UserManagement() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Users className="h-6 w-6" />
               User Management
             </h1>
             <p className="text-muted-foreground">
-              Create users and manage roles and location access permissions
+              Create users, manage roles, and configure screen permissions
             </p>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {/* Password Reset Dialog */}
+            <Dialog open={isPasswordResetDialogOpen} onOpenChange={setIsPasswordResetDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <KeyRound className="h-4 w-4" />
+                  Password Reset
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Send Password Reset</DialogTitle>
+                  <DialogDescription>
+                    Send a password reset email to a user
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="resetEmail">User Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="resetEmail"
+                        type="email"
+                        placeholder="user@example.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsPasswordResetDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handlePasswordReset} disabled={sendingReset}>
+                    {sendingReset ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      'Send Reset Email'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Bulk Import */}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="gap-2" onClick={handleDownloadTemplate}>
+                <Download className="h-4 w-4" />
+                Template
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleBulkImport}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Upload className="h-4 w-4" />
+                {uploading ? 'Importing...' : 'Bulk Import'}
+              </Button>
+            </div>
+
             {/* Create User Dialog */}
             <Dialog open={isCreateUserDialogOpen} onOpenChange={setIsCreateUserDialogOpen}>
               <DialogTrigger asChild>
@@ -473,10 +758,7 @@ export default function UserManagement() {
                           onCheckedChange={(checked) => setNewUserIsHoAdmin(checked === true)}
                         />
                         <div className="grid gap-1.5 leading-none">
-                          <label
-                            htmlFor="newUserHoAdmin"
-                            className="text-sm font-medium cursor-pointer"
-                          >
+                          <label htmlFor="newUserHoAdmin" className="text-sm font-medium cursor-pointer">
                             HO Admin
                           </label>
                           <p className="text-xs text-muted-foreground">
@@ -493,100 +775,15 @@ export default function UserManagement() {
                     Cancel
                   </Button>
                   <Button onClick={handleCreateUser} disabled={creatingUser}>
-                    {creatingUser ? 'Creating...' : 'Create User'}
+                    {creatingUser ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      'Create User'
+                    )}
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-
-            {/* Assign Role Dialog */}
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Shield className="h-4 w-4" />
-                  Assign Role
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Assign User Role</DialogTitle>
-                  <DialogDescription>
-                    Assign a role to an existing user at a specific location
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label>User</Label>
-                    <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select user" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border z-50">
-                        {profiles.map((profile) => (
-                          <SelectItem key={profile.user_id} value={profile.user_id}>
-                            {profile.full_name || 'Unnamed User'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Location</Label>
-                    <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select location" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border z-50">
-                        {locations.map((location) => (
-                          <SelectItem key={location.id} value={location.id}>
-                            {location.name} {location.city && `(${location.city})`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Role</Label>
-                    <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as AppRole)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border border-border z-50">
-                        <SelectItem value="admin">Admin - Full access</SelectItem>
-                        <SelectItem value="manager">Manager - Manage visitors</SelectItem>
-                        <SelectItem value="operator">Operator - Basic operations</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
-                    <Checkbox
-                      id="ho_admin"
-                      checked={isHoAdminFlag}
-                      onCheckedChange={(checked) => setIsHoAdminFlag(checked === true)}
-                    />
-                    <div className="grid gap-1.5 leading-none">
-                      <label
-                        htmlFor="ho_admin"
-                        className="text-sm font-medium cursor-pointer"
-                      >
-                        HO Admin
-                      </label>
-                      <p className="text-xs text-muted-foreground">
-                        Can access all locations and manage user roles
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddRole}>Assign Role</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -643,110 +840,263 @@ export default function UserManagement() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
                 <div className="p-3 rounded-lg bg-info/10 text-info">
-                  <Shield className="h-6 w-6" />
+                  <Monitor className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Role Assignments</p>
-                  <p className="text-2xl font-bold">{userRoles.length}</p>
+                  <p className="text-sm text-muted-foreground">Screens</p>
+                  <p className="text-2xl font-bold">{screens.length}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Search */}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search users, locations, or roles..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        {/* Tabs */}
+        <Tabs defaultValue="users" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="users" className="gap-2">
+              <Users className="h-4 w-4" />
+              Users & Roles
+            </TabsTrigger>
+            <TabsTrigger value="permissions" className="gap-2">
+              <Shield className="h-4 w-4" />
+              Role Permissions
+            </TabsTrigger>
+          </TabsList>
 
-        {/* User Roles Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>User Roles by Location</CardTitle>
-            <CardDescription>
-              View and manage user access permissions across locations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>HO Admin</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUserRoles.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      {searchQuery
-                        ? 'No users found matching your search'
-                        : 'No user roles assigned yet. Click "Create User" or "Assign Role" to get started.'}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredUserRoles.map((role) => (
-                    <TableRow key={role.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
-                            {(role.profile?.full_name || 'U')[0].toUpperCase()}
-                          </div>
-                          <span className="font-medium">
-                            {role.profile?.full_name || 'Unknown User'}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-muted-foreground" />
-                          {role.location?.name || 'Unknown'}
-                          {role.location?.city && (
-                            <span className="text-muted-foreground text-sm">
-                              ({role.location.city})
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={roleColors[role.role]}>
-                          {roleLabels[role.role]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {role.is_ho_admin && (
-                          <Badge variant="outline" className="gap-1">
-                            <Crown className="h-3 w-3" />
-                            Yes
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => handleDeleteRole(role.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-4">
+            {/* Search */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search users, locations, or roles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* User Roles Table */}
+            <Card>
+              <CardHeader>
+                <CardTitle>User Roles by Location</CardTitle>
+                <CardDescription>
+                  View and manage user access permissions across locations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                      <TableHead>Location</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>HO Admin</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))
+                  </TableHeader>
+                  <TableBody>
+                    {filteredUserRoles.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                          {searchQuery
+                            ? 'No users found matching your search'
+                            : 'No user roles assigned yet. Click "Create User" to get started.'}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredUserRoles.map((role) => (
+                        <TableRow key={role.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                                {(role.profile?.full_name || 'U')[0].toUpperCase()}
+                              </div>
+                              <span className="font-medium">
+                                {role.profile?.full_name || 'Unknown User'}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Building2 className="h-4 w-4 text-muted-foreground" />
+                              {role.location?.name || 'Unknown'}
+                              {role.location?.city && (
+                                <span className="text-muted-foreground text-sm">
+                                  ({role.location.city})
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={roleColors[role.role]}>
+                              {roleLabels[role.role]}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {role.is_ho_admin && (
+                              <Badge variant="outline" className="gap-1">
+                                <Crown className="h-3 w-3" />
+                                Yes
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteRole(role.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Permissions Tab */}
+          <TabsContent value="permissions" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Monitor className="h-5 w-5" />
+                  Screen Permissions by Role
+                </CardTitle>
+                <CardDescription>
+                  Configure which screens each role can access at each location
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Location and Role Selector */}
+                <div className="flex flex-wrap gap-4">
+                  <div className="space-y-2 min-w-[200px]">
+                    <Label>Location</Label>
+                    <Select value={selectedPermLocation} onValueChange={setSelectedPermLocation}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        {locations.map((location) => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.name} {location.city && `(${location.city})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2 min-w-[200px]">
+                    <Label>Role</Label>
+                    <Select value={selectedPermRole} onValueChange={(v) => setSelectedPermRole(v as AppRole)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
+                        <SelectItem value="operator">Operator</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Permissions Grid */}
+                {selectedPermLocation && selectedPermRole && (
+                  <div className="space-y-6">
+                    {Object.entries(screensByCategory).map(([category, categoryScreens]) => (
+                      <div key={category} className="space-y-3">
+                        <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                          {category}
+                        </h4>
+                        <div className="border rounded-lg overflow-hidden">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Screen</TableHead>
+                                <TableHead className="w-[100px] text-center">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <Eye className="h-4 w-4" />
+                                    View
+                                  </div>
+                                </TableHead>
+                                <TableHead className="w-[100px] text-center">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <Edit className="h-4 w-4" />
+                                    Edit
+                                  </div>
+                                </TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {categoryScreens.map((screen) => (
+                                <TableRow key={screen.id}>
+                                  <TableCell>
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{screen.name}</span>
+                                      <span className="text-xs text-muted-foreground">{screen.path}</span>
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Checkbox
+                                      checked={permissionChanges[screen.id]?.can_view ?? true}
+                                      onCheckedChange={(checked) => 
+                                        handlePermissionChange(screen.id, 'can_view', checked === true)
+                                      }
+                                    />
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Checkbox
+                                      checked={permissionChanges[screen.id]?.can_edit ?? false}
+                                      disabled={!permissionChanges[screen.id]?.can_view}
+                                      onCheckedChange={(checked) => 
+                                        handlePermissionChange(screen.id, 'can_edit', checked === true)
+                                      }
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="flex justify-end pt-4 border-t">
+                      <Button onClick={handleSavePermissions} disabled={savingPermissions} className="gap-2">
+                        {savingPermissions ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="h-4 w-4" />
+                            Save Permissions
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* CSV Import Result Dialog */}
+        <CsvImportResult
+          open={showImportResult}
+          onOpenChange={setShowImportResult}
+          result={importResult}
+          entityName="Users"
+        />
       </div>
     </MainLayout>
   );
