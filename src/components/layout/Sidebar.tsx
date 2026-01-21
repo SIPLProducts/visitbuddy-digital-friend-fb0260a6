@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   UserCog,
+  Truck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,6 +27,7 @@ import { useAuth } from '@/hooks/useAuth';
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: Users, label: 'Visitors', path: '/visitors' },
+  { icon: Truck, label: 'Vehicles', path: '/vehicles' },
   { icon: Calendar, label: 'Appointments', path: '/appointments' },
   { icon: QrCode, label: 'Check-in/Out', path: '/check-in-out' },
   { icon: Printer, label: 'Badge Printing', path: '/badge-printing' },
