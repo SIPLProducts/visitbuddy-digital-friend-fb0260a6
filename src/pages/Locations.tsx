@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +42,8 @@ import {
   Edit,
   Trash2,
   LocateFixed,
+  Upload,
+  Download,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Location } from '@/types/database';
@@ -51,6 +53,8 @@ import { toast } from 'sonner';
 export default function Locations() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [stats, setStats] = useState({
     totalLocations: 0,
     totalGates: 0,
@@ -193,6 +197,75 @@ export default function Locations() {
       setSelectedLocation(null);
       fetchLocations();
     }
+  };
+
+  const downloadTemplate = () => {
+    const headers = ['Name', 'Address', 'City', 'Country', 'Email', 'Phone', 'Status', 'Latitude', 'Longitude', 'Geo Address'];
+    const sampleRows = [
+      ['Corporate HQ', '123 Business Park', 'Mumbai', 'India', 'hq@company.com', '+919876543210', 'active', '19.0760', '72.8777', 'Business Park, Andheri East'],
+      ['Tech Center', '456 Tech Avenue', 'Bengaluru', 'India', 'tech@company.com', '+919123456789', 'active', '12.9716', '77.5946', 'Tech Park, Whitefield'],
+    ];
+    const csv = [headers.join(','), ...sampleRows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'locations-upload-template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Template downloaded');
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith('.csv')) {
+      toast.error('Please upload a CSV file');
+      return;
+    }
+    setUploading(true);
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
+        toast.error('CSV file is empty or has no data rows');
+        setUploading(false);
+        return;
+      }
+      const locationsToInsert = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        if (values.length < 1 || !values[0]) continue;
+        locationsToInsert.push({
+          name: values[0] || 'Unknown',
+          address: values[1] || null,
+          city: values[2] || null,
+          country: values[3] || 'India',
+          email: values[4] || null,
+          phone: values[5] || null,
+          status: (values[6]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
+          latitude: values[7] ? parseFloat(values[7]) : null,
+          longitude: values[8] ? parseFloat(values[8]) : null,
+          geo_address: values[9] || null,
+        });
+      }
+      if (locationsToInsert.length === 0) {
+        toast.error('No valid data rows found');
+        setUploading(false);
+        return;
+      }
+      const { error } = await supabase.from('locations').insert(locationsToInsert);
+      if (error) {
+        toast.error('Failed to import locations: ' + error.message);
+      } else {
+        toast.success(`Successfully imported ${locationsToInsert.length} locations`);
+        fetchLocations();
+      }
+    } catch (err) {
+      toast.error('Failed to parse CSV file');
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const openEditDialog = (location: Location) => {
@@ -403,10 +476,33 @@ export default function Locations() {
             <h1 className="text-2xl font-bold text-foreground">Locations</h1>
             <p className="text-muted-foreground">Manage your office locations and facilities</p>
           </div>
-          <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-            <Plus className="h-4 w-4" />
-            Add Location
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
+              <Download className="h-4 w-4" />
+              Template
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? 'Importing...' : 'Import CSV'}
+            </Button>
+            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+              <Plus className="h-4 w-4" />
+              Add Location
+            </Button>
+          </div>
         </div>
 
         {/* Locations Grid */}
