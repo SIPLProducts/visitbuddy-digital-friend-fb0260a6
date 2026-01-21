@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Select,
   SelectContent,
@@ -10,6 +11,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Table,
   TableBody,
@@ -19,50 +25,68 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Search, Download, Truck, LogIn, LogOut, Clock } from 'lucide-react';
+import { 
+  FileText, Search, Download, Truck, LogIn, LogOut, Clock, 
+  CalendarIcon, Upload, FileDown 
+} from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle } from '@/types/vehicle';
 import { cn } from '@/lib/utils';
-import { format, differenceInMinutes } from 'date-fns';
+import { format, differenceInMinutes, subDays } from 'date-fns';
+import { toast } from 'sonner';
+import { DateRange } from 'react-day-picker';
 
 export default function VehicleReport() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('7');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  });
   const [stats, setStats] = useState({
     total: 0,
     checkedIn: 0,
     checkedOut: 0,
     avgDuration: '0h 0m',
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetchVehicles();
-  }, [dateFilter]);
+    if (dateRange?.from) {
+      fetchVehicles();
+    }
+  }, [dateRange]);
 
   const fetchVehicles = async () => {
     setLoading(true);
     
-    const daysAgo = new Date();
-    daysAgo.setDate(daysAgo.getDate() - parseInt(dateFilter));
-
-    const { data } = await supabase
+    let query = supabase
       .from('vehicles')
       .select(`
         *,
         gate:gates(*),
         location:locations(*)
       `)
-      .gte('created_at', daysAgo.toISOString())
       .order('created_at', { ascending: false });
+
+    if (dateRange?.from) {
+      query = query.gte('created_at', dateRange.from.toISOString());
+    }
+    if (dateRange?.to) {
+      const endOfDay = new Date(dateRange.to);
+      endOfDay.setHours(23, 59, 59, 999);
+      query = query.lte('created_at', endOfDay.toISOString());
+    }
+
+    const { data } = await query;
 
     if (data) {
       const typedData = data as unknown as Vehicle[];
       setVehicles(typedData);
       
-      // Calculate average duration for checked out vehicles
       const completedVisits = typedData.filter(
         (v) => v.check_in_time && v.check_out_time
       );
@@ -94,42 +118,22 @@ export default function VehicleReport() {
 
   const exportToCsv = () => {
     const headers = [
-      'Vehicle ID',
       'Vehicle Number',
       'Type',
       'Driver Name',
       'Driver Phone',
       'Company',
       'Purpose',
-      'Status',
-      'Check In Time',
-      'Check Out Time',
-      'Duration (mins)',
-      'Gate',
-      'Location',
     ];
     
-    const rows = vehicles.map((v) => {
-      const duration = v.check_in_time && v.check_out_time
-        ? differenceInMinutes(new Date(v.check_out_time), new Date(v.check_in_time))
-        : '';
-      
-      return [
-        v.vehicle_id,
-        v.vehicle_number,
-        v.vehicle_type,
-        v.driver_name,
-        v.driver_phone || '',
-        v.company || '',
-        v.purpose || '',
-        v.status,
-        v.check_in_time ? format(new Date(v.check_in_time), 'yyyy-MM-dd HH:mm:ss') : '',
-        v.check_out_time ? format(new Date(v.check_out_time), 'yyyy-MM-dd HH:mm:ss') : '',
-        duration.toString(),
-        v.gate?.name || '',
-        v.location?.name || '',
-      ];
-    });
+    const rows = vehicles.map((v) => [
+      v.vehicle_number,
+      v.vehicle_type,
+      v.driver_name,
+      v.driver_phone || '',
+      v.company || '',
+      v.purpose || '',
+    ]);
 
     const escapeCsvField = (field: string) => {
       if (field.includes(',') || field.includes('"') || field.includes('\n')) {
@@ -150,6 +154,119 @@ export default function VehicleReport() {
     a.download = `vehicle-report-${format(new Date(), 'yyyy-MM-dd')}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const downloadTemplate = () => {
+    const headers = [
+      'Vehicle Number',
+      'Vehicle Type',
+      'Driver Name',
+      'Driver Phone',
+      'Company',
+      'Purpose',
+    ];
+    
+    const sampleRows = [
+      ['KA-01-AB-1234', 'Truck', 'John Doe', '+919876543210', 'ABC Transport', 'Delivery'],
+      ['MH-02-CD-5678', 'Van', 'Jane Smith', '+919123456789', 'XYZ Logistics', 'Pickup'],
+    ];
+
+    const csv = [
+      headers.join(','),
+      ...sampleRows.map((r) => r.join(',')),
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vehicle-upload-template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Template downloaded');
+  };
+
+  const generateVehicleId = () => {
+    const uuid1 = crypto.randomUUID().replace(/-/g, '');
+    const uuid2 = crypto.randomUUID().replace(/-/g, '');
+    return `VEH-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.csv')) {
+      toast.error('Please upload a CSV file');
+      return;
+    }
+
+    setUploading(true);
+    
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        toast.error('CSV file is empty or has no data rows');
+        setUploading(false);
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      
+      const requiredHeaders = ['vehicle number', 'driver name'];
+      const missingHeaders = requiredHeaders.filter(
+        h => !headers.some(header => header.includes(h.replace(' ', '')))
+      );
+      
+      if (missingHeaders.length > 0) {
+        toast.error(`Missing required columns: ${missingHeaders.join(', ')}`);
+        setUploading(false);
+        return;
+      }
+
+      const vehiclesToInsert = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        
+        if (values.length < 2 || !values[0]) continue;
+        
+        vehiclesToInsert.push({
+          vehicle_id: generateVehicleId(),
+          vehicle_number: values[0]?.toUpperCase() || '',
+          vehicle_type: values[1] || 'Truck',
+          driver_name: values[2] || 'Unknown',
+          driver_phone: values[3] || null,
+          company: values[4] || null,
+          purpose: values[5] || null,
+          status: 'registered',
+        });
+      }
+
+      if (vehiclesToInsert.length === 0) {
+        toast.error('No valid data rows found');
+        setUploading(false);
+        return;
+      }
+
+      const { error } = await supabase.from('vehicles').insert(vehiclesToInsert);
+
+      if (error) {
+        toast.error('Failed to import vehicles: ' + error.message);
+      } else {
+        toast.success(`Successfully imported ${vehiclesToInsert.length} vehicles`);
+        fetchVehicles();
+      }
+    } catch (err) {
+      toast.error('Failed to parse CSV file');
+    }
+
+    setUploading(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const filteredVehicles = vehicles.filter((vehicle) => {
@@ -206,20 +323,42 @@ export default function VehicleReport() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Truck className="h-6 w-6 text-primary" />
               <h1 className="text-2xl font-bold text-foreground">Vehicle Report</h1>
             </div>
             <p className="text-muted-foreground">
-              View entry/exit logs and export vehicle history
+              View entry/exit logs and manage vehicle data
             </p>
           </div>
-          <Button onClick={exportToCsv} className="gap-2">
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={downloadTemplate} className="gap-2">
+              <FileDown className="h-4 w-4" />
+              Template
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button 
+              variant="outline" 
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? 'Importing...' : 'Import CSV'}
+            </Button>
+            <Button onClick={exportToCsv} className="gap-2">
+              <Download className="h-4 w-4" />
+              Export CSV
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -300,17 +439,66 @@ export default function VehicleReport() {
               <SelectItem value="checked_out">Checked Out</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={dateFilter} onValueChange={setDateFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7">Last 7 Days</SelectItem>
-              <SelectItem value="30">Last 30 Days</SelectItem>
-              <SelectItem value="90">Last 90 Days</SelectItem>
-              <SelectItem value="365">Last Year</SelectItem>
-            </SelectContent>
-          </Select>
+          
+          {/* Date Range Picker */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "justify-start text-left font-normal min-w-[240px]",
+                  !dateRange && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateRange?.from ? (
+                  dateRange.to ? (
+                    <>
+                      {format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM yyyy")}
+                    </>
+                  ) : (
+                    format(dateRange.from, "dd MMM yyyy")
+                  )
+                ) : (
+                  <span>Pick date range</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={dateRange?.from}
+                selected={dateRange}
+                onSelect={setDateRange}
+                numberOfMonths={2}
+                className={cn("p-3 pointer-events-auto")}
+              />
+              <div className="border-t p-3 flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}
+                >
+                  Last 7 days
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}
+                >
+                  Last 30 days
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })}
+                >
+                  Last 90 days
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Vehicle History Table */}
