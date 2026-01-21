@@ -356,6 +356,51 @@ export type Database = {
           },
         ]
       }
+      screens: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          path: string
+          requires_admin: boolean | null
+          requires_manager: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          path: string
+          requires_admin?: boolean | null
+          requires_manager?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          path?: string
+          requires_admin?: boolean | null
+          requires_manager?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_location_roles: {
         Row: {
           created_at: string
