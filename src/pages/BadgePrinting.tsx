@@ -1,14 +1,29 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Search, Printer, Laptop, MapPin } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Search, Printer, Laptop, MapPin, UserCheck, Camera } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location } from '@/types/database';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { CameraCapture } from '@/components/checkin/CameraCapture';
 
 interface VisitorWithLocation extends Omit<Visitor, 'gate'> {
   gate?: {
@@ -19,16 +34,32 @@ interface VisitorWithLocation extends Omit<Visitor, 'gate'> {
 }
 
 export default function BadgePrinting() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'checked_in' | 'scheduled' | 'all'>('all');
   const [visitors, setVisitors] = useState<VisitorWithLocation[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<VisitorWithLocation | null>(null);
+  const [showCameraDialog, setShowCameraDialog] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    fetchCheckedInVisitors();
-  }, []);
+    fetchVisitors();
+  }, [statusFilter]);
 
-  const fetchCheckedInVisitors = async () => {
-    const { data } = await supabase
+  useEffect(() => {
+    // Auto-select visitor from URL params
+    const visitorId = searchParams.get('visitorId');
+    if (visitorId && visitors.length > 0) {
+      const visitor = visitors.find((v) => v.id === visitorId);
+      if (visitor) {
+        setSelectedVisitor(visitor);
+      }
+    }
+  }, [searchParams, visitors]);
+
+  const fetchVisitors = async () => {
+    let query = supabase
       .from('visitors')
       .select(`
         *,
@@ -36,16 +67,103 @@ export default function BadgePrinting() {
         department:departments(*),
         gate:gates(id, location_id, location:locations(*))
       `)
-      .eq('status', 'checked_in')
-      .order('check_in_time', { ascending: false });
+      .order('created_at', { ascending: false });
+
+    if (statusFilter === 'checked_in') {
+      query = query.eq('status', 'checked_in');
+    } else if (statusFilter === 'scheduled') {
+      query = query.eq('status', 'scheduled');
+    } else {
+      query = query.in('status', ['checked_in', 'scheduled']);
+    }
+
+    const { data } = await query;
 
     if (data) {
       setVisitors(data as unknown as VisitorWithLocation[]);
     }
   };
 
-  const handlePrintBadge = async (visitor: Visitor) => {
-    // Mark badge as printed
+  const uploadPhoto = async (blob: Blob, visitorId: string): Promise<string | null> => {
+    const fileName = `${visitorId}-${Date.now()}.jpg`;
+    const filePath = `photos/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('visitor-photos')
+      .upload(filePath, blob, {
+        contentType: 'image/jpeg',
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      return null;
+    }
+
+    const { data } = supabase.storage
+      .from('visitor-photos')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
+  const handlePhotoCapture = async (blob: Blob) => {
+    if (!selectedVisitor) return;
+
+    setIsUploading(true);
+    const photoUrl = await uploadPhoto(blob, selectedVisitor.id);
+    
+    if (photoUrl) {
+      const { error } = await supabase
+        .from('visitors')
+        .update({ photo_url: photoUrl })
+        .eq('id', selectedVisitor.id);
+
+      if (error) {
+        toast.error('Failed to save photo');
+      } else {
+        toast.success('Photo captured successfully');
+        setSelectedVisitor({ ...selectedVisitor, photo_url: photoUrl });
+        fetchVisitors();
+      }
+    } else {
+      toast.error('Failed to upload photo');
+    }
+
+    setIsUploading(false);
+    setShowCameraDialog(false);
+  };
+
+  const handleCheckInAndPrint = async (visitor: VisitorWithLocation) => {
+    // First check in the visitor
+    const { error: checkInError } = await supabase
+      .from('visitors')
+      .update({
+        status: 'checked_in',
+        check_in_time: new Date().toISOString(),
+      })
+      .eq('id', visitor.id);
+
+    if (checkInError) {
+      toast.error('Failed to check in visitor');
+      return;
+    }
+
+    // Then print badge
+    const { error: badgeError } = await supabase
+      .from('visitors')
+      .update({ badge_printed: true })
+      .eq('id', visitor.id);
+
+    if (badgeError) {
+      toast.error('Failed to update badge status');
+    } else {
+      toast.success(`${visitor.name} checked in and badge printed`);
+      fetchVisitors();
+    }
+  };
+
+  const handlePrintBadge = async (visitor: VisitorWithLocation) => {
     const { error } = await supabase
       .from('visitors')
       .update({ badge_printed: true })
@@ -55,7 +173,7 @@ export default function BadgePrinting() {
       toast.error('Failed to update badge status');
     } else {
       toast.success(`Badge printed for ${visitor.name}`);
-      fetchCheckedInVisitors();
+      fetchVisitors();
     }
   };
 
@@ -71,7 +189,8 @@ export default function BadgePrinting() {
   const filteredVisitors = visitors.filter(
     (v) =>
       v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.company?.toLowerCase().includes(searchQuery.toLowerCase())
+      v.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      v.visitor_id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -84,15 +203,30 @@ export default function BadgePrinting() {
             <h1 className="text-2xl font-bold text-foreground">Badge Printing</h1>
           </div>
           <p className="text-muted-foreground">
-            Print visitor badges for checked-in visitors
+            Print visitor badges with check-in option
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Checked-in Visitors List */}
+          {/* Visitors List */}
           <div className="bg-card rounded-xl border border-border">
-            <div className="p-6 border-b border-border">
-              <h3 className="font-semibold text-foreground mb-4">Checked-in Visitors</h3>
+            <div className="p-6 border-b border-border space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-foreground">Visitors</h3>
+                <Select
+                  value={statusFilter}
+                  onValueChange={(v) => setStatusFilter(v as 'checked_in' | 'scheduled' | 'all')}
+                >
+                  <SelectTrigger className="w-36">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Active</SelectItem>
+                    <SelectItem value="checked_in">Checked In</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -106,7 +240,7 @@ export default function BadgePrinting() {
             <div className="max-h-[500px] overflow-y-auto divide-y divide-border">
               {filteredVisitors.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
-                  No checked-in visitors
+                  No visitors found
                 </div>
               ) : (
                 filteredVisitors.map((visitor) => (
@@ -119,6 +253,9 @@ export default function BadgePrinting() {
                     )}
                   >
                     <Avatar className="h-10 w-10">
+                      {visitor.photo_url ? (
+                        <AvatarImage src={visitor.photo_url} alt={visitor.name} />
+                      ) : null}
                       <AvatarFallback
                         className={cn(
                           'font-medium',
@@ -135,9 +272,13 @@ export default function BadgePrinting() {
                         <p className="font-medium text-foreground">{visitor.name}</p>
                         <Badge
                           variant="outline"
-                          className="bg-emerald-100 text-emerald-700 border-emerald-200"
+                          className={cn(
+                            visitor.status === 'checked_in'
+                              ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                              : 'bg-sky-100 text-sky-700 border-sky-200'
+                          )}
                         >
-                          Checked In
+                          {visitor.status === 'checked_in' ? 'Checked In' : 'Scheduled'}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">
@@ -176,6 +317,9 @@ export default function BadgePrinting() {
 
                   <div className="flex-1 flex flex-col items-center justify-center text-center">
                     <Avatar className="h-20 w-20 mb-4">
+                      {selectedVisitor.photo_url ? (
+                        <AvatarImage src={selectedVisitor.photo_url} alt={selectedVisitor.name} />
+                      ) : null}
                       <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
                         {getInitials(selectedVisitor.name)}
                       </AvatarFallback>
@@ -210,14 +354,49 @@ export default function BadgePrinting() {
                   </div>
                 </div>
 
-                {/* Print Button */}
-                <Button
-                  className="w-full gap-2"
-                  onClick={() => handlePrintBadge(selectedVisitor as unknown as Visitor)}
-                >
-                  <Printer className="h-4 w-4" />
-                  {selectedVisitor.badge_printed ? 'Reprint Badge' : 'Print Badge'}
-                </Button>
+                {/* Photo Capture Button */}
+                {!selectedVisitor.photo_url && (
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => setShowCameraDialog(true)}
+                  >
+                    <Camera className="h-4 w-4" />
+                    Capture Photo
+                  </Button>
+                )}
+
+                {/* Action Buttons */}
+                <div className="space-y-2">
+                  {selectedVisitor.status === 'scheduled' ? (
+                    <>
+                      <Button
+                        className="w-full gap-2"
+                        onClick={() => handleCheckInAndPrint(selectedVisitor)}
+                      >
+                        <UserCheck className="h-4 w-4" />
+                        <Printer className="h-4 w-4" />
+                        Check In & Print Badge
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2"
+                        onClick={() => handlePrintBadge(selectedVisitor)}
+                      >
+                        <Printer className="h-4 w-4" />
+                        Print Badge Only
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      className="w-full gap-2"
+                      onClick={() => handlePrintBadge(selectedVisitor)}
+                    >
+                      <Printer className="h-4 w-4" />
+                      {selectedVisitor.badge_printed ? 'Reprint Badge' : 'Print Badge'}
+                    </Button>
+                  )}
+                </div>
               </div>
             ) : (
               <div className="text-center py-12">
@@ -232,6 +411,27 @@ export default function BadgePrinting() {
           </div>
         </div>
       </div>
+
+      {/* Camera Capture Dialog */}
+      <Dialog open={showCameraDialog} onOpenChange={setShowCameraDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Capture Visitor Photo
+            </DialogTitle>
+          </DialogHeader>
+          <CameraCapture
+            onCapture={handlePhotoCapture}
+            onCancel={() => setShowCameraDialog(false)}
+          />
+          {isUploading && (
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground">Uploading photo...</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
