@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Building2, Search, Plus, Users, MapPin, Edit, Trash2 } from 'lucide-react';
+import { Building2, Search, Plus, Users, MapPin, Edit, Trash2, Upload, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Location } from '@/types/database';
 import { toast } from 'sonner';
@@ -43,6 +43,8 @@ export default function Departments() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Dialog states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -164,6 +166,72 @@ export default function Departments() {
     setIsDeleteDialogOpen(true);
   };
 
+  const downloadTemplate = () => {
+    const headers = ['Name', 'Description', 'Location Name'];
+    const sampleRows = [
+      ['Engineering', 'Software development team', 'Corporate HQ'],
+      ['Human Resources', 'HR and recruitment', 'Tech Center'],
+      ['Finance', 'Accounting and finance', 'Corporate HQ'],
+    ];
+    const csv = [headers.join(','), ...sampleRows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'departments-upload-template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Template downloaded');
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith('.csv')) {
+      toast.error('Please upload a CSV file');
+      return;
+    }
+    setUploading(true);
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
+        toast.error('CSV file is empty or has no data rows');
+        setUploading(false);
+        return;
+      }
+      const departmentsToInsert = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        if (values.length < 1 || !values[0]) continue;
+        const locationName = values[2]?.toLowerCase();
+        const matchedLocation = locations.find(l => l.name.toLowerCase() === locationName);
+        departmentsToInsert.push({
+          name: values[0] || 'Unknown',
+          description: values[1] || null,
+          location: matchedLocation?.name || null,
+          location_id: matchedLocation?.id || null,
+        });
+      }
+      if (departmentsToInsert.length === 0) {
+        toast.error('No valid data rows found');
+        setUploading(false);
+        return;
+      }
+      const { error } = await supabase.from('departments').insert(departmentsToInsert);
+      if (error) {
+        toast.error('Failed to import departments: ' + error.message);
+      } else {
+        toast.success(`Successfully imported ${departmentsToInsert.length} departments`);
+        fetchData();
+      }
+    } catch (err) {
+      toast.error('Failed to parse CSV file');
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const getInitials = (name: string) => {
     return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
   };
@@ -180,15 +248,38 @@ export default function Departments() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Departments</h1>
             <p className="text-muted-foreground">Manage departments and their employees</p>
           </div>
-          <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-            <Plus className="h-4 w-4" />
-            Add Department
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
+              <Download className="h-4 w-4" />
+              Template
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? 'Importing...' : 'Import CSV'}
+            </Button>
+            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+              <Plus className="h-4 w-4" />
+              Add Department
+            </Button>
+          </div>
         </div>
 
         {/* Search */}

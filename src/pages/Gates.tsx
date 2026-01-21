@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +41,8 @@ import {
   Edit,
   Trash2,
   Power,
+  Upload,
+  Download,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Gate, Location } from '@/types/database';
@@ -51,6 +53,8 @@ export default function Gates() {
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [stats, setStats] = useState({
     totalGates: 0,
     activeGates: 0,
@@ -220,6 +224,75 @@ export default function Gates() {
     setIsDeleteDialogOpen(true);
   };
 
+  const downloadTemplate = () => {
+    const headers = ['Name', 'Building', 'Location Name', 'Gate Type', 'Capacity', 'Operating Hours', 'QR Enabled', 'Status'];
+    const sampleRows = [
+      ['Main Entry', 'Building A', 'Corporate HQ', 'Entry & Exit', '100', '06:00 - 22:00', 'yes', 'active'],
+      ['Side Gate', 'Building B', 'Tech Center', 'Entry Only', '50', '08:00 - 18:00', 'yes', 'active'],
+    ];
+    const csv = [headers.join(','), ...sampleRows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gates-upload-template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Template downloaded');
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith('.csv')) {
+      toast.error('Please upload a CSV file');
+      return;
+    }
+    setUploading(true);
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
+        toast.error('CSV file is empty or has no data rows');
+        setUploading(false);
+        return;
+      }
+      const gatesToInsert = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        if (values.length < 1 || !values[0]) continue;
+        const locationName = values[2]?.toLowerCase();
+        const matchedLocation = locations.find(l => l.name.toLowerCase() === locationName);
+        gatesToInsert.push({
+          name: values[0] || 'Unknown',
+          building: values[1] || null,
+          location_id: matchedLocation?.id || null,
+          gate_type: values[3] || 'Entry & Exit',
+          capacity: parseInt(values[4]) || 100,
+          operating_hours: values[5] || '06:00 - 22:00',
+          has_qr: values[6]?.toLowerCase() === 'yes' || values[6]?.toLowerCase() === 'true',
+          status: (values[7]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
+        });
+      }
+      if (gatesToInsert.length === 0) {
+        toast.error('No valid data rows found');
+        setUploading(false);
+        return;
+      }
+      const { error } = await supabase.from('gates').insert(gatesToInsert);
+      if (error) {
+        toast.error('Failed to import gates: ' + error.message);
+      } else {
+        toast.success(`Successfully imported ${gatesToInsert.length} gates`);
+        fetchData();
+      }
+    } catch (err) {
+      toast.error('Failed to parse CSV file');
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const getCapacityPercentage = (current: number, capacity: number) => {
     return Math.round((current / capacity) * 100);
   };
@@ -363,10 +436,33 @@ export default function Gates() {
             <h1 className="text-2xl font-bold text-foreground">Gates</h1>
             <p className="text-muted-foreground">Manage entry and exit points for your facilities</p>
           </div>
-          <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-            <Plus className="h-4 w-4" />
-            Add Gate
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
+              <Download className="h-4 w-4" />
+              Template
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              <Upload className="h-4 w-4" />
+              {uploading ? 'Importing...' : 'Import CSV'}
+            </Button>
+            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+              <Plus className="h-4 w-4" />
+              Add Gate
+            </Button>
+          </div>
         </div>
 
         {/* Gates Grid */}
