@@ -247,7 +247,10 @@ export type Database = {
           department_count: number | null
           email: string | null
           gate_count: number | null
+          geo_address: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           name: string
           phone: string | null
           status: Database["public"]["Enums"]["location_status"] | null
@@ -263,7 +266,10 @@ export type Database = {
           department_count?: number | null
           email?: string | null
           gate_count?: number | null
+          geo_address?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name: string
           phone?: string | null
           status?: Database["public"]["Enums"]["location_status"] | null
@@ -279,7 +285,10 @@ export type Database = {
           department_count?: number | null
           email?: string | null
           gate_count?: number | null
+          geo_address?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           name?: string
           phone?: string | null
           status?: Database["public"]["Enums"]["location_status"] | null
