@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Shield, Users, Building2, CheckCircle2, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Shield, Users, Building2, CheckCircle2, Loader2, Crown } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -32,6 +32,20 @@ const features = [
   { icon: Shield, title: 'Secure Access Control', description: 'Enterprise-grade security for your facilities' },
   { icon: Users, title: 'Visitor Management', description: 'Streamlined check-in and tracking' },
   { icon: Building2, title: 'Multi-Location Support', description: 'Manage all your sites from one platform' },
+];
+
+// Demo users for client demonstration
+const demoUsers = [
+  { 
+    email: 'bala@sharviinfotech.com', 
+    password: 'Bala@123', 
+    name: 'Bala', 
+    role: 'HO Admin',
+    location: 'All Locations',
+    color: 'bg-[#f59e0b]',
+    icon: Crown,
+    description: 'Full access to all locations',
+  },
 ];
 
 export default function Auth() {
@@ -87,6 +101,11 @@ export default function Auth() {
       toast.success('Account created successfully!');
       navigate('/');
     }
+  };
+
+  const handleDemoLogin = (email: string, password: string) => {
+    loginForm.setValue('email', email);
+    loginForm.setValue('password', password);
   };
 
   return (
@@ -162,7 +181,7 @@ export default function Auth() {
           </div>
 
           {/* Form Header */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h2 className="text-2xl font-bold text-foreground">
               {isLogin ? 'Welcome back' : 'Create your account'}
             </h2>
@@ -172,6 +191,33 @@ export default function Auth() {
                 : 'Get started with VisiGuard today'}
             </p>
           </div>
+
+          {/* Demo Users Section */}
+          {isLogin && (
+            <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-accent/50 to-accent/30 border border-border">
+              <p className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
+                <Crown className="h-4 w-4 text-[#f59e0b]" />
+                Demo Account
+              </p>
+              {demoUsers.map((demo) => (
+                <button
+                  key={demo.email}
+                  type="button"
+                  onClick={() => handleDemoLogin(demo.email, demo.password)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:border-primary transition-all hover:shadow-md text-left"
+                >
+                  <div className={`w-10 h-10 rounded-full ${demo.color} flex items-center justify-center shrink-0`}>
+                    <demo.icon className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground">{demo.name}</p>
+                    <p className="text-xs text-muted-foreground">{demo.role} • {demo.location}</p>
+                  </div>
+                  <div className="text-xs text-primary font-medium">Click to login →</div>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Auth Form */}
           <div className="bg-card rounded-2xl border shadow-sm p-6 sm:p-8">
