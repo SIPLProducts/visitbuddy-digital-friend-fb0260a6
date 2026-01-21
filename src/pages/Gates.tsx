@@ -1,9 +1,37 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Switch } from '@/components/ui/switch';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   DoorOpen,
   Plus,
@@ -15,11 +43,14 @@ import {
   Power,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Gate } from '@/types/database';
+import { Gate, Location } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function Gates() {
   const [gates, setGates] = useState<Gate[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState({
     totalGates: 0,
     activeGates: 0,
@@ -27,18 +58,36 @@ export default function Gates() {
     currentVisitors: 0,
   });
 
+  // Dialog states
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedGate, setSelectedGate] = useState<Gate | null>(null);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    building: '',
+    location_id: '',
+    gate_type: 'Entry & Exit',
+    capacity: 100,
+    operating_hours: '06:00 - 22:00',
+    has_qr: true,
+    status: 'active' as 'active' | 'inactive',
+  });
+
   useEffect(() => {
-    fetchGates();
+    fetchData();
   }, []);
 
-  const fetchGates = async () => {
-    const { data } = await supabase
-      .from('gates')
-      .select('*, location:locations(*)')
-      .order('name');
+  const fetchData = async () => {
+    const [gatesRes, locRes] = await Promise.all([
+      supabase.from('gates').select('*, location:locations(*)').order('name'),
+      supabase.from('locations').select('*').order('name'),
+    ]);
 
-    if (data) {
-      const typedData = data as Gate[];
+    if (gatesRes.data) {
+      const typedData = gatesRes.data as Gate[];
       setGates(typedData);
 
       setStats({
@@ -48,11 +97,214 @@ export default function Gates() {
         currentVisitors: typedData.reduce((acc, g) => acc + g.current_visitors, 0),
       });
     }
+    if (locRes.data) setLocations(locRes.data as Location[]);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      building: '',
+      location_id: '',
+      gate_type: 'Entry & Exit',
+      capacity: 100,
+      operating_hours: '06:00 - 22:00',
+      has_qr: true,
+      status: 'active',
+    });
+  };
+
+  const handleAdd = async () => {
+    if (!formData.name) {
+      toast.error('Please enter gate name');
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.from('gates').insert({
+      name: formData.name,
+      building: formData.building || null,
+      location_id: formData.location_id || null,
+      gate_type: formData.gate_type,
+      capacity: formData.capacity,
+      operating_hours: formData.operating_hours,
+      has_qr: formData.has_qr,
+      status: formData.status,
+    });
+
+    setLoading(false);
+    if (error) {
+      toast.error('Failed to add gate');
+    } else {
+      toast.success('Gate added successfully');
+      setIsAddDialogOpen(false);
+      resetForm();
+      fetchData();
+    }
+  };
+
+  const handleEdit = async () => {
+    if (!selectedGate || !formData.name) return;
+
+    setLoading(true);
+    const { error } = await supabase
+      .from('gates')
+      .update({
+        name: formData.name,
+        building: formData.building || null,
+        location_id: formData.location_id || null,
+        gate_type: formData.gate_type,
+        capacity: formData.capacity,
+        operating_hours: formData.operating_hours,
+        has_qr: formData.has_qr,
+        status: formData.status,
+      })
+      .eq('id', selectedGate.id);
+
+    setLoading(false);
+    if (error) {
+      toast.error('Failed to update gate');
+    } else {
+      toast.success('Gate updated successfully');
+      setIsEditDialogOpen(false);
+      resetForm();
+      fetchData();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedGate) return;
+
+    setLoading(true);
+    const { error } = await supabase.from('gates').delete().eq('id', selectedGate.id);
+
+    setLoading(false);
+    if (error) {
+      toast.error('Failed to delete gate');
+    } else {
+      toast.success('Gate deleted successfully');
+      setIsDeleteDialogOpen(false);
+      setSelectedGate(null);
+      fetchData();
+    }
+  };
+
+  const toggleGateStatus = async (gate: Gate) => {
+    const newStatus = gate.status === 'active' ? 'inactive' : 'active';
+    const { error } = await supabase.from('gates').update({ status: newStatus }).eq('id', gate.id);
+
+    if (error) {
+      toast.error('Failed to update gate status');
+    } else {
+      toast.success(`Gate ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
+      fetchData();
+    }
+  };
+
+  const openEditDialog = (gate: Gate) => {
+    setSelectedGate(gate);
+    setFormData({
+      name: gate.name,
+      building: gate.building || '',
+      location_id: gate.location_id || '',
+      gate_type: gate.gate_type,
+      capacity: gate.capacity,
+      operating_hours: gate.operating_hours,
+      has_qr: gate.has_qr,
+      status: gate.status,
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (gate: Gate) => {
+    setSelectedGate(gate);
+    setIsDeleteDialogOpen(true);
   };
 
   const getCapacityPercentage = (current: number, capacity: number) => {
     return Math.round((current / capacity) * 100);
   };
+
+  const GateForm = () => (
+    <div className="space-y-4 py-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Gate Name *</Label>
+          <Input
+            placeholder="e.g., Main Entry"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Building</Label>
+          <Input
+            placeholder="e.g., Building A"
+            value={formData.building}
+            onChange={(e) => setFormData({ ...formData, building: e.target.value })}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Location</Label>
+          <Select value={formData.location_id} onValueChange={(v) => setFormData({ ...formData, location_id: v })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select location" />
+            </SelectTrigger>
+            <SelectContent>
+              {locations.map((loc) => (
+                <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Gate Type</Label>
+          <Select value={formData.gate_type} onValueChange={(v) => setFormData({ ...formData, gate_type: v })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Entry & Exit">Entry & Exit</SelectItem>
+              <SelectItem value="Entry Only">Entry Only</SelectItem>
+              <SelectItem value="Exit Only">Exit Only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Capacity</Label>
+          <Input
+            type="number"
+            value={formData.capacity}
+            onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 100 })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Operating Hours</Label>
+          <Input
+            placeholder="06:00 - 22:00"
+            value={formData.operating_hours}
+            onChange={(e) => setFormData({ ...formData, operating_hours: e.target.value })}
+          />
+        </div>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Switch checked={formData.has_qr} onCheckedChange={(v) => setFormData({ ...formData, has_qr: v })} />
+          <Label>QR Code Enabled</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={formData.status === 'active'}
+            onCheckedChange={(v) => setFormData({ ...formData, status: v ? 'active' : 'inactive' })}
+          />
+          <Label>Active</Label>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <MainLayout>
@@ -61,7 +313,7 @@ export default function Gates() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-card rounded-xl border border-border p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+              <div className="p-2 rounded-lg bg-[#3b82f6] text-white">
                 <DoorOpen className="h-5 w-5" />
               </div>
               <div>
@@ -72,7 +324,7 @@ export default function Gates() {
           </div>
           <div className="bg-card rounded-xl border border-border p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-700">
+              <div className="p-2 rounded-lg bg-[#10b981] text-white">
                 <Power className="h-5 w-5" />
               </div>
               <div>
@@ -83,7 +335,7 @@ export default function Gates() {
           </div>
           <div className="bg-card rounded-xl border border-border p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-sky-100 text-sky-700">
+              <div className="p-2 rounded-lg bg-[#14b8a6] text-white">
                 <QrCode className="h-5 w-5" />
               </div>
               <div>
@@ -94,7 +346,7 @@ export default function Gates() {
           </div>
           <div className="bg-card rounded-xl border border-border p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
+              <div className="p-2 rounded-lg bg-[#f59e0b] text-white">
                 <Users className="h-5 w-5" />
               </div>
               <div>
@@ -109,11 +361,9 @@ export default function Gates() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Gates</h1>
-            <p className="text-muted-foreground">
-              Manage entry and exit points for your facilities
-            </p>
+            <p className="text-muted-foreground">Manage entry and exit points for your facilities</p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
             <Plus className="h-4 w-4" />
             Add Gate
           </Button>
@@ -125,48 +375,30 @@ export default function Gates() {
             <div className="col-span-full text-center py-12">
               <DoorOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
               <p className="text-muted-foreground">No gates configured</p>
-              <Button variant="outline" className="mt-4">
+              <Button variant="outline" className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
                 Add Your First Gate
               </Button>
             </div>
           ) : (
             gates.map((gate) => {
-              const capacityPercent = getCapacityPercentage(
-                gate.current_visitors,
-                gate.capacity
-              );
+              const capacityPercent = getCapacityPercentage(gate.current_visitors, gate.capacity);
 
               return (
                 <Card key={gate.id} className="overflow-hidden">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
-                        <div
-                          className={cn(
-                            'p-2 rounded-lg',
-                            gate.status === 'active'
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-slate-100 text-slate-700'
-                          )}
-                        >
+                        <div className={cn('p-2 rounded-lg', gate.status === 'active' ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-gray-100 text-gray-600')}>
                           <DoorOpen className="h-5 w-5" />
                         </div>
                         <div>
                           <CardTitle className="text-lg">{gate.name}</CardTitle>
-                          {gate.building && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {gate.building}
-                            </p>
-                          )}
+                          {gate.building && <p className="text-sm text-muted-foreground mt-1">{gate.building}</p>}
                         </div>
                       </div>
                       <Badge
                         variant="outline"
-                        className={cn(
-                          gate.status === 'active'
-                            ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                            : 'bg-slate-100 text-slate-700 border-slate-200'
-                        )}
+                        className={cn(gate.status === 'active' ? 'bg-[#dcfce7] text-[#16a34a] border-[#16a34a]/20' : 'bg-gray-100 text-gray-600 border-gray-300/20')}
                       >
                         {gate.status}
                       </Badge>
@@ -188,17 +420,11 @@ export default function Gates() {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-muted-foreground">Capacity</span>
-                        <span className="text-sm font-medium">
-                          {gate.current_visitors} / {gate.capacity}
-                        </span>
+                        <span className="text-sm font-medium">{gate.current_visitors} / {gate.capacity}</span>
                       </div>
                       <Progress
                         value={capacityPercent}
-                        className={cn(
-                          'h-2',
-                          capacityPercent > 80 && '[&>div]:bg-amber-500',
-                          capacityPercent > 95 && '[&>div]:bg-rose-500'
-                        )}
+                        className={cn('h-2', capacityPercent > 80 && '[&>div]:bg-amber-500', capacityPercent > 95 && '[&>div]:bg-rose-500')}
                       />
                     </div>
 
@@ -210,26 +436,19 @@ export default function Gates() {
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                      <Button variant="outline" className="flex-1 gap-2">
+                      <Button variant="outline" className="flex-1 gap-2" onClick={() => openEditDialog(gate)}>
                         <Edit className="h-4 w-4" />
                         Edit
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className={cn(
-                          gate.status === 'active'
-                            ? 'text-amber-600 hover:text-amber-700'
-                            : 'text-emerald-600 hover:text-emerald-700'
-                        )}
+                        className={cn(gate.status === 'active' ? 'text-amber-600 hover:text-amber-700' : 'text-emerald-600 hover:text-emerald-700')}
+                        onClick={() => toggleGateStatus(gate)}
                       >
                         <Power className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                      >
+                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => openDeleteDialog(gate)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -240,6 +459,54 @@ export default function Gates() {
           )}
         </div>
       </div>
+
+      {/* Add Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add Gate</DialogTitle>
+            <DialogDescription>Create a new entry/exit point</DialogDescription>
+          </DialogHeader>
+          <GateForm />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAdd} disabled={loading}>{loading ? 'Adding...' : 'Add Gate'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Gate</DialogTitle>
+            <DialogDescription>Update gate details</DialogDescription>
+          </DialogHeader>
+          <GateForm />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleEdit} disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Gate</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{selectedGate?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MainLayout>
   );
 }

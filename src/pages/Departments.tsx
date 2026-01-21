@@ -2,40 +2,170 @@ import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Search, Plus, Users, MapPin, User } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Building2, Search, Plus, Users, MapPin, Edit, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Department, Employee } from '@/types/database';
+import { Department, Employee, Location } from '@/types/database';
+import { toast } from 'sonner';
 
 export default function Departments() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  
+  // Dialog states
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    location: '',
+    location_id: '',
+  });
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const [deptRes, empRes] = await Promise.all([
+    const [deptRes, empRes, locRes] = await Promise.all([
       supabase.from('departments').select('*').order('name'),
       supabase.from('employees').select('*, department:departments(*)').order('name'),
+      supabase.from('locations').select('*').order('name'),
     ]);
 
     if (deptRes.data) setDepartments(deptRes.data as Department[]);
     if (empRes.data) setEmployees(empRes.data as unknown as Employee[]);
+    if (locRes.data) setLocations(locRes.data as Location[]);
+  };
+
+  const resetForm = () => {
+    setFormData({ name: '', description: '', location: '', location_id: '' });
+  };
+
+  const handleAdd = async () => {
+    if (!formData.name) {
+      toast.error('Please enter department name');
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.from('departments').insert({
+      name: formData.name,
+      description: formData.description || null,
+      location: formData.location || null,
+      location_id: formData.location_id || null,
+    });
+
+    setLoading(false);
+    if (error) {
+      toast.error('Failed to add department');
+    } else {
+      toast.success('Department added successfully');
+      setIsAddDialogOpen(false);
+      resetForm();
+      fetchData();
+    }
+  };
+
+  const handleEdit = async () => {
+    if (!selectedDepartment || !formData.name) return;
+
+    setLoading(true);
+    const { error } = await supabase
+      .from('departments')
+      .update({
+        name: formData.name,
+        description: formData.description || null,
+        location: formData.location || null,
+        location_id: formData.location_id || null,
+      })
+      .eq('id', selectedDepartment.id);
+
+    setLoading(false);
+    if (error) {
+      toast.error('Failed to update department');
+    } else {
+      toast.success('Department updated successfully');
+      setIsEditDialogOpen(false);
+      resetForm();
+      fetchData();
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedDepartment) return;
+
+    setLoading(true);
+    const { error } = await supabase
+      .from('departments')
+      .delete()
+      .eq('id', selectedDepartment.id);
+
+    setLoading(false);
+    if (error) {
+      toast.error('Failed to delete department');
+    } else {
+      toast.success('Department deleted successfully');
+      setIsDeleteDialogOpen(false);
+      setSelectedDepartment(null);
+      fetchData();
+    }
+  };
+
+  const openEditDialog = (dept: Department) => {
+    setSelectedDepartment(dept);
+    setFormData({
+      name: dept.name,
+      description: dept.description || '',
+      location: dept.location || '',
+      location_id: (dept as any).location_id || '',
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const openDeleteDialog = (dept: Department) => {
+    setSelectedDepartment(dept);
+    setIsDeleteDialogOpen(true);
   };
 
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
   const getDepartmentEmployees = (deptId: string) => {
@@ -53,11 +183,9 @@ export default function Departments() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Departments</h1>
-            <p className="text-muted-foreground">
-              Manage departments and their employees
-            </p>
+            <p className="text-muted-foreground">Manage departments and their employees</p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
             <Plus className="h-4 w-4" />
             Add Department
           </Button>
@@ -80,7 +208,7 @@ export default function Departments() {
             <div className="col-span-full text-center py-12 text-muted-foreground">
               <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No departments found</p>
-              <Button variant="outline" className="mt-4">
+              <Button variant="outline" className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
                 Add Your First Department
               </Button>
             </div>
@@ -90,19 +218,13 @@ export default function Departments() {
               const hosts = deptEmployees.filter((e) => e.is_host);
 
               return (
-                <Card
-                  key={dept.id}
-                  className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedDepartment(dept)}
-                >
+                <Card key={dept.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-lg">{dept.name}</CardTitle>
                         {dept.description && (
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {dept.description}
-                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">{dept.description}</p>
                         )}
                       </div>
                       <Badge variant="outline" className="gap-1">
@@ -117,7 +239,6 @@ export default function Departments() {
                       {dept.location || 'No location set'}
                     </div>
 
-                    {/* Department Lead */}
                     {hosts[0] && (
                       <div className="flex items-center gap-3 p-3 bg-accent/50 rounded-lg">
                         <Avatar className="h-8 w-8">
@@ -127,77 +248,42 @@ export default function Departments() {
                         </Avatar>
                         <div className="flex-1">
                           <p className="text-sm font-medium">{hosts[0].name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {hosts[0].position || 'Department Host'}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{hosts[0].position || 'Department Host'}</p>
                         </div>
-                        <Badge variant="secondary" className="text-xs">
-                          Host
-                        </Badge>
+                        <Badge variant="secondary" className="text-xs">Host</Badge>
                       </div>
                     )}
 
-                    {/* Employees Preview */}
                     <div>
                       <p className="text-sm font-medium mb-2">Employees</p>
                       <div className="space-y-2">
                         {deptEmployees.slice(0, 3).map((emp) => (
-                          <div
-                            key={emp.id}
-                            className="flex items-center gap-2 text-sm"
-                          >
+                          <div key={emp.id} className="flex items-center gap-2 text-sm">
                             <Avatar className="h-6 w-6">
-                              <AvatarFallback className="text-xs">
-                                {getInitials(emp.name)}
-                              </AvatarFallback>
+                              <AvatarFallback className="text-xs">{getInitials(emp.name)}</AvatarFallback>
                             </Avatar>
                             <span>{emp.name}</span>
-                            {emp.is_host && (
-                              <Badge variant="outline" className="text-xs">
-                                Host
-                              </Badge>
-                            )}
+                            {emp.is_host && <Badge variant="outline" className="text-xs">Host</Badge>}
                           </div>
                         ))}
                         {deptEmployees.length > 3 && (
-                          <p className="text-xs text-muted-foreground">
-                            +{deptEmployees.length - 3} more
-                          </p>
+                          <p className="text-xs text-muted-foreground">+{deptEmployees.length - 3} more</p>
                         )}
                         {deptEmployees.length === 0 && (
-                          <p className="text-sm text-muted-foreground">
-                            No employees in this department
-                          </p>
+                          <p className="text-sm text-muted-foreground">No employees</p>
                         )}
                       </div>
                     </div>
 
-                    {/* Approved Hosts */}
-                    {hosts.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium mb-2">Approved Hosts</p>
-                        <div className="flex flex-wrap gap-1">
-                          {hosts.slice(0, 4).map((host) => (
-                            <Badge
-                              key={host.id}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {host.name.split(' ')[0]}
-                            </Badge>
-                          ))}
-                          {hosts.length > 4 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{hosts.length - 4}
-                            </Badge>
-                          )}
-                        </div>
-                        <Button variant="ghost" size="sm" className="mt-2 text-xs">
-                          <User className="h-3 w-3 mr-1" />
-                          Add
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex gap-2 pt-2">
+                      <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openEditDialog(dept)}>
+                        <Edit className="h-3 w-3" />
+                        Edit
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => openDeleteDialog(dept)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -205,6 +291,124 @@ export default function Departments() {
           )}
         </div>
       </div>
+
+      {/* Add Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Department</DialogTitle>
+            <DialogDescription>Create a new department</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Department Name *</Label>
+              <Input
+                placeholder="e.g., Engineering"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea
+                placeholder="Brief description..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <Select
+                value={formData.location_id}
+                onValueChange={(value) => {
+                  const loc = locations.find(l => l.id === value);
+                  setFormData({ ...formData, location_id: value, location: loc?.name || '' });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {locations.map((loc) => (
+                    <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAdd} disabled={loading}>{loading ? 'Adding...' : 'Add Department'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Department</DialogTitle>
+            <DialogDescription>Update department details</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Department Name *</Label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <Select
+                value={formData.location_id}
+                onValueChange={(value) => {
+                  const loc = locations.find(l => l.id === value);
+                  setFormData({ ...formData, location_id: value, location: loc?.name || '' });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {locations.map((loc) => (
+                    <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleEdit} disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Department</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{selectedDepartment?.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </MainLayout>
   );
 }
