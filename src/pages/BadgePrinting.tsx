@@ -330,7 +330,26 @@ export default function BadgePrinting() {
               <div className="space-y-6">
                 {/* Safety Permit Badge - Printable area */}
                 <div id="printable-badge" ref={badgeRef}>
-                  <SafetyPermitBadge visitor={selectedVisitor} />
+                  <SafetyPermitBadge 
+                    visitor={{
+                      visitor_id: selectedVisitor.visitor_id,
+                      name: selectedVisitor.name,
+                      phone: selectedVisitor.phone,
+                      company: selectedVisitor.company,
+                      purpose: selectedVisitor.purpose,
+                      has_laptop: selectedVisitor.has_laptop,
+                      photo_url: selectedVisitor.photo_url,
+                      check_in_time: selectedVisitor.check_in_time,
+                      host: selectedVisitor.host ? {
+                        name: selectedVisitor.host.name,
+                        department: selectedVisitor.host.department
+                      } : null,
+                      department: selectedVisitor.department,
+                      gate: selectedVisitor.gate ? {
+                        location: selectedVisitor.gate.location
+                      } : null
+                    }} 
+                  />
                 </div>
 
                 {/* Photo Capture Button */}
