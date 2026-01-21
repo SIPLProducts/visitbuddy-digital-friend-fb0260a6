@@ -101,6 +101,33 @@ export interface Visitor {
   gate?: Gate;
 }
 
+export interface Visitor {
+  id: string;
+  visitor_id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  company: string | null;
+  purpose: string | null;
+  host_id: string | null;
+  department_id: string | null;
+  gate_id: string | null;
+  laptop_brand: string | null;
+  laptop_serial: string | null;
+  has_laptop: boolean;
+  status: VisitorStatus;
+  check_in_time: string | null;
+  check_out_time: string | null;
+  badge_printed: boolean;
+  qr_code: string | null;
+  photo_url: string | null;
+  created_at: string;
+  updated_at: string;
+  host?: Employee;
+  department?: Department;
+  gate?: Gate;
+}
+
 export interface Appointment {
   id: string;
   visitor_name: string;

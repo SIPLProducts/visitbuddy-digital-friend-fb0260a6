@@ -37,7 +37,7 @@ export default function Dashboard() {
         *,
         host:employees(*),
         department:departments(*),
-        gate:gates(*)
+        gate:gates(*, location:locations(*))
       `)
       .order('created_at', { ascending: false })
       .limit(10);

@@ -124,6 +124,11 @@ export default function VehicleReport() {
       'Driver Phone',
       'Company',
       'Purpose',
+      'Location',
+      'Gate',
+      'Status',
+      'Check In',
+      'Check Out',
     ];
     
     const rows = vehicles.map((v) => [
@@ -133,6 +138,11 @@ export default function VehicleReport() {
       v.driver_phone || '',
       v.company || '',
       v.purpose || '',
+      v.location?.name || '',
+      v.gate?.name || '',
+      v.status,
+      v.check_in_time ? format(new Date(v.check_in_time), 'yyyy-MM-dd HH:mm:ss') : '',
+      v.check_out_time ? format(new Date(v.check_out_time), 'yyyy-MM-dd HH:mm:ss') : '',
     ]);
 
     const escapeCsvField = (field: string) => {
@@ -517,6 +527,7 @@ export default function VehicleReport() {
                 <TableHead>Type</TableHead>
                 <TableHead>Driver</TableHead>
                 <TableHead>Company</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Check In</TableHead>
                 <TableHead>Check Out</TableHead>
@@ -526,13 +537,13 @@ export default function VehicleReport() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : filteredVehicles.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     No vehicles found matching your criteria
                   </TableCell>
                 </TableRow>
@@ -559,6 +570,16 @@ export default function VehicleReport() {
                       </div>
                     </TableCell>
                     <TableCell>{vehicle.company || '—'}</TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{vehicle.location?.name || '—'}</p>
+                        {vehicle.gate?.name && (
+                          <p className="text-xs text-muted-foreground">
+                            {vehicle.gate.name}
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>{getStatusBadge(vehicle.status)}</TableCell>
                     <TableCell className="text-sm">
                       {vehicle.check_in_time
