@@ -13,7 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, Truck, User, Phone, Building2 } from 'lucide-react';
+import { ArrowLeft, Truck, User, Phone, Building2, MessageCircle } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { Gate, Location } from '@/types/database';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ const vehicleTypes = ['Truck', 'Van', 'Pickup', 'Trailer', 'Container', 'Tanker'
 export default function NewVehicle() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
 
@@ -97,7 +99,40 @@ export default function NewVehicle() {
       return;
     }
 
-    toast.success('Vehicle registered successfully');
+    // Send WhatsApp badge if enabled and phone number provided
+    if (sendWhatsApp && data.driver_phone) {
+      try {
+        const selectedGate = gates.find(g => g.id === data.gate_id);
+        const selectedLocation = locations.find(l => l.id === data.location_id);
+
+        const { error: whatsappError } = await supabase.functions.invoke('send-vehicle-whatsapp', {
+          body: {
+            vehicleNumber: data.vehicle_number.toUpperCase(),
+            vehicleId: vehicleId,
+            vehicleType: data.vehicle_type,
+            driverName: data.driver_name,
+            phone: data.driver_phone,
+            company: data.company,
+            purpose: data.purpose,
+            gateName: selectedGate?.name,
+            locationName: selectedLocation?.name,
+          }
+        });
+
+        if (whatsappError) {
+          console.error('WhatsApp error:', whatsappError);
+          toast.warning('Vehicle registered but WhatsApp message failed to send');
+        } else {
+          toast.success('Vehicle registered & pass sent to WhatsApp! 📱');
+        }
+      } catch (err) {
+        console.error('WhatsApp send error:', err);
+        toast.warning('Vehicle registered but WhatsApp message failed');
+      }
+    } else {
+      toast.success('Vehicle registered successfully');
+    }
+
     setLoading(false);
     navigate('/vehicles');
   };
@@ -219,6 +254,24 @@ export default function NewVehicle() {
                     className="pl-10"
                     {...form.register('company')}
                   />
+                </div>
+              </div>
+
+              {/* WhatsApp Badge Option */}
+              <div className="flex items-center space-x-3 p-4 rounded-lg bg-accent/50 border border-accent">
+                <Checkbox 
+                  id="send-whatsapp" 
+                  checked={sendWhatsApp}
+                  onCheckedChange={(checked) => setSendWhatsApp(checked === true)}
+                />
+                <div className="flex-1">
+                  <Label htmlFor="send-whatsapp" className="flex items-center gap-2 cursor-pointer">
+                    <MessageCircle className="h-4 w-4 text-primary" />
+                    Send vehicle pass via WhatsApp
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    The driver will receive a digital pass with QR code on WhatsApp
+                  </p>
                 </div>
               </div>
             </CardContent>
