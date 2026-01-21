@@ -365,6 +365,54 @@ export type Database = {
           },
         ]
       }
+      role_screen_permissions: {
+        Row: {
+          can_edit: boolean
+          can_view: boolean
+          created_at: string
+          id: string
+          location_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          screen_id: string
+          updated_at: string
+        }
+        Insert: {
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          location_id: string
+          role: Database["public"]["Enums"]["app_role"]
+          screen_id: string
+          updated_at?: string
+        }
+        Update: {
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          location_id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          screen_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_screen_permissions_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_screen_permissions_screen_id_fkey"
+            columns: ["screen_id"]
+            isOneToOne: false
+            referencedRelation: "screens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       screens: {
         Row: {
           category: string | null
