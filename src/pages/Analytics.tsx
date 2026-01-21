@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Select,
   SelectContent,
@@ -9,6 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   BarChart3,
   Download,
@@ -18,6 +24,7 @@ import {
   DoorOpen,
   Truck,
   MapPin,
+  CalendarIcon,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -36,6 +43,9 @@ import {
 } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import { Location } from '@/types/database';
+import { format, subDays } from 'date-fns';
+import { DateRange } from 'react-day-picker';
+import { cn } from '@/lib/utils';
 
 const LOCATION_COLORS = [
   'hsl(var(--primary))',
@@ -63,6 +73,10 @@ export default function Analytics() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationStats, setLocationStats] = useState<LocationStats[]>([]);
   const [trendData, setTrendData] = useState<TrendData[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 30),
+    to: new Date(),
+  });
   const [totals, setTotals] = useState({
     visitors: 0,
     vehicles: 0,
@@ -72,11 +86,12 @@ export default function Analytics() {
     peakHour: '9:00 AM',
   });
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('month');
 
   useEffect(() => {
-    fetchAnalyticsData();
-  }, [timeRange]);
+    if (dateRange?.from) {
+      fetchAnalyticsData();
+    }
+  }, [dateRange]);
 
   const fetchAnalyticsData = async () => {
     setLoading(true);
@@ -91,18 +106,41 @@ export default function Analytics() {
       setLocations(locationsData as Location[]);
     }
 
-    // Fetch visitors grouped by location
-    const { data: visitorsData } = await supabase
+    // Fetch visitors grouped by location with date filter
+    let visitorsQuery = supabase
       .from('visitors')
       .select(`
         id,
+        created_at,
         gate:gates(location_id)
       `);
 
-    // Fetch vehicles grouped by location
-    const { data: vehiclesData } = await supabase
+    if (dateRange?.from) {
+      visitorsQuery = visitorsQuery.gte('created_at', dateRange.from.toISOString());
+    }
+    if (dateRange?.to) {
+      const endOfDay = new Date(dateRange.to);
+      endOfDay.setHours(23, 59, 59, 999);
+      visitorsQuery = visitorsQuery.lte('created_at', endOfDay.toISOString());
+    }
+
+    const { data: visitorsData } = await visitorsQuery;
+
+    // Fetch vehicles grouped by location with date filter
+    let vehiclesQuery = supabase
       .from('vehicles')
-      .select('id, location_id');
+      .select('id, location_id, created_at');
+
+    if (dateRange?.from) {
+      vehiclesQuery = vehiclesQuery.gte('created_at', dateRange.from.toISOString());
+    }
+    if (dateRange?.to) {
+      const endOfDay = new Date(dateRange.to);
+      endOfDay.setHours(23, 59, 59, 999);
+      vehiclesQuery = vehiclesQuery.lte('created_at', endOfDay.toISOString());
+    }
+
+    const { data: vehiclesData } = await vehiclesQuery;
 
     // Fetch gates for active count
     const { data: gatesData } = await supabase
@@ -177,7 +215,7 @@ export default function Analytics() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <BarChart3 className="h-6 w-6 text-primary" />
@@ -187,18 +225,66 @@ export default function Analytics() {
               Location-wise insights and performance metrics
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border border-border z-50">
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="quarter">This Quarter</SelectItem>
-                <SelectItem value="year">This Year</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Date Range Picker */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "justify-start text-left font-normal min-w-[240px]",
+                    !dateRange && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM yyyy")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "dd MMM yyyy")
+                    )
+                  ) : (
+                    <span>Pick date range</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+                <div className="border-t p-3 flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}
+                  >
+                    Last 7 days
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}
+                  >
+                    Last 30 days
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })}
+                  >
+                    Last 90 days
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Button variant="outline" className="gap-2">
               <Download className="h-4 w-4" />
               Export Report
