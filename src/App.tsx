@@ -13,6 +13,7 @@ import NewVisitor from "./pages/NewVisitor";
 import Appointments from "./pages/Appointments";
 import CheckInOut from "./pages/CheckInOut";
 import BadgePrinting from "./pages/BadgePrinting";
+import PrintBadge from "./pages/PrintBadge";
 import VisitorReport from "./pages/VisitorReport";
 import Departments from "./pages/Departments";
 import Employees from "./pages/Employees";
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
             <Route path="/check-in-out" element={<ProtectedRoute><CheckInOut /></ProtectedRoute>} />
             <Route path="/badge-printing" element={<ProtectedRoute><BadgePrinting /></ProtectedRoute>} />
+            <Route path="/print-badge" element={<ProtectedRoute><PrintBadge /></ProtectedRoute>} />
             <Route path="/visitor-report" element={<ProtectedRoute><VisitorReport /></ProtectedRoute>} />
             <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
             <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
