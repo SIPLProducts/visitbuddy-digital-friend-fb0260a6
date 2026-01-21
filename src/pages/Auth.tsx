@@ -38,7 +38,7 @@ const features = [
 const demoUsers = [
   { 
     email: 'bala@sharviinfotech.com', 
-    password: 'Bala@123', 
+    password: '123456', 
     name: 'Bala', 
     role: 'HO Admin',
     location: 'All Locations',
