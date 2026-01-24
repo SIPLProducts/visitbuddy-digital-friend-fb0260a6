@@ -27,6 +27,7 @@ interface VisitorData {
       latitude?: number | null;
       longitude?: number | null;
       emergency_contact?: string | null;
+      assembly_point?: string | null;
     } | null;
   } | null;
   gate?: {
@@ -36,6 +37,7 @@ interface VisitorData {
       latitude?: number | null;
       longitude?: number | null;
       emergency_contact?: string | null;
+      assembly_point?: string | null;
     } | null;
   } | null;
 }
@@ -70,8 +72,8 @@ export default function PrintBadge() {
         .select(`
           *,
           host:employees(name, department:departments(name)),
-          department:departments(name, floor_number, building_section, location:locations(name, geo_address, latitude, longitude, emergency_contact)),
-          gate:gates(name, location:locations(name, geo_address, latitude, longitude, emergency_contact))
+          department:departments(name, floor_number, building_section, location:locations(name, geo_address, latitude, longitude, emergency_contact, assembly_point)),
+          gate:gates(name, location:locations(name, geo_address, latitude, longitude, emergency_contact, assembly_point))
         `)
         .eq('id', visitorId)
         .single();
@@ -160,6 +162,7 @@ export default function PrintBadge() {
   const latitude = location?.latitude;
   const longitude = location?.longitude;
   const emergencyContact = location?.emergency_contact;
+  const assemblyPoint = location?.assembly_point;
   
   // Generate Google Maps navigation URL
   const getNavigationUrl = () => {
@@ -531,6 +534,11 @@ export default function PrintBadge() {
               {emergencyContact && (
                 <p style={{ marginTop: '4px', fontWeight: 600, color: '#dc2626' }}>
                   🆘 Emergency: {emergencyContact}
+                </p>
+              )}
+              {assemblyPoint && (
+                <p style={{ marginTop: '2px', fontWeight: 600, color: '#0369a1' }}>
+                  🚨 Assembly Point: {assemblyPoint}
                 </p>
               )}
             </div>
