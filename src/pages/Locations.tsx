@@ -80,6 +80,7 @@ export default function Locations() {
     email: '',
     phone: '',
     emergency_contact: '',
+    assembly_point: '',
     status: 'active' as 'active' | 'inactive',
     latitude: '',
     longitude: '',
@@ -115,6 +116,7 @@ export default function Locations() {
       email: '',
       phone: '',
       emergency_contact: '',
+      assembly_point: '',
       status: 'active',
       latitude: '',
       longitude: '',
@@ -137,6 +139,7 @@ export default function Locations() {
       email: formData.email || null,
       phone: formData.phone || null,
       emergency_contact: formData.emergency_contact || null,
+      assembly_point: formData.assembly_point || null,
       status: formData.status,
       latitude: formData.latitude ? parseFloat(formData.latitude) : null,
       longitude: formData.longitude ? parseFloat(formData.longitude) : null,
@@ -168,6 +171,7 @@ export default function Locations() {
         email: formData.email || null,
         phone: formData.phone || null,
         emergency_contact: formData.emergency_contact || null,
+        assembly_point: formData.assembly_point || null,
         status: formData.status,
         latitude: formData.latitude ? parseFloat(formData.latitude) : null,
         longitude: formData.longitude ? parseFloat(formData.longitude) : null,
@@ -207,10 +211,10 @@ export default function Locations() {
   };
 
   const downloadTemplate = () => {
-    const headers = ['Name', 'Address', 'City', 'Country', 'Email', 'Phone', 'Emergency Contact', 'Status', 'Latitude', 'Longitude', 'Geo Address'];
+    const headers = ['Name', 'Address', 'City', 'Country', 'Email', 'Phone', 'Emergency Contact', 'Assembly Point', 'Status', 'Latitude', 'Longitude', 'Geo Address'];
     const sampleRows = [
-      ['Corporate HQ', '123 Business Park', 'Mumbai', 'India', 'hq@company.com', '+919876543210', '+911234567890', 'active', '19.0760', '72.8777', 'Business Park, Andheri East'],
-      ['Tech Center', '456 Tech Avenue', 'Bengaluru', 'India', 'tech@company.com', '+919123456789', '+911800123456', 'active', '12.9716', '77.5946', 'Tech Park, Whitefield'],
+      ['Corporate HQ', '123 Business Park', 'Mumbai', 'India', 'hq@company.com', '+919876543210', '+911234567890', 'Main Gate Parking Lot', 'active', '19.0760', '72.8777', 'Business Park, Andheri East'],
+      ['Tech Center', '456 Tech Avenue', 'Bengaluru', 'India', 'tech@company.com', '+919123456789', '+911800123456', 'Open Ground near Cafeteria', 'active', '12.9716', '77.5946', 'Tech Park, Whitefield'],
     ];
     const csv = [headers.join(','), ...sampleRows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -267,21 +271,21 @@ export default function Locations() {
         }
         
         // Validate status if provided
-        const statusError = validateStatus(values[7], ['active', 'inactive']);
+        const statusError = validateStatus(values[8], ['active', 'inactive']);
         if (statusError) {
-          errors.push({ row: rowNum, field: 'Status', message: statusError, value: values[7] });
+          errors.push({ row: rowNum, field: 'Status', message: statusError, value: values[8] });
         }
         
         // Validate latitude if provided
-        const latError = validateNumber(values[8], 'Latitude');
+        const latError = validateNumber(values[9], 'Latitude');
         if (latError) {
-          errors.push({ row: rowNum, field: 'Latitude', message: latError, value: values[8] });
+          errors.push({ row: rowNum, field: 'Latitude', message: latError, value: values[9] });
         }
         
         // Validate longitude if provided
-        const lngError = validateNumber(values[9], 'Longitude');
+        const lngError = validateNumber(values[10], 'Longitude');
         if (lngError) {
-          errors.push({ row: rowNum, field: 'Longitude', message: lngError, value: values[9] });
+          errors.push({ row: rowNum, field: 'Longitude', message: lngError, value: values[10] });
         }
         
         // Skip row if it has critical errors
@@ -295,10 +299,11 @@ export default function Locations() {
           email: emailError ? null : (values[4] || null),
           phone: phoneError ? null : (values[5] || null),
           emergency_contact: values[6] || null,
-          status: (values[7]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
-          latitude: latError ? null : (values[8] ? parseFloat(values[8]) : null),
-          longitude: lngError ? null : (values[9] ? parseFloat(values[9]) : null),
-          geo_address: values[10] || null,
+          assembly_point: values[7] || null,
+          status: (values[8]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
+          latitude: latError ? null : (values[9] ? parseFloat(values[9]) : null),
+          longitude: lngError ? null : (values[10] ? parseFloat(values[10]) : null),
+          geo_address: values[11] || null,
         });
       }
       
@@ -343,6 +348,7 @@ export default function Locations() {
       email: location.email || '',
       phone: location.phone || '',
       emergency_contact: (location as any).emergency_contact || '',
+      assembly_point: (location as any).assembly_point || '',
       status: location.status,
       latitude: location.latitude?.toString() || '',
       longitude: location.longitude?.toString() || '',
@@ -488,6 +494,14 @@ export default function Locations() {
           placeholder="+91 XXXXX XXXXX or 1800-XXX-XXXX"
           value={formData.emergency_contact}
           onChange={(e) => setFormData({ ...formData, emergency_contact: e.target.value })}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Evacuation Assembly Point</Label>
+        <Input
+          placeholder="e.g., Main Gate Parking Lot"
+          value={formData.assembly_point}
+          onChange={(e) => setFormData({ ...formData, assembly_point: e.target.value })}
         />
       </div>
     </div>

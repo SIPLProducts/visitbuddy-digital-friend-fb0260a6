@@ -249,6 +249,7 @@ export type Database = {
       locations: {
         Row: {
           address: string | null
+          assembly_point: string | null
           capacity_usage: number | null
           city: string | null
           country: string | null
@@ -269,6 +270,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          assembly_point?: string | null
           capacity_usage?: number | null
           city?: string | null
           country?: string | null
@@ -289,6 +291,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          assembly_point?: string | null
           capacity_usage?: number | null
           city?: string | null
           country?: string | null
