@@ -16,21 +16,39 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const isMountedRef = useRef(true);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [capturedBlob, setCapturedBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('camera');
 
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setIsVideoReady(false);
+  }, []);
+
   const startCamera = useCallback(async () => {
+    if (isStarting) return;
+    
     setIsStarting(true);
     setError(null);
+    setIsVideoReady(false);
+    
+    // Stop any existing stream first
+    stopCamera();
+    
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Camera not supported on this device/browser');
       }
 
+      console.log('Requesting camera access...');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { 
           facingMode: 'user', 
@@ -40,27 +58,25 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         audio: false,
       });
       
-      setStream(mediaStream);
+      if (!isMountedRef.current) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        return;
+      }
       
-      if (videoRef.current) {
+      streamRef.current = mediaStream;
+      console.log('Camera stream obtained:', mediaStream.active);
+      
+      // Wait a tick for the video element to be ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      if (videoRef.current && isMountedRef.current) {
         videoRef.current.srcObject = mediaStream;
-        // Ensure video is ready before playing
-        videoRef.current.onloadedmetadata = () => {
-          if (videoRef.current) {
-            videoRef.current.play().catch((playErr) => {
-              console.error('Video play error:', playErr);
-            });
-          }
-        };
-        // Also try to play immediately for browsers that support it
-        try {
-          await videoRef.current.play();
-        } catch (playErr) {
-          console.log('Initial play attempt failed, waiting for metadata');
-        }
+        console.log('Stream attached to video element');
       }
     } catch (err: any) {
       console.error('Camera error:', err);
+      if (!isMountedRef.current) return;
+      
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
         setError('Camera permission denied. Try uploading a photo instead.');
         setActiveTab('upload');
@@ -70,33 +86,50 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
         setError('Camera is in use. Try uploading a photo instead.');
         setActiveTab('upload');
-      } else if (err.name === 'AbortError') {
-        // Play was interrupted, try again
-        console.log('Play aborted, will retry on metadata load');
       } else {
         setError(err.message || 'Unable to access camera.');
         setActiveTab('upload');
       }
     } finally {
-      setIsStarting(false);
+      if (isMountedRef.current) {
+        setIsStarting(false);
+      }
+    }
+  }, [isStarting, stopCamera]);
+
+  // Handle video element events
+  const handleVideoCanPlay = useCallback(() => {
+    console.log('Video can play, attempting to play...');
+    if (videoRef.current) {
+      videoRef.current.play()
+        .then(() => {
+          console.log('Video playing successfully');
+          if (isMountedRef.current) {
+            setIsVideoReady(true);
+          }
+        })
+        .catch((err) => {
+          console.error('Video play failed:', err);
+        });
     }
   }, []);
 
-  const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
-  }, [stream]);
-
   useEffect(() => {
+    isMountedRef.current = true;
+    
     if (autoStart && activeTab === 'camera') {
-      startCamera();
+      // Small delay to ensure dialog is fully rendered
+      const timer = setTimeout(() => {
+        if (isMountedRef.current) {
+          startCamera();
+        }
+      }, 300);
+      return () => clearTimeout(timer);
     }
+    
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
+      isMountedRef.current = false;
+      stopCamera();
     };
   }, [autoStart, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -213,21 +246,29 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                 alt="Captured"
                 className="absolute inset-0 w-full h-full object-cover"
               />
-            ) : stream ? (
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ transform: 'scaleX(-1)' }}
-                onCanPlay={() => {
-                  // Ensure video plays when it can
-                  if (videoRef.current && videoRef.current.paused) {
-                    videoRef.current.play().catch(console.error);
-                  }
-                }}
-              />
+            ) : streamRef.current || isStarting ? (
+              <>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ transform: 'scaleX(-1)' }}
+                  onCanPlay={handleVideoCanPlay}
+                  onLoadedMetadata={handleVideoCanPlay}
+                />
+                {!isVideoReady && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
+                    <div className="text-center space-y-2">
+                      <div className="p-3 rounded-full bg-primary/10 w-fit mx-auto animate-pulse">
+                        <Camera className="h-8 w-8 text-primary" />
+                      </div>
+                      <p className="text-sm font-medium text-foreground">Starting camera...</p>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center space-y-4">
@@ -236,17 +277,15 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      {isStarting ? 'Starting camera...' : 'Camera not started'}
+                      Camera not started
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {isStarting ? 'Please allow camera access' : 'Click below to start'}
+                      Click below to start
                     </p>
                   </div>
-                  {!isStarting && (
-                    <Button onClick={startCamera} size="sm">
-                      Start Camera
-                    </Button>
-                  )}
+                  <Button onClick={startCamera} size="sm">
+                    Start Camera
+                  </Button>
                 </div>
               </div>
             )}
@@ -310,7 +349,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
               Use Photo
             </Button>
           </>
-        ) : activeTab === 'camera' && stream ? (
+        ) : activeTab === 'camera' && (streamRef.current || isVideoReady) ? (
           <>
             {onCancel && (
               <Button variant="outline" onClick={handleCancel} className="gap-2">
