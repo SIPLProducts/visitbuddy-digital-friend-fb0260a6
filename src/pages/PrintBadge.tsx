@@ -75,8 +75,31 @@ export default function PrintBadge() {
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-        Loading badge...
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        justifyContent: 'center',
+        minHeight: '100vh',
+        fontFamily: 'Arial, sans-serif',
+        background: '#f5f5f5'
+      }}>
+        <div style={{
+          width: '60px',
+          height: '60px',
+          border: '4px solid #e5e7eb',
+          borderTop: '4px solid #0891b2',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          marginBottom: '20px'
+        }} />
+        <p style={{ color: '#6b7280', fontSize: '16px', margin: 0 }}>Preparing badge for printing...</p>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }

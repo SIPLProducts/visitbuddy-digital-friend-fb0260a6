@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Printer, Laptop, UserCheck, Camera, Bell, Users, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
+import { Search, Printer, Laptop, UserCheck, Camera, Bell, Users, CheckCircle2, Clock, RefreshCw, Mail, MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location, Employee } from '@/types/database';
 import { toast } from 'sonner';
@@ -50,6 +50,8 @@ export default function BadgePrinting() {
   const [showCameraDialog, setShowCameraDialog] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isNotifying, setIsNotifying] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
 
   useEffect(() => {
     fetchVisitors();
@@ -202,6 +204,77 @@ export default function BadgePrinting() {
       toast.error(error.message || 'Failed to notify host');
     } finally {
       setIsNotifying(false);
+    }
+  };
+
+  const handleSendEmail = async (visitor: VisitorWithLocation) => {
+    if (!visitor.email) {
+      toast.error('Visitor email not available');
+      return;
+    }
+
+    setIsSendingEmail(true);
+    try {
+      // Generate QR code URL
+      const qrData = encodeURIComponent(JSON.stringify({
+        visitorId: visitor.visitor_id,
+        name: visitor.name,
+        action: 'checkout',
+      }));
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}&format=png`;
+
+      const { error } = await supabase.functions.invoke('send-email-badge', {
+        body: {
+          email: visitor.email,
+          visitorName: visitor.name,
+          visitorId: visitor.visitor_id,
+          company: visitor.company,
+          purpose: visitor.purpose,
+          hostName: visitor.host?.name,
+          departmentName: visitor.host?.department?.name || visitor.department?.name,
+          checkInTime: visitor.check_in_time,
+          qrCodeUrl,
+        },
+      });
+
+      if (error) throw error;
+      toast.success('Badge sent to email successfully');
+    } catch (error: any) {
+      console.error('Send email error:', error);
+      toast.error(error.message || 'Failed to send email');
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
+  const handleSendWhatsApp = async (visitor: VisitorWithLocation) => {
+    if (!visitor.phone) {
+      toast.error('Visitor phone number not available');
+      return;
+    }
+
+    setIsSendingWhatsApp(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-whatsapp-badge', {
+        body: {
+          visitorName: visitor.name,
+          visitorId: visitor.visitor_id,
+          phone: visitor.phone,
+          company: visitor.company,
+          purpose: visitor.purpose,
+          hostName: visitor.host?.name,
+          departmentName: visitor.host?.department?.name || visitor.department?.name,
+          gateName: visitor.gate?.name,
+        },
+      });
+
+      if (error) throw error;
+      toast.success('Badge sent via WhatsApp successfully');
+    } catch (error: any) {
+      console.error('Send WhatsApp error:', error);
+      toast.error(error.message || 'Failed to send WhatsApp');
+    } finally {
+      setIsSendingWhatsApp(false);
     }
   };
 
@@ -467,6 +540,30 @@ export default function BadgePrinting() {
                         Capture Photo
                       </Button>
                     )}
+
+                    {/* Share Badge */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 gap-2"
+                        onClick={() => handleSendEmail(selectedVisitor)}
+                        disabled={isSendingEmail || !selectedVisitor.email}
+                        title={!selectedVisitor.email ? 'No email available' : 'Send badge via email'}
+                      >
+                        <Mail className="h-4 w-4" />
+                        {isSendingEmail ? 'Sending...' : 'Email'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 gap-2"
+                        onClick={() => handleSendWhatsApp(selectedVisitor)}
+                        disabled={isSendingWhatsApp || !selectedVisitor.phone}
+                        title={!selectedVisitor.phone ? 'No phone available' : 'Send badge via WhatsApp'}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        {isSendingWhatsApp ? 'Sending...' : 'WhatsApp'}
+                      </Button>
+                    </div>
 
                     {/* Notify Host */}
                     {selectedVisitor.host && (
