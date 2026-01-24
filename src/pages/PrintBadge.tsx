@@ -17,7 +17,23 @@ interface VisitorData {
     name?: string;
     department?: { name?: string } | null;
   } | null;
-  department?: { name?: string } | null;
+  department?: { 
+    name?: string;
+    location?: {
+      name?: string;
+      geo_address?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+    } | null;
+  } | null;
+  gate?: {
+    location?: {
+      name?: string;
+      geo_address?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+    } | null;
+  } | null;
 }
 
 export default function PrintBadge() {
@@ -50,7 +66,8 @@ export default function PrintBadge() {
         .select(`
           *,
           host:employees(name, department:departments(name)),
-          department:departments(name)
+          department:departments(name, location:locations(name, geo_address, latitude, longitude)),
+          gate:gates(name, location:locations(name, geo_address, latitude, longitude))
         `)
         .eq('id', visitorId)
         .single();
@@ -132,6 +149,29 @@ export default function PrintBadge() {
     action: 'checkout',
   }));
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}&format=png`;
+
+  // Get location details from department or gate
+  const location = visitor.department?.location || visitor.gate?.location;
+  const geoAddress = location?.geo_address;
+  const latitude = location?.latitude;
+  const longitude = location?.longitude;
+  
+  // Generate Google Maps navigation URL
+  const getNavigationUrl = () => {
+    if (latitude && longitude) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    } else if (geoAddress) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(geoAddress)}`;
+    }
+    return null;
+  };
+  
+  const navigationUrl = getNavigationUrl();
+  
+  // Generate QR code for navigation
+  const navigationQrUrl = navigationUrl 
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(navigationUrl)}&format=png`
+    : null;
 
   return (
     <>
@@ -288,6 +328,7 @@ export default function PrintBadge() {
           width: 96px;
           padding: 4px;
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           border-left: 1px solid #d1d5db;
@@ -295,6 +336,39 @@ export default function PrintBadge() {
         .qr-box img {
           width: 80px;
           height: 80px;
+        }
+        .qr-label {
+          font-size: 8px;
+          text-align: center;
+          margin-top: 2px;
+          font-weight: 600;
+        }
+        .location-row {
+          display: flex;
+          border-top: 1px solid #d1d5db;
+          padding: 6px 8px;
+          background: #e0f2fe;
+          align-items: center;
+          gap: 8px;
+        }
+        .location-icon {
+          font-size: 14px;
+        }
+        .location-text {
+          flex: 1;
+          font-size: 10px;
+        }
+        .location-text .address {
+          font-weight: 600;
+          color: #0369a1;
+        }
+        .location-text .nav-hint {
+          color: #64748b;
+          font-size: 9px;
+        }
+        .nav-qr {
+          width: 50px;
+          height: 50px;
         }
         .print-btn {
           display: block;
@@ -419,6 +493,20 @@ export default function PrintBadge() {
             </div>
           </div>
 
+          {/* Location with Navigation */}
+          {(geoAddress || navigationUrl) && (
+            <div className="location-row">
+              <span className="location-icon">📍</span>
+              <div className="location-text">
+                <p className="address">{geoAddress || location?.name || 'Location'}</p>
+                <p className="nav-hint">Scan QR to navigate →</p>
+              </div>
+              {navigationQrUrl && (
+                <img src={navigationQrUrl} alt="Navigate" className="nav-qr" />
+              )}
+            </div>
+          )}
+
           {/* Safety Guidelines */}
           <div className="guidelines">
             <div className="guidelines-text">
@@ -429,6 +517,7 @@ export default function PrintBadge() {
             </div>
             <div className="qr-box">
               <img src={qrCodeUrl} alt="QR Code" />
+              <span className="qr-label">Check-out</span>
             </div>
           </div>
         </div>
