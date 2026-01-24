@@ -26,6 +26,7 @@ interface VisitorData {
       geo_address?: string | null;
       latitude?: number | null;
       longitude?: number | null;
+      emergency_contact?: string | null;
     } | null;
   } | null;
   gate?: {
@@ -34,6 +35,7 @@ interface VisitorData {
       geo_address?: string | null;
       latitude?: number | null;
       longitude?: number | null;
+      emergency_contact?: string | null;
     } | null;
   } | null;
 }
@@ -68,8 +70,8 @@ export default function PrintBadge() {
         .select(`
           *,
           host:employees(name, department:departments(name)),
-          department:departments(name, floor_number, building_section, location:locations(name, geo_address, latitude, longitude)),
-          gate:gates(name, location:locations(name, geo_address, latitude, longitude))
+          department:departments(name, floor_number, building_section, location:locations(name, geo_address, latitude, longitude, emergency_contact)),
+          gate:gates(name, location:locations(name, geo_address, latitude, longitude, emergency_contact))
         `)
         .eq('id', visitorId)
         .single();
@@ -157,6 +159,7 @@ export default function PrintBadge() {
   const geoAddress = location?.geo_address;
   const latitude = location?.latitude;
   const longitude = location?.longitude;
+  const emergencyContact = location?.emergency_contact;
   
   // Generate Google Maps navigation URL
   const getNavigationUrl = () => {
@@ -525,6 +528,11 @@ export default function PrintBadge() {
               <p>2. Always follow the safety procedures.</p>
               <p>3. Always keep company work place clean.</p>
               <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
+              {emergencyContact && (
+                <p style={{ marginTop: '4px', fontWeight: 600, color: '#dc2626' }}>
+                  🆘 Emergency: {emergencyContact}
+                </p>
+              )}
             </div>
             <div className="qr-box">
               <img src={qrCodeUrl} alt="QR Code" />
