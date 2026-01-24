@@ -54,6 +54,7 @@ export interface Location {
   capacity_usage: number;
   email: string | null;
   phone: string | null;
+  emergency_contact: string | null;
   latitude: number | null;
   longitude: number | null;
   geo_address: string | null;

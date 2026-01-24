@@ -255,6 +255,7 @@ export type Database = {
           created_at: string
           department_count: number | null
           email: string | null
+          emergency_contact: string | null
           gate_count: number | null
           geo_address: string | null
           id: string
@@ -274,6 +275,7 @@ export type Database = {
           created_at?: string
           department_count?: number | null
           email?: string | null
+          emergency_contact?: string | null
           gate_count?: number | null
           geo_address?: string | null
           id?: string
@@ -293,6 +295,7 @@ export type Database = {
           created_at?: string
           department_count?: number | null
           email?: string | null
+          emergency_contact?: string | null
           gate_count?: number | null
           geo_address?: string | null
           id?: string
