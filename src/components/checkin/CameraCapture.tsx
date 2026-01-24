@@ -39,10 +39,25 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         },
         audio: false,
       });
+      
       setStream(mediaStream);
+      
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play();
+        // Ensure video is ready before playing
+        videoRef.current.onloadedmetadata = () => {
+          if (videoRef.current) {
+            videoRef.current.play().catch((playErr) => {
+              console.error('Video play error:', playErr);
+            });
+          }
+        };
+        // Also try to play immediately for browsers that support it
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.log('Initial play attempt failed, waiting for metadata');
+        }
       }
     } catch (err: any) {
       console.error('Camera error:', err);
@@ -55,6 +70,9 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
         setError('Camera is in use. Try uploading a photo instead.');
         setActiveTab('upload');
+      } else if (err.name === 'AbortError') {
+        // Play was interrupted, try again
+        console.log('Play aborted, will retry on metadata load');
       } else {
         setError(err.message || 'Unable to access camera.');
         setActiveTab('upload');
@@ -203,6 +221,12 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                 muted
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ transform: 'scaleX(-1)' }}
+                onCanPlay={() => {
+                  // Ensure video plays when it can
+                  if (videoRef.current && videoRef.current.paused) {
+                    videoRef.current.play().catch(console.error);
+                  }
+                }}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
