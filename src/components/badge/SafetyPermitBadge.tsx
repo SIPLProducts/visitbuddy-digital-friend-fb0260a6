@@ -18,11 +18,15 @@ interface SafetyPermitBadgeProps {
     } | null;
     department?: { 
       name?: string;
+      floor_number?: string | null;
+      building_section?: string | null;
       location?: string | {
         name?: string;
         geo_address?: string | null;
         latitude?: number | null;
         longitude?: number | null;
+        emergency_contact?: string | null;
+        assembly_point?: string | null;
       } | null;
     } | null;
     gate?: {
@@ -31,6 +35,8 @@ interface SafetyPermitBadgeProps {
         geo_address?: string | null;
         latitude?: number | null;
         longitude?: number | null;
+        emergency_contact?: string | null;
+        assembly_point?: string | null;
       } | null;
     } | null;
   };
@@ -73,6 +79,12 @@ export function SafetyPermitBadge({
   const geoAddress = location?.geo_address;
   const latitude = location?.latitude;
   const longitude = location?.longitude;
+  const emergencyContact = location?.emergency_contact;
+  const assemblyPoint = location?.assembly_point;
+  
+  // Floor and building info from department
+  const floorNumber = visitor.department?.floor_number;
+  const buildingSection = visitor.department?.building_section;
   
   // Generate Google Maps navigation URL
   const getNavigationUrl = () => {
@@ -151,6 +163,15 @@ export function SafetyPermitBadge({
           <span className="w-24 font-semibold">Dept. To Meet</span>
           <span className="flex-1">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
         </div>
+        {(floorNumber || buildingSection) && (
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Location</span>
+            <span className="flex-1">: {[
+              floorNumber && `Floor ${floorNumber}`,
+              buildingSection
+            ].filter(Boolean).join(', ')}</span>
+          </div>
+        )}
         <div className="flex p-1.5">
           <span className="w-24 font-semibold">Host</span>
           <span className="flex-1">: {visitor.host?.name || 'N/A'}</span>
@@ -210,6 +231,12 @@ export function SafetyPermitBadge({
           <p className="mb-0.5">2. Always follow the safety procedures.</p>
           <p className="mb-0.5">3. Always keep company work place clean.</p>
           <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
+          {emergencyContact && (
+            <p className="mt-1 font-semibold text-red-600">🆘 Emergency: {emergencyContact}</p>
+          )}
+          {assemblyPoint && (
+            <p className="mt-0.5 font-semibold text-sky-700">🚨 Assembly Point: {assemblyPoint}</p>
+          )}
         </div>
         <div className="w-24 p-1 flex flex-col items-center justify-center border-l border-gray-300">
           <img 

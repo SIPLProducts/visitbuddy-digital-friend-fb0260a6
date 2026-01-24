@@ -76,8 +76,8 @@ export default function BadgePrinting() {
         .select(`
           *,
           host:employees(*, department:departments(*)),
-          department:departments(*),
-          gate:gates(id, name, location_id, location:locations(*))
+          department:departments(*, location:locations!departments_location_id_fkey(*)),
+          gate:gates(id, name, location_id, location:locations!gates_location_id_fkey(*))
         `)
         .order('created_at', { ascending: false })
         .limit(100);
