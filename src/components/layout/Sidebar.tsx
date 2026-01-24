@@ -21,6 +21,7 @@ import {
   UserCog,
   Truck,
   UserRound,
+  ScanLine,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -37,6 +38,7 @@ const menuItems = [
   { icon: UserRound, label: 'Employees', path: '/employees' },
   { icon: MapPin, label: 'Locations', path: '/locations' },
   { icon: DoorOpen, label: 'Gates', path: '/gates' },
+  { icon: ScanLine, label: 'Gate QR Codes', path: '/gate-qr-codes' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   { icon: UserCog, label: 'User Management', path: '/users' },
   { icon: Settings, label: 'Settings', path: '/settings' },

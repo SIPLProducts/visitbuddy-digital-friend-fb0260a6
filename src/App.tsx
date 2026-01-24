@@ -30,6 +30,7 @@ import VehicleReport from "./pages/VehicleReport";
 import NotFound from "./pages/NotFound";
 import SelfService from "./pages/SelfService";
 import Install from "./pages/Install";
+import GateQRCodes from "./pages/GateQRCodes";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,7 @@ const App = () => (
             <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
             <Route path="/locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
             <Route path="/gates" element={<ProtectedRoute><Gates /></ProtectedRoute>} />
+            <Route path="/gate-qr-codes" element={<ProtectedRoute><GateQRCodes /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
