@@ -74,7 +74,8 @@ export default function Visitors() {
   };
 
   const handlePrintBadge = (visitor: Visitor) => {
-    navigate(`/badge-printing?visitorId=${visitor.id}`);
+    // Open dedicated print page in new tab for direct printing
+    window.open(`/print-badge?id=${visitor.id}`, '_blank');
   };
 
   const handleCheckIn = async (visitor: Visitor) => {
