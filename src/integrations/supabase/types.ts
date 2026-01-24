@@ -140,6 +140,7 @@ export type Database = {
           is_host: boolean | null
           location_id: string | null
           name: string
+          phone: string | null
           position: string | null
           updated_at: string
         }
@@ -152,6 +153,7 @@ export type Database = {
           is_host?: boolean | null
           location_id?: string | null
           name: string
+          phone?: string | null
           position?: string | null
           updated_at?: string
         }
@@ -164,6 +166,7 @@ export type Database = {
           is_host?: boolean | null
           location_id?: string | null
           name?: string
+          phone?: string | null
           position?: string | null
           updated_at?: string
         }
