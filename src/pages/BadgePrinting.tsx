@@ -532,17 +532,22 @@ export default function BadgePrinting() {
 
       {/* Camera Capture Dialog */}
       <Dialog open={showCameraDialog} onOpenChange={setShowCameraDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md" aria-describedby="badge-camera-dialog-description">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Camera className="h-5 w-5" />
               Capture Visitor Photo
             </DialogTitle>
+            <p id="badge-camera-dialog-description" className="text-sm text-muted-foreground">
+              Take a photo of the visitor for their badge
+            </p>
           </DialogHeader>
-          <CameraCapture
-            onCapture={handlePhotoCapture}
-            onCancel={() => setShowCameraDialog(false)}
-          />
+          {showCameraDialog && (
+            <CameraCapture
+              onCapture={handlePhotoCapture}
+              onCancel={() => setShowCameraDialog(false)}
+            />
+          )}
           {isUploading && (
             <div className="text-center py-4">
               <p className="text-sm text-muted-foreground">Uploading photo...</p>
