@@ -72,8 +72,8 @@ export default function PrintBadge() {
         .select(`
           *,
           host:employees(name, department:departments(name)),
-          department:departments(name, floor_number, building_section, location:locations(name, geo_address, latitude, longitude, emergency_contact, assembly_point)),
-          gate:gates(name, location:locations(name, geo_address, latitude, longitude, emergency_contact, assembly_point))
+          department:departments(name, floor_number, building_section, location:locations!departments_location_id_fkey(name, geo_address, latitude, longitude, emergency_contact, assembly_point)),
+          gate:gates(name, location:locations!gates_location_id_fkey(name, geo_address, latitude, longitude, emergency_contact, assembly_point))
         `)
         .eq('id', visitorId)
         .single();
