@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -12,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Printer, Laptop, UserCheck, Camera, Bell } from 'lucide-react';
+import { Search, Printer, Laptop, UserCheck, Camera, Bell, Users, CheckCircle2, Clock, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location, Employee } from '@/types/database';
 import { toast } from 'sonner';
@@ -25,6 +26,8 @@ import {
 } from '@/components/ui/dialog';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { SafetyPermitBadge } from '@/components/badge/SafetyPermitBadge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface VisitorWithLocation extends Omit<Visitor, 'gate' | 'host'> {
   host?: (Employee & { phone?: string | null }) | null;
@@ -40,8 +43,9 @@ export default function BadgePrinting() {
   const [searchParams] = useSearchParams();
   const badgeRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'checked_in' | 'scheduled' | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<'checked_in' | 'scheduled' | 'checked_out' | 'all'>('all');
   const [visitors, setVisitors] = useState<VisitorWithLocation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedVisitor, setSelectedVisitor] = useState<VisitorWithLocation | null>(null);
   const [showCameraDialog, setShowCameraDialog] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -52,7 +56,6 @@ export default function BadgePrinting() {
   }, [statusFilter]);
 
   useEffect(() => {
-    // Auto-select visitor from URL params
     const visitorId = searchParams.get('visitorId');
     if (visitorId && visitors.length > 0) {
       const visitor = visitors.find((v) => v.id === visitorId);
@@ -63,28 +66,35 @@ export default function BadgePrinting() {
   }, [searchParams, visitors]);
 
   const fetchVisitors = async () => {
-    let query = supabase
-      .from('visitors')
-      .select(`
-        *,
-        host:employees(*, department:departments(*), phone),
-        department:departments(*),
-        gate:gates(id, name, location_id, location:locations(*))
-      `)
-      .order('created_at', { ascending: false });
+    setLoading(true);
+    try {
+      let query = supabase
+        .from('visitors')
+        .select(`
+          *,
+          host:employees(*, department:departments(*)),
+          department:departments(*),
+          gate:gates(id, name, location_id, location:locations(*))
+        `)
+        .order('created_at', { ascending: false })
+        .limit(100);
 
-    if (statusFilter === 'checked_in') {
-      query = query.eq('status', 'checked_in');
-    } else if (statusFilter === 'scheduled') {
-      query = query.eq('status', 'scheduled');
-    } else {
-      query = query.in('status', ['checked_in', 'scheduled']);
-    }
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
+      }
 
-    const { data } = await query;
+      const { data, error } = await query;
 
-    if (data) {
-      setVisitors(data as unknown as VisitorWithLocation[]);
+      if (error) {
+        console.error('Error fetching visitors:', error);
+        toast.error('Failed to load visitors');
+      } else {
+        setVisitors((data || []) as unknown as VisitorWithLocation[]);
+      }
+    } catch (err) {
+      console.error('Fetch error:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -139,7 +149,6 @@ export default function BadgePrinting() {
   };
 
   const handleCheckInAndPrint = async (visitor: VisitorWithLocation) => {
-    // First check in the visitor
     const { error: checkInError } = await supabase
       .from('visitors')
       .update({
@@ -154,14 +163,11 @@ export default function BadgePrinting() {
     }
 
     toast.success(`${visitor.name} checked in successfully`);
-    
-    // Open print page in new tab
     window.open(`/print-badge?id=${visitor.id}`, '_blank');
     fetchVisitors();
   };
 
   const handlePrintBadge = (visitor: VisitorWithLocation) => {
-    // Open dedicated print page in new tab
     window.open(`/print-badge?id=${visitor.id}`, '_blank');
     fetchVisitors();
   };
@@ -174,7 +180,7 @@ export default function BadgePrinting() {
 
     setIsNotifying(true);
     try {
-      const { data, error } = await supabase.functions.invoke('notify-host', {
+      const { error } = await supabase.functions.invoke('notify-host', {
         body: {
           visitorName: visitor.name,
           visitorId: visitor.visitor_id,
@@ -208,6 +214,19 @@ export default function BadgePrinting() {
       .slice(0, 2);
   };
 
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case 'checked_in':
+        return { label: 'Checked In', className: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: CheckCircle2 };
+      case 'scheduled':
+        return { label: 'Scheduled', className: 'bg-sky-100 text-sky-700 border-sky-200', icon: Clock };
+      case 'checked_out':
+        return { label: 'Checked Out', className: 'bg-slate-100 text-slate-700 border-slate-200', icon: Users };
+      default:
+        return { label: status, className: 'bg-gray-100 text-gray-700 border-gray-200', icon: Users };
+    }
+  };
+
   const filteredVisitors = visitors.filter(
     (v) =>
       v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -215,211 +234,299 @@ export default function BadgePrinting() {
       v.visitor_id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Stats
+  const checkedInCount = visitors.filter(v => v.status === 'checked_in').length;
+  const scheduledCount = visitors.filter(v => v.status === 'scheduled').length;
+  const printedCount = visitors.filter(v => v.badge_printed).length;
+
   return (
     <MainLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Printer className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">Badge Printing</h1>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Printer className="h-6 w-6 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold text-foreground">Badge Printing</h1>
+            </div>
+            <p className="text-muted-foreground">
+              Select a visitor to preview and print their safety permit badge
+            </p>
           </div>
-          <p className="text-muted-foreground">
-            Print visitor badges with check-in option
-          </p>
+          <Button variant="outline" size="sm" onClick={fetchVisitors} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </Button>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Card className="border-l-4 border-l-emerald-500">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-2 rounded-full bg-emerald-100">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{checkedInCount}</p>
+                <p className="text-sm text-muted-foreground">Checked In</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-l-4 border-l-sky-500">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-2 rounded-full bg-sky-100">
+                <Clock className="h-5 w-5 text-sky-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{scheduledCount}</p>
+                <p className="text-sm text-muted-foreground">Scheduled</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-l-4 border-l-primary">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="p-2 rounded-full bg-primary/10">
+                <Printer className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{printedCount}</p>
+                <p className="text-sm text-muted-foreground">Badges Printed</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Visitors List */}
-          <div className="bg-card rounded-xl border border-border">
-            <div className="p-6 border-b border-border space-y-4">
+          <Card>
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">Visitors</h3>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Users className="h-5 w-5 text-muted-foreground" />
+                  Visitors ({filteredVisitors.length})
+                </CardTitle>
                 <Select
                   value={statusFilter}
-                  onValueChange={(v) => setStatusFilter(v as 'checked_in' | 'scheduled' | 'all')}
+                  onValueChange={(v) => setStatusFilter(v as 'checked_in' | 'scheduled' | 'checked_out' | 'all')}
                 >
                   <SelectTrigger className="w-36">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Active</SelectItem>
+                    <SelectItem value="all">All Visitors</SelectItem>
                     <SelectItem value="checked_in">Checked In</SelectItem>
                     <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="checked_out">Checked Out</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="relative">
+              <div className="relative mt-4">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search visitors..."
+                  placeholder="Search by name, company, or ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
-            </div>
-            <div className="max-h-[500px] overflow-y-auto divide-y divide-border">
-              {filteredVisitors.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
-                  No visitors found
-                </div>
-              ) : (
-                filteredVisitors.map((visitor) => (
-                  <button
-                    key={visitor.id}
-                    onClick={() => setSelectedVisitor(visitor)}
-                    className={cn(
-                      'w-full p-4 text-left hover:bg-accent/50 transition-colors flex items-center gap-4',
-                      selectedVisitor?.id === visitor.id && 'bg-accent'
-                    )}
-                  >
-                    <Avatar className="h-10 w-10">
-                      {visitor.photo_url ? (
-                        <AvatarImage src={visitor.photo_url} alt={visitor.name} />
-                      ) : null}
-                      <AvatarFallback
-                        className={cn(
-                          'font-medium',
-                          visitor.badge_printed
-                            ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-primary/10 text-primary'
-                        )}
-                      >
-                        {getInitials(visitor.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-foreground">{visitor.name}</p>
-                        <Badge
-                          variant="outline"
+            </CardHeader>
+            <CardContent className="p-0">
+              <ScrollArea className="h-[500px]">
+                {loading ? (
+                  <div className="p-4 space-y-3">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="flex items-center gap-4 p-3">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="h-4 w-[200px]" />
+                          <Skeleton className="h-3 w-[150px]" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredVisitors.length === 0 ? (
+                  <div className="p-12 text-center">
+                    <Users className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                    <p className="text-lg font-medium text-foreground mb-1">No visitors found</p>
+                    <p className="text-sm text-muted-foreground">
+                      {searchQuery ? 'Try adjusting your search' : 'No visitors match the current filter'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {filteredVisitors.map((visitor) => {
+                      const statusConfig = getStatusConfig(visitor.status);
+                      const StatusIcon = statusConfig.icon;
+                      return (
+                        <button
+                          key={visitor.id}
+                          onClick={() => setSelectedVisitor(visitor)}
                           className={cn(
-                            visitor.status === 'checked_in'
-                              ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                              : 'bg-sky-100 text-sky-700 border-sky-200'
+                            'w-full p-4 text-left hover:bg-accent/50 transition-colors flex items-center gap-4',
+                            selectedVisitor?.id === visitor.id && 'bg-accent border-l-4 border-l-primary'
                           )}
                         >
-                          {visitor.status === 'checked_in' ? 'Checked In' : 'Scheduled'}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {visitor.company || visitor.purpose}
-                      </p>
-                    </div>
-                    {visitor.has_laptop && (
-                      <Badge variant="outline" className="gap-1">
-                        <Laptop className="h-3 w-3" />
-                        Laptop
-                      </Badge>
-                    )}
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
+                          <Avatar className="h-12 w-12 ring-2 ring-background shadow-sm">
+                            {visitor.photo_url ? (
+                              <AvatarImage src={visitor.photo_url} alt={visitor.name} />
+                            ) : null}
+                            <AvatarFallback
+                              className={cn(
+                                'font-semibold text-sm',
+                                visitor.badge_printed
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : 'bg-primary/10 text-primary'
+                              )}
+                            >
+                              {getInitials(visitor.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="font-semibold text-foreground truncate">{visitor.name}</p>
+                              {visitor.badge_printed && (
+                                <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-200 text-xs">
+                                  Printed
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground truncate">
+                              {visitor.company || visitor.purpose || 'No details'}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className={cn('text-xs', statusConfig.className)}>
+                                <StatusIcon className="h-3 w-3 mr-1" />
+                                {statusConfig.label}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {visitor.visitor_id}
+                              </span>
+                            </div>
+                          </div>
+                          {visitor.has_laptop && (
+                            <Badge variant="secondary" className="gap-1 shrink-0">
+                              <Laptop className="h-3 w-3" />
+                            </Badge>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
 
           {/* Badge Preview */}
-          <div className="bg-card rounded-xl border border-border p-6">
-            <h3 className="font-semibold text-foreground mb-6 flex items-center gap-2">
-              <Printer className="h-5 w-5" />
-              Safety Permit Preview
-            </h3>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Printer className="h-5 w-5 text-muted-foreground" />
+                Safety Permit Preview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {selectedVisitor ? (
+                <div className="space-y-6">
+                  {/* Safety Permit Badge */}
+                  <div id="printable-badge" ref={badgeRef} className="flex justify-center">
+                    <SafetyPermitBadge 
+                      visitor={{
+                        visitor_id: selectedVisitor.visitor_id,
+                        name: selectedVisitor.name,
+                        phone: selectedVisitor.phone,
+                        company: selectedVisitor.company,
+                        purpose: selectedVisitor.purpose,
+                        has_laptop: selectedVisitor.has_laptop,
+                        photo_url: selectedVisitor.photo_url,
+                        check_in_time: selectedVisitor.check_in_time,
+                        host: selectedVisitor.host ? {
+                          name: selectedVisitor.host.name,
+                          department: selectedVisitor.host.department
+                        } : null,
+                        department: selectedVisitor.department,
+                        gate: selectedVisitor.gate ? {
+                          location: selectedVisitor.gate.location
+                        } : null
+                      }} 
+                    />
+                  </div>
 
-            {selectedVisitor ? (
-              <div className="space-y-6">
-                {/* Safety Permit Badge - Printable area */}
-                <div id="printable-badge" ref={badgeRef}>
-                  <SafetyPermitBadge 
-                    visitor={{
-                      visitor_id: selectedVisitor.visitor_id,
-                      name: selectedVisitor.name,
-                      phone: selectedVisitor.phone,
-                      company: selectedVisitor.company,
-                      purpose: selectedVisitor.purpose,
-                      has_laptop: selectedVisitor.has_laptop,
-                      photo_url: selectedVisitor.photo_url,
-                      check_in_time: selectedVisitor.check_in_time,
-                      host: selectedVisitor.host ? {
-                        name: selectedVisitor.host.name,
-                        department: selectedVisitor.host.department
-                      } : null,
-                      department: selectedVisitor.department,
-                      gate: selectedVisitor.gate ? {
-                        location: selectedVisitor.gate.location
-                      } : null
-                    }} 
-                  />
-                </div>
-
-                {/* Photo Capture Button */}
-                {!selectedVisitor.photo_url && (
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2 no-print"
-                    onClick={() => setShowCameraDialog(true)}
-                  >
-                    <Camera className="h-4 w-4" />
-                    Capture Photo
-                  </Button>
-                )}
-
-                {/* Notify Host Button */}
-                {selectedVisitor.host?.phone && (
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2 no-print"
-                    onClick={() => handleNotifyHost(selectedVisitor)}
-                    disabled={isNotifying}
-                  >
-                    <Bell className="h-4 w-4" />
-                    {isNotifying ? 'Notifying...' : 'Notify Host via WhatsApp'}
-                  </Button>
-                )}
-
-                {/* Action Buttons */}
-                <div className="space-y-2 no-print">
-                  {selectedVisitor.status === 'scheduled' ? (
-                    <>
-                      <Button
-                        className="w-full gap-2"
-                        onClick={() => handleCheckInAndPrint(selectedVisitor)}
-                      >
-                        <UserCheck className="h-4 w-4" />
-                        <Printer className="h-4 w-4" />
-                        Check In & Print Badge
-                      </Button>
+                  {/* Action Buttons */}
+                  <div className="space-y-3 pt-4 border-t">
+                    {/* Photo Capture */}
+                    {!selectedVisitor.photo_url && (
                       <Button
                         variant="outline"
                         className="w-full gap-2"
+                        onClick={() => setShowCameraDialog(true)}
+                      >
+                        <Camera className="h-4 w-4" />
+                        Capture Photo
+                      </Button>
+                    )}
+
+                    {/* Notify Host */}
+                    {selectedVisitor.host && (
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2"
+                        onClick={() => handleNotifyHost(selectedVisitor)}
+                        disabled={isNotifying}
+                      >
+                        <Bell className="h-4 w-4" />
+                        {isNotifying ? 'Notifying...' : 'Notify Host via WhatsApp'}
+                      </Button>
+                    )}
+
+                    {/* Print Actions */}
+                    {selectedVisitor.status === 'scheduled' ? (
+                      <>
+                        <Button
+                          className="w-full gap-2"
+                          size="lg"
+                          onClick={() => handleCheckInAndPrint(selectedVisitor)}
+                        >
+                          <UserCheck className="h-4 w-4" />
+                          <Printer className="h-4 w-4" />
+                          Check In & Print Badge
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full gap-2"
+                          onClick={() => handlePrintBadge(selectedVisitor)}
+                        >
+                          <Printer className="h-4 w-4" />
+                          Print Badge Only
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        className="w-full gap-2"
+                        size="lg"
                         onClick={() => handlePrintBadge(selectedVisitor)}
                       >
                         <Printer className="h-4 w-4" />
-                        Print Badge Only
+                        {selectedVisitor.badge_printed ? 'Reprint Badge' : 'Print Badge'}
                       </Button>
-                    </>
-                  ) : (
-                    <Button
-                      className="w-full gap-2"
-                      onClick={() => handlePrintBadge(selectedVisitor)}
-                    >
-                      <Printer className="h-4 w-4" />
-                      {selectedVisitor.badge_printed ? 'Reprint Badge' : 'Print Badge'}
-                    </Button>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-32 h-40 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4 border-2 border-dashed border-border">
-                  <Printer className="h-8 w-8 text-muted-foreground" />
+              ) : (
+                <div className="text-center py-16">
+                  <div className="w-24 h-32 mx-auto bg-muted rounded-lg flex items-center justify-center mb-4 border-2 border-dashed border-border">
+                    <Printer className="h-10 w-10 text-muted-foreground/50" />
+                  </div>
+                  <p className="text-lg font-medium text-foreground mb-1">No visitor selected</p>
+                  <p className="text-sm text-muted-foreground">
+                    Select a visitor from the list to preview their badge
+                  </p>
                 </div>
-                <p className="text-muted-foreground">
-                  Select a visitor to preview their badge
-                </p>
-              </div>
-            )}
-          </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
