@@ -231,11 +231,11 @@ export default function Employees() {
   };
 
   const downloadTemplate = () => {
-    const headers = ['Employee ID', 'Name', 'Email', 'Position', 'Department Name', 'Location Name', 'Is Host (yes/no)'];
+    const headers = ['Employee ID', 'Name', 'Email', 'Phone', 'Position', 'Department Name', 'Location Name', 'Is Host (yes/no)'];
     const sampleRows = [
-      ['EMP-001', 'John Doe', 'john@company.com', 'Software Engineer', 'Engineering', 'Corporate HQ', 'yes'],
-      ['EMP-002', 'Jane Smith', 'jane@company.com', 'HR Manager', 'Human Resources', 'Tech Center', 'yes'],
-      ['EMP-003', 'Bob Wilson', 'bob@company.com', 'Accountant', 'Finance', 'Corporate HQ', 'no'],
+      ['EMP-001', 'John Doe', 'john@company.com', '+919876543210', 'Software Engineer', 'Engineering', 'Corporate HQ', 'yes'],
+      ['EMP-002', 'Jane Smith', 'jane@company.com', '+919876543211', 'HR Manager', 'Human Resources', 'Tech Center', 'yes'],
+      ['EMP-003', 'Bob Wilson', 'bob@company.com', '', 'Accountant', 'Finance', 'Corporate HQ', 'no'],
     ];
     const csv = [headers.join(','), ...sampleRows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -285,27 +285,28 @@ export default function Employees() {
           errors.push({ row: rowNum, field: 'Email', message: emailError, value: values[2] });
         }
         
-        // Match department
-        const deptName = values[4]?.toLowerCase();
+        // Match department (column index shifted due to phone field)
+        const deptName = values[5]?.toLowerCase();
         const matchedDept = departments.find(d => d.name.toLowerCase() === deptName);
-        if (values[4] && !matchedDept) {
-          errors.push({ row: rowNum, field: 'Department', message: `Department "${values[4]}" not found`, value: values[4] });
+        if (values[5] && !matchedDept) {
+          errors.push({ row: rowNum, field: 'Department', message: `Department "${values[5]}" not found`, value: values[5] });
         }
         
         // Match location
-        const locName = values[5]?.toLowerCase();
+        const locName = values[6]?.toLowerCase();
         const matchedLoc = locations.find(l => l.name.toLowerCase() === locName);
-        if (values[5] && !matchedLoc) {
-          errors.push({ row: rowNum, field: 'Location', message: `Location "${values[5]}" not found`, value: values[5] });
+        if (values[6] && !matchedLoc) {
+          errors.push({ row: rowNum, field: 'Location', message: `Location "${values[6]}" not found`, value: values[6] });
         }
         
-        const isHost = values[6]?.toLowerCase() === 'yes' || values[6]?.toLowerCase() === 'true' || values[6] === '1';
+        const isHost = values[7]?.toLowerCase() === 'yes' || values[7]?.toLowerCase() === 'true' || values[7] === '1';
         
         employeesToInsert.push({
           employee_id: values[0] || generateEmployeeId(),
           name: values[1],
           email: emailError ? null : (values[2] || null),
-          position: values[3] || null,
+          phone: values[3] || null,
+          position: values[4] || null,
           department_id: matchedDept?.id || null,
           location_id: matchedLoc?.id || null,
           is_host: isHost,
@@ -553,6 +554,7 @@ export default function Employees() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Employee</TableHead>
+                  <TableHead>Phone</TableHead>
                   <TableHead>Position</TableHead>
                   <TableHead>Department</TableHead>
                   <TableHead>Location</TableHead>
@@ -563,7 +565,7 @@ export default function Employees() {
               <TableBody>
                 {filteredEmployees.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12">
+                    <TableCell colSpan={7} className="text-center py-12">
                       <UserRound className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                       <p className="text-muted-foreground">No employees found</p>
                       <Button variant="outline" className="mt-4" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
@@ -593,6 +595,16 @@ export default function Employees() {
                             </p>
                           </div>
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        {(emp as any).phone ? (
+                          <span className="text-sm flex items-center gap-1 text-muted-foreground">
+                            <Phone className="h-3 w-3 text-success" />
+                            {(emp as any).phone}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">No phone</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted-foreground">{emp.position || '—'}</span>
