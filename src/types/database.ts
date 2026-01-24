@@ -17,6 +17,9 @@ export interface Department {
   name: string;
   description: string | null;
   location: string | null;
+  location_id: string | null;
+  floor_number: string | null;
+  building_section: string | null;
   employee_count: number;
   active_visitors: number;
   created_at: string;

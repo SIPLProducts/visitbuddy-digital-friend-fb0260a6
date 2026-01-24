@@ -89,9 +89,11 @@ export type Database = {
       departments: {
         Row: {
           active_visitors: number | null
+          building_section: string | null
           created_at: string
           description: string | null
           employee_count: number | null
+          floor_number: string | null
           id: string
           location: string | null
           location_id: string | null
@@ -100,9 +102,11 @@ export type Database = {
         }
         Insert: {
           active_visitors?: number | null
+          building_section?: string | null
           created_at?: string
           description?: string | null
           employee_count?: number | null
+          floor_number?: string | null
           id?: string
           location?: string | null
           location_id?: string | null
@@ -111,9 +115,11 @@ export type Database = {
         }
         Update: {
           active_visitors?: number | null
+          building_section?: string | null
           created_at?: string
           description?: string | null
           employee_count?: number | null
+          floor_number?: string | null
           id?: string
           location?: string | null
           location_id?: string | null

@@ -19,6 +19,8 @@ interface VisitorData {
   } | null;
   department?: { 
     name?: string;
+    floor_number?: string | null;
+    building_section?: string | null;
     location?: {
       name?: string;
       geo_address?: string | null;
@@ -66,7 +68,7 @@ export default function PrintBadge() {
         .select(`
           *,
           host:employees(name, department:departments(name)),
-          department:departments(name, location:locations(name, geo_address, latitude, longitude)),
+          department:departments(name, floor_number, building_section, location:locations(name, geo_address, latitude, longitude)),
           gate:gates(name, location:locations(name, geo_address, latitude, longitude))
         `)
         .eq('id', visitorId)
@@ -459,6 +461,15 @@ export default function PrintBadge() {
               <span className="detail-label">Dept. To Meet</span>
               <span className="detail-value">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
             </div>
+            {(visitor.department?.floor_number || visitor.department?.building_section) && (
+              <div className="detail-row">
+                <span className="detail-label">Location</span>
+                <span className="detail-value">: {[
+                  visitor.department?.floor_number && `Floor ${visitor.department.floor_number}`,
+                  visitor.department?.building_section
+                ].filter(Boolean).join(', ') || 'N/A'}</span>
+              </div>
+            )}
             <div className="detail-row">
               <span className="detail-label">Host</span>
               <span className="detail-value">: {visitor.host?.name || 'N/A'}</span>
