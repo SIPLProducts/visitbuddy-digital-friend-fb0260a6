@@ -82,10 +82,10 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Get host details from employees table
+    // Get host details from employees table including phone
     const { data: hostData, error: hostError } = await supabase
       .from("employees")
-      .select("id, name, email")
+      .select("id, name, email, phone")
       .eq("id", visitor.host_id)
       .single();
 
@@ -119,7 +119,7 @@ const handler = async (req: Request): Promise<Response> => {
       departmentName = deptData?.name || "";
     }
 
-    console.log(`Host ${hostData.name} (${hostData.email}) should be notified about visitor ${visitor.name}`);
+    console.log(`Host ${hostData.name} (${hostData.email}, ${hostData.phone}) should be notified about visitor ${visitor.name}`);
 
     const currentDate = new Date().toLocaleDateString("en-IN", {
       weekday: "long",
@@ -133,8 +133,18 @@ const handler = async (req: Request): Promise<Response> => {
       minute: "2-digit",
     });
 
-    // If we had the host's phone, we would send this message:
-    const message = `
+    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    let hostNotificationSent = false;
+    let hostMessageSid = "";
+
+    // Send WhatsApp notification to host if they have a phone number
+    if (hostData.phone) {
+      let formattedHostPhone = hostData.phone.replace(/\s/g, "").replace(/-/g, "");
+      if (!formattedHostPhone.startsWith("+")) {
+        formattedHostPhone = "+91" + formattedHostPhone.replace(/^0/, "");
+      }
+
+      const hostMessage = `
 🔔 *Visitor Arrival Notification*
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -156,15 +166,50 @@ ${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
 Please proceed to the reception to receive your visitor.
 
 _VisiGuard Visitor Management System_
-    `.trim();
+      `.trim();
 
-    console.log("Notification message prepared:", message);
+      const hostFormData = new URLSearchParams();
+      hostFormData.append("To", `whatsapp:${formattedHostPhone}`);
+      hostFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
+      hostFormData.append("Body", hostMessage);
+      
+      // Include visitor photo if available
+      if (visitor.photo_url) {
+        hostFormData.append("MediaUrl", visitor.photo_url);
+      }
 
-    // If we have the visitor's phone, send them a confirmation that host was notified
+      try {
+        const twilioResponse = await fetch(twilioUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: hostFormData,
+        });
+
+        const twilioResult = await twilioResponse.json();
+
+        if (twilioResponse.ok) {
+          console.log("Host notification sent successfully:", twilioResult.sid);
+          hostNotificationSent = true;
+          hostMessageSid = twilioResult.sid;
+        } else {
+          console.error("Failed to send host notification:", twilioResult);
+        }
+      } catch (whatsappError) {
+        console.error("WhatsApp send error to host:", whatsappError);
+      }
+    } else {
+      console.log("Host has no phone number configured, skipping WhatsApp notification");
+    }
+
+    // Send confirmation to visitor if they have a phone number
+    let visitorNotificationSent = false;
     if (visitor.phone) {
-      let formattedPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
-      if (!formattedPhone.startsWith("+")) {
-        formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
+      let formattedVisitorPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
+      if (!formattedVisitorPhone.startsWith("+")) {
+        formattedVisitorPhone = "+91" + formattedVisitorPhone.replace(/^0/, "");
       }
 
       const visitorMessage = `
@@ -183,18 +228,15 @@ ${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
 📅 *Date:* ${currentDate}
 ⏰ *Time:* ${currentTime}
 
-Your host has been notified of your arrival.
-Please wait at the reception area.
+${hostNotificationSent ? "Your host has been notified of your arrival." : "Please wait at the reception area."}
 
 _VisiGuard Visitor Management System_
       `.trim();
 
-      const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-      
-      const formData = new URLSearchParams();
-      formData.append("To", `whatsapp:${formattedPhone}`);
-      formData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
-      formData.append("Body", visitorMessage);
+      const visitorFormData = new URLSearchParams();
+      visitorFormData.append("To", `whatsapp:${formattedVisitorPhone}`);
+      visitorFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
+      visitorFormData.append("Body", visitorMessage);
 
       try {
         const twilioResponse = await fetch(twilioUrl, {
@@ -203,35 +245,37 @@ _VisiGuard Visitor Management System_
             "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: formData,
+          body: visitorFormData,
         });
 
         const twilioResult = await twilioResponse.json();
 
         if (twilioResponse.ok) {
           console.log("Visitor confirmation sent:", twilioResult.sid);
+          visitorNotificationSent = true;
         } else {
           console.error("Failed to send visitor confirmation:", twilioResult);
         }
       } catch (whatsappError) {
-        console.error("WhatsApp send error:", whatsappError);
+        console.error("WhatsApp send error to visitor:", whatsappError);
       }
     }
-
-    // Create in-app notification for the host (if we have user_id)
-    // This would require linking employees to auth users
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Host notification processed",
+        message: "Notifications processed",
+        hostNotified: hostNotificationSent,
+        hostMessageSid: hostMessageSid || null,
+        visitorNotified: visitorNotificationSent,
         visitor: {
           id: visitor.visitor_id,
           name: visitor.name
         },
         host: {
           name: hostData.name,
-          email: hostData.email
+          email: hostData.email,
+          phone: hostData.phone ? "***" + hostData.phone.slice(-4) : null
         }
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }

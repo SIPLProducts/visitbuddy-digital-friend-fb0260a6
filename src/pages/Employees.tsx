@@ -75,6 +75,7 @@ export default function Employees() {
     employee_id: '',
     name: '',
     email: '',
+    phone: '',
     position: '',
     department_id: '',
     location_id: '',
@@ -124,6 +125,7 @@ export default function Employees() {
       employee_id: generateEmployeeId(),
       name: '',
       email: '',
+      phone: '',
       position: '',
       department_id: '',
       location_id: '',
@@ -142,6 +144,7 @@ export default function Employees() {
       employee_id: formData.employee_id || generateEmployeeId(),
       name: formData.name,
       email: formData.email || null,
+      phone: formData.phone || null,
       position: formData.position || null,
       department_id: formData.department_id || null,
       location_id: formData.location_id || null,
@@ -168,6 +171,7 @@ export default function Employees() {
       .update({
         name: formData.name,
         email: formData.email || null,
+        phone: formData.phone || null,
         position: formData.position || null,
         department_id: formData.department_id || null,
         location_id: formData.location_id || null,
@@ -212,6 +216,7 @@ export default function Employees() {
       employee_id: emp.employee_id,
       name: emp.name,
       email: emp.email || '',
+      phone: (emp as any).phone || '',
       position: emp.position || '',
       department_id: emp.department_id || '',
       location_id: emp.location_id || '',
@@ -379,6 +384,17 @@ export default function Employees() {
           />
         </div>
         <div className="space-y-2">
+          <Label>Phone (for WhatsApp notifications)</Label>
+          <Input
+            type="tel"
+            placeholder="+91 XXXXX XXXXX"
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
           <Label>Position</Label>
           <Input
             placeholder="Job title"
@@ -386,8 +402,6 @@ export default function Employees() {
             onChange={(e) => setFormData({ ...formData, position: e.target.value })}
           />
         </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Department</Label>
           <Select value={formData.department_id} onValueChange={(v) => setFormData({ ...formData, department_id: v })}>
@@ -401,6 +415,8 @@ export default function Employees() {
             </SelectContent>
           </Select>
         </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Location</Label>
           <Select value={formData.location_id} onValueChange={(v) => setFormData({ ...formData, location_id: v })}>
@@ -414,13 +430,13 @@ export default function Employees() {
             </SelectContent>
           </Select>
         </div>
-      </div>
-      <div className="flex items-center gap-3 pt-2">
-        <Switch
-          checked={formData.is_host}
-          onCheckedChange={(v) => setFormData({ ...formData, is_host: v })}
-        />
-        <Label>Can host visitors</Label>
+        <div className="flex items-center gap-3 pt-6">
+          <Switch
+            checked={formData.is_host}
+            onCheckedChange={(v) => setFormData({ ...formData, is_host: v })}
+          />
+          <Label>Can host visitors</Label>
+        </div>
       </div>
     </div>
   );
