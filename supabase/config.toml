@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.notify-host]
 verify_jwt = false
+
+[functions.send-email-badge]
+verify_jwt = false
