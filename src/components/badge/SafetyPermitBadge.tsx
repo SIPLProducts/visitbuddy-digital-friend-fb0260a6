@@ -16,9 +16,22 @@ interface SafetyPermitBadgeProps {
       name?: string;
       department?: { name?: string } | null;
     } | null;
-    department?: { name?: string } | null;
+    department?: { 
+      name?: string;
+      location?: string | {
+        name?: string;
+        geo_address?: string | null;
+        latitude?: number | null;
+        longitude?: number | null;
+      } | null;
+    } | null;
     gate?: {
-      location?: { name?: string; geo_address?: string | null } | null;
+      location?: { 
+        name?: string; 
+        geo_address?: string | null;
+        latitude?: number | null;
+        longitude?: number | null;
+      } | null;
     } | null;
   };
   companyName?: string;
@@ -50,6 +63,33 @@ export function SafetyPermitBadge({
     timestamp: currentDate.toISOString()
   }));
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}&format=png`;
+
+  // Get location details from department or gate (handle both string and object formats)
+  const deptLocation = visitor.department?.location;
+  const gateLocation = visitor.gate?.location;
+  
+  // Department location can be a string (legacy) or object (new format)
+  const location = typeof deptLocation === 'object' ? deptLocation : gateLocation;
+  const geoAddress = location?.geo_address;
+  const latitude = location?.latitude;
+  const longitude = location?.longitude;
+  
+  // Generate Google Maps navigation URL
+  const getNavigationUrl = () => {
+    if (latitude && longitude) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    } else if (geoAddress) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(geoAddress)}`;
+    }
+    return null;
+  };
+  
+  const navigationUrl = getNavigationUrl();
+  
+  // Generate QR code for navigation
+  const navigationQrUrl = navigationUrl 
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(navigationUrl)}&format=png`
+    : null;
 
   return (
     <div className="bg-white border-2 border-gray-800 rounded-lg overflow-hidden w-[350px] mx-auto text-black print:border-black">
@@ -145,6 +185,24 @@ export function SafetyPermitBadge({
         </div>
       </div>
 
+      {/* Location with Navigation QR */}
+      {(geoAddress || navigationUrl) && (
+        <div className="flex items-center gap-2 px-2 py-1.5 bg-sky-50 border-t border-sky-200">
+          <span className="text-sm">📍</span>
+          <div className="flex-1 text-[10px]">
+            <p className="font-semibold text-sky-700">{geoAddress || location?.name || 'Location'}</p>
+            <p className="text-gray-500">Scan QR to navigate</p>
+          </div>
+          {navigationQrUrl && (
+            <img 
+              src={navigationQrUrl} 
+              alt="Navigate" 
+              className="w-12 h-12"
+            />
+          )}
+        </div>
+      )}
+
       {/* Safety Guidelines with QR */}
       <div className="flex border-t-2 border-gray-800 bg-gray-100">
         <div className="flex-1 p-2 text-[10px] leading-tight">
@@ -153,12 +211,13 @@ export function SafetyPermitBadge({
           <p className="mb-0.5">3. Always keep company work place clean.</p>
           <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
         </div>
-        <div className="w-24 p-1 flex items-center justify-center border-l border-gray-300">
+        <div className="w-24 p-1 flex flex-col items-center justify-center border-l border-gray-300">
           <img 
             src={qrCodeUrl} 
             alt="Check-out QR Code" 
             className="w-20 h-20"
           />
+          <span className="text-[8px] font-semibold text-gray-600">Check-out</span>
         </div>
       </div>
     </div>
