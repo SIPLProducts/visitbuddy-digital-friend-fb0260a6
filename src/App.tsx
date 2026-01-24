@@ -28,6 +28,8 @@ import NewVehicle from "./pages/NewVehicle";
 import VehicleGate from "./pages/VehicleGate";
 import VehicleReport from "./pages/VehicleReport";
 import NotFound from "./pages/NotFound";
+import SelfService from "./pages/SelfService";
+import Install from "./pages/Install";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +85,8 @@ const App = () => (
             <Route path="/check-in-out" element={<ProtectedRoute><CheckInOut /></ProtectedRoute>} />
             <Route path="/badge-printing" element={<ProtectedRoute><BadgePrinting /></ProtectedRoute>} />
             <Route path="/print-badge" element={<PrintBadge />} />
+            <Route path="/self-service" element={<SelfService />} />
+            <Route path="/install" element={<Install />} />
             <Route path="/visitor-report" element={<ProtectedRoute><VisitorReport /></ProtectedRoute>} />
             <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
             <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
