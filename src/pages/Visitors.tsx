@@ -95,6 +95,25 @@ export default function Visitors() {
     }
   };
 
+  const handleCheckInAndPrint = async (visitor: Visitor) => {
+    const { error } = await supabase
+      .from('visitors')
+      .update({
+        status: 'checked_in',
+        check_in_time: new Date().toISOString(),
+      })
+      .eq('id', visitor.id);
+
+    if (error) {
+      toast.error('Failed to check in visitor');
+      return;
+    }
+
+    toast.success(`${visitor.name} checked in successfully`);
+    window.open(`/print-badge?id=${visitor.id}`, '_blank');
+    fetchVisitors();
+  };
+
   const handleCheckOut = async (visitor: Visitor) => {
     const { error } = await supabase
       .from('visitors')
@@ -335,6 +354,7 @@ export default function Visitors() {
                         onPrintBadge={handlePrintBadge}
                         onCheckIn={handleCheckIn}
                         onCheckOut={handleCheckOut}
+                        onCheckInAndPrint={handleCheckInAndPrint}
                       />
                     </TableCell>
                   </TableRow>
