@@ -61,6 +61,8 @@ export default function Departments() {
     description: '',
     location: '',
     location_id: '',
+    floor_number: '',
+    building_section: '',
   });
 
   useEffect(() => {
@@ -80,7 +82,7 @@ export default function Departments() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', location: '', location_id: '' });
+    setFormData({ name: '', description: '', location: '', location_id: '', floor_number: '', building_section: '' });
   };
 
   const handleAdd = async () => {
@@ -95,6 +97,8 @@ export default function Departments() {
       description: formData.description || null,
       location: formData.location || null,
       location_id: formData.location_id || null,
+      floor_number: formData.floor_number || null,
+      building_section: formData.building_section || null,
     });
 
     setLoading(false);
@@ -119,6 +123,8 @@ export default function Departments() {
         description: formData.description || null,
         location: formData.location || null,
         location_id: formData.location_id || null,
+        floor_number: formData.floor_number || null,
+        building_section: formData.building_section || null,
       })
       .eq('id', selectedDepartment.id);
 
@@ -160,6 +166,8 @@ export default function Departments() {
       description: dept.description || '',
       location: dept.location || '',
       location_id: (dept as any).location_id || '',
+      floor_number: (dept as any).floor_number || '',
+      building_section: (dept as any).building_section || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -170,11 +178,11 @@ export default function Departments() {
   };
 
   const downloadTemplate = () => {
-    const headers = ['Name', 'Description', 'Location Name'];
+    const headers = ['Name', 'Description', 'Location Name', 'Floor Number', 'Building Section'];
     const sampleRows = [
-      ['Engineering', 'Software development team', 'Corporate HQ'],
-      ['Human Resources', 'HR and recruitment', 'Tech Center'],
-      ['Finance', 'Accounting and finance', 'Corporate HQ'],
+      ['Engineering', 'Software development team', 'Corporate HQ', '3', 'Block A'],
+      ['Human Resources', 'HR and recruitment', 'Tech Center', 'Ground', 'Main Building'],
+      ['Finance', 'Accounting and finance', 'Corporate HQ', '2', 'Block B'],
     ];
     const csv = [headers.join(','), ...sampleRows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -230,6 +238,8 @@ export default function Departments() {
           description: values[1] || null,
           location: matchedLocation?.name || null,
           location_id: matchedLocation?.id || null,
+          floor_number: values[3] || null,
+          building_section: values[4] || null,
         });
       }
       
@@ -357,9 +367,18 @@ export default function Departments() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
-                      {dept.location || 'No location set'}
+                    <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        {dept.location || 'No location set'}
+                      </div>
+                      {((dept as any).floor_number || (dept as any).building_section) && (
+                        <div className="flex items-center gap-2 text-xs pl-6">
+                          {(dept as any).floor_number && <span>Floor: {(dept as any).floor_number}</span>}
+                          {(dept as any).floor_number && (dept as any).building_section && <span>•</span>}
+                          {(dept as any).building_section && <span>{(dept as any).building_section}</span>}
+                        </div>
+                      )}
                     </div>
 
                     {hosts[0] && (
@@ -458,6 +477,24 @@ export default function Departments() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Floor Number</Label>
+                <Input
+                  placeholder="e.g., 3 or Ground"
+                  value={formData.floor_number}
+                  onChange={(e) => setFormData({ ...formData, floor_number: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Building Section</Label>
+                <Input
+                  placeholder="e.g., Block A"
+                  value={formData.building_section}
+                  onChange={(e) => setFormData({ ...formData, building_section: e.target.value })}
+                />
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
@@ -506,6 +543,24 @@ export default function Departments() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Floor Number</Label>
+                <Input
+                  placeholder="e.g., 3 or Ground"
+                  value={formData.floor_number}
+                  onChange={(e) => setFormData({ ...formData, floor_number: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Building Section</Label>
+                <Input
+                  placeholder="e.g., Block A"
+                  value={formData.building_section}
+                  onChange={(e) => setFormData({ ...formData, building_section: e.target.value })}
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>
