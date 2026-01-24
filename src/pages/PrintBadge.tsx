@@ -43,25 +43,38 @@ export default function PrintBadge() {
   }, [visitor, loading]);
 
   const fetchVisitor = async () => {
-    const { data } = await supabase
-      .from('visitors')
-      .select(`
-        *,
-        host:employees(name, department:departments(name)),
-        department:departments(name)
-      `)
-      .eq('id', visitorId)
-      .single();
-
-    if (data) {
-      setVisitor(data as unknown as VisitorData);
-      // Mark badge as printed
-      await supabase
+    try {
+      console.log('Fetching visitor with ID:', visitorId);
+      const { data, error } = await supabase
         .from('visitors')
-        .update({ badge_printed: true })
-        .eq('id', visitorId);
+        .select(`
+          *,
+          host:employees(name, department:departments(name)),
+          department:departments(name)
+        `)
+        .eq('id', visitorId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching visitor:', error);
+        setLoading(false);
+        return;
+      }
+
+      if (data) {
+        console.log('Visitor data loaded:', data.name);
+        setVisitor(data as unknown as VisitorData);
+        // Mark badge as printed
+        await supabase
+          .from('visitors')
+          .update({ badge_printed: true })
+          .eq('id', visitorId);
+      }
+    } catch (err) {
+      console.error('Fetch visitor error:', err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const getInitials = (name: string) => {
@@ -300,9 +313,23 @@ export default function PrintBadge() {
       `}</style>
 
       <div style={{ padding: '20px' }}>
-        <button className="no-print print-btn" onClick={() => window.print()}>
-          🖨️ Print Badge
-        </button>
+        <div className="no-print" style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
+          <button className="print-btn" onClick={() => window.print()} style={{ margin: 0 }}>
+            🖨️ Print Badge
+          </button>
+          <button 
+            className="print-btn" 
+            onClick={() => {
+              // Trigger print dialog - user can choose "Save as PDF" from there
+              window.print();
+            }}
+            style={{ margin: 0, background: '#059669' }}
+            onMouseOver={(e) => (e.currentTarget.style.background = '#047857')}
+            onMouseOut={(e) => (e.currentTarget.style.background = '#059669')}
+          >
+            📄 Save as PDF
+          </button>
+        </div>
 
         <div className="badge">
           {/* Header */}
