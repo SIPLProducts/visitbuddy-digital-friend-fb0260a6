@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Printer, Laptop, UserCheck, Camera, Bell, Users, CheckCircle2, Clock, RefreshCw, Mail, MessageCircle } from 'lucide-react';
+import { Search, Printer, Laptop, UserCheck, Camera, Bell, Users, CheckCircle2, Clock, RefreshCw, Mail, MessageCircle, Smartphone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location, Employee } from '@/types/database';
 import { toast } from 'sonner';
@@ -52,6 +52,7 @@ export default function BadgePrinting() {
   const [isNotifying, setIsNotifying] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
+  const [isSendingSms, setIsSendingSms] = useState(false);
 
   useEffect(() => {
     fetchVisitors();
@@ -275,6 +276,37 @@ export default function BadgePrinting() {
       toast.error(error.message || 'Failed to send WhatsApp');
     } finally {
       setIsSendingWhatsApp(false);
+    }
+  };
+
+  const handleSendSms = async (visitor: VisitorWithLocation) => {
+    if (!visitor.phone) {
+      toast.error('Visitor phone number not available');
+      return;
+    }
+
+    setIsSendingSms(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-sms-badge', {
+        body: {
+          visitorName: visitor.name,
+          visitorId: visitor.visitor_id,
+          phone: visitor.phone,
+          company: visitor.company,
+          purpose: visitor.purpose,
+          hostName: visitor.host?.name,
+          departmentName: visitor.host?.department?.name || visitor.department?.name,
+          gateName: visitor.gate?.name,
+        },
+      });
+
+      if (error) throw error;
+      toast.success('Badge sent via SMS successfully');
+    } catch (error: any) {
+      console.error('Send SMS error:', error);
+      toast.error(error.message || 'Failed to send SMS');
+    } finally {
+      setIsSendingSms(false);
     }
   };
 
@@ -562,6 +594,16 @@ export default function BadgePrinting() {
                       >
                         <MessageCircle className="h-4 w-4" />
                         {isSendingWhatsApp ? 'Sending...' : 'WhatsApp'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 gap-2"
+                        onClick={() => handleSendSms(selectedVisitor)}
+                        disabled={isSendingSms || !selectedVisitor.phone}
+                        title={!selectedVisitor.phone ? 'No phone available' : 'Send badge via SMS'}
+                      >
+                        <Smartphone className="h-4 w-4" />
+                        {isSendingSms ? 'Sending...' : 'SMS'}
                       </Button>
                     </div>
 
