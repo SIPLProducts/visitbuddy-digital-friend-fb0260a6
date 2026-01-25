@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { QrScanner } from '@/components/checkin/QrScanner';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { useNavigate } from 'react-router-dom';
+import reslLogo from '@/assets/resl-logo.png';
 
 export default function CheckInOut() {
   const navigate = useNavigate();
@@ -267,14 +268,27 @@ export default function CheckInOut() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Check-in / Check-out</h1>
-          <p className="text-muted-foreground">
-            Scan QR code or search to manage visitor check-ins
-          </p>
+      <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+        {/* Branding Header */}
+        <div className="bg-destructive py-6 -mx-6 -mt-6 px-6 mb-6">
+          <div className="flex flex-col items-center justify-center">
+            <img 
+              src={reslLogo} 
+              alt="Resustainability Logo" 
+              className="h-16 w-auto brightness-0 invert"
+            />
+            <span className="text-destructive-foreground font-bold text-lg mt-2 tracking-wide">Resustainability</span>
+          </div>
         </div>
+
+        <div className="flex-1 space-y-6">
+          {/* Header */}
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Check-in / Check-out</h1>
+            <p className="text-muted-foreground">
+              Scan QR code or search to manage visitor check-ins
+            </p>
+          </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Panel - Scan / Search */}
@@ -338,8 +352,8 @@ export default function CheckInOut() {
                           variant="outline"
                           className={cn(
                             visitor.status === 'checked_in'
-                              ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                              : 'bg-sky-100 text-sky-700 border-sky-200'
+                              ? 'bg-success/20 text-success border-success/30'
+                              : 'bg-info/20 text-info border-info/30'
                           )}
                         >
                           {visitor.status === 'checked_in' ? 'Checked In' : 'Scheduled'}
@@ -475,7 +489,7 @@ export default function CheckInOut() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-card rounded-xl border border-border p-4 text-center">
-                <p className="text-3xl font-bold text-emerald-600">{stats.checkedIn}</p>
+                <p className="text-3xl font-bold text-success">{stats.checkedIn}</p>
                 <p className="text-sm text-muted-foreground">Checked In</p>
               </div>
               <div className="bg-card rounded-xl border border-border p-4 text-center">
@@ -483,11 +497,19 @@ export default function CheckInOut() {
                 <p className="text-sm text-muted-foreground">Checked Out</p>
               </div>
               <div className="bg-card rounded-xl border border-border p-4 text-center">
-                <p className="text-3xl font-bold text-sky-600">{stats.scheduled}</p>
+                <p className="text-3xl font-bold text-info">{stats.scheduled}</p>
                 <p className="text-sm text-muted-foreground">Scheduled</p>
               </div>
             </div>
           </div>
+          </div>
+        </div>
+
+        {/* Powered By Footer */}
+        <div className="mt-auto pt-6 pb-2">
+          <p className="text-center text-xs text-muted-foreground">
+            Powered by <span className="font-semibold text-foreground">Sharvi Infotech</span>
+          </p>
         </div>
       </div>
 
