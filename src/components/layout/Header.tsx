@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Bell, Plus, Building2, ChevronDown, Crown } from 'lucide-react';
+import { Search, Bell, Plus, Building2, ChevronDown, Crown, Menu } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -23,6 +23,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Location {
   id: string;
@@ -30,12 +31,17 @@ interface Location {
   city: string | null;
 }
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { user, signOut } = useAuth();
   const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     fetchLocations();
@@ -83,20 +89,31 @@ export function Header() {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
-      {/* Left side - Search and Location */}
-      <div className="flex items-center gap-4">
+    <header className="h-14 md:h-16 border-b border-border bg-card px-3 md:px-6 flex items-center justify-between gap-2 safe-area-top">
+      {/* Left side - Menu button (mobile) + Location + Search */}
+      <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+        {/* Mobile menu button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onMenuClick}
+          className="md:hidden h-10 w-10 flex-shrink-0"
+          aria-label="Open menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+
         {/* Location Selector */}
         {!rolesLoading && locations.length > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Select value={selectedLocationId} onValueChange={handleLocationChange}>
-              <SelectTrigger className="w-[200px] bg-background">
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Select location" />
+              <SelectTrigger className="w-[120px] md:w-[200px] bg-background h-10">
+                <div className="flex items-center gap-2 truncate">
+                  <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <SelectValue placeholder="Location" className="truncate" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover z-50">
                 {isHoAdmin && (
                   <SelectItem value="all">
                     <div className="flex items-center gap-2">
@@ -115,29 +132,36 @@ export function Header() {
           </div>
         )}
 
-        {/* Search */}
-        <div className="relative w-80">
+        {/* Search - hidden on mobile */}
+        <div className="relative w-80 hidden lg:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search visitors, appointments..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-background"
+            className="pl-10 bg-background h-10"
           />
         </div>
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-4">
-        <Link to="/visitors/new">
-          <Button className="gap-2">
+      <div className="flex items-center gap-1 md:gap-4 flex-shrink-0">
+        <Link to="/visitors/new" className="hidden sm:block">
+          <Button className="gap-2 h-10">
             <Plus className="h-4 w-4" />
-            New Visitor
+            <span className="hidden md:inline">New Visitor</span>
+          </Button>
+        </Link>
+
+        {/* Mobile: FAB for new visitor */}
+        <Link to="/visitors/new" className="sm:hidden">
+          <Button size="icon" className="h-10 w-10">
+            <Plus className="h-5 w-5" />
           </Button>
         </Link>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative h-10 w-10">
           <Bell className="h-5 w-5" />
           <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] text-destructive-foreground flex items-center justify-center">
             3
@@ -147,14 +171,14 @@ export function Header() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 px-2">
+            <Button variant="ghost" className="flex items-center gap-2 px-2 h-10">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="" />
                 <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
-              <div className="text-left hidden md:block">
+              <div className="text-left hidden lg:block">
                 <p className="text-sm font-medium">
                   {isHoAdmin ? 'HO Admin' : 'User'}
                 </p>
@@ -164,7 +188,7 @@ export function Header() {
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             {isHoAdmin && (
               <div className="px-2 py-1">
@@ -176,13 +200,13 @@ export function Header() {
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/users">User Management</Link>
+              <Link to="/users" className="w-full">User Management</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/settings">Settings</Link>
+              <Link to="/settings" className="w-full">Settings</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/help">Help & Support</Link>
+              <Link to="/help" className="w-full">Help & Support</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut} className="text-destructive">
