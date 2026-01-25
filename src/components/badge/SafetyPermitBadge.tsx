@@ -105,13 +105,15 @@ export function SafetyPermitBadge({
 
   return (
     <div className="bg-white border-2 border-gray-800 rounded-lg overflow-hidden w-[350px] mx-auto text-black print:border-black">
-      {/* Header with RESL Logo */}
-      <div className="flex items-center border-b-2 border-gray-800">
-        <div className="w-16 p-2 border-r-2 border-gray-800 flex items-center justify-center">
-          <img src={companyLogo} alt={companyName} className="w-12 h-12 object-contain" />
-        </div>
-        <div className="flex-1 text-center py-1">
-          <p className="text-red-600 font-semibold italic text-sm">{companyName}</p>
+      {/* Header with RESL Logo - Red Background */}
+      <div className="bg-red-600 py-3">
+        <div className="flex flex-col items-center justify-center">
+          <img 
+            src={companyLogo} 
+            alt={companyName} 
+            className="h-12 w-auto brightness-0 invert" 
+          />
+          <p className="text-white font-bold text-sm mt-1 tracking-wide">{companyName}</p>
         </div>
       </div>
 
@@ -246,6 +248,13 @@ export function SafetyPermitBadge({
           />
           <span className="text-[8px] font-semibold text-gray-600">Check-out</span>
         </div>
+      </div>
+
+      {/* Powered By Footer */}
+      <div className="bg-gray-200 py-1.5 text-center border-t border-gray-300">
+        <p className="text-[9px] text-gray-600">
+          Powered by <span className="font-semibold text-gray-800">Sharvi Infotech</span>
+        </p>
       </div>
     </div>
   );
