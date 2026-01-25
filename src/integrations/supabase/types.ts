@@ -807,7 +807,12 @@ export type Database = {
       appointment_status: "pending" | "confirmed" | "cancelled" | "completed"
       gate_status: "active" | "inactive"
       location_status: "active" | "inactive"
-      visitor_status: "checked_in" | "checked_out" | "scheduled" | "cancelled"
+      visitor_status:
+        | "checked_in"
+        | "checked_out"
+        | "scheduled"
+        | "cancelled"
+        | "pending_approval"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -939,7 +944,13 @@ export const Constants = {
       appointment_status: ["pending", "confirmed", "cancelled", "completed"],
       gate_status: ["active", "inactive"],
       location_status: ["active", "inactive"],
-      visitor_status: ["checked_in", "checked_out", "scheduled", "cancelled"],
+      visitor_status: [
+        "checked_in",
+        "checked_out",
+        "scheduled",
+        "cancelled",
+        "pending_approval",
+      ],
     },
   },
 } as const
