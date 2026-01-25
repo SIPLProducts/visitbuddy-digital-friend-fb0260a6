@@ -7,6 +7,7 @@ import { QuickActions } from '@/components/dashboard/QuickActions';
 import { GateStatus } from '@/components/dashboard/GateStatus';
 import { WeeklyOverview } from '@/components/dashboard/WeeklyOverview';
 import { CombinedStats } from '@/components/dashboard/CombinedStats';
+import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +31,7 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     const today = new Date().toISOString().split('T')[0];
 
-    // Fetch visitors with related data
+    // Fetch visitors with related data (including pending_approval)
     const { data: visitorsData } = await supabase
       .from('visitors')
       .select(`
@@ -39,8 +40,9 @@ export default function Dashboard() {
         department:departments(*),
         gate:gates(*, location:locations(*))
       `)
+      .in('status', ['checked_in', 'checked_out', 'scheduled', 'pending_approval'])
       .order('created_at', { ascending: false })
-      .limit(10);
+      .limit(50);
 
     if (visitorsData) {
       setVisitors(visitorsData as unknown as Visitor[]);
@@ -52,11 +54,15 @@ export default function Dashboard() {
       const activeCheckIns = visitorsData.filter(
         (v) => v.status === 'checked_in'
       ).length;
+      const pendingApproval = visitorsData.filter(
+        (v) => v.status === 'pending_approval'
+      ).length;
 
       setStats((prev) => ({
         ...prev,
         todaysVisitors,
         activeCheckIns,
+        pendingApproval,
       }));
     }
 
@@ -136,11 +142,14 @@ export default function Dashboard() {
           />
         </div>
 
+        {/* Pending Approvals Widget */}
+        <PendingApprovals visitors={visitors} onRefresh={fetchDashboardData} />
+
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Visitors - Takes 2 columns */}
           <div className="lg:col-span-2">
-            <RecentVisitors visitors={visitors} />
+            <RecentVisitors visitors={visitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} />
           </div>
 
           {/* Quick Actions */}
