@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils';
 import { QrScanner } from '@/components/checkin/QrScanner';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { useNavigate } from 'react-router-dom';
-import reslLogo from '@/assets/resl-logo.png';
 
 export default function CheckInOut() {
   const navigate = useNavigate();
@@ -268,27 +267,14 @@ export default function CheckInOut() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col min-h-[calc(100vh-4rem)]">
-        {/* Branding Header */}
-        <div className="bg-destructive py-6 -mx-6 -mt-6 px-6 mb-6">
-          <div className="flex flex-col items-center justify-center">
-            <img 
-              src={reslLogo} 
-              alt="Resustainability Logo" 
-              className="h-16 w-auto brightness-0 invert"
-            />
-            <span className="text-destructive-foreground font-bold text-lg mt-2 tracking-wide">Resustainability</span>
-          </div>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Check-in / Check-out</h1>
+          <p className="text-muted-foreground">
+            Scan QR code or search to manage visitor check-ins
+          </p>
         </div>
-
-        <div className="flex-1 space-y-6">
-          {/* Header */}
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Check-in / Check-out</h1>
-            <p className="text-muted-foreground">
-              Scan QR code or search to manage visitor check-ins
-            </p>
-          </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Panel - Scan / Search */}
@@ -502,14 +488,6 @@ export default function CheckInOut() {
               </div>
             </div>
           </div>
-          </div>
-        </div>
-
-        {/* Powered By Footer */}
-        <div className="mt-auto pt-6 pb-2">
-          <p className="text-center text-xs text-muted-foreground">
-            Powered by <span className="font-semibold text-foreground">Sharvi Infotech</span>
-          </p>
         </div>
       </div>
 
