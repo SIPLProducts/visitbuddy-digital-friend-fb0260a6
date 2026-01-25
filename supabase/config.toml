@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.send-email-badge]
 verify_jwt = false
+
+[functions.approve-visitor]
+verify_jwt = false
+
+[functions.send-sms-badge]
+verify_jwt = false

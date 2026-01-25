@@ -1,4 +1,4 @@
-export type VisitorStatus = 'checked_in' | 'checked_out' | 'scheduled' | 'cancelled';
+export type VisitorStatus = 'checked_in' | 'checked_out' | 'scheduled' | 'cancelled' | 'pending_approval';
 export type AppointmentStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 export type GateStatus = 'active' | 'inactive';
 export type LocationStatus = 'active' | 'inactive';

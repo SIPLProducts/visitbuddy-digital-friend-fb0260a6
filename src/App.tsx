@@ -31,6 +31,7 @@ import NotFound from "./pages/NotFound";
 import SelfService from "./pages/SelfService";
 import Install from "./pages/Install";
 import GateQRCodes from "./pages/GateQRCodes";
+import ApproveVisitor from "./pages/ApproveVisitor";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="/badge-printing" element={<ProtectedRoute><BadgePrinting /></ProtectedRoute>} />
             <Route path="/print-badge" element={<PrintBadge />} />
             <Route path="/self-service" element={<SelfService />} />
+            <Route path="/approve-visitor" element={<ApproveVisitor />} />
             <Route path="/install" element={<Install />} />
             <Route path="/visitor-report" element={<ProtectedRoute><VisitorReport /></ProtectedRoute>} />
             <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />

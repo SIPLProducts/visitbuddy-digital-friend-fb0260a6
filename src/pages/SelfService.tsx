@@ -151,7 +151,7 @@ export default function SelfService() {
         laptop_serial: formData.hasLaptop ? formData.laptopSerial : null,
         accompanying_count: formData.accompanyingCount,
         photo_url: formData.photoUrl || null,
-        status: 'scheduled',
+        status: 'pending_approval',
       };
 
       const { data, error } = await supabase
@@ -164,7 +164,7 @@ export default function SelfService() {
 
       setVisitorId(data.visitor_id);
       setIsSuccess(true);
-      toast.success('Check-in request submitted successfully!');
+      toast.success('Check-in request submitted! Awaiting host approval.');
 
       // Notify host if selected
       if (formData.hostId) {
@@ -200,13 +200,14 @@ export default function SelfService() {
               <CheckCircle2 className="h-12 w-12 text-success" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-foreground">Check-in Submitted!</h2>
+              <h2 className="text-2xl font-bold text-foreground">Request Submitted!</h2>
               <p className="text-muted-foreground">Your visitor ID is:</p>
               <p className="text-xl font-mono font-bold text-primary">{visitorId}</p>
             </div>
-            <div className="bg-muted/50 rounded-lg p-4 text-sm text-muted-foreground">
-              <p>Please proceed to the security desk.</p>
-              <p className="mt-1">Your host will be notified of your arrival.</p>
+            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4 text-sm text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+              <p className="font-medium">⏳ Awaiting Host Approval</p>
+              <p className="mt-1">Your host will receive a notification and must approve your visit.</p>
+              <p className="mt-1">Once approved, you'll receive your badge via WhatsApp & SMS.</p>
             </div>
             <Button 
               onClick={() => {
