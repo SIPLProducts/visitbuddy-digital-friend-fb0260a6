@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,18 +24,36 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   FileText, Search, Download, Truck, LogIn, LogOut, Clock, 
-  CalendarIcon, Upload, FileDown, MapPin 
+  CalendarIcon, Upload, FileDown, MapPin, TrendingUp, BarChart3,
+  Filter, Building2
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle } from '@/types/vehicle';
 import { Location } from '@/types/database';
 import { cn } from '@/lib/utils';
-import { format, differenceInMinutes, subDays } from 'date-fns';
+import { format, differenceInMinutes, subDays, eachDayOfInterval, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
+
+const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 export default function VehicleReport() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -45,8 +63,9 @@ export default function VehicleReport() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: subDays(new Date(), 7),
+    from: subDays(new Date(), 30),
     to: new Date(),
   });
   const [stats, setStats] = useState({
@@ -133,6 +152,80 @@ export default function VehicleReport() {
     setLoading(false);
   };
 
+  // Chart data calculations
+  const chartData = useMemo(() => {
+    if (!dateRange?.from || !dateRange?.to || vehicles.length === 0) {
+      return { dailyTrend: [], vehicleTypes: [], locationStats: [], statusDistribution: [] };
+    }
+
+    // Daily trend data
+    const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
+    const dailyTrend = days.map(day => {
+      const dayStart = startOfDay(day);
+      const dayVehicles = vehicles.filter(v => {
+        const created = startOfDay(new Date(v.created_at));
+        return created.getTime() === dayStart.getTime();
+      });
+      const checkIns = vehicles.filter(v => {
+        if (!v.check_in_time) return false;
+        const checkIn = startOfDay(new Date(v.check_in_time));
+        return checkIn.getTime() === dayStart.getTime();
+      });
+      const checkOuts = vehicles.filter(v => {
+        if (!v.check_out_time) return false;
+        const checkOut = startOfDay(new Date(v.check_out_time));
+        return checkOut.getTime() === dayStart.getTime();
+      });
+      return {
+        date: format(day, 'dd MMM'),
+        total: dayVehicles.length,
+        checkIns: checkIns.length,
+        checkOuts: checkOuts.length,
+      };
+    });
+
+    // Vehicle type distribution
+    const typeMap = new Map<string, number>();
+    vehicles.forEach(v => {
+      const type = v.vehicle_type || 'Unknown';
+      typeMap.set(type, (typeMap.get(type) || 0) + 1);
+    });
+    const vehicleTypes = Array.from(typeMap.entries()).map(([name, value]) => ({
+      name,
+      value,
+    }));
+
+    // Location stats
+    const locationMap = new Map<string, { checkIns: number; checkOuts: number }>();
+    vehicles.forEach(v => {
+      const locName = v.location?.name || 'Unknown';
+      const existing = locationMap.get(locName) || { checkIns: 0, checkOuts: 0 };
+      if (v.status === 'checked_in') existing.checkIns++;
+      if (v.status === 'checked_out') existing.checkOuts++;
+      locationMap.set(locName, existing);
+    });
+    const locationStats = Array.from(locationMap.entries()).map(([name, data]) => ({
+      name: name.length > 15 ? name.substring(0, 15) + '...' : name,
+      checkIns: data.checkIns,
+      checkOuts: data.checkOuts,
+    }));
+
+    // Status distribution
+    const statusDistribution = [
+      { name: 'Currently Inside', value: stats.checkedIn, color: '#10b981' },
+      { name: 'Checked Out', value: stats.checkedOut, color: '#64748b' },
+      { name: 'Registered', value: stats.total - stats.checkedIn - stats.checkedOut, color: '#3b82f6' },
+    ].filter(s => s.value > 0);
+
+    return { dailyTrend, vehicleTypes, locationStats, statusDistribution };
+  }, [vehicles, dateRange, stats]);
+
+  // Get unique vehicle types for filter
+  const vehicleTypes = useMemo(() => {
+    const types = new Set(vehicles.map(v => v.vehicle_type));
+    return Array.from(types).filter(Boolean);
+  }, [vehicles]);
+
   const exportToCsv = () => {
     const headers = [
       'Vehicle Number',
@@ -148,7 +241,7 @@ export default function VehicleReport() {
       'Check Out',
     ];
     
-    const rows = vehicles.map((v) => [
+    const rows = filteredVehicles.map((v) => [
       v.vehicle_number,
       v.vehicle_type,
       v.driver_name,
@@ -309,7 +402,10 @@ export default function VehicleReport() {
     const matchesLocation =
       locationFilter === 'all' || vehicle.location?.id === locationFilter;
 
-    return matchesSearch && matchesStatus && matchesLocation;
+    const matchesVehicleType =
+      vehicleTypeFilter === 'all' || vehicle.vehicle_type === vehicleTypeFilter;
+
+    return matchesSearch && matchesStatus && matchesLocation && matchesVehicleType;
   });
 
   const getStatusBadge = (status: string) => {
@@ -349,6 +445,15 @@ export default function VehicleReport() {
     return `${remainingMins}m`;
   };
 
+  const clearFilters = () => {
+    setSearchQuery('');
+    setStatusFilter('all');
+    setLocationFilter('all');
+    setVehicleTypeFilter('all');
+  };
+
+  const hasActiveFilters = searchQuery || statusFilter !== 'all' || locationFilter !== 'all' || vehicleTypeFilter !== 'all';
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -357,10 +462,10 @@ export default function VehicleReport() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Truck className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">Vehicle Report</h1>
+              <h1 className="text-2xl font-bold text-foreground">Vehicle Report Dashboard</h1>
             </div>
             <p className="text-muted-foreground">
-              View entry/exit logs and manage vehicle data
+              Analytics, trends, and entry/exit logs for commercial vehicles
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -391,9 +496,79 @@ export default function VehicleReport() {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Date Range Picker - Prominent */}
+        <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+          <CardContent className="py-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5 text-primary" />
+                <span className="font-medium text-foreground">Date Range:</span>
+              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "justify-start text-left font-normal min-w-[280px] bg-background",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "dd MMM yyyy")} - {format(dateRange.to, "dd MMM yyyy")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "dd MMM yyyy")
+                      )
+                    ) : (
+                      <span>Pick date range</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-popover" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                  <div className="border-t p-3 flex gap-2 flex-wrap">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}
+                    >
+                      Last 7 days
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}
+                    >
+                      Last 30 days
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })}
+                    >
+                      Last 90 days
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
+          <Card className="border-l-4 border-l-primary">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -406,7 +581,7 @@ export default function VehicleReport() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-l-4 border-l-emerald-500">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">
@@ -419,7 +594,7 @@ export default function VehicleReport() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-l-4 border-l-slate-500">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-slate-500/10 text-slate-600">
@@ -432,7 +607,7 @@ export default function VehicleReport() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-l-4 border-l-amber-500">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600">
@@ -447,104 +622,284 @@ export default function VehicleReport() {
           </Card>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by vehicle number, driver, or company..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border border-border z-50">
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="registered">Registered</SelectItem>
-              <SelectItem value="checked_in">Checked In</SelectItem>
-              <SelectItem value="checked_out">Checked Out</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={locationFilter} onValueChange={setLocationFilter}>
-            <SelectTrigger className="w-48">
-              <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="All Locations" />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border border-border z-50">
-              <SelectItem value="all">All Locations</SelectItem>
-              {locations.map((location) => (
-                <SelectItem key={location.id} value={location.id}>
-                  {location.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          {/* Date Range Picker */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "justify-start text-left font-normal min-w-[240px]",
-                  !dateRange && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange?.from ? (
-                  dateRange.to ? (
-                    <>
-                      {format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM yyyy")}
-                    </>
-                  ) : (
-                    format(dateRange.from, "dd MMM yyyy")
-                  )
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Daily Trend Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Daily Activity Trend
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                {chartData.dailyTrend.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData.dailyTrend}>
+                      <defs>
+                        <linearGradient id="colorCheckIns" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorCheckOuts" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#64748b" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#64748b" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis
+                        dataKey="date"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="checkIns"
+                        name="Check-Ins"
+                        stroke="#10b981"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorCheckIns)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="checkOuts"
+                        name="Check-Outs"
+                        stroke="#64748b"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#colorCheckOuts)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 ) : (
-                  <span>Pick date range</span>
+                  <div className="h-full flex items-center justify-center text-muted-foreground">
+                    No data available for selected range
+                  </div>
                 )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={dateRange?.from}
-                selected={dateRange}
-                onSelect={setDateRange}
-                numberOfMonths={2}
-                className={cn("p-3 pointer-events-auto")}
-              />
-              <div className="border-t p-3 flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}
-                >
-                  Last 7 days
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}
-                >
-                  Last 30 days
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setDateRange({ from: subDays(new Date(), 90), to: new Date() })}
-                >
-                  Last 90 days
-                </Button>
               </div>
-            </PopoverContent>
-          </Popover>
+            </CardContent>
+          </Card>
+
+          {/* Vehicle Type Distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Truck className="h-5 w-5 text-primary" />
+                Vehicle Type Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                {chartData.vehicleTypes.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData.vehicleTypes}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                        labelLine={false}
+                      >
+                        {chartData.vehicleTypes.map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-muted-foreground">
+                    No data available
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Location Stats */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Building2 className="h-5 w-5 text-primary" />
+                Activity by Location
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                {chartData.locationStats.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData.locationStats} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }} />
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        width={100}
+                        tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 11 }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="checkIns" name="Check-Ins" fill="#10b981" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="checkOuts" name="Check-Outs" fill="#64748b" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-muted-foreground">
+                    No location data available
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Status Distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Current Status Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                {chartData.statusDistribution.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData.statusDistribution}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        {chartData.statusDistribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px',
+                        }}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-muted-foreground">
+                    No status data available
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Filters Section */}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center justify-between text-lg">
+              <span className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-primary" />
+                Filters & Search
+              </span>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
+                  Clear all
+                </Button>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="relative flex-1 min-w-[250px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by vehicle number, driver, or company..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border z-50">
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="registered">Registered</SelectItem>
+                  <SelectItem value="checked_in">Checked In</SelectItem>
+                  <SelectItem value="checked_out">Checked Out</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={vehicleTypeFilter} onValueChange={setVehicleTypeFilter}>
+                <SelectTrigger className="w-40">
+                  <Truck className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border z-50">
+                  <SelectItem value="all">All Types</SelectItem>
+                  {vehicleTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={locationFilter} onValueChange={setLocationFilter}>
+                <SelectTrigger className="w-48">
+                  <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="All Locations" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border z-50">
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {locations.map((location) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Vehicle History Table */}
         <Card>
@@ -573,7 +928,10 @@ export default function VehicleReport() {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-8">
-                    Loading...
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                      Loading...
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : filteredVehicles.length === 0 ? (
@@ -583,7 +941,7 @@ export default function VehicleReport() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredVehicles.map((vehicle) => (
+                filteredVehicles.slice(0, 50).map((vehicle) => (
                   <TableRow key={vehicle.id}>
                     <TableCell>
                       <div>
@@ -634,6 +992,11 @@ export default function VehicleReport() {
               )}
             </TableBody>
           </Table>
+          {filteredVehicles.length > 50 && (
+            <div className="p-4 text-center text-sm text-muted-foreground border-t">
+              Showing 50 of {filteredVehicles.length} records. Export to CSV for full data.
+            </div>
+          )}
         </Card>
       </div>
     </MainLayout>
