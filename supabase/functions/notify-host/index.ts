@@ -22,6 +22,7 @@ const handler = async (req: Request): Promise<Response> => {
     let twilioWhatsAppNumber = Deno.env.get("TWILIO_WHATSAPP_NUMBER");
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const publicUrl = Deno.env.get("PUBLIC_URL") || "https://visitbuddy-digital-friend.lovable.app";
 
     if (!accountSid || !authToken || !twilioWhatsAppNumber) {
       console.error("Missing Twilio credentials");
@@ -59,9 +60,11 @@ const handler = async (req: Request): Promise<Response> => {
     // Fetch visitor details
     const { data: visitor, error: visitorError } = await supabase
       .from("visitors")
-      .select("id, visitor_id, name, phone, company, purpose, photo_url, host_id, department_id, gate_id")
+      .select("id, visitor_id, name, phone, company, purpose, photo_url, host_id, department_id, gate_id, status")
       .eq("id", visitorId)
       .single();
+    
+    const isPendingApproval = visitor?.status === 'pending_approval';
 
     if (visitorError || !visitor) {
       console.error("Failed to fetch visitor:", visitorError);
@@ -144,7 +147,40 @@ const handler = async (req: Request): Promise<Response> => {
         formattedHostPhone = "+91" + formattedHostPhone.replace(/^0/, "");
       }
 
-      const hostMessage = `
+      // Generate approval links if pending approval
+      const approveLink = isPendingApproval 
+        ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=approve`
+        : null;
+      const rejectLink = isPendingApproval 
+        ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`
+        : null;
+
+      const hostMessage = isPendingApproval
+        ? `
+🔔 *Visitor Approval Request*
+━━━━━━━━━━━━━━━━━━━━
+
+Dear *${hostData.name}*,
+
+A visitor is waiting for your approval:
+
+👤 *Visitor:* ${visitor.name}
+🆔 *ID:* ${visitor.visitor_id}
+${visitor.phone ? `📱 *Mobile:* ${visitor.phone}` : ""}
+${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
+${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
+${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
+
+📅 *Date:* ${currentDate}
+⏰ *Time:* ${currentTime}
+
+━━━━━━━━━━━━━━━━━━━━
+✅ *Approve:* ${approveLink}
+❌ *Reject:* ${rejectLink}
+
+_VisiGuard Visitor Management System_
+        `.trim()
+        : `
 🔔 *Visitor Arrival Notification*
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -166,7 +202,7 @@ ${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
 Please proceed to the reception to receive your visitor.
 
 _VisiGuard Visitor Management System_
-      `.trim();
+        `.trim();
 
       const hostFormData = new URLSearchParams();
       hostFormData.append("To", `whatsapp:${formattedHostPhone}`);

@@ -139,6 +139,10 @@ export default function Visitors() {
         return 'bg-slate-100 text-slate-700 border-slate-200';
       case 'scheduled':
         return 'bg-sky-100 text-sky-700 border-sky-200';
+      case 'pending_approval':
+        return 'bg-amber-100 text-amber-700 border-amber-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-700 border-red-200';
       default:
         return 'bg-slate-100 text-slate-700 border-slate-200';
     }
@@ -152,8 +156,50 @@ export default function Visitors() {
         return 'checked out';
       case 'scheduled':
         return 'scheduled';
+      case 'pending_approval':
+        return 'pending approval';
+      case 'cancelled':
+        return 'cancelled';
       default:
         return status;
+    }
+  };
+
+  const handleApprove = async (visitor: Visitor) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-visitor', {
+        body: { visitorId: visitor.id, action: 'approve' }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast.success(`${visitor.name} approved! Badge sent via WhatsApp & SMS.`);
+        fetchVisitors();
+      } else {
+        throw new Error(data.error || 'Failed to approve');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to approve visitor');
+    }
+  };
+
+  const handleReject = async (visitor: Visitor) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-visitor', {
+        body: { visitorId: visitor.id, action: 'reject' }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast.success(`${visitor.name} rejected.`);
+        fetchVisitors();
+      } else {
+        throw new Error(data.error || 'Failed to reject');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to reject visitor');
     }
   };
 
@@ -225,9 +271,11 @@ export default function Visitors() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="pending_approval">Pending Approval</SelectItem>
               <SelectItem value="checked_in">Checked In</SelectItem>
               <SelectItem value="checked_out">Checked Out</SelectItem>
               <SelectItem value="scheduled">Scheduled</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" className="gap-2">
@@ -347,15 +395,36 @@ export default function Visitors() {
                         : '—'}
                     </TableCell>
                     <TableCell>
-                      <VisitorActions
-                        visitor={visitor}
-                        onViewDetails={handleViewDetails}
-                        onEdit={handleEdit}
-                        onPrintBadge={handlePrintBadge}
-                        onCheckIn={handleCheckIn}
-                        onCheckOut={handleCheckOut}
-                        onCheckInAndPrint={handleCheckInAndPrint}
-                      />
+                      {visitor.status === 'pending_approval' ? (
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                            onClick={() => handleApprove(visitor)}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 text-xs border-red-300 text-red-700 hover:bg-red-50"
+                            onClick={() => handleReject(visitor)}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      ) : (
+                        <VisitorActions
+                          visitor={visitor}
+                          onViewDetails={handleViewDetails}
+                          onEdit={handleEdit}
+                          onPrintBadge={handlePrintBadge}
+                          onCheckIn={handleCheckIn}
+                          onCheckOut={handleCheckOut}
+                          onCheckInAndPrint={handleCheckInAndPrint}
+                        />
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
