@@ -354,7 +354,7 @@ export default function Employees() {
     emp.employee_id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const EmployeeForm = () => (
+  const employeeFormContent = (
     <div className="space-y-4 py-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -664,7 +664,7 @@ export default function Employees() {
             <DialogTitle>Add Employee</DialogTitle>
             <DialogDescription>Add a new employee who can host visitors</DialogDescription>
           </DialogHeader>
-          <EmployeeForm />
+          {employeeFormContent}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleAdd} disabled={loading}>{loading ? 'Adding...' : 'Add Employee'}</Button>
@@ -679,7 +679,7 @@ export default function Employees() {
             <DialogTitle>Edit Employee</DialogTitle>
             <DialogDescription>Update employee details</DialogDescription>
           </DialogHeader>
-          <EmployeeForm />
+          {employeeFormContent}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleEdit} disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
