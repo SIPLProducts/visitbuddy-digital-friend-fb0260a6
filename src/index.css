@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Safe area insets for iOS */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Minimum touch target size for mobile */
+@media (max-width: 768px) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* VisiGuard Design System - Enterprise VMS Theme */
 
 @layer base {

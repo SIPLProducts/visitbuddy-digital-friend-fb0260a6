@@ -23,6 +23,7 @@ import {
   UserRound,
   ScanLine,
   ChevronDown,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,6 +32,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const menuGroups = [
   {
@@ -82,11 +85,17 @@ const menuGroups = [
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>(menuGroups.map(g => g.label));
   const location = useLocation();
   const { signOut } = useAuth();
+  const isMobile = useIsMobile();
 
   const toggleGroup = (label: string) => {
     setOpenGroups(prev =>
@@ -96,49 +105,50 @@ export function Sidebar() {
     );
   };
 
-  return (
-    <aside
-      className={cn(
-        'flex flex-col bg-card border-r border-border transition-all duration-300',
-        collapsed ? 'w-16' : 'w-64'
-      )}
-    >
+  const handleLinkClick = () => {
+    if (isMobile && onOpenChange) {
+      onOpenChange(false);
+    }
+  };
+
+  const sidebarContent = (
+    <>
       {/* Logo */}
       <div className="flex items-center justify-between p-4 border-b border-border">
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">V</span>
-            </div>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-sm">V</span>
+          </div>
+          {(!collapsed || isMobile) && (
             <div>
               <h1 className="font-bold text-foreground">VisiGuard</h1>
               <p className="text-xs text-muted-foreground">Enterprise VMS</p>
             </div>
-          </div>
+          )}
+        </div>
+        {!isMobile && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCollapsed(!collapsed)}
+            className="h-8 w-8"
+          >
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className="h-8 w-8"
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </Button>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto scrollbar-thin py-2">
         <div className="space-y-1 px-2">
           {menuGroups.map((group) => {
-            const isGroupActive = group.items.some(item => location.pathname === item.path);
-            
             return (
               <Collapsible
                 key={group.label}
-                open={collapsed ? false : openGroups.includes(group.label)}
-                onOpenChange={() => !collapsed && toggleGroup(group.label)}
+                open={collapsed && !isMobile ? false : openGroups.includes(group.label)}
+                onOpenChange={() => (!collapsed || isMobile) && toggleGroup(group.label)}
               >
-                {!collapsed && (
+                {(!collapsed || isMobile) && (
                   <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
                     <span>{group.label}</span>
                     <ChevronDown
@@ -156,20 +166,21 @@ export function Sidebar() {
                       <Link
                         key={item.path}
                         to={item.path}
+                        onClick={handleLinkClick}
                         className={cn(
-                          'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors',
+                          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px]',
                           isActive
                             ? 'bg-primary text-primary-foreground'
-                            : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                            : 'text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80'
                         )}
                       >
                         <item.icon className="h-5 w-5 flex-shrink-0" />
-                        {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
+                        {(!collapsed || isMobile) && <span className="text-sm font-medium">{item.label}</span>}
                       </Link>
                     );
                   })}
                 </CollapsibleContent>
-                {collapsed && (
+                {collapsed && !isMobile && (
                   <div className="space-y-0.5">
                     {group.items.map((item) => {
                       const isActive = location.pathname === item.path;
@@ -178,7 +189,7 @@ export function Sidebar() {
                           key={item.path}
                           to={item.path}
                           className={cn(
-                            'flex items-center justify-center px-3 py-2 rounded-lg transition-colors',
+                            'flex items-center justify-center px-3 py-2.5 rounded-lg transition-colors min-h-[44px]',
                             isActive
                               ? 'bg-primary text-primary-foreground'
                               : 'text-muted-foreground hover:bg-accent hover:text-foreground'
@@ -201,19 +212,49 @@ export function Sidebar() {
       <div className="border-t border-border p-2 space-y-1">
         <Link
           to="/notifications"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+          onClick={handleLinkClick}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors min-h-[44px]"
         >
           <Bell className="h-5 w-5 flex-shrink-0" />
-          {!collapsed && <span className="text-sm font-medium">Notifications</span>}
+          {(!collapsed || isMobile) && <span className="text-sm font-medium">Notifications</span>}
         </Link>
         <button
-          onClick={signOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+          onClick={() => {
+            handleLinkClick();
+            signOut();
+          }}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors min-h-[44px]"
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
-          {!collapsed && <span className="text-sm font-medium">Logout</span>}
+          {(!collapsed || isMobile) && <span className="text-sm font-medium">Logout</span>}
         </button>
       </div>
+    </>
+  );
+
+  // Mobile: Use Sheet drawer
+  if (isMobile) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation Menu</SheetTitle>
+          </SheetHeader>
+          {sidebarContent}
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop: Regular sidebar
+  return (
+    <aside
+      className={cn(
+        'hidden md:flex flex-col bg-card border-r border-border transition-all duration-300',
+        collapsed ? 'w-16' : 'w-64'
+      )}
+    >
+      {sidebarContent}
     </aside>
   );
 }
