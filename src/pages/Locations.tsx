@@ -362,7 +362,7 @@ export default function Locations() {
     setIsDeleteDialogOpen(true);
   };
 
-  const LocationForm = () => (
+  const locationFormContent = (
     <div className="space-y-4 py-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -701,7 +701,7 @@ export default function Locations() {
             <DialogTitle>Add Location</DialogTitle>
             <DialogDescription>Create a new office location or facility</DialogDescription>
           </DialogHeader>
-          <LocationForm />
+          {locationFormContent}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleAdd} disabled={loading}>{loading ? 'Adding...' : 'Add Location'}</Button>
@@ -716,7 +716,7 @@ export default function Locations() {
             <DialogTitle>Edit Location</DialogTitle>
             <DialogDescription>Update location details</DialogDescription>
           </DialogHeader>
-          <LocationForm />
+          {locationFormContent}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleEdit} disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
