@@ -23,7 +23,8 @@ export default function GateQRCodes() {
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const baseUrl = window.location.origin;
+  // Use the published URL for QR codes so visitors can access without auth
+  const baseUrl = import.meta.env.VITE_PUBLIC_URL || 'https://visitbuddy-digital-friend.lovable.app';
 
   useEffect(() => {
     fetchGates();
