@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { VisitorDetailsDialog } from '@/components/visitors/VisitorDetailsDialog';
 import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
 import { VisitorActions } from '@/components/visitors/VisitorActions';
+import { PullToRefresh } from '@/components/shared/PullToRefresh';
 
 export default function Visitors() {
   const navigate = useNavigate();
@@ -234,10 +235,14 @@ export default function Visitors() {
     return matchesSearch && matchesStatus;
   });
 
+  const handleRefresh = useCallback(async () => {
+    await fetchVisitors();
+  }, []);
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -432,7 +437,8 @@ export default function Visitors() {
             </TableBody>
           </Table>
         </div>
-      </div>
+        </div>
+      </PullToRefresh>
 
       {/* Dialogs */}
       <VisitorDetailsDialog

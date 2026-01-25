@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Users, Calendar, UserCheck, Clock } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -8,11 +8,13 @@ import { GateStatus } from '@/components/dashboard/GateStatus';
 import { WeeklyOverview } from '@/components/dashboard/WeeklyOverview';
 import { CombinedStats } from '@/components/dashboard/CombinedStats';
 import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
+import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
 
 export default function Dashboard() {
+  const [refreshKey, setRefreshKey] = useState(0);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [gates, setGates] = useState<Gate[]>([]);
   const [stats, setStats] = useState({
@@ -88,9 +90,15 @@ export default function Dashboard() {
     }));
   };
 
+  const handleRefresh = useCallback(async () => {
+    await fetchDashboardData();
+    setRefreshKey(prev => prev + 1);
+  }, []);
+
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="space-y-6">
         {/* Header */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1e3a8a] via-[#0891b2] to-[#10b981] p-6 text-white">
           {/* Background decoration */}
@@ -164,7 +172,8 @@ export default function Dashboard() {
 
         {/* Weekly Overview Chart */}
         <WeeklyOverview />
-      </div>
+        </div>
+      </PullToRefresh>
     </MainLayout>
   );
 }
