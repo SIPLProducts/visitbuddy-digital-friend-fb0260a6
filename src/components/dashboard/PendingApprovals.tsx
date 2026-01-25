@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Visitor } from '@/types/database';
 import { Link } from 'react-router-dom';
+import { SwipeableCard } from '@/components/shared/SwipeableCard';
 
 interface PendingApprovalsProps {
   visitors: Visitor[];
@@ -119,74 +120,88 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
       </CardHeader>
       <CardContent className="space-y-3">
         {pendingVisitors.slice(0, 5).map((visitor) => (
-          <div
+          <SwipeableCard
             key={visitor.id}
-            className="flex items-center gap-3 p-3 rounded-lg bg-background border"
+            leftAction={{
+              icon: <CheckCircle2 className="h-5 w-5" />,
+              label: 'Approve',
+              onClick: () => handleApprove(visitor),
+              className: 'bg-emerald-500',
+            }}
+            rightAction={{
+              icon: <XCircle className="h-5 w-5" />,
+              label: 'Reject',
+              onClick: () => handleReject(visitor),
+              className: 'bg-rose-500',
+            }}
+            disabled={processingId === visitor.id}
           >
-            <Avatar className="h-10 w-10">
-              {visitor.photo_url && <AvatarImage src={visitor.photo_url} />}
-              <AvatarFallback className="bg-amber-100 text-amber-700 text-sm font-medium">
-                {getInitials(visitor.name)}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-sm truncate">{visitor.name}</p>
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-amber-100 text-amber-700 border-amber-200">
-                  Pending
-                </Badge>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {visitor.company && (
-                  <span className="flex items-center gap-1 truncate">
-                    <Building2 className="h-3 w-3" />
-                    {visitor.company}
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-background border">
+              <Avatar className="h-10 w-10">
+                {visitor.photo_url && <AvatarImage src={visitor.photo_url} />}
+                <AvatarFallback className="bg-amber-100 text-amber-700 text-sm font-medium">
+                  {getInitials(visitor.name)}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm truncate">{visitor.name}</p>
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-amber-100 text-amber-700 border-amber-200">
+                    Pending
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {visitor.company && (
+                    <span className="flex items-center gap-1 truncate">
+                      <Building2 className="h-3 w-3" />
+                      {visitor.company}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {formatTime(visitor.created_at)}
                   </span>
+                </div>
+                {visitor.host?.name && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Host: <span className="font-medium">{visitor.host.name}</span>
+                  </p>
                 )}
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {formatTime(visitor.created_at)}
-                </span>
               </div>
-              {visitor.host?.name && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Host: <span className="font-medium">{visitor.host.name}</span>
-                </p>
-              )}
-            </div>
 
-            <div className="flex items-center gap-1.5">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={() => handleReject(visitor)}
-                disabled={processingId === visitor.id}
-              >
-                {processingId === visitor.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <XCircle className="h-4 w-4" />
-                )}
-              </Button>
-              <Button
-                size="sm"
-                className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
-                onClick={() => handleApprove(visitor)}
-                disabled={processingId === visitor.id}
-              >
-                {processingId === visitor.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Approve
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => handleReject(visitor)}
+                  disabled={processingId === visitor.id}
+                >
+                  {processingId === visitor.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <XCircle className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  size="sm"
+                  className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
+                  onClick={() => handleApprove(visitor)}
+                  disabled={processingId === visitor.id}
+                >
+                  {processingId === visitor.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Approve
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
+          </SwipeableCard>
         ))}
         
         {pendingVisitors.length > 5 && (
