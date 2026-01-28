@@ -214,3 +214,49 @@
     margin: 5mm;
   }
 }
+
+/* Print Styles for Proposal Document */
+@media print {
+  /* When proposal document is being printed */
+  body:has(#proposal-document) * {
+    visibility: visible;
+  }
+  
+  body:has(#proposal-document) {
+    background: white !important;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body:has(#proposal-document) .no-print {
+    display: none !important;
+  }
+  
+  body:has(#proposal-document) #proposal-document {
+    padding: 0 !important;
+    background: white !important;
+  }
+  
+  body:has(#proposal-document) .proposal-page {
+    margin: 0 !important;
+    box-shadow: none !important;
+    page-break-after: always;
+    page-break-inside: avoid;
+  }
+  
+  body:has(#proposal-document) .proposal-page:last-child {
+    page-break-after: auto;
+  }
+}
+
+/* Proposal Document A4 Page Sizing */
+@media print {
+  @page proposal {
+    size: A4 portrait;
+    margin: 0;
+  }
+  
+  body:has(#proposal-document) {
+    @page: proposal;
+  }
+}
