@@ -32,6 +32,7 @@ import SelfService from "./pages/SelfService";
 import Install from "./pages/Install";
 import GateQRCodes from "./pages/GateQRCodes";
 import ApproveVisitor from "./pages/ApproveVisitor";
+import ProposalDocument from "./pages/ProposalDocument";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,7 @@ const App = () => (
             <Route path="/vehicles/gate" element={<ProtectedRoute><VehicleGate /></ProtectedRoute>} />
             <Route path="/vehicles/report" element={<ProtectedRoute><VehicleReport /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
+            <Route path="/proposal-document" element={<ProposalDocument />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
