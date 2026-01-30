@@ -1,11 +1,15 @@
 import { Button } from '@/components/ui/button';
-import { Printer, Download, ArrowLeft } from 'lucide-react';
+import { Printer, Download, ArrowLeft, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ProposalCoverPage } from '@/components/proposal/ProposalCoverPage';
 import { ProposalExecutiveSummary } from '@/components/proposal/ProposalExecutiveSummary';
 import { ProposalFeatureSection } from '@/components/proposal/ProposalFeatureSection';
 import { ProposalTechStack } from '@/components/proposal/ProposalTechStack';
 import { ProposalContactPage } from '@/components/proposal/ProposalContactPage';
+import { ProposalPricing } from '@/components/proposal/ProposalPricing';
+import { ProposalTimeline } from '@/components/proposal/ProposalTimeline';
+import { generateProposalDocx } from '@/utils/generateProposalDocx';
+import { toast } from 'sonner';
 import { 
   Users, 
   Truck, 
@@ -141,6 +145,19 @@ export default function ProposalDocument() {
     window.print();
   };
 
+  const handleDownloadWord = async () => {
+    try {
+      toast.loading('Generating Word document...');
+      await generateProposalDocx();
+      toast.dismiss();
+      toast.success('Word document downloaded successfully!');
+    } catch (error) {
+      toast.dismiss();
+      toast.error('Failed to generate Word document');
+      console.error(error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-muted">
       {/* Action Bar - Hidden during print */}
@@ -167,6 +184,14 @@ export default function ProposalDocument() {
           </Button>
 
           <div style={{ display: 'flex', gap: '12px' }}>
+            <Button 
+              variant="outline" 
+              onClick={handleDownloadWord}
+              className="gap-2"
+            >
+              <FileText size={18} />
+              Download Word
+            </Button>
             <Button 
               variant="outline" 
               onClick={handlePrint}
@@ -225,6 +250,12 @@ export default function ProposalDocument() {
           features={organizationFeatures}
           pageBreakBefore
         />
+
+        {/* Pricing */}
+        <ProposalPricing />
+
+        {/* Implementation Timeline */}
+        <ProposalTimeline />
 
         {/* Technical Specifications */}
         <ProposalTechStack />
