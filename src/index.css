@@ -249,14 +249,4 @@
   }
 }
 
-/* Proposal Document A4 Page Sizing */
-@media print {
-  @page proposal {
-    size: A4 portrait;
-    margin: 0;
-  }
-  
-  body:has(#proposal-document) {
-    @page: proposal;
-  }
-}
+/* Proposal Document A4 Page Sizing - applied via body selector above */
