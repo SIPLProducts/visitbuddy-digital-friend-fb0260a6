@@ -12,10 +12,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Settings as SettingsIcon, Bell, Shield, Palette, Upload, Save, HelpCircle, RotateCcw } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, Shield, Palette, Upload, Save, HelpCircle, RotateCcw, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 export default function Settings() {
+  const navigate = useNavigate();
+  
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto space-y-6">
@@ -353,6 +356,19 @@ export default function Settings() {
                       </p>
                     </div>
                     <Button variant="outline">Contact Us</Button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 rounded-lg border bg-gradient-to-r from-primary/5 to-info/5">
+                    <div>
+                      <p className="font-medium">Product Proposal</p>
+                      <p className="text-sm text-muted-foreground">
+                        View and download the VisiGuard VMS proposal document
+                      </p>
+                    </div>
+                    <Button onClick={() => navigate('/proposal-document')} className="gap-2">
+                      <FileText className="h-4 w-4" />
+                      View Proposal
+                    </Button>
                   </div>
                 </div>
               </CardContent>

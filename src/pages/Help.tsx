@@ -18,7 +18,9 @@ import {
   MessageSquare,
   FileQuestion,
   Send,
+  FileText,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const helpCategories = [
   {
@@ -77,6 +79,8 @@ const faqs = [
 ];
 
 export default function Help() {
+  const navigate = useNavigate();
+  
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto space-y-8">
@@ -118,6 +122,29 @@ export default function Help() {
             </Card>
           ))}
         </div>
+
+        {/* Proposal Document Card */}
+        <Card className="bg-gradient-to-r from-primary/10 to-info/10 border-primary/20">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                  <FileText className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Product Proposal Document</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Download the complete VisiGuard VMS proposal for presentations
+                  </p>
+                </div>
+              </div>
+              <Button onClick={() => navigate('/proposal-document')} className="gap-2">
+                <FileText className="h-4 w-4" />
+                View Proposal
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* FAQs */}
