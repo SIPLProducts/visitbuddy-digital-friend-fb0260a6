@@ -19,6 +19,7 @@ import {
   FileQuestion,
   Send,
   FileText,
+  Server,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -123,28 +124,42 @@ export default function Help() {
           ))}
         </div>
 
-        {/* Proposal Document Card */}
-        <Card className="bg-gradient-to-r from-primary/10 to-info/10 border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between flex-wrap gap-4">
+        {/* Document Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+            <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-foreground">Product Proposal Document</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Download the complete VisiGuard VMS proposal for presentations
-                  </p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground">Product Proposal</h3>
+                  <p className="text-sm text-muted-foreground">Complete VisiGuard VMS proposal for presentations</p>
                 </div>
+                <Button onClick={() => navigate('/proposal-document')} size="sm" className="gap-2 shrink-0">
+                  <FileText className="h-4 w-4" /> View
+                </Button>
               </div>
-              <Button onClick={() => navigate('/proposal-document')} className="gap-2">
-                <FileText className="h-4 w-4" />
-                View Proposal
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                  <Server className="h-6 w-6 text-emerald-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground">Resource Requirements</h3>
+                  <p className="text-sm text-muted-foreground">Server config for cloud & on-premise deployment</p>
+                </div>
+                <Button onClick={() => navigate('/resource-requirements')} size="sm" variant="outline" className="gap-2 shrink-0">
+                  <Server className="h-4 w-4" /> View
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* FAQs */}
