@@ -101,7 +101,7 @@ const ResourceRequirements = () => {
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <Globe className="h-5 w-5 text-primary" /> Recommended Cloud Platforms
           </h3>
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-4 mb-4">
             {[
               { name: 'AWS', services: 'EC2 / RDS / S3 / CloudFront', tier: 't3.medium+' },
               { name: 'Azure', services: 'App Service / Azure SQL / Blob / CDN', tier: 'B2+' },
@@ -113,6 +113,36 @@ const ResourceRequirements = () => {
                 <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">Min: {p.tier}</span>
               </div>
             ))}
+          </div>
+
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <Server className="h-5 w-5 text-primary" /> Existing Vendor (If Applicable)
+          </h3>
+          <div className="border rounded-lg p-4 mb-6 bg-muted/30">
+            <p className="text-sm text-muted-foreground mb-3">
+              If the client already has an existing cloud or hosting vendor, VisiGuard VMS can be deployed on their current infrastructure provided it meets the minimum specifications listed above. Common existing vendors include:
+            </p>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              {[
+                { name: 'DigitalOcean', spec: 'Droplets (4 GB+) / Managed DB / Spaces' },
+                { name: 'Oracle Cloud (OCI)', spec: 'Compute / Autonomous DB / Object Storage' },
+                { name: 'IBM Cloud', spec: 'Virtual Servers / Db2 / Cloud Object Storage' },
+                { name: 'Linode (Akamai)', spec: 'Dedicated CPU / Managed DB / Object Storage' },
+                { name: 'Hetzner', spec: 'Cloud Servers / Managed DB / Storage Box' },
+                { name: "Client's Own Data Center", spec: 'On-premise VM / Bare metal (see next page)' },
+              ].map((v) => (
+                <div key={v.name} className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  <div>
+                    <span className="font-medium">{v.name}</span>
+                    <p className="text-xs text-muted-foreground">{v.spec}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 italic">
+              * Sharvi Infotech will assess the existing vendor environment and provide deployment guidance accordingly.
+            </p>
           </div>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
