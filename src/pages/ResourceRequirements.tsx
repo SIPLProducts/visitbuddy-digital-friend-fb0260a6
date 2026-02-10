@@ -287,39 +287,9 @@ const ResourceRequirements = () => {
             </tbody>
           </table>
 
-          <h3 className="text-lg font-semibold mb-3">Estimated Monthly Cloud Costs</h3>
-          <table className="w-full border-collapse mb-6 text-sm">
-            <thead>
-              <tr className="bg-primary/10">
-                <th className="border p-2.5 text-left font-semibold">Service</th>
-                <th className="border p-2.5 text-center font-semibold">Small</th>
-                <th className="border p-2.5 text-center font-semibold">Medium</th>
-                <th className="border p-2.5 text-center font-semibold">Large</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ['Compute (App + DB)', '$30–50', '$80–150', '$200–400'],
-                ['Storage', '$5', '$15', '$50'],
-                ['CDN / Bandwidth', '$5–10', '$15–30', '$50–100'],
-                ['Backup', '$5', '$10', '$25'],
-                ['SSL / Domain', 'Free', '$10', '$20'],
-                ['Monitoring', 'Free tier', '$15', '$30'],
-                ['Total Estimate', '$45–70', '$145–230', '$375–625'],
-              ].map(([service, s, m, l], i) => (
-                <tr key={i} className={i % 2 === 0 ? 'bg-muted/30' : ''}>
-                  <td className="border p-2.5 font-medium">{service}</td>
-                  <td className="border p-2.5 text-center">{s}</td>
-                  <td className="border p-2.5 text-center">{m}</td>
-                  <td className="border p-2.5 text-center">{l}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
           <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Note:</strong> All costs are approximate and may vary based on cloud provider, region, and actual usage. On-premise costs depend on existing infrastructure. Contact Sharvi Infotech for a detailed quote tailored to your organization.
+              <strong className="text-foreground">Note:</strong> On-premise costs depend on existing infrastructure. Contact Sharvi Infotech for a detailed quote tailored to your organization.
             </p>
           </div>
 
