@@ -20,13 +20,70 @@ const ResourceRequirements = () => {
     try {
       const pages = element.querySelectorAll('.proposal-page');
       const pdf = new jsPDF('p', 'mm', 'a4');
+      const A4_WIDTH_MM = 210;
+      const A4_HEIGHT_MM = 297;
+
       for (let i = 0; i < pages.length; i++) {
-        const canvas = await html2canvas(pages[i] as HTMLElement, { scale: 2, useCORS: true, logging: false });
+        const page = pages[i] as HTMLElement;
+        
+        // Temporarily force the page to render at exact A4 width for consistent capture
+        const originalStyle = page.style.cssText;
+        page.style.width = '210mm';
+        page.style.minHeight = 'auto';
+        page.style.height = 'auto';
+        page.style.overflow = 'visible';
+        page.style.boxShadow = 'none';
+        page.style.margin = '0';
+
+        const canvas = await html2canvas(page, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          windowWidth: 794, // 210mm in pixels at 96dpi
+          width: 794,
+        });
+
+        // Restore original styles
+        page.style.cssText = originalStyle;
+
         const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 210;
+        const imgWidth = A4_WIDTH_MM;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
         if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+        // If content is taller than one A4 page, split across multiple pages
+        if (imgHeight > A4_HEIGHT_MM) {
+          let remainingHeight = imgHeight;
+          let sourceY = 0;
+          let pageIndex = 0;
+
+          while (remainingHeight > 0) {
+            if (pageIndex > 0) pdf.addPage();
+            
+            const sliceHeight = Math.min(remainingHeight, A4_HEIGHT_MM);
+            // Calculate the source region from the canvas
+            const sourceHeightPx = (sliceHeight / imgHeight) * canvas.height;
+            const sourceYPx = (sourceY / imgHeight) * canvas.height;
+
+            // Create a temporary canvas for this slice
+            const sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = sourceHeightPx;
+            const ctx = sliceCanvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(canvas, 0, sourceYPx, canvas.width, sourceHeightPx, 0, 0, canvas.width, sourceHeightPx);
+              const sliceData = sliceCanvas.toDataURL('image/png');
+              pdf.addImage(sliceData, 'PNG', 0, 0, imgWidth, sliceHeight);
+            }
+
+            sourceY += sliceHeight;
+            remainingHeight -= sliceHeight;
+            pageIndex++;
+          }
+        } else {
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        }
       }
       pdf.save('VisiGuard-Resource-Requirements.pdf');
       toast.success('PDF downloaded successfully!');
