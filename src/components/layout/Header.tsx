@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Bell, Plus, Building2, ChevronDown, Crown, Menu } from 'lucide-react';
+import { Search, Plus, Building2, ChevronDown, Crown, Menu } from 'lucide-react';
+import { NotificationDropdown } from '@/components/layout/NotificationDropdown';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -161,12 +162,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         </Link>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative h-10 w-10">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] text-destructive-foreground flex items-center justify-center">
-            3
-          </span>
-        </Button>
+        <NotificationDropdown />
 
         {/* User Menu */}
         <DropdownMenu>
