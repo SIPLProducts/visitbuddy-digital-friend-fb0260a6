@@ -42,12 +42,23 @@ const ResourceRequirements = () => {
       let isFirst = true;
 
       for (const section of sections) {
+        // Force section to exact A4 width for consistent capture
+        const originalWidth = section.style.width;
+        const originalMinHeight = section.style.minHeight;
+        section.style.width = '794px'; // 210mm at 96dpi
+        section.style.minHeight = 'auto';
+
         const canvas = await html2canvas(section, {
           scale: 2,
           useCORS: true,
           backgroundColor: '#ffffff',
           logging: false,
+          width: 794,
         });
+
+        // Restore
+        section.style.width = originalWidth;
+        section.style.minHeight = originalMinHeight;
 
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const imgWidth = A4_WIDTH_MM;
@@ -56,32 +67,25 @@ const ResourceRequirements = () => {
         if (!isFirst) pdf.addPage();
         isFirst = false;
 
-        if (imgHeight <= A4_HEIGHT_MM) {
-          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-        } else {
-          let position = 0;
-          let pageNum = 0;
-          while (position < imgHeight) {
-            if (pageNum > 0) pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, -position, imgWidth, imgHeight);
-            position += A4_HEIGHT_MM;
-            pageNum++;
-          }
-        }
+        // Always fit to single page per section (scale down if needed)
+        const finalHeight = Math.min(imgHeight, A4_HEIGHT_MM);
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, finalHeight);
       }
 
       // Restore icons
       allIcons.forEach(el => (el as HTMLElement).style.display = '');
       iconFallbacks.forEach(el => (el as HTMLElement).style.display = 'none');
 
-      // Add footer and page numbers to every page
+      // Add footer and page numbers — skip footer on page 1 (cover)
       const totalPages = pdf.getNumberOfPages();
       for (let p = 1; p <= totalPages; p++) {
         pdf.setPage(p);
         pdf.setFontSize(8);
         pdf.setTextColor(150, 150, 150);
-        pdf.text(`© ${new Date().getFullYear()} Sharvi Infotech. All rights reserved.`, 105, 286, { align: 'center' });
-        pdf.text('info@sharviinfotech.com | +91 88976 46530', 105, 290, { align: 'center' });
+        if (p > 1) {
+          pdf.text(`© ${new Date().getFullYear()} Sharvi Infotech. All rights reserved.`, 105, 286, { align: 'center' });
+          pdf.text('info@sharviinfotech.com | +91 88976 46530', 105, 290, { align: 'center' });
+        }
         pdf.text(`Page ${p} of ${totalPages}`, 105, 294, { align: 'center' });
       }
 
