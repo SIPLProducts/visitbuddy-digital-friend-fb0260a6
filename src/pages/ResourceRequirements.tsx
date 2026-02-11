@@ -74,6 +74,15 @@ const ResourceRequirements = () => {
       allIcons.forEach(el => (el as HTMLElement).style.display = '');
       iconFallbacks.forEach(el => (el as HTMLElement).style.display = 'none');
 
+      // Add page numbers to every page
+      const totalPages = pdf.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        pdf.setPage(p);
+        pdf.setFontSize(9);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(`Page ${p} of ${totalPages}`, 105, 290, { align: 'center' });
+      }
+
       pdf.save('VisiGuard-Resource-Requirements.pdf');
       toast.success('PDF downloaded successfully!');
     } catch (error) {
