@@ -349,11 +349,6 @@ const ResourceRequirements = () => {
             </tbody>
           </table>
 
-          <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Disclaimer:</strong> The above hardware, device, and manpower specifications are recommendations only. Sharvi Infotech is not responsible for procurement, supply, or maintenance of any hardware or staffing. The client is solely responsible for arranging the required infrastructure and personnel.
-            </p>
-          </div>
 
           {/* Footer */}
           <div className="mt-auto pt-8 text-center border-t mt-8">
