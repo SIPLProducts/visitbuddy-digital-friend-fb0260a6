@@ -329,7 +329,7 @@ const ResourceRequirements = () => {
           {/* Footer */}
           <div className="mt-auto pt-8 text-center border-t mt-8">
             <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Sharvi Infotech. All rights reserved.</p>
-            <p className="text-xs text-muted-foreground">info@sharviinfotech.com | +91 XXXXX XXXXX</p>
+            <p className="text-xs text-muted-foreground">info@sharviinfotech.com | +91 88976 46530</p>
           </div>
         </div>
       </div>
