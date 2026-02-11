@@ -322,7 +322,7 @@ const ResourceRequirements = () => {
 
           <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Note:</strong> On-premise costs depend on existing infrastructure. Contact Sharvi Infotech for a detailed quote tailored to your organization.
+              <strong className="text-foreground">Disclaimer:</strong> The above hardware and device specifications are recommendations only. Sharvi Infotech is not responsible for procurement, supply, or maintenance of any hardware. The client is solely responsible for arranging the required infrastructure.
             </p>
           </div>
 
