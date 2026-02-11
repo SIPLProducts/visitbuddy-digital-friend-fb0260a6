@@ -320,9 +320,38 @@ const ResourceRequirements = () => {
             </tbody>
           </table>
 
+          <h3 className="text-lg font-semibold mb-3 mt-6">👥 Manpower Requirement (Client Side)</h3>
+          <p className="text-sm text-muted-foreground mb-3">
+            For smooth implementation and ongoing operations, the client must designate the following personnel at each site:
+          </p>
+          <table className="w-full border-collapse mb-6 text-sm">
+            <thead>
+              <tr className="bg-primary/10">
+                <th className="border p-2.5 text-left font-semibold">Role</th>
+                <th className="border p-2.5 text-left font-semibold">Responsibility</th>
+                <th className="border p-2.5 text-center font-semibold">Required Per Site</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ['Process Owner', 'Overall ownership of VMS adoption, SOP alignment & compliance at the site', '1'],
+                ['Decision Maker / SPOC', 'Approve configurations, escalations & change requests; single point of contact for Sharvi Infotech', '1'],
+                ['Application Tester', 'Test features, validate workflows, report bugs & provide feedback during UAT and post go-live', '1–2'],
+                ['IT Coordinator', 'Manage network, devices, server access & coordinate with Sharvi Infotech for technical setup', '1'],
+                ['Gate Operator / Security', 'Day-to-day check-in/out operations, badge printing, QR scanning at gates', 'As per gates'],
+              ].map(([role, responsibility, count], i) => (
+                <tr key={i} className={i % 2 === 0 ? 'bg-muted/30' : ''}>
+                  <td className="border p-2.5 font-medium">{role}</td>
+                  <td className="border p-2.5">{responsibility}</td>
+                  <td className="border p-2.5 text-center">{count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
           <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Disclaimer:</strong> The above hardware and device specifications are recommendations only. Sharvi Infotech is not responsible for procurement, supply, or maintenance of any hardware. The client is solely responsible for arranging the required infrastructure.
+              <strong className="text-foreground">Disclaimer:</strong> The above hardware, device, and manpower specifications are recommendations only. Sharvi Infotech is not responsible for procurement, supply, or maintenance of any hardware or staffing. The client is solely responsible for arranging the required infrastructure and personnel.
             </p>
           </div>
 
