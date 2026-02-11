@@ -3,12 +3,37 @@ import { ArrowLeft, Printer, Download, Server, Cloud, HardDrive, Cpu, MemoryStic
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import reslLogo from '@/assets/resl-logo.png';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const ResourceRequirements = () => {
   const navigate = useNavigate();
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleDownloadPdf = async () => {
+    const element = document.getElementById('resource-requirements-document');
+    if (!element) return;
+    toast.info('Generating PDF, please wait...');
+    try {
+      const pages = element.querySelectorAll('.proposal-page');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      for (let i = 0; i < pages.length; i++) {
+        const canvas = await html2canvas(pages[i] as HTMLElement, { scale: 2, useCORS: true, logging: false });
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      }
+      pdf.save('VisiGuard-Resource-Requirements.pdf');
+      toast.success('PDF downloaded successfully!');
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast.error('Failed to generate PDF');
+    }
   };
 
   return (
@@ -20,7 +45,10 @@ const ResourceRequirements = () => {
         </Button>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handlePrint} className="gap-2">
-            <Printer className="h-4 w-4" /> Print / Save PDF
+            <Printer className="h-4 w-4" /> Print
+          </Button>
+          <Button onClick={handleDownloadPdf} className="gap-2">
+            <Download className="h-4 w-4" /> Download PDF
           </Button>
         </div>
       </div>
