@@ -307,6 +307,9 @@ const ResourceRequirements = () => {
                 ['Smartphone', 'Guard mobile app, QR scanning', 'Android 9+ / iOS 14+ with camera'],
                 ['Badge Printer', 'Visitor badge printing', 'Thermal printer (100x150mm) or A4 laser'],
                 ['Barcode/QR Scanner', 'Rapid check-in (optional)', 'USB or Bluetooth 2D scanner'],
+                ['ANPR Camera', 'Automatic vehicle number plate capture for entry/exit', 'IP camera with ANPR/LPR support (2MP+, IR night vision)'],
+                ['Boom Barrier (optional)', 'Automated gate open/close on vehicle detection', 'ANPR-integrated boom barrier with controller'],
+                ['RFID Reader (optional)', 'Recurring vehicle identification', 'UHF RFID reader (865–868 MHz) with windshield tags'],
               ].map(([device, purpose, spec], i) => (
                 <tr key={i} className={i % 2 === 0 ? 'bg-muted/30' : ''}>
                   <td className="border p-2.5 font-medium">{device}</td>
