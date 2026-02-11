@@ -18,71 +18,41 @@ const ResourceRequirements = () => {
     if (!element) return;
     toast.info('Generating PDF, please wait...');
     try {
-      const pages = element.querySelectorAll('.proposal-page');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const sections = Array.from(element.querySelectorAll('.proposal-page')) as HTMLElement[];
+      if (sections.length === 0) return;
+
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const A4_WIDTH_MM = 210;
       const A4_HEIGHT_MM = 297;
 
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i] as HTMLElement;
-        
-        // Temporarily force the page to render at exact A4 width for consistent capture
-        const originalStyle = page.style.cssText;
-        page.style.width = '210mm';
-        page.style.minHeight = 'auto';
-        page.style.height = 'auto';
-        page.style.overflow = 'visible';
-        page.style.boxShadow = 'none';
-        page.style.margin = '0';
-
-        const canvas = await html2canvas(page, {
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        const canvas = await html2canvas(section, {
           scale: 2,
           useCORS: true,
+          backgroundColor: '#ffffff',
           logging: false,
-          windowWidth: 794, // 210mm in pixels at 96dpi
-          width: 794,
         });
 
-        // Restore original styles
-        page.style.cssText = originalStyle;
-
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const imgWidth = A4_WIDTH_MM;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
         if (i > 0) pdf.addPage();
 
-        // If content is taller than one A4 page, split across multiple pages
-        if (imgHeight > A4_HEIGHT_MM) {
-          let remainingHeight = imgHeight;
-          let sourceY = 0;
-          let pageIndex = 0;
-
-          while (remainingHeight > 0) {
-            if (pageIndex > 0) pdf.addPage();
-            
-            const sliceHeight = Math.min(remainingHeight, A4_HEIGHT_MM);
-            // Calculate the source region from the canvas
-            const sourceHeightPx = (sliceHeight / imgHeight) * canvas.height;
-            const sourceYPx = (sourceY / imgHeight) * canvas.height;
-
-            // Create a temporary canvas for this slice
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = canvas.width;
-            sliceCanvas.height = sourceHeightPx;
-            const ctx = sliceCanvas.getContext('2d');
-            if (ctx) {
-              ctx.drawImage(canvas, 0, sourceYPx, canvas.width, sourceHeightPx, 0, 0, canvas.width, sourceHeightPx);
-              const sliceData = sliceCanvas.toDataURL('image/png');
-              pdf.addImage(sliceData, 'PNG', 0, 0, imgWidth, sliceHeight);
-            }
-
-            sourceY += sliceHeight;
-            remainingHeight -= sliceHeight;
-            pageIndex++;
-          }
+        // If content fits on one page, just add it
+        if (imgHeight <= A4_HEIGHT_MM) {
+          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
         } else {
-          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          // Content taller than one page — tile it across multiple pages
+          let position = 0;
+          let pageNum = 0;
+          while (position < imgHeight) {
+            if (pageNum > 0) pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, -position, imgWidth, imgHeight);
+            position += A4_HEIGHT_MM;
+            pageNum++;
+          }
         }
       }
       pdf.save('VisiGuard-Resource-Requirements.pdf');
