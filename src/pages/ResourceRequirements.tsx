@@ -6,6 +6,14 @@ import reslLogo from '@/assets/resl-logo.png';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
+// Helper: renders both SVG icon (screen) and text fallback (PDF)
+const PdfIcon = ({ icon: Icon, fallback, className = "h-5 w-5 text-primary" }: { icon: any; fallback: string; className?: string }) => (
+  <>
+    <Icon className={className} />
+    <span className="pdf-icon-fallback" style={{ display: 'none', fontSize: 'inherit' }}>{fallback}</span>
+  </>
+);
+
 const ResourceRequirements = () => {
   const navigate = useNavigate();
 
@@ -18,14 +26,21 @@ const ResourceRequirements = () => {
     if (!element) return;
     toast.info('Generating PDF, please wait...');
     try {
+      // Hide SVG icons and show text fallbacks
+      const allIcons = element.querySelectorAll('.lucide');
+      const iconFallbacks = element.querySelectorAll('.pdf-icon-fallback');
+      allIcons.forEach(el => (el as HTMLElement).style.display = 'none');
+      iconFallbacks.forEach(el => (el as HTMLElement).style.display = 'inline');
+
       const sections = Array.from(element.querySelectorAll('[data-pdf-section]')) as HTMLElement[];
       if (sections.length === 0) return;
 
       const A4_WIDTH_MM = 210;
       const A4_HEIGHT_MM = 297;
 
-      // Capture all sections
-      const captures: { imgData: string; heightMM: number }[] = [];
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      let isFirst = true;
+
       for (const section of sections) {
         const canvas = await html2canvas(section, {
           scale: 2,
@@ -33,33 +48,40 @@ const ResourceRequirements = () => {
           backgroundColor: '#ffffff',
           logging: false,
         });
+
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const heightMM = (canvas.height * A4_WIDTH_MM) / canvas.width;
-        captures.push({ imgData, heightMM });
-      }
+        const imgWidth = A4_WIDTH_MM;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      let currentY = 0;
-      let isFirstSection = true;
+        if (!isFirst) pdf.addPage();
+        isFirst = false;
 
-      for (const { imgData, heightMM } of captures) {
-        const remainingSpace = A4_HEIGHT_MM - currentY;
-
-        // Start a new page if section won't fit and we're not at the top
-        if (!isFirstSection && heightMM > remainingSpace) {
-          pdf.addPage();
-          currentY = 0;
+        if (imgHeight <= A4_HEIGHT_MM) {
+          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+        } else {
+          let position = 0;
+          let pageNum = 0;
+          while (position < imgHeight) {
+            if (pageNum > 0) pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, -position, imgWidth, imgHeight);
+            position += A4_HEIGHT_MM;
+            pageNum++;
+          }
         }
-
-        pdf.addImage(imgData, 'JPEG', 0, currentY, A4_WIDTH_MM, heightMM);
-        currentY += heightMM;
-        isFirstSection = false;
       }
+
+      // Restore icons
+      allIcons.forEach(el => (el as HTMLElement).style.display = '');
+      iconFallbacks.forEach(el => (el as HTMLElement).style.display = 'none');
 
       pdf.save('VisiGuard-Resource-Requirements.pdf');
       toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error('PDF generation error:', error);
+      const allIcons = element?.querySelectorAll('.lucide');
+      const iconFallbacks = element?.querySelectorAll('.pdf-icon-fallback');
+      allIcons?.forEach(el => (el as HTMLElement).style.display = '');
+      iconFallbacks?.forEach(el => (el as HTMLElement).style.display = 'none');
       toast.error('Failed to generate PDF');
     }
   };
@@ -93,10 +115,12 @@ const ResourceRequirements = () => {
               <div className="flex gap-6 mt-4">
                 <div className="bg-white/20 rounded-lg p-4 text-white">
                   <Cloud className="h-8 w-8 mx-auto mb-2" />
+                  <span className="pdf-icon-fallback" style={{ display: 'none', fontSize: '24px' }}>☁️</span>
                   <span className="text-sm font-medium">Cloud Deploy</span>
                 </div>
                 <div className="bg-white/20 rounded-lg p-4 text-white">
                   <Server className="h-8 w-8 mx-auto mb-2" />
+                  <span className="pdf-icon-fallback" style={{ display: 'none', fontSize: '24px' }}>🖥️</span>
                   <span className="text-sm font-medium">On-Premise</span>
                 </div>
               </div>
@@ -113,16 +137,15 @@ const ResourceRequirements = () => {
         {/* Page 2 — Cloud Deployment */}
         <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
-            <Cloud className="h-7 w-7 text-primary" />
+            <PdfIcon icon={Cloud} fallback="☁️" className="h-7 w-7 text-primary" />
             <h2 className="text-2xl font-bold text-foreground">Cloud Deployment Configuration</h2>
           </div>
           <p className="text-muted-foreground mb-6">
             VisiGuard VMS is optimized for cloud-native deployment using modern PaaS/IaaS platforms. Below are the recommended configurations based on expected user load.
           </p>
 
-          {/* Cloud Tiers Table */}
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Cpu className="h-5 w-5 text-primary" /> Compute Requirements
+            <PdfIcon icon={Cpu} fallback="⚙️" /> Compute Requirements
           </h3>
           <table className="w-full border-collapse mb-6 text-sm">
             <thead>
@@ -155,7 +178,7 @@ const ResourceRequirements = () => {
           </table>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Globe className="h-5 w-5 text-primary" /> Recommended Cloud Platforms
+            <PdfIcon icon={Globe} fallback="🌐" /> Recommended Cloud Platforms
           </h3>
           <div className="grid grid-cols-3 gap-4 mb-4">
             {[
@@ -172,7 +195,7 @@ const ResourceRequirements = () => {
           </div>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Server className="h-5 w-5 text-primary" /> Existing Vendor (If Applicable)
+            <PdfIcon icon={Server} fallback="🖥️" /> Existing Vendor (If Applicable)
           </h3>
           <div className="border rounded-lg p-4 mb-6 bg-muted/30">
             <p className="text-sm text-muted-foreground mb-3">
@@ -202,7 +225,7 @@ const ResourceRequirements = () => {
           </div>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Shield className="h-5 w-5 text-primary" /> Cloud Security Checklist
+            <PdfIcon icon={Shield} fallback="🛡️" /> Cloud Security Checklist
           </h3>
           <ul className="space-y-1.5 text-sm">
             {[
@@ -225,7 +248,7 @@ const ResourceRequirements = () => {
         {/* Page 3 — On-Premise / Rack Server */}
         <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
-            <Server className="h-7 w-7 text-primary" />
+            <PdfIcon icon={Server} fallback="🖥️" className="h-7 w-7 text-primary" />
             <h2 className="text-2xl font-bold text-foreground">On-Premise / Rack Server Configuration</h2>
           </div>
           <p className="text-muted-foreground mb-6">
@@ -233,7 +256,7 @@ const ResourceRequirements = () => {
           </p>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <HardDrive className="h-5 w-5 text-primary" /> Hardware Requirements
+            <PdfIcon icon={HardDrive} fallback="💾" /> Hardware Requirements
           </h3>
           <table className="w-full border-collapse mb-6 text-sm">
             <thead>
@@ -264,7 +287,7 @@ const ResourceRequirements = () => {
           </table>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Monitor className="h-5 w-5 text-primary" /> Software Stack
+            <PdfIcon icon={Monitor} fallback="🖥️" /> Software Stack
           </h3>
           <table className="w-full border-collapse mb-6 text-sm">
             <thead>
@@ -295,7 +318,7 @@ const ResourceRequirements = () => {
           </table>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <Shield className="h-5 w-5 text-primary" /> On-Premise Security Requirements
+            <PdfIcon icon={Shield} fallback="🛡️" /> On-Premise Security Requirements
           </h3>
           <ul className="space-y-1.5 text-sm">
             {[
@@ -315,10 +338,10 @@ const ResourceRequirements = () => {
           </ul>
         </div>
 
-        {/* Page 4 — Network & Client Requirements */}
+        {/* Page 4 — Network & Client Device Requirements */}
         <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
-            <Globe className="h-7 w-7 text-primary" />
+            <PdfIcon icon={Globe} fallback="🌐" className="h-7 w-7 text-primary" />
             <h2 className="text-2xl font-bold text-foreground">Network & Client Requirements</h2>
           </div>
 
@@ -375,9 +398,15 @@ const ResourceRequirements = () => {
               ))}
             </tbody>
           </table>
+        </div>
 
-          <h3 className="text-lg font-semibold mb-3 mt-6">👥 Manpower Requirement (Client Side)</h3>
-          <p className="text-sm text-muted-foreground mb-3">
+        {/* Page 5 — Manpower Requirement */}
+        <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
+            <span className="text-2xl">👥</span>
+            <h2 className="text-2xl font-bold text-foreground">Manpower Requirement (Client Side)</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-6">
             For smooth implementation and ongoing operations, the client must designate the following personnel at each site:
           </p>
           <table className="w-full border-collapse mb-6 text-sm">
@@ -405,9 +434,8 @@ const ResourceRequirements = () => {
             </tbody>
           </table>
 
-
           {/* Footer */}
-          <div className="mt-auto pt-8 text-center border-t mt-8">
+          <div className="mt-auto pt-8 text-center border-t" style={{ marginTop: 'auto' }}>
             <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Sharvi Infotech. All rights reserved.</p>
             <p className="text-xs text-muted-foreground">info@sharviinfotech.com | +91 88976 46530</p>
           </div>
