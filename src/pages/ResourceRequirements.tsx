@@ -18,43 +18,44 @@ const ResourceRequirements = () => {
     if (!element) return;
     toast.info('Generating PDF, please wait...');
     try {
-      const sections = Array.from(element.querySelectorAll('.proposal-page')) as HTMLElement[];
+      const sections = Array.from(element.querySelectorAll('[data-pdf-section]')) as HTMLElement[];
       if (sections.length === 0) return;
 
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const A4_WIDTH_MM = 210;
       const A4_HEIGHT_MM = 297;
 
-      for (let i = 0; i < sections.length; i++) {
-        const section = sections[i];
+      // Capture all sections
+      const captures: { imgData: string; heightMM: number }[] = [];
+      for (const section of sections) {
         const canvas = await html2canvas(section, {
           scale: 2,
           useCORS: true,
           backgroundColor: '#ffffff',
           logging: false,
         });
-
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const imgWidth = A4_WIDTH_MM;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        if (i > 0) pdf.addPage();
-
-        // If content fits on one page, just add it
-        if (imgHeight <= A4_HEIGHT_MM) {
-          pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-        } else {
-          // Content taller than one page — tile it across multiple pages
-          let position = 0;
-          let pageNum = 0;
-          while (position < imgHeight) {
-            if (pageNum > 0) pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, -position, imgWidth, imgHeight);
-            position += A4_HEIGHT_MM;
-            pageNum++;
-          }
-        }
+        const heightMM = (canvas.height * A4_WIDTH_MM) / canvas.width;
+        captures.push({ imgData, heightMM });
       }
+
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      let currentY = 0;
+      let isFirstSection = true;
+
+      for (const { imgData, heightMM } of captures) {
+        const remainingSpace = A4_HEIGHT_MM - currentY;
+
+        // Start a new page if section won't fit and we're not at the top
+        if (!isFirstSection && heightMM > remainingSpace) {
+          pdf.addPage();
+          currentY = 0;
+        }
+
+        pdf.addImage(imgData, 'JPEG', 0, currentY, A4_WIDTH_MM, heightMM);
+        currentY += heightMM;
+        isFirstSection = false;
+      }
+
       pdf.save('VisiGuard-Resource-Requirements.pdf');
       toast.success('PDF downloaded successfully!');
     } catch (error) {
@@ -82,7 +83,7 @@ const ResourceRequirements = () => {
 
       <div className="pt-20 print:pt-0">
         {/* Cover Page */}
-        <div className="proposal-page bg-white mx-auto shadow-lg print:shadow-none" style={{ width: '210mm', minHeight: '297mm', padding: '0' }}>
+        <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none" style={{ width: '210mm', minHeight: '297mm', padding: '0' }}>
           <div className="h-full flex flex-col" style={{ minHeight: '297mm' }}>
             <div className="flex-1 flex flex-col items-center justify-center text-center p-12" style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #0891b2 50%, #10b981 100%)' }}>
               <img src={reslLogo} alt="RESL Logo" className="h-20 mb-8 bg-white/90 rounded-lg p-3" />
@@ -110,7 +111,7 @@ const ResourceRequirements = () => {
         </div>
 
         {/* Page 2 — Cloud Deployment */}
-        <div className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
+        <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
             <Cloud className="h-7 w-7 text-primary" />
             <h2 className="text-2xl font-bold text-foreground">Cloud Deployment Configuration</h2>
@@ -222,7 +223,7 @@ const ResourceRequirements = () => {
         </div>
 
         {/* Page 3 — On-Premise / Rack Server */}
-        <div className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
+        <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
             <Server className="h-7 w-7 text-primary" />
             <h2 className="text-2xl font-bold text-foreground">On-Premise / Rack Server Configuration</h2>
@@ -315,7 +316,7 @@ const ResourceRequirements = () => {
         </div>
 
         {/* Page 4 — Network & Client Requirements */}
-        <div className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
+        <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
             <Globe className="h-7 w-7 text-primary" />
             <h2 className="text-2xl font-bold text-foreground">Network & Client Requirements</h2>
