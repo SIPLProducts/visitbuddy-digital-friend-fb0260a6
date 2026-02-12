@@ -415,7 +415,131 @@ const ResourceRequirements = () => {
           </table>
         </div>
 
-        {/* Page 5 — Manpower Requirement */}
+        {/* Page 5 — System Architecture & Hardware Connectivity */}
+        <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
+          <div className="flex items-center gap-3 mb-5 pb-3 border-b-2 border-primary">
+            <PdfIcon icon={Server} fallback="🏗️" className="h-7 w-7 text-primary" />
+            <h2 className="text-2xl font-bold text-foreground">System Architecture & Hardware Connectivity</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            This diagram illustrates the complete infrastructure stack and gate-level hardware setup required to run VisiGuard VMS.
+          </p>
+
+          {/* System Architecture Diagram */}
+          <h3 className="text-sm font-semibold mb-2">Application Architecture (Vertical Flow)</h3>
+          <div className="border rounded-lg p-3 mb-4" style={{ background: '#f8fafc' }}>
+            {/* Client Layer */}
+            <div className="rounded-md p-2 text-center text-xs font-semibold text-white" style={{ background: '#64748b' }}>
+              🌐 INTERNET / CLIENTS — Browser · Tablet · Smartphone · Self-Service Kiosk
+            </div>
+            <div className="text-center text-xs text-muted-foreground py-1">▼ HTTPS / 443</div>
+
+            {/* Firewall */}
+            <div className="rounded-md p-2 text-center text-xs font-semibold text-white" style={{ background: '#dc2626' }}>
+              🛡️ FIREWALL / WAF / DDoS Protection
+            </div>
+            <div className="text-center text-xs text-muted-foreground py-1">▼</div>
+
+            {/* Load Balancer */}
+            <div className="rounded-md p-2 text-center text-xs font-semibold text-white" style={{ background: '#7c3aed' }}>
+              ⚖️ LOAD BALANCER / REVERSE PROXY (Nginx / Caddy)
+            </div>
+            <div className="text-center text-xs text-muted-foreground py-1">▼</div>
+
+            {/* App Layer - Split */}
+            <div className="grid grid-cols-2 gap-2 mb-1">
+              <div className="rounded-md p-2 text-center text-xs font-semibold text-white" style={{ background: '#0284c7' }}>
+                🖥️ APPLICATION SERVER<br />React PWA (Static Files)
+              </div>
+              <div className="rounded-md p-2 text-center text-xs font-semibold text-white" style={{ background: '#0369a1' }}>
+                ⚡ EDGE FUNCTIONS<br />API / Webhooks / Auth
+              </div>
+            </div>
+            <div className="text-center text-xs text-muted-foreground py-1">▼</div>
+
+            {/* Database Layer */}
+            <div className="grid grid-cols-2 gap-2 mb-1">
+              <div className="rounded-md p-2 text-center text-xs font-semibold text-white" style={{ background: '#16a34a' }}>
+                🗄️ PostgreSQL 15+<br />Primary Database
+              </div>
+              <div className="rounded-md p-2 text-center text-xs font-semibold" style={{ background: '#bbf7d0', color: '#166534' }}>
+                ⚡ Redis Cache<br />(Optional)
+              </div>
+            </div>
+            <div className="text-center text-xs text-muted-foreground py-1">▼</div>
+
+            {/* Storage */}
+            <div className="rounded-md p-2 text-center text-xs font-semibold" style={{ background: '#dbeafe', color: '#1e40af' }}>
+              📁 FILE STORAGE — Badge Photos · Documents · NAS/S3 Backup
+            </div>
+
+            {/* External */}
+            <div className="mt-2 rounded-md p-2 text-center text-xs font-semibold" style={{ background: '#fef3c7', color: '#92400e' }}>
+              🔗 EXTERNAL SERVICES — Twilio (SMS/WhatsApp) · Resend (Email) · Google Maps · ANPR Feed
+            </div>
+          </div>
+
+          {/* Gate Hardware Diagram */}
+          <h3 className="text-sm font-semibold mb-2">Gate-Level Hardware Connectivity</h3>
+          <div className="border rounded-lg p-3 mb-4" style={{ background: '#f8fafc' }}>
+            <div className="rounded-md p-2 text-center text-xs font-bold mb-2" style={{ background: '#1e3a5f', color: 'white' }}>
+              🏢 GATE ENTRY POINT
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
+              {[
+                ['📱 Tablet / Kiosk', 'Wi-Fi (2.4/5 GHz)', 'Access Point → LAN'],
+                ['🖨️ Badge Printer', 'USB / LAN', 'Gate PC / Tablet'],
+                ['📷 QR / Barcode Scanner', 'USB / Bluetooth', 'Gate PC / Tablet'],
+                ['📹 ANPR Camera', 'IP / PoE (Ethernet)', 'NVR → Server'],
+                ['🚧 Boom Barrier', 'Controller (RS-485)', 'ANPR System'],
+                ['📡 RFID Reader (UHF)', '865–868 MHz', 'Gate Controller → Server'],
+              ].map(([device, protocol, target], i) => (
+                <div key={i} className="flex items-center gap-1 border-b border-dashed pb-1">
+                  <span className="font-medium whitespace-nowrap">{device}</span>
+                  <span className="text-muted-foreground">—{protocol}→</span>
+                  <span className="text-muted-foreground">{target}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2 text-center text-xs text-muted-foreground">
+              ▼ All devices connect back to <strong>Central Server</strong> via LAN / Wi-Fi / VPN
+            </div>
+          </div>
+
+          {/* Data Flow Table */}
+          <h3 className="text-sm font-semibold mb-2">Data Flow Summary</h3>
+          <table className="w-full border-collapse text-xs">
+            <thead>
+              <tr className="bg-primary/10">
+                <th className="border p-1.5 text-left font-semibold">Source</th>
+                <th className="border p-1.5 text-left font-semibold">Destination</th>
+                <th className="border p-1.5 text-center font-semibold">Protocol / Port</th>
+                <th className="border p-1.5 text-left font-semibold">Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ['Browser / Tablet', 'App Server', 'HTTPS / 443', 'Web app access & API calls'],
+                ['App Server', 'PostgreSQL', 'TCP / 5432', 'Database queries & writes'],
+                ['App Server', 'Redis', 'TCP / 6379', 'Session cache (optional)'],
+                ['App Server', 'Twilio API', 'HTTPS / 443', 'SMS & WhatsApp notifications'],
+                ['App Server', 'Resend API', 'HTTPS / 443', 'Email notifications & badges'],
+                ['ANPR Camera', 'NVR / Server', 'RTSP / IP', 'Vehicle plate capture feed'],
+                ['RFID Reader', 'Gate Controller', 'UHF (865–868 MHz)', 'Vehicle tag identification'],
+                ['Gate Tablet', 'Access Point', 'Wi-Fi', 'Check-in/out operations'],
+              ].map(([src, dest, proto, purpose], i) => (
+                <tr key={i} className={i % 2 === 0 ? 'bg-muted/30' : ''}>
+                  <td className="border p-1.5">{src}</td>
+                  <td className="border p-1.5">{dest}</td>
+                  <td className="border p-1.5 text-center font-mono">{proto}</td>
+                  <td className="border p-1.5">{purpose}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Page 6 — Manpower Requirement */}
         <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mt-8 print:mt-0" style={{ width: '210mm', minHeight: '297mm', padding: '15mm' }}>
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-primary">
             <span className="text-2xl">👥</span>
