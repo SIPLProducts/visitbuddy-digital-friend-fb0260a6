@@ -1,163 +1,102 @@
 
-# VisiGuard VMS - Proposal Document Generator
+# Architecture Diagram for VisiGuard VMS Infrastructure
 
 ## Overview
-Create a professional, print-ready proposal document page that showcases all VisiGuard VMS functionalities with company branding. The document will be accessible from within the application and can be printed or saved as PDF directly from the browser.
+Add a new page (Page 6) to the Resource Requirements document with a visual architecture diagram that helps infrastructure teams understand the complete server and hardware setup required to run VisiGuard VMS smoothly.
 
-## Document Structure
+## What Will Be Added
 
-### Page Layout (A4 Portrait - 210mm x 297mm)
-The proposal document will consist of multiple sections designed for professional client presentations:
+### New Architecture Diagram Page
+A dedicated page inserted before the Manpower section containing:
 
-1. **Cover Page**
-   - Company logo (RESL branding from assets)
-   - Document title: "VisiGuard VMS - Product Proposal"
-   - Tagline: "Enterprise Visitor Management System"
-   - Date and version information
-   - Powered by Sharvi Infotech footer
+1. **System Architecture Diagram** - A visual block diagram built with styled HTML/CSS boxes and connectors showing:
+   - **Internet/Client Layer**: Browsers, tablets, smartphones connecting via HTTPS
+   - **Load Balancer / Reverse Proxy**: Nginx/Caddy entry point
+   - **Application Layer**: VisiGuard Web App (React PWA) + Backend API (Edge Functions)
+   - **Database Layer**: PostgreSQL primary + Redis cache (optional)
+   - **Storage Layer**: File storage for badges, photos, documents
+   - **External Services**: Twilio (SMS/WhatsApp), Resend (Email), ANPR Camera feeds
+   - **Network Components**: Firewall, VPN (multi-site), DNS
 
-2. **Executive Summary** (Page 2)
-   - Brief overview of VisiGuard VMS
-   - Key value propositions
-   - Target audience/use cases
+2. **Hardware Connectivity Diagram** - Shows physical connections at gate level:
+   - Gate Tablet/Kiosk connected to Wi-Fi AP
+   - Badge Printer (USB/Network)
+   - QR/Barcode Scanner (USB/Bluetooth)
+   - ANPR Camera (IP Network)
+   - Boom Barrier (Controller via ANPR)
+   - RFID Reader (UHF)
+   - All connecting back to the server via LAN/Wi-Fi
 
-3. **Core Features Section** (Pages 3-5)
-   - Visitor Management
-   - Vehicle Management  
-   - Dashboard and Analytics
-   - Badge and Pass System
-   - Mobile and PWA Experience
-   - Scheduling and Appointments
+3. **Data Flow Summary Table** - A quick-reference table showing:
+   - Source to Destination
+   - Protocol/Port
+   - Purpose (e.g., "Browser to Server | HTTPS/443 | App access")
 
-4. **Technical Specifications** (Page 6)
-   - Technology stack
-   - Security features
-   - Integration capabilities
-   - Deployment options
+## Technical Details
 
-5. **Contact/CTA Page** (Page 7)
-   - Company contact information
-   - Next steps
-   - Call to action
+### File to Modify
+- `src/pages/ResourceRequirements.tsx`
 
-## Implementation Details
+### Changes
+- Add a new `data-pdf-section` div between the Network/Client Requirements page (Page 4) and the Manpower page (Page 5)
+- The diagram will use pure HTML/CSS boxes with borders, background colors, and arrows (using CSS borders/pseudo-elements or Unicode arrows) for maximum PDF compatibility
+- No external charting library needed -- styled divs ensure html2canvas captures everything correctly
+- Consistent styling with existing pages (same border colors, fonts, section headers)
 
-### New Files to Create
+### Diagram Layout (Vertical Flow)
 
-**1. `src/pages/ProposalDocument.tsx`**
-- Main page component with all proposal content
-- Structured sections with proper page breaks for print
-- Print-optimized styling with @media print rules
-- "Print" and "Save as PDF" action buttons (hidden during print)
+```text
++--------------------------------------------------+
+|              INTERNET / CLIENTS                   |
+|  [Browser] [Tablet] [Smartphone] [Self-Service]  |
++--------------------------------------------------+
+                      |
+                  HTTPS / 443
+                      |
++--------------------------------------------------+
+|         FIREWALL / WAF / DDoS Protection         |
++--------------------------------------------------+
+                      |
++--------------------------------------------------+
+|       LOAD BALANCER / REVERSE PROXY (Nginx)      |
++--------------------------------------------------+
+              |                    |
++-------------+------+  +---------+---------+
+| APPLICATION SERVER |  |  EDGE FUNCTIONS   |
+| React PWA (Static) |  | (API / Webhooks)  |
++--------------------+  +-------------------+
+              |                    |
++--------------------------------------------------+
+|              DATABASE LAYER                       |
+|  [PostgreSQL 15+]    [Redis Cache (optional)]    |
++--------------------------------------------------+
+              |
++--------------------------------------------------+
+|            FILE STORAGE / BACKUPS                 |
+|  [Badge Photos] [Documents] [NAS/S3 Backup]     |
++--------------------------------------------------+
 
-**2. `src/components/proposal/ProposalCoverPage.tsx`**
-- Cover page with RESL logo and branding
-- Gradient header matching dashboard theme (Navy to Cyan to Emerald)
-- Document metadata (date, version)
++--------------------------------------------------+
+|          EXTERNAL INTEGRATIONS                    |
+|  [Twilio SMS/WA] [Resend Email] [Google Maps]   |
++--------------------------------------------------+
 
-**3. `src/components/proposal/ProposalFeatureSection.tsx`**
-- Reusable component for feature sections
-- Icon, title, description, and bullet points
-- Professional card-based layout
+--- GATE HARDWARE LAYOUT ---
 
-**4. `src/components/proposal/ProposalTechStack.tsx`**
-- Technology stack visualization
-- Architecture overview
-- Integration diagram
++--------------------------------------------------+
+|                 GATE SETUP                        |
+|                                                   |
+|  [Tablet/Kiosk] ---Wi-Fi---> [Access Point]      |
+|  [Badge Printer] ---USB/LAN--> [Gate PC]         |
+|  [QR Scanner] ---USB/BT--> [Gate PC/Tablet]      |
+|  [ANPR Camera] ---IP/PoE--> [NVR/Server]         |
+|  [Boom Barrier] ---Controller--> [ANPR System]   |
+|  [RFID Reader] ---UHF--> [Gate Controller]       |
++--------------------------------------------------+
+```
 
-### Files to Modify
-
-**1. `src/App.tsx`**
-- Add route: `/proposal-document`
-
-**2. `src/index.css`**
-- Add print styles for proposal document
-- A4 page sizing for proper PDF export
-- Page break rules for multi-page document
-
-### Design Specifications
-
-**Color Palette (matching existing branding):**
-- Primary gradient: Navy (#1e3a8a) -> Cyan (#0891b2) -> Emerald (#10b981)
-- Accent: Red (#dc2626) - RESL brand color
-- Text: Dark gray (#1f2937)
-- Backgrounds: White with subtle gray accents
-
-**Typography:**
-- Headings: Bold, larger sizes for hierarchy
-- Body: Clean, readable 11-12pt for print
-- Feature lists: Bullet points with icons
-
-**Print Optimization:**
-- A4 page size with 15mm margins
-- Page breaks before major sections
-- No background colors on print (optional toggle)
-- QR code linking to live demo/website
-
-## Feature Content Breakdown
-
-### 1. Visitor Management
-- Pre-registration and walk-in support
-- Host approval workflow with notifications
-- Photo capture and ID verification
-- Asset tracking (laptops, devices)
-- QR-based rapid check-in/check-out
-- Multi-channel badge delivery (WhatsApp, SMS, Email)
-
-### 2. Commercial Vehicle Management
-- Vehicle registration with driver details
-- In/Out trip logging and tracking
-- Material and purpose documentation
-- Vehicle-specific reporting
-
-### 3. Analytics Dashboard
-- Real-time KPI monitoring
-- Daily activity trends (Area Charts)
-- Location distribution (Pie Charts)
-- Top 10 frequent visitors
-- Exportable reports (CSV)
-
-### 4. Badge and Pass System
-- 100x150mm Safety Permit badges
-- Dual QR codes (Check-out + Navigation)
-- Company branding customization
-- Emergency contact display
-- Direct print and PDF export
-
-### 5. Mobile and PWA Experience
-- Installable Progressive Web App
-- 4-step self-service visitor wizard
-- Bottom navigation bar
-- Pull-to-refresh functionality
-- Haptic feedback on interactions
-- Swipe actions on visitor cards
-- iOS safe area support
-
-### 6. Organization Management
-- Multi-location facility support
-- Department management
-- Gate configuration with QR codes
-- Employee/host directory
-- Role-based access control (RBAC)
-
-### 7. Security Features
-- Supabase authentication
-- Row-level security (RLS)
-- Encrypted data storage
-- Audit logging
-
-## User Flow
-
-1. User navigates to `/proposal-document` (accessible from Help page or Settings)
-2. Document renders with all sections
-3. User clicks "Print" or "Save as PDF" button
-4. Browser print dialog opens
-5. User can print directly or choose "Save as PDF" destination
-
-## Technical Notes
-
-- Use inline styles for maximum print compatibility (following PrintBadge.tsx pattern)
-- Include CSS page-break-before/after for section control
-- Use system fonts for consistent cross-platform rendering
-- Optimize images for print resolution
-- Keep file size minimal for fast loading
+### Styling Approach
+- Each layer rendered as a colored box with rounded corners
+- Arrows between layers using styled divs with Unicode characters
+- Color coding: Blue for compute, green for database, orange for external, gray for network
+- Consistent with existing page design (primary color borders, muted backgrounds)
