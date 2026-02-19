@@ -158,6 +158,23 @@ export default function Help() {
                 </Button>
               </div>
             </CardContent>
+        </Card>
+
+          <Card className="bg-gradient-to-r from-amber-500/10 to-amber-500/5 border-amber-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                  <FileText className="h-6 w-6 text-amber-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground">Product Features & Specs</h3>
+                  <p className="text-sm text-muted-foreground">Detailed feature list & technical specifications</p>
+                </div>
+                <Button onClick={() => navigate('/product-features')} size="sm" variant="outline" className="gap-2 shrink-0">
+                  <FileText className="h-4 w-4" /> View
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         </div>
 

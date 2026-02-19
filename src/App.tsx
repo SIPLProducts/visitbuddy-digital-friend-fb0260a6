@@ -34,6 +34,7 @@ import GateQRCodes from "./pages/GateQRCodes";
 import ApproveVisitor from "./pages/ApproveVisitor";
 import ProposalDocument from "./pages/ProposalDocument";
 import ResourceRequirements from "./pages/ResourceRequirements";
+import ProductFeatures from "./pages/ProductFeatures";
 import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
@@ -110,6 +111,7 @@ const App = () => (
             <Route path="/proposal-document" element={<ProposalDocument />} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/resource-requirements" element={<ResourceRequirements />} />
+            <Route path="/product-features" element={<ProductFeatures />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
