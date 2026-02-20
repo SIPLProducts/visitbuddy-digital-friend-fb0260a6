@@ -35,6 +35,7 @@ import ApproveVisitor from "./pages/ApproveVisitor";
 import ProposalDocument from "./pages/ProposalDocument";
 import ResourceRequirements from "./pages/ResourceRequirements";
 import ProductFeatures from "./pages/ProductFeatures";
+import UserManual from "./pages/UserManual";
 import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
@@ -112,6 +113,7 @@ const App = () => (
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/resource-requirements" element={<ResourceRequirements />} />
             <Route path="/product-features" element={<ProductFeatures />} />
+            <Route path="/user-manual" element={<UserManual />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

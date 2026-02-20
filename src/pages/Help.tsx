@@ -20,6 +20,7 @@ import {
   Send,
   FileText,
   Server,
+  BookOpen,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -172,6 +173,23 @@ export default function Help() {
                 </div>
                 <Button onClick={() => navigate('/product-features')} size="sm" variant="outline" className="gap-2 shrink-0">
                   <FileText className="h-4 w-4" /> View
+                </Button>
+              </div>
+            </CardContent>
+           </Card>
+
+          <Card className="bg-gradient-to-r from-indigo-500/10 to-indigo-500/5 border-indigo-500/20">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0">
+                  <BookOpen className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground">User Manual</h3>
+                  <p className="text-sm text-muted-foreground">Step-by-step guide with storylines & screenshots</p>
+                </div>
+                <Button onClick={() => navigate('/user-manual')} size="sm" variant="outline" className="gap-2 shrink-0">
+                  <BookOpen className="h-4 w-4" /> View
                 </Button>
               </div>
             </CardContent>
