@@ -851,18 +851,6 @@ export default function UserManual() {
               </div>
             </ScreenMockup>
           </StorySection>
-
-          {/* Back Cover */}
-          <div className="mt-8 p-6 rounded-lg text-center text-white" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)' }}>
-            <div className="text-3xl font-bold mb-2">Sharvi</div>
-            <p className="text-white/80 text-sm">VisiGuard VMS — Enterprise Visitor & Vehicle Management</p>
-            <div className="flex justify-center gap-6 mt-4 text-[10px] text-white/60">
-              <span>📧 support@sharvi.com</span>
-              <span>🌐 www.sharvi.com</span>
-              <span>📞 +966-XX-XXX-XXXX</span>
-            </div>
-            <p className="text-[9px] text-white/40 mt-4">© {new Date().getFullYear()} Sharvi Technologies. All rights reserved.</p>
-          </div>
         </div>
 
       </div>
