@@ -853,6 +853,27 @@ export default function UserManual() {
           </StorySection>
         </div>
 
+        {/* End Page — Thank You */}
+        <div data-pdf-section className="proposal-page bg-white mx-auto shadow-lg print:shadow-none mb-8" style={{ width: '210mm', minHeight: '297mm', padding: '0' }}>
+          <div className="h-full flex flex-col items-center justify-center text-center" style={{ minHeight: '297mm', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0891b2 100%)' }}>
+            <div className="text-5xl mb-8 bg-white/90 rounded-lg px-6 py-3 font-bold" style={{ color: '#1e3a8a' }}>Sharvi</div>
+            <h1 className="text-4xl font-bold text-white mb-4">Thank You</h1>
+            <p className="text-lg text-white/80 mb-12">For choosing VisiGuard VMS</p>
+            <div className="bg-white/10 backdrop-blur rounded-xl p-8 max-w-md">
+              <h3 className="text-xl font-semibold text-white mb-4">Sharvi Infotech Pvt Ltd</h3>
+              <div className="space-y-3 text-white/80">
+                <p className="flex items-center justify-center gap-2 text-sm">
+                  <span>📧</span> info@sharviinfotech.com
+                </p>
+                <p className="flex items-center justify-center gap-2 text-sm">
+                  <span>📞</span> +91 88976 46530
+                </p>
+              </div>
+            </div>
+            <p className="text-white/40 text-xs mt-12">© {new Date().getFullYear()} Sharvi Infotech Pvt Ltd. All rights reserved.</p>
+          </div>
+        </div>
+
       </div>
     </div>
   );
