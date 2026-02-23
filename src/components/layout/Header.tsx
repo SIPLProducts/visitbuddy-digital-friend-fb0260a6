@@ -147,19 +147,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
       {/* Right side */}
       <div className="flex items-center gap-1 md:gap-4 flex-shrink-0">
-        <Link to="/visitors/new" className="hidden sm:block">
-          <Button className="gap-2 h-10">
-            <Plus className="h-4 w-4" />
-            <span className="hidden md:inline">New Visitor</span>
-          </Button>
-        </Link>
-
-        {/* Mobile: FAB for new visitor */}
-        <Link to="/visitors/new" className="sm:hidden">
-          <Button size="icon" className="h-10 w-10">
-            <Plus className="h-5 w-5" />
-          </Button>
-        </Link>
+        
 
         {/* Notifications */}
         <NotificationDropdown />
