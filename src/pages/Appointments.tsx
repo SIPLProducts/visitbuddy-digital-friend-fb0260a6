@@ -303,12 +303,6 @@ export default function Appointments() {
                           <Badge variant="outline" className={cn(getStatusColor(appointment.status))}>
                             {appointment.status}
                           </Badge>
-                          {appointment.has_teams_meeting && (
-                            <Badge variant="outline" className="gap-1">
-                              <Video className="h-3 w-3" />
-                              Teams
-                            </Badge>
-                          )}
                         </div>
                         <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
                           {appointment.company && (
@@ -492,13 +486,6 @@ export default function Appointments() {
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               />
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={formData.has_teams_meeting}
-                onCheckedChange={(v) => setFormData({ ...formData, has_teams_meeting: v })}
-              />
-              <Label>Include Teams Meeting</Label>
             </div>
           </div>
           <DialogFooter>
