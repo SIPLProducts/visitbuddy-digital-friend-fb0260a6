@@ -1,102 +1,114 @@
 
-# Architecture Diagram for VisiGuard VMS Infrastructure
 
-## Overview
-Add a new page (Page 6) to the Resource Requirements document with a visual architecture diagram that helps infrastructure teams understand the complete server and hardware setup required to run VisiGuard VMS smoothly.
+# Enhancements to Visitor and Vehicle Registration
 
-## What Will Be Added
+This plan covers 5 feature requests across the visitor and vehicle modules.
 
-### New Architecture Diagram Page
-A dedicated page inserted before the Manpower section containing:
+---
 
-1. **System Architecture Diagram** - A visual block diagram built with styled HTML/CSS boxes and connectors showing:
-   - **Internet/Client Layer**: Browsers, tablets, smartphones connecting via HTTPS
-   - **Load Balancer / Reverse Proxy**: Nginx/Caddy entry point
-   - **Application Layer**: VisiGuard Web App (React PWA) + Backend API (Edge Functions)
-   - **Database Layer**: PostgreSQL primary + Redis cache (optional)
-   - **Storage Layer**: File storage for badges, photos, documents
-   - **External Services**: Twilio (SMS/WhatsApp), Resend (Email), ANPR Camera feeds
-   - **Network Components**: Firewall, VPN (multi-site), DNS
+## 1. Accompanying Visitor Details Entry
 
-2. **Hardware Connectivity Diagram** - Shows physical connections at gate level:
-   - Gate Tablet/Kiosk connected to Wi-Fi AP
-   - Badge Printer (USB/Network)
-   - QR/Barcode Scanner (USB/Bluetooth)
-   - ANPR Camera (IP Network)
-   - Boom Barrier (Controller via ANPR)
-   - RFID Reader (UHF)
-   - All connecting back to the server via LAN/Wi-Fi
+**Current behavior:** When `accompanying_count > 0`, the system only stores a number.
 
-3. **Data Flow Summary Table** - A quick-reference table showing:
-   - Source to Destination
-   - Protocol/Port
-   - Purpose (e.g., "Browser to Server | HTTPS/443 | App access")
+**New behavior:** When the count is more than 0, dynamic form fields appear for each accompanying person to capture their name, phone number, and laptop details.
+
+### Changes:
+- **Database:** Create a new `accompanying_visitors` table with columns: `id`, `visitor_id` (FK to visitors), `name`, `phone`, `has_laptop`, `laptop_brand`, `laptop_serial`, `created_at`
+- **NewVisitor.tsx:** When `accompanying_count` changes to > 0, render dynamic rows for each person with Name, Phone, Has Laptop toggle, and conditional Laptop Brand/Serial fields
+- **VisitorEditDialog.tsx:** Same dynamic fields for editing accompanying visitors
+- **Types:** Add `AccompanyingVisitor` interface to `database.ts`
+
+---
+
+## 2. Updated Vehicle Types
+
+**Current list:** Truck, Van, Pickup, Trailer, Container, Tanker, Other
+
+**New list:** Car, Auto, TATA Ace, DCM, 20 Feet Container, 40 Feet Container, Truck, Van, Pickup, Trailer, Tanker, JCB, Forklift, Other
+
+### Changes:
+- **NewVehicle.tsx:** Update the `vehicleTypes` array with the new list
+
+---
+
+## 3. Driving License Entry for Vehicles
+
+**New behavior:** Add a "Driving License Number" field to the vehicle/driver registration form.
+
+### Changes:
+- **Database:** Add `driver_license` column (text, nullable) to the `vehicles` table
+- **NewVehicle.tsx:** Add a "Driving License No." input field in the Driver Information card
+- **Vehicle type:** Update `Vehicle` interface to include `driver_license`
+- **Vehicles.tsx:** Show license number in vehicle details/history dialog
+
+---
+
+## 4. Department Field for Vehicles
+
+**Current behavior:** Vehicle registration has no department association.
+
+**New behavior:** Add a Department dropdown to the vehicle registration form.
+
+### Changes:
+- **Database:** Add `department_id` column (uuid, nullable, FK to departments) to the `vehicles` table
+- **NewVehicle.tsx:** Fetch departments and add a Department dropdown in the Entry Details card
+- **Vehicle type:** Update `Vehicle` interface to include `department_id` and optional `department`
+- **Vehicles.tsx:** Show department in the vehicle table
+
+---
+
+## 5. Employee Car Auto-Allow
+
+**New behavior:** Add a way to register employee vehicles that are automatically allowed entry without manual check-in approval.
+
+### Changes:
+- **Database:** Add `is_employee_vehicle` (boolean, default false) and `employee_id` (uuid, nullable, FK to employees) columns to the `vehicles` table
+- **NewVehicle.tsx:** Add an "Employee Vehicle" toggle. When enabled, show an Employee dropdown to link the vehicle to an employee. These vehicles get `auto_allow = true` status
+- **Database:** Add `auto_allow` column (boolean, default false) to `vehicles` table
+- **Vehicles.tsx:** Show an "Auto" badge for employee vehicles; gate check-in logic can skip manual approval for these
+- **VehicleGate.tsx:** When scanning an auto-allow vehicle, automatically check it in without requiring manual confirmation
+
+---
 
 ## Technical Details
 
-### File to Modify
-- `src/pages/ResourceRequirements.tsx`
+### New Database Migration
 
-### Changes
-- Add a new `data-pdf-section` div between the Network/Client Requirements page (Page 4) and the Manpower page (Page 5)
-- The diagram will use pure HTML/CSS boxes with borders, background colors, and arrows (using CSS borders/pseudo-elements or Unicode arrows) for maximum PDF compatibility
-- No external charting library needed -- styled divs ensure html2canvas captures everything correctly
-- Consistent styling with existing pages (same border colors, fonts, section headers)
+```sql
+-- Accompanying visitors table
+CREATE TABLE public.accompanying_visitors (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  visitor_id uuid NOT NULL REFERENCES public.visitors(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  phone text,
+  has_laptop boolean DEFAULT false,
+  laptop_brand text,
+  laptop_serial text,
+  created_at timestamptz DEFAULT now()
+);
 
-### Diagram Layout (Vertical Flow)
+ALTER TABLE public.accompanying_visitors ENABLE ROW LEVEL SECURITY;
+-- RLS policies matching visitors table patterns
 
-```text
-+--------------------------------------------------+
-|              INTERNET / CLIENTS                   |
-|  [Browser] [Tablet] [Smartphone] [Self-Service]  |
-+--------------------------------------------------+
-                      |
-                  HTTPS / 443
-                      |
-+--------------------------------------------------+
-|         FIREWALL / WAF / DDoS Protection         |
-+--------------------------------------------------+
-                      |
-+--------------------------------------------------+
-|       LOAD BALANCER / REVERSE PROXY (Nginx)      |
-+--------------------------------------------------+
-              |                    |
-+-------------+------+  +---------+---------+
-| APPLICATION SERVER |  |  EDGE FUNCTIONS   |
-| React PWA (Static) |  | (API / Webhooks)  |
-+--------------------+  +-------------------+
-              |                    |
-+--------------------------------------------------+
-|              DATABASE LAYER                       |
-|  [PostgreSQL 15+]    [Redis Cache (optional)]    |
-+--------------------------------------------------+
-              |
-+--------------------------------------------------+
-|            FILE STORAGE / BACKUPS                 |
-|  [Badge Photos] [Documents] [NAS/S3 Backup]     |
-+--------------------------------------------------+
-
-+--------------------------------------------------+
-|          EXTERNAL INTEGRATIONS                    |
-|  [Twilio SMS/WA] [Resend Email] [Google Maps]   |
-+--------------------------------------------------+
-
---- GATE HARDWARE LAYOUT ---
-
-+--------------------------------------------------+
-|                 GATE SETUP                        |
-|                                                   |
-|  [Tablet/Kiosk] ---Wi-Fi---> [Access Point]      |
-|  [Badge Printer] ---USB/LAN--> [Gate PC]         |
-|  [QR Scanner] ---USB/BT--> [Gate PC/Tablet]      |
-|  [ANPR Camera] ---IP/PoE--> [NVR/Server]         |
-|  [Boom Barrier] ---Controller--> [ANPR System]   |
-|  [RFID Reader] ---UHF--> [Gate Controller]       |
-+--------------------------------------------------+
+-- Vehicle table additions
+ALTER TABLE public.vehicles
+  ADD COLUMN driver_license text,
+  ADD COLUMN department_id uuid REFERENCES public.departments(id),
+  ADD COLUMN is_employee_vehicle boolean DEFAULT false,
+  ADD COLUMN employee_id uuid REFERENCES public.employees(id),
+  ADD COLUMN auto_allow boolean DEFAULT false;
 ```
 
-### Styling Approach
-- Each layer rendered as a colored box with rounded corners
-- Arrows between layers using styled divs with Unicode characters
-- Color coding: Blue for compute, green for database, orange for external, gray for network
-- Consistent with existing page design (primary color borders, muted backgrounds)
+### Files to Create/Modify
+
+| File | Action |
+|------|--------|
+| Database migration | Create new table + alter vehicles |
+| `src/types/database.ts` | Add `AccompanyingVisitor` interface |
+| `src/types/vehicle.ts` | Add new vehicle fields |
+| `src/pages/NewVisitor.tsx` | Add dynamic accompanying visitor form |
+| `src/pages/NewVehicle.tsx` | Update vehicle types, add license/department/employee fields |
+| `src/pages/Vehicles.tsx` | Display new fields in table and dialogs |
+| `src/components/visitors/VisitorEditDialog.tsx` | Add accompanying visitor editing |
+| `src/pages/VehicleGate.tsx` | Auto-allow logic for employee vehicles |
+
