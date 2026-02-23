@@ -166,17 +166,48 @@ const handler = async (req: Request): Promise<Response> => {
 </html>
     `;
 
-    const { error } = await resend.emails.send({
+    // Try sending to the actual recipient first
+    let sendResult = await resend.emails.send({
       from: "VisiGuard <onboarding@resend.dev>",
       to: [email],
       subject: `Your Visitor Badge - ${visitorId}`,
       html: htmlContent,
     });
 
-    if (error) {
-      console.error("Resend error:", error);
+    // If domain not verified (sandbox mode), fall back to owner email
+    if (sendResult.error && sendResult.error.message?.includes("testing emails to your own email")) {
+      console.warn("Resend sandbox mode: redirecting email to owner address");
+      const ownerEmail = "bala@sharviinfotech.com";
+      sendResult = await resend.emails.send({
+        from: "VisiGuard <onboarding@resend.dev>",
+        to: [ownerEmail],
+        subject: `[Test] Visitor Badge for ${visitorName} - ${visitorId}`,
+        html: htmlContent,
+      });
+
+      if (sendResult.error) {
+        console.error("Resend error:", sendResult.error);
+        return new Response(
+          JSON.stringify({ error: "Failed to send email", details: sendResult.error.message }),
+          { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      console.log("Badge email sent to owner (sandbox mode):", ownerEmail);
       return new Response(
-        JSON.stringify({ error: "Failed to send email", details: error.message }),
+        JSON.stringify({ 
+          success: true, 
+          message: `Badge sent to ${ownerEmail} (sandbox mode). To send to any email, verify your domain at resend.com/domains.`,
+          sandbox: true
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (sendResult.error) {
+      console.error("Resend error:", sendResult.error);
+      return new Response(
+        JSON.stringify({ error: "Failed to send email", details: sendResult.error.message }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
