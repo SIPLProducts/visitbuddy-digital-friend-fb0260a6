@@ -96,7 +96,11 @@ export default function Appointments() {
     if (!selectedDate) return;
 
     setLoading(true);
-    const dateStr = selectedDate.toISOString().split('T')[0];
+    // Use local date to avoid timezone offset issues
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
 
     const { data } = await supabase
       .from('appointments')
@@ -123,7 +127,9 @@ export default function Appointments() {
       purpose: '',
       host_id: '',
       department_id: '',
-      scheduled_date: selectedDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
+      scheduled_date: selectedDate 
+        ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+        : `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
       scheduled_time: '10:00',
       duration_minutes: 60,
       has_teams_meeting: false,
@@ -249,12 +255,18 @@ export default function Appointments() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
-          <div className="bg-card rounded-xl border border-border p-4">
+          <div className="bg-card rounded-xl border border-border p-4 shadow-none">
             <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
               <Clock className="h-5 w-5" />
               Select Date
             </h3>
-            <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md" />
+            <Calendar 
+              mode="single" 
+              selected={selectedDate} 
+              onSelect={setSelectedDate} 
+              className="rounded-md"
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+            />
           </div>
 
           {/* Appointments List */}
@@ -275,9 +287,6 @@ export default function Appointments() {
                 <div className="p-12 text-center text-muted-foreground">
                   <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No appointments scheduled for this date</p>
-                  <Button variant="outline" className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
-                    Schedule Appointment
-                  </Button>
                 </div>
               ) : (
                 appointments.map((appointment) => (

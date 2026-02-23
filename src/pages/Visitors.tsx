@@ -254,7 +254,7 @@ export default function Visitors() {
           <Link to="/visitors/new">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              Pre-Register Visitor
+              New Visitor
             </Button>
           </Link>
         </div>
