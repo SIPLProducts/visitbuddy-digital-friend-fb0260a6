@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2, Smartphone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
@@ -35,6 +35,9 @@ const visitorSchema = z.object({
   has_laptop: z.boolean().default(false),
   laptop_brand: z.string().optional(),
   laptop_serial: z.string().optional(),
+  has_mobile: z.boolean().default(false),
+  mobile_brand: z.string().optional(),
+  mobile_serial: z.string().optional(),
   accompanying_count: z.number().min(0).max(50).default(0),
 });
 
@@ -46,6 +49,9 @@ interface AccompanyingPerson {
   has_laptop: boolean;
   laptop_brand: string;
   laptop_serial: string;
+  has_mobile: boolean;
+  mobile_brand: string;
+  mobile_serial: string;
 }
 
 export default function NewVisitor() {
@@ -68,11 +74,15 @@ export default function NewVisitor() {
       has_laptop: false,
       laptop_brand: '',
       laptop_serial: '',
+      has_mobile: false,
+      mobile_brand: '',
+      mobile_serial: '',
       accompanying_count: 0,
     },
   });
 
   const hasLaptop = form.watch('has_laptop');
+  const hasMobile = form.watch('has_mobile');
 
   useEffect(() => {
     fetchFormData();
@@ -114,6 +124,9 @@ export default function NewVisitor() {
       has_laptop: data.has_laptop,
       laptop_brand: data.has_laptop ? data.laptop_brand : null,
       laptop_serial: data.has_laptop ? data.laptop_serial : null,
+      has_mobile: data.has_mobile,
+      mobile_brand: data.has_mobile ? data.mobile_brand : null,
+      mobile_serial: data.has_mobile ? data.mobile_serial : null,
       accompanying_count: data.accompanying_count || 0,
       status: 'scheduled' as const,
     }]).select('id').single();
@@ -135,6 +148,9 @@ export default function NewVisitor() {
           has_laptop: p.has_laptop,
           laptop_brand: p.has_laptop ? p.laptop_brand || null : null,
           laptop_serial: p.has_laptop ? p.laptop_serial || null : null,
+          has_mobile: p.has_mobile,
+          mobile_brand: p.has_mobile ? p.mobile_brand || null : null,
+          mobile_serial: p.has_mobile ? p.mobile_serial || null : null,
         }));
 
       if (accompanyingData.length > 0) {
@@ -302,7 +318,7 @@ export default function NewVisitor() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setAccompanyingPersons([...accompanyingPersons, { name: '', phone: '', has_laptop: false, laptop_brand: '', laptop_serial: '' }]);
+                      setAccompanyingPersons([...accompanyingPersons, { name: '', phone: '', has_laptop: false, laptop_brand: '', laptop_serial: '', has_mobile: false, mobile_brand: '', mobile_serial: '' }]);
                       form.setValue('accompanying_count', accompanyingPersons.length + 1);
                     }}
                   >
@@ -389,6 +405,46 @@ export default function NewVisitor() {
                                 onChange={(e) => {
                                   const updated = [...accompanyingPersons];
                                   updated[index].laptop_serial = e.target.value;
+                                  setAccompanyingPersons(updated);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        {/* Mobile for accompanying person */}
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={person.has_mobile}
+                            onCheckedChange={(checked) => {
+                              const updated = [...accompanyingPersons];
+                              updated[index].has_mobile = checked;
+                              setAccompanyingPersons(updated);
+                            }}
+                          />
+                          <Label className="text-xs">Has Mobile</Label>
+                        </div>
+                        {person.has_mobile && (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Mobile Brand</Label>
+                              <Input
+                                placeholder="iPhone 15"
+                                value={person.mobile_brand}
+                                onChange={(e) => {
+                                  const updated = [...accompanyingPersons];
+                                  updated[index].mobile_brand = e.target.value;
+                                  setAccompanyingPersons(updated);
+                                }}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">IMEI / Serial</Label>
+                              <Input
+                                placeholder="35-123456-789012-3"
+                                value={person.mobile_serial}
+                                onChange={(e) => {
+                                  const updated = [...accompanyingPersons];
+                                  updated[index].mobile_serial = e.target.value;
                                   setAccompanyingPersons(updated);
                                 }}
                               />
@@ -484,45 +540,85 @@ export default function NewVisitor() {
             </CardContent>
           </Card>
 
-          {/* Laptop Details */}
+          {/* Device Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Laptop className="h-5 w-5" />
-                Laptop Information
+                Device Information
               </CardTitle>
               <CardDescription>
-                Register any laptops the visitor is carrying
+                Register laptops and mobile devices the visitor is carrying
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Switch
-                  checked={hasLaptop}
-                  onCheckedChange={(checked) => form.setValue('has_laptop', checked)}
-                />
-                <Label>Visitor has a laptop</Label>
-              </div>
-              {hasLaptop && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="laptop_brand">Laptop Brand/Model</Label>
-                    <Input
-                      id="laptop_brand"
-                      placeholder="Dell XPS 15"
-                      {...form.register('laptop_brand')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="laptop_serial">Serial Number</Label>
-                    <Input
-                      id="laptop_serial"
-                      placeholder="DELL-XPS-2024-ABC123"
-                      {...form.register('laptop_serial')}
-                    />
-                  </div>
+            <CardContent className="space-y-6">
+              {/* Laptop */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Switch
+                    checked={hasLaptop}
+                    onCheckedChange={(checked) => form.setValue('has_laptop', checked)}
+                  />
+                  <Label className="flex items-center gap-2">
+                    <Laptop className="h-4 w-4" /> Visitor has a laptop
+                  </Label>
                 </div>
-              )}
+                {hasLaptop && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="laptop_brand">Laptop Brand/Model</Label>
+                      <Input
+                        id="laptop_brand"
+                        placeholder="Dell XPS 15"
+                        {...form.register('laptop_brand')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="laptop_serial">Serial Number</Label>
+                      <Input
+                        id="laptop_serial"
+                        placeholder="DELL-XPS-2024-ABC123"
+                        {...form.register('laptop_serial')}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t" />
+
+              {/* Mobile */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <Switch
+                    checked={hasMobile}
+                    onCheckedChange={(checked) => form.setValue('has_mobile', checked)}
+                  />
+                  <Label className="flex items-center gap-2">
+                    <Smartphone className="h-4 w-4" /> Visitor has a mobile device
+                  </Label>
+                </div>
+                {hasMobile && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="mobile_brand">Mobile Brand/Model</Label>
+                      <Input
+                        id="mobile_brand"
+                        placeholder="iPhone 15 Pro"
+                        {...form.register('mobile_brand')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="mobile_serial">IMEI / Serial Number</Label>
+                      <Input
+                        id="mobile_serial"
+                        placeholder="35-123456-789012-3"
+                        {...form.register('mobile_serial')}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 

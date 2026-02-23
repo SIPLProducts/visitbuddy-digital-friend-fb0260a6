@@ -55,6 +55,9 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
     has_laptop: false,
     laptop_brand: '',
     laptop_serial: '',
+    has_mobile: false,
+    mobile_brand: '',
+    mobile_serial: '',
     accompanying_count: 0,
   });
 
@@ -71,6 +74,9 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         has_laptop: visitor.has_laptop || false,
         laptop_brand: visitor.laptop_brand || '',
         laptop_serial: visitor.laptop_serial || '',
+        has_mobile: (visitor as any).has_mobile || false,
+        mobile_brand: (visitor as any).mobile_brand || '',
+        mobile_serial: (visitor as any).mobile_serial || '',
         accompanying_count: visitor.accompanying_count || 0,
       });
     }
@@ -118,6 +124,9 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         has_laptop: formData.has_laptop,
         laptop_brand: formData.has_laptop ? formData.laptop_brand : null,
         laptop_serial: formData.has_laptop ? formData.laptop_serial : null,
+        has_mobile: formData.has_mobile,
+        mobile_brand: formData.has_mobile ? formData.mobile_brand : null,
+        mobile_serial: formData.has_mobile ? formData.mobile_serial : null,
         accompanying_count: formData.accompanying_count,
       })
       .eq('id', visitor.id);
@@ -269,6 +278,39 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
                     id="laptop_serial"
                     value={formData.laptop_serial}
                     onChange={(e) => setFormData({ ...formData, laptop_serial: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Section */}
+          <div className="border-t pt-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="has_mobile">Has Mobile Device</Label>
+              <Switch
+                id="has_mobile"
+                checked={formData.has_mobile}
+                onCheckedChange={(checked) => setFormData({ ...formData, has_mobile: checked })}
+              />
+            </div>
+            
+            {formData.has_mobile && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="mobile_brand">Mobile Brand/Model</Label>
+                  <Input
+                    id="mobile_brand"
+                    value={formData.mobile_brand}
+                    onChange={(e) => setFormData({ ...formData, mobile_brand: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="mobile_serial">IMEI / Serial Number</Label>
+                  <Input
+                    id="mobile_serial"
+                    value={formData.mobile_serial}
+                    onChange={(e) => setFormData({ ...formData, mobile_serial: e.target.value })}
                   />
                 </div>
               </div>

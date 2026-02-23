@@ -93,6 +93,9 @@ export interface Visitor {
   laptop_brand: string | null;
   laptop_serial: string | null;
   has_laptop: boolean;
+  has_mobile: boolean;
+  mobile_brand: string | null;
+  mobile_serial: string | null;
   status: VisitorStatus;
   check_in_time: string | null;
   check_out_time: string | null;
