@@ -67,6 +67,7 @@ const menuGroups = [
       { icon: MapPin, label: 'Locations', path: '/locations' },
       { icon: DoorOpen, label: 'Gates', path: '/gates' },
       { icon: ScanLine, label: 'Gate QR Codes', path: '/gate-qr-codes' },
+      { icon: Truck, label: 'Vehicle Types', path: '/vehicle-types' },
     ],
   },
   {
