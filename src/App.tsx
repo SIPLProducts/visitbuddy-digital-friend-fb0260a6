@@ -27,6 +27,7 @@ import Vehicles from "./pages/Vehicles";
 import NewVehicle from "./pages/NewVehicle";
 import VehicleGate from "./pages/VehicleGate";
 import VehicleReport from "./pages/VehicleReport";
+import VehicleTypes from "./pages/VehicleTypes";
 import NotFound from "./pages/NotFound";
 import SelfService from "./pages/SelfService";
 import Install from "./pages/Install";
@@ -108,6 +109,7 @@ const App = () => (
             <Route path="/vehicles/new" element={<ProtectedRoute><NewVehicle /></ProtectedRoute>} />
             <Route path="/vehicles/gate" element={<ProtectedRoute><VehicleGate /></ProtectedRoute>} />
             <Route path="/vehicles/report" element={<ProtectedRoute><VehicleReport /></ProtectedRoute>} />
+            <Route path="/vehicle-types" element={<ProtectedRoute><VehicleTypes /></ProtectedRoute>} />
             <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
             <Route path="/proposal-document" element={<ProposalDocument />} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />

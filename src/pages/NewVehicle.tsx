@@ -40,7 +40,10 @@ const vehicleSchema = z.object({
 
 type VehicleFormData = z.infer<typeof vehicleSchema>;
 
-const vehicleTypes = ['Car', 'Auto', 'TATA Ace', 'DCM', '20 Feet Container', '40 Feet Container', 'Truck', 'Van', 'Pickup', 'Trailer', 'Tanker', 'JCB', 'Forklift', 'Other'];
+interface VehicleTypeOption {
+  id: string;
+  name: string;
+}
 
 export default function NewVehicle() {
   const navigate = useNavigate();
@@ -50,6 +53,7 @@ export default function NewVehicle() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [vehicleTypes, setVehicleTypes] = useState<VehicleTypeOption[]>([]);
 
   const form = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleSchema),
@@ -70,17 +74,19 @@ export default function NewVehicle() {
   }, []);
 
   const fetchFormData = async () => {
-    const [gateRes, locRes, deptRes, empRes] = await Promise.all([
+    const [gateRes, locRes, deptRes, empRes, vtRes] = await Promise.all([
       supabase.from('gates').select('*').eq('status', 'active').order('name'),
       supabase.from('locations').select('*').eq('status', 'active').order('name'),
       supabase.from('departments').select('*').order('name'),
       supabase.from('employees').select('*, department:departments(id, name)').order('name'),
+      supabase.from('vehicle_types').select('id, name').eq('is_active', true).order('name'),
     ]);
 
     if (gateRes.data) setGates(gateRes.data as Gate[]);
     if (locRes.data) setLocations(locRes.data as Location[]);
     if (deptRes.data) setDepartments(deptRes.data as Department[]);
     if (empRes.data) setEmployees(empRes.data as unknown as Employee[]);
+    if (vtRes.data) setVehicleTypes(vtRes.data as VehicleTypeOption[]);
   };
 
   const generateVehicleId = () => {
@@ -214,8 +220,8 @@ export default function NewVehicle() {
                     </SelectTrigger>
                     <SelectContent>
                       {vehicleTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
+                        <SelectItem key={type.id} value={type.name}>
+                          {type.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
