@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users } from 'lucide-react';
+import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
@@ -40,6 +40,14 @@ const visitorSchema = z.object({
 
 type VisitorFormData = z.infer<typeof visitorSchema>;
 
+interface AccompanyingPerson {
+  name: string;
+  phone: string;
+  has_laptop: boolean;
+  laptop_brand: string;
+  laptop_serial: string;
+}
+
 export default function NewVisitor() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -47,6 +55,7 @@ export default function NewVisitor() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [gates, setGates] = useState<Gate[]>([]);
+  const [accompanyingPersons, setAccompanyingPersons] = useState<AccompanyingPerson[]>([]);
 
   const form = useForm<VisitorFormData>({
     resolver: zodResolver(visitorSchema),
@@ -92,7 +101,7 @@ export default function NewVisitor() {
     setLoading(true);
     const visitorId = generateVisitorId();
     
-    const { error } = await supabase.from('visitors').insert([{
+    const { data: insertedVisitor, error } = await supabase.from('visitors').insert([{
       visitor_id: visitorId,
       name: data.name,
       email: data.email || null,
@@ -107,12 +116,30 @@ export default function NewVisitor() {
       laptop_serial: data.has_laptop ? data.laptop_serial : null,
       accompanying_count: data.accompanying_count || 0,
       status: 'scheduled' as const,
-    }]);
+    }]).select('id').single();
 
     if (error) {
       setLoading(false);
       toast.error('Failed to register visitor');
       return;
+    }
+
+    // Save accompanying visitors
+    if (accompanyingPersons.length > 0 && insertedVisitor) {
+      const accompanyingData = accompanyingPersons
+        .filter(p => p.name.trim())
+        .map(p => ({
+          visitor_id: insertedVisitor.id,
+          name: p.name,
+          phone: p.phone || null,
+          has_laptop: p.has_laptop,
+          laptop_brand: p.has_laptop ? p.laptop_brand || null : null,
+          laptop_serial: p.has_laptop ? p.laptop_serial || null : null,
+        }));
+
+      if (accompanyingData.length > 0) {
+        await supabase.from('accompanying_visitors').insert(accompanyingData);
+      }
     }
 
     // Send WhatsApp badge if enabled and phone number provided
@@ -260,30 +287,127 @@ export default function NewVisitor() {
 
               {/* Accompanying Visitors */}
               <div className="p-4 rounded-lg bg-muted/50 border">
-                <div className="flex items-center gap-3 mb-3">
-                  <Users className="h-5 w-5 text-primary" />
-                  <div>
-                    <Label className="text-base font-medium">Accompanying Visitors</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Number of additional people with the main visitor
-                    </p>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-primary" />
+                    <div>
+                      <Label className="text-base font-medium">Accompanying Visitors</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Additional people with the main visitor
+                      </p>
+                    </div>
                   </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setAccompanyingPersons([...accompanyingPersons, { name: '', phone: '', has_laptop: false, laptop_brand: '', laptop_serial: '' }]);
+                      form.setValue('accompanying_count', accompanyingPersons.length + 1);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-1" /> Add Person
+                  </Button>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="number"
-                    min={0}
-                    max={50}
-                    className="w-24"
-                    {...form.register('accompanying_count', { valueAsNumber: true })}
-                  />
-                  <div className="text-sm text-muted-foreground">
+                
+                {accompanyingPersons.length > 0 && (
+                  <div className="space-y-3 mt-3">
+                    {accompanyingPersons.map((person, index) => (
+                      <div key={index} className="p-3 rounded-lg border bg-background space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Person {index + 1}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => {
+                              const updated = accompanyingPersons.filter((_, i) => i !== index);
+                              setAccompanyingPersons(updated);
+                              form.setValue('accompanying_count', updated.length);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs">Name *</Label>
+                            <Input
+                              placeholder="Full name"
+                              value={person.name}
+                              onChange={(e) => {
+                                const updated = [...accompanyingPersons];
+                                updated[index].name = e.target.value;
+                                setAccompanyingPersons(updated);
+                              }}
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Phone</Label>
+                            <Input
+                              placeholder="+91 98765 43210"
+                              value={person.phone}
+                              onChange={(e) => {
+                                const updated = [...accompanyingPersons];
+                                updated[index].phone = e.target.value;
+                                setAccompanyingPersons(updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Switch
+                            checked={person.has_laptop}
+                            onCheckedChange={(checked) => {
+                              const updated = [...accompanyingPersons];
+                              updated[index].has_laptop = checked;
+                              setAccompanyingPersons(updated);
+                            }}
+                          />
+                          <Label className="text-xs">Has Laptop</Label>
+                        </div>
+                        {person.has_laptop && (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Laptop Brand</Label>
+                              <Input
+                                placeholder="Dell XPS 15"
+                                value={person.laptop_brand}
+                                onChange={(e) => {
+                                  const updated = [...accompanyingPersons];
+                                  updated[index].laptop_brand = e.target.value;
+                                  setAccompanyingPersons(updated);
+                                }}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Serial Number</Label>
+                              <Input
+                                placeholder="SN-12345"
+                                value={person.laptop_serial}
+                                onChange={(e) => {
+                                  const updated = [...accompanyingPersons];
+                                  updated[index].laptop_serial = e.target.value;
+                                  setAccompanyingPersons(updated);
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {accompanyingPersons.length > 0 && (
+                  <div className="text-sm text-muted-foreground mt-2">
                     <span className="font-medium text-foreground">
-                      Total: {1 + (form.watch('accompanying_count') || 0)}
+                      Total: {1 + accompanyingPersons.length}
                     </span>
                     {' '}visitor(s)
                   </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

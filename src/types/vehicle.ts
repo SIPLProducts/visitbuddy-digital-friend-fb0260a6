@@ -17,11 +17,18 @@ export interface Vehicle {
   gate_id: string | null;
   location_id: string | null;
   qr_code: string | null;
+  driver_license: string | null;
+  department_id: string | null;
+  is_employee_vehicle: boolean;
+  employee_id: string | null;
+  auto_allow: boolean;
   created_at: string;
   updated_at: string;
   // Relations
   gate?: Gate;
   location?: Location;
+  department?: { id: string; name: string };
+  employee?: { id: string; name: string };
   // Entry count for display
   entry_count?: number;
   active_entry?: VehicleEntry | null;

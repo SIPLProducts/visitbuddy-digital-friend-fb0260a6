@@ -128,6 +128,17 @@ export interface Appointment {
   department?: Department;
 }
 
+export interface AccompanyingVisitor {
+  id: string;
+  visitor_id: string;
+  name: string;
+  phone: string | null;
+  has_laptop: boolean;
+  laptop_brand: string | null;
+  laptop_serial: string | null;
+  created_at: string;
+}
+
 export interface Notification {
   id: string;
   title: string;

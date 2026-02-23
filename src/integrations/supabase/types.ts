@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      accompanying_visitors: {
+        Row: {
+          created_at: string | null
+          has_laptop: boolean | null
+          id: string
+          laptop_brand: string | null
+          laptop_serial: string | null
+          name: string
+          phone: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          has_laptop?: boolean | null
+          id?: string
+          laptop_brand?: string | null
+          laptop_serial?: string | null
+          name: string
+          phone?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          has_laptop?: boolean | null
+          id?: string
+          laptop_brand?: string | null
+          laptop_serial?: string | null
+          name?: string
+          phone?: string | null
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accompanying_visitors_visitor_id_fkey"
+            columns: ["visitor_id"]
+            isOneToOne: false
+            referencedRelation: "visitors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           company: string | null
@@ -615,14 +656,19 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          auto_allow: boolean | null
           check_in_time: string | null
           check_out_time: string | null
           company: string | null
           created_at: string
+          department_id: string | null
+          driver_license: string | null
           driver_name: string
           driver_phone: string | null
+          employee_id: string | null
           gate_id: string | null
           id: string
+          is_employee_vehicle: boolean | null
           location_id: string | null
           purpose: string | null
           qr_code: string | null
@@ -633,14 +679,19 @@ export type Database = {
           vehicle_type: string
         }
         Insert: {
+          auto_allow?: boolean | null
           check_in_time?: string | null
           check_out_time?: string | null
           company?: string | null
           created_at?: string
+          department_id?: string | null
+          driver_license?: string | null
           driver_name: string
           driver_phone?: string | null
+          employee_id?: string | null
           gate_id?: string | null
           id?: string
+          is_employee_vehicle?: boolean | null
           location_id?: string | null
           purpose?: string | null
           qr_code?: string | null
@@ -651,14 +702,19 @@ export type Database = {
           vehicle_type?: string
         }
         Update: {
+          auto_allow?: boolean | null
           check_in_time?: string | null
           check_out_time?: string | null
           company?: string | null
           created_at?: string
+          department_id?: string | null
+          driver_license?: string | null
           driver_name?: string
           driver_phone?: string | null
+          employee_id?: string | null
           gate_id?: string | null
           id?: string
+          is_employee_vehicle?: boolean | null
           location_id?: string | null
           purpose?: string | null
           qr_code?: string | null
@@ -669,6 +725,20 @@ export type Database = {
           vehicle_type?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "vehicles_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "vehicles_gate_id_fkey"
             columns: ["gate_id"]
