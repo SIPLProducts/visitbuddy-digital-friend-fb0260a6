@@ -26,8 +26,16 @@ export default function Dashboard() {
     overstayed: 0,
   });
 
+  const getSelectedLocationId = () => localStorage.getItem('selectedLocationId') || '';
+
   useEffect(() => {
     fetchDashboardData();
+
+    const handleLocationChange = () => {
+      fetchDashboardData();
+    };
+    window.addEventListener('locationChanged', handleLocationChange);
+    return () => window.removeEventListener('locationChanged', handleLocationChange);
   }, []);
 
   const fetchDashboardData = async () => {

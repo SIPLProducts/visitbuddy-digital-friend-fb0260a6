@@ -245,7 +245,7 @@ export default function VehicleReport() {
       v.vehicle_number,
       v.vehicle_type,
       v.driver_name,
-      v.driver_phone || '',
+      `'${v.driver_phone || ''}`,
       v.company || '',
       v.purpose || '',
       v.location?.name || '',
@@ -287,8 +287,8 @@ export default function VehicleReport() {
     ];
     
     const sampleRows = [
-      ['KA-01-AB-1234', 'Truck', 'John Doe', '+919876543210', 'ABC Transport', 'Delivery'],
-      ['MH-02-CD-5678', 'Van', 'Jane Smith', '+919123456789', 'XYZ Logistics', 'Pickup'],
+      ['KA-01-AB-1234', 'Truck', 'John Doe', "'+919876543210", 'ABC Transport', 'Delivery'],
+      ['MH-02-CD-5678', 'Van', 'Jane Smith', "'+919123456789", 'XYZ Logistics', 'Pickup'],
     ];
 
     const csv = [

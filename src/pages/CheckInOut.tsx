@@ -56,11 +56,19 @@ export default function CheckInOut() {
       
       const checkedIn = typedData.filter((v) => v.status === 'checked_in').length;
       const scheduled = typedData.filter((v) => v.status === 'scheduled').length;
+
+      // Fetch checked out count for today
+      const today = new Date().toISOString().split('T')[0];
+      const { count: checkedOutCount } = await supabase
+        .from('visitors')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'checked_out')
+        .gte('check_out_time', today);
       
       setStats({
         checkedIn,
         scheduled,
-        checkedOut: 0,
+        checkedOut: checkedOutCount || 0,
       });
     }
   };

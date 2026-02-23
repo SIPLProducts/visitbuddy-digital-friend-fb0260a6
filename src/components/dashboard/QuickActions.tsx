@@ -3,8 +3,6 @@ import {
   UserPlus,
   QrCode,
   CalendarPlus,
-  Video,
-  Mail,
   FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -12,8 +10,8 @@ import { cn } from '@/lib/utils';
 const actions = [
   {
     icon: UserPlus,
-    label: 'Pre-Register',
-    description: 'Add new visitor',
+    label: 'New Visitor',
+    description: 'Register visitor',
     path: '/visitors/new',
     colorClass: 'bg-[#3b82f6] text-white hover:bg-[#2563eb]',
   },
@@ -28,21 +26,7 @@ const actions = [
     icon: CalendarPlus,
     label: 'Schedule',
     description: 'New appointment',
-    path: '/appointments/new',
-    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
-  },
-  {
-    icon: Video,
-    label: 'Teams Meet',
-    description: 'Create meeting',
-    path: '/appointments/new?meeting=true',
-    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
-  },
-  {
-    icon: Mail,
-    label: 'Send Invite',
-    description: 'Email invitation',
-    path: '/visitors/invite',
+    path: '/appointments',
     colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
   },
   {

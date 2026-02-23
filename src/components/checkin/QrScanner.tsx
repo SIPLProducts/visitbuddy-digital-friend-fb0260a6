@@ -145,14 +145,14 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         ref={containerRef}
         className={`mx-auto mb-4 overflow-hidden rounded-lg ${
           isScanning 
-            ? 'w-72 h-72' 
+            ? 'w-72 h-72 relative' 
             : 'w-48 h-48 bg-muted flex items-center justify-center'
         }`}
       >
         {/* This div is used by html5-qrcode */}
         <div 
           id="qr-reader" 
-          className={isScanning ? 'w-full h-full' : 'hidden'}
+          style={isScanning ? { width: '100%', height: '100%', minHeight: '288px' } : { display: 'none' }}
         />
         {!isScanning && !isInitializing && (
           <Camera className="h-16 w-16 text-muted-foreground" />
