@@ -18,9 +18,12 @@ export type Database = {
         Row: {
           created_at: string | null
           has_laptop: boolean | null
+          has_mobile: boolean | null
           id: string
           laptop_brand: string | null
           laptop_serial: string | null
+          mobile_brand: string | null
+          mobile_serial: string | null
           name: string
           phone: string | null
           visitor_id: string
@@ -28,9 +31,12 @@ export type Database = {
         Insert: {
           created_at?: string | null
           has_laptop?: boolean | null
+          has_mobile?: boolean | null
           id?: string
           laptop_brand?: string | null
           laptop_serial?: string | null
+          mobile_brand?: string | null
+          mobile_serial?: string | null
           name: string
           phone?: string | null
           visitor_id: string
@@ -38,9 +44,12 @@ export type Database = {
         Update: {
           created_at?: string | null
           has_laptop?: boolean | null
+          has_mobile?: boolean | null
           id?: string
           laptop_brand?: string | null
           laptop_serial?: string | null
+          mobile_brand?: string | null
+          mobile_serial?: string | null
           name?: string
           phone?: string | null
           visitor_id?: string
@@ -767,10 +776,13 @@ export type Database = {
           email: string | null
           gate_id: string | null
           has_laptop: boolean | null
+          has_mobile: boolean | null
           host_id: string | null
           id: string
           laptop_brand: string | null
           laptop_serial: string | null
+          mobile_brand: string | null
+          mobile_serial: string | null
           name: string
           phone: string | null
           photo_url: string | null
@@ -791,10 +803,13 @@ export type Database = {
           email?: string | null
           gate_id?: string | null
           has_laptop?: boolean | null
+          has_mobile?: boolean | null
           host_id?: string | null
           id?: string
           laptop_brand?: string | null
           laptop_serial?: string | null
+          mobile_brand?: string | null
+          mobile_serial?: string | null
           name: string
           phone?: string | null
           photo_url?: string | null
@@ -815,10 +830,13 @@ export type Database = {
           email?: string | null
           gate_id?: string | null
           has_laptop?: boolean | null
+          has_mobile?: boolean | null
           host_id?: string | null
           id?: string
           laptop_brand?: string | null
           laptop_serial?: string | null
+          mobile_brand?: string | null
+          mobile_serial?: string | null
           name?: string
           phone?: string | null
           photo_url?: string | null
