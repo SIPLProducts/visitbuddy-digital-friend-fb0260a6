@@ -45,8 +45,49 @@ export default function VehicleGate() {
     } else {
       setSelectedVehicle(data as unknown as Vehicle);
       await fetchVehicleEntries(data.id);
+      
+      // Auto-allow: automatically check in employee vehicles
+      if ((data as any).auto_allow && !(await hasActiveEntry(data.id))) {
+        await autoCheckIn(data as unknown as Vehicle);
+      }
     }
     setLoading(false);
+  };
+
+  const hasActiveEntry = async (vehicleId: string) => {
+    const { data } = await supabase
+      .from('vehicle_entries')
+      .select('id')
+      .eq('vehicle_id', vehicleId)
+      .is('exit_time', null)
+      .single();
+    return !!data;
+  };
+
+  const autoCheckIn = async (vehicle: Vehicle) => {
+    const { error } = await supabase
+      .from('vehicle_entries')
+      .insert({
+        vehicle_id: vehicle.id,
+        gate_id: vehicle.gate_id,
+        location_id: vehicle.location_id,
+        entry_time: new Date().toISOString(),
+        purpose: 'Employee vehicle - auto entry',
+      });
+
+    if (!error) {
+      await supabase
+        .from('vehicles')
+        .update({
+          status: 'checked_in',
+          check_in_time: new Date().toISOString(),
+          check_out_time: null,
+        })
+        .eq('id', vehicle.id);
+
+      toast.success(`✅ ${vehicle.vehicle_number} auto-checked in (employee vehicle)`);
+      await fetchVehicleEntries(vehicle.id);
+    }
   };
 
   const fetchVehicleEntries = async (vehicleId: string) => {
@@ -93,6 +134,11 @@ export default function VehicleGate() {
       setSelectedVehicle(vehicleData as unknown as Vehicle);
       await fetchVehicleEntries(vehicleData.id);
       toast.success(`Found: ${vehicleData.vehicle_number}`);
+      
+      // Auto-allow for employee vehicles
+      if ((vehicleData as any).auto_allow && !(await hasActiveEntry(vehicleData.id))) {
+        await autoCheckIn(vehicleData as unknown as Vehicle);
+      }
     }
     setLoading(false);
   };

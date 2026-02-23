@@ -53,7 +53,9 @@ export default function Vehicles() {
       .select(`
         *,
         gate:gates(*),
-        location:locations(*)
+        location:locations(*),
+        department:departments(id, name),
+        employee:employees(id, name)
       `)
       .order('created_at', { ascending: false });
 
@@ -186,13 +188,18 @@ export default function Vehicles() {
   };
 
   const getStatusBadge = (vehicle: Vehicle) => {
+    const badges = [];
+    if (vehicle.auto_allow) {
+      badges.push(<Badge key="auto" className="bg-purple-500/10 text-purple-600 border-purple-500/20">Auto</Badge>);
+    }
     if (vehicle.active_entry) {
-      return <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Inside</Badge>;
+      badges.push(<Badge key="status" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">Inside</Badge>);
+    } else if (vehicle.entry_count && vehicle.entry_count > 0) {
+      badges.push(<Badge key="status" className="bg-slate-500/10 text-slate-600 border-slate-500/20">Outside</Badge>);
+    } else {
+      badges.push(<Badge key="status" className="bg-blue-500/10 text-blue-600 border-blue-500/20">Registered</Badge>);
     }
-    if (vehicle.entry_count && vehicle.entry_count > 0) {
-      return <Badge className="bg-slate-500/10 text-slate-600 border-slate-500/20">Outside</Badge>;
-    }
-    return <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">Registered</Badge>;
+    return <div className="flex gap-1">{badges}</div>;
   };
 
   const formatDuration = (entry: VehicleEntry) => {

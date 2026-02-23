@@ -13,10 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, Truck, User, Phone, Building2, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Truck, User, Phone, Building2, MessageCircle, IdCard, Car } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/integrations/supabase/client';
-import { Gate, Location } from '@/types/database';
+import { Gate, Location, Department, Employee } from '@/types/database';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -27,15 +28,19 @@ const vehicleSchema = z.object({
   vehicle_type: z.string().min(1, 'Please select a vehicle type'),
   driver_name: z.string().min(2, 'Driver name must be at least 2 characters'),
   driver_phone: z.string().optional(),
+  driver_license: z.string().optional(),
   company: z.string().optional(),
   purpose: z.string().optional(),
   gate_id: z.string().optional(),
   location_id: z.string().optional(),
+  department_id: z.string().optional(),
+  is_employee_vehicle: z.boolean().default(false),
+  employee_id: z.string().optional(),
 });
 
 type VehicleFormData = z.infer<typeof vehicleSchema>;
 
-const vehicleTypes = ['Truck', 'Van', 'Pickup', 'Trailer', 'Container', 'Tanker', 'Other'];
+const vehicleTypes = ['Car', 'Auto', 'TATA Ace', 'DCM', '20 Feet Container', '40 Feet Container', 'Truck', 'Van', 'Pickup', 'Trailer', 'Tanker', 'JCB', 'Forklift', 'Other'];
 
 export default function NewVehicle() {
   const navigate = useNavigate();
@@ -43,6 +48,8 @@ export default function NewVehicle() {
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
 
   const form = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleSchema),
@@ -51,8 +58,10 @@ export default function NewVehicle() {
       vehicle_type: 'Truck',
       driver_name: '',
       driver_phone: '',
+      driver_license: '',
       company: '',
       purpose: '',
+      is_employee_vehicle: false,
     },
   });
 
@@ -61,13 +70,17 @@ export default function NewVehicle() {
   }, []);
 
   const fetchFormData = async () => {
-    const [gateRes, locRes] = await Promise.all([
+    const [gateRes, locRes, deptRes, empRes] = await Promise.all([
       supabase.from('gates').select('*').eq('status', 'active').order('name'),
       supabase.from('locations').select('*').eq('status', 'active').order('name'),
+      supabase.from('departments').select('*').order('name'),
+      supabase.from('employees').select('*, department:departments(id, name)').order('name'),
     ]);
 
     if (gateRes.data) setGates(gateRes.data as Gate[]);
     if (locRes.data) setLocations(locRes.data as Location[]);
+    if (deptRes.data) setDepartments(deptRes.data as Department[]);
+    if (empRes.data) setEmployees(empRes.data as unknown as Employee[]);
   };
 
   const generateVehicleId = () => {
@@ -80,16 +93,23 @@ export default function NewVehicle() {
     setLoading(true);
     const vehicleId = generateVehicleId();
 
+    const isEmployeeVehicle = data.is_employee_vehicle;
+    
     const { error } = await supabase.from('vehicles').insert([{
       vehicle_id: vehicleId,
       vehicle_number: data.vehicle_number.toUpperCase(),
       vehicle_type: data.vehicle_type,
       driver_name: data.driver_name,
       driver_phone: data.driver_phone || null,
+      driver_license: data.driver_license || null,
       company: data.company || null,
       purpose: data.purpose || null,
       gate_id: data.gate_id || null,
       location_id: data.location_id || null,
+      department_id: data.department_id || null,
+      is_employee_vehicle: isEmployeeVehicle,
+      employee_id: isEmployeeVehicle ? (data.employee_id || null) : null,
+      auto_allow: isEmployeeVehicle,
       status: 'registered',
     }]);
 
@@ -244,16 +264,30 @@ export default function NewVehicle() {
                   </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
-                <div className="relative">
-                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="company"
-                    placeholder="Transport Company Ltd."
-                    className="pl-10"
-                    {...form.register('company')}
-                  />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="driver_license">Driving License No.</Label>
+                  <div className="relative">
+                    <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="driver_license"
+                      placeholder="DL-1234567890"
+                      className="pl-10"
+                      {...form.register('driver_license')}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company">Company</Label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="company"
+                      placeholder="Transport Company Ltd."
+                      className="pl-10"
+                      {...form.register('company')}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -319,6 +353,21 @@ export default function NewVehicle() {
                 </div>
               </div>
               <div className="space-y-2">
+                <Label>Department</Label>
+                <Select onValueChange={(value) => form.setValue('department_id', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="purpose">Purpose of Visit</Label>
                 <Textarea
                   id="purpose"
@@ -326,6 +375,48 @@ export default function NewVehicle() {
                   {...form.register('purpose')}
                 />
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Employee Vehicle */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="h-5 w-5" />
+                Employee Vehicle
+              </CardTitle>
+              <CardDescription>
+                Mark as employee vehicle for auto-allow entry
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Switch
+                  checked={form.watch('is_employee_vehicle')}
+                  onCheckedChange={(checked) => {
+                    form.setValue('is_employee_vehicle', checked);
+                    if (!checked) form.setValue('employee_id', undefined);
+                  }}
+                />
+                <Label>This is an employee vehicle (auto-allow at gate)</Label>
+              </div>
+              {form.watch('is_employee_vehicle') && (
+                <div className="space-y-2">
+                  <Label>Link to Employee</Label>
+                  <Select onValueChange={(value) => form.setValue('employee_id', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employees.map((emp) => (
+                        <SelectItem key={emp.id} value={emp.id}>
+                          {emp.name} {emp.department ? `(${emp.department.name})` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </CardContent>
           </Card>
 
