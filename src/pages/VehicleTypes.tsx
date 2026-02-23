@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -21,9 +21,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Truck, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Truck, Plus, Pencil, Trash2, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { CsvImport, downloadCsvTemplate, parseCsvFile } from '@/components/shared/CsvImport';
+import { CsvImportResult, ImportResult, ImportError, validateRequired } from '@/components/shared/CsvImportResult';
 
 interface VehicleType {
   id: string;
@@ -42,6 +44,9 @@ export default function VehicleTypes() {
   const [formDescription, setFormDescription] = useState('');
   const [formActive, setFormActive] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importResultOpen, setImportResultOpen] = useState(false);
 
   useEffect(() => {
     fetchTypes();
@@ -156,6 +161,98 @@ export default function VehicleTypes() {
     }
   };
 
+  const handleExport = () => {
+    if (types.length === 0) {
+      toast.error('No data to export');
+      return;
+    }
+    const csv = [
+      ['Name', 'Description', 'Status'].join(','),
+      ...types.map((t) =>
+        [`"${t.name}"`, `"${t.description || ''}"`, t.is_active ? 'Active' : 'Inactive'].join(',')
+      ),
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vehicle_types.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Exported successfully');
+  };
+
+  const handleDownloadTemplate = () => {
+    downloadCsvTemplate(
+      ['Name', 'Description', 'Status'],
+      [['Crane', 'Heavy lifting vehicle', 'Active']],
+      'vehicle_types_template.csv'
+    );
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const errors: ImportError[] = [];
+    let success = 0;
+    let failed = 0;
+
+    try {
+      const text = await file.text();
+      const { headers, rows } = parseCsvFile(text);
+
+      const nameIdx = headers.indexOf('name');
+      const descIdx = headers.indexOf('description');
+      const statusIdx = headers.indexOf('status');
+
+      if (nameIdx === -1) {
+        toast.error('CSV must have a "Name" column');
+        setUploading(false);
+        event.target.value = '';
+        return;
+      }
+
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const name = row[nameIdx]?.trim();
+        const description = descIdx >= 0 ? row[descIdx]?.trim() || null : null;
+        const statusRaw = statusIdx >= 0 ? row[statusIdx]?.trim().toLowerCase() : 'active';
+        const is_active = statusRaw !== 'inactive';
+
+        const nameError = validateRequired(name, 'Name');
+        if (nameError) {
+          errors.push({ row: i + 2, field: 'Name', message: nameError, value: name });
+          failed++;
+          continue;
+        }
+
+        const { error } = await supabase
+          .from('vehicle_types')
+          .insert({ name: name!, description, is_active });
+
+        if (error) {
+          const msg = error.code === '23505' ? 'Duplicate name' : error.message;
+          errors.push({ row: i + 2, field: 'Name', message: msg, value: name });
+          failed++;
+        } else {
+          success++;
+        }
+      }
+
+      setImportResult({ success, failed, errors });
+      setImportResultOpen(true);
+      if (success > 0) fetchTypes();
+    } catch {
+      toast.error('Failed to parse CSV file');
+    }
+
+    setUploading(false);
+    event.target.value = '';
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -169,10 +266,22 @@ export default function VehicleTypes() {
               Manage vehicle type categories used during registration
             </p>
           </div>
-          <Button onClick={openAddDialog}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Vehicle Type
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+            <CsvImport
+              onFileUpload={handleFileUpload}
+              onDownloadTemplate={handleDownloadTemplate}
+              uploading={uploading}
+              templateName="Vehicle Types"
+            />
+            <Button onClick={openAddDialog}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Vehicle Type
+            </Button>
+          </div>
         </div>
 
         <Card>
@@ -267,6 +376,13 @@ export default function VehicleTypes() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <CsvImportResult
+          open={importResultOpen}
+          onOpenChange={setImportResultOpen}
+          result={importResult}
+          entityName="Vehicle Types"
+        />
       </div>
     </MainLayout>
   );
