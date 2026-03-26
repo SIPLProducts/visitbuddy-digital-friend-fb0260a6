@@ -1,13 +1,19 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer, Edit } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { SwipeableCard } from '@/components/shared/SwipeableCard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface RecentVisitorsProps {
   visitors: Visitor[];
