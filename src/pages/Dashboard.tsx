@@ -277,17 +277,16 @@ export default function Dashboard() {
             trend={{ value: '-8% from last week', positive: false }}
             iconColor="indigo"
           />
-          />
         </div>
 
         {/* Pending Approvals Widget */}
-        <PendingApprovals visitors={visitors} onRefresh={fetchDashboardData} />
+        <PendingApprovals visitors={filteredVisitors} onRefresh={fetchDashboardData} />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Visitors - Takes 2 columns */}
           <div className="lg:col-span-2">
-            <RecentVisitors visitors={visitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} onRefresh={fetchDashboardData} />
+            <RecentVisitors visitors={filteredVisitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} onRefresh={fetchDashboardData} />
           </div>
 
           {/* Quick Actions */}
