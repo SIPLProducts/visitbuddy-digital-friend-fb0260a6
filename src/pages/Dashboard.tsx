@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Users, Calendar, UserCheck, Clock } from 'lucide-react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Users, Calendar, UserCheck, Clock, MapPin, Filter, X, Zap } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -10,8 +10,18 @@ import { CombinedStats } from '@/components/dashboard/CombinedStats';
 import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor, Gate } from '@/types/database';
+import { Visitor, Gate, Location } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { subDays, startOfDay, isToday, isThisWeek } from 'date-fns';
 
 export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
