@@ -197,9 +197,35 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                         )}
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-popover border border-border z-50">
+                        <DropdownMenuItem onClick={() => navigate(`/visitors`)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                        {visitor.status === 'checked_in' && (
+                          <DropdownMenuItem onClick={() => handleCheckOut(visitor)}>
+                            <LogOut className="h-4 w-4 mr-2" />
+                            Check Out
+                          </DropdownMenuItem>
+                        )}
+                        {(visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
+                          <DropdownMenuItem onClick={() => handleCheckIn(visitor)}>
+                            <LogIn className="h-4 w-4 mr-2" />
+                            Check In
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => navigate(`/print-badge/${visitor.id}`)}>
+                          <Printer className="h-4 w-4 mr-2" />
+                          Print Badge
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </SwipeableCard>
