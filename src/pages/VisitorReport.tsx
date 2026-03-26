@@ -428,9 +428,10 @@ export default function VisitorReport() {
     setStatusFilter('all');
     setLocationFilter('all');
     setCompanyFilter('all');
+    setDepartmentFilter('all');
   };
 
-  const hasActiveFilters = searchQuery || statusFilter !== 'all' || locationFilter !== 'all' || companyFilter !== 'all';
+  const hasActiveFilters = searchQuery || statusFilter !== 'all' || locationFilter !== 'all' || companyFilter !== 'all' || departmentFilter !== 'all';
 
   return (
     <MainLayout>
