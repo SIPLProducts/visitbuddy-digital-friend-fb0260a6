@@ -42,6 +42,10 @@ export default function Visitors() {
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
+  const [checkInVisitor, setCheckInVisitor] = useState<Visitor | null>(null);
+  const [checkInLoading, setCheckInLoading] = useState(false);
+  const [checkInAndPrint, setCheckInAndPrint] = useState(false);
 
   useEffect(() => {
     fetchVisitors();
