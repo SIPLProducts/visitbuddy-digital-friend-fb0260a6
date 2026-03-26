@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar, UserCheck, Clock, MapPin, Filter, X, Zap } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Filter, X, Zap, CalendarDays } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate, Location } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Select,
   SelectContent,
@@ -20,8 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { subDays, startOfDay, isToday, isThisWeek } from 'date-fns';
+import { subDays, startOfDay, isToday, isThisWeek, format, isWithinInterval } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
