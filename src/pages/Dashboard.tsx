@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Filter, X, Zap, CalendarDays } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Filter, X, Zap, CalendarDays, Building2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -10,7 +10,7 @@ import { CombinedStats } from '@/components/dashboard/CombinedStats';
 import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor, Gate, Location } from '@/types/database';
+import { Visitor, Gate, Location, Department } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -37,6 +37,8 @@ export default function Dashboard() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeSmartFilter, setActiveSmartFilter] = useState<string>('today');
   const [locationFilter, setLocationFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [stats, setStats] = useState({
     todaysVisitors: 0,
@@ -52,6 +54,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetchDashboardData();
     fetchLocations();
+    fetchDepartments();
 
     const handleLocationChange = () => {
       fetchDashboardData();
@@ -63,6 +66,11 @@ export default function Dashboard() {
   const fetchLocations = async () => {
     const { data } = await supabase.from('locations').select('*').order('name');
     if (data) setLocations(data as Location[]);
+  };
+
+  const fetchDepartments = async () => {
+    const { data } = await supabase.from('departments').select('*').order('name');
+    if (data) setDepartments(data as Department[]);
   };
 
   const fetchDashboardData = async () => {
@@ -139,6 +147,11 @@ export default function Dashboard() {
       result = result.filter(v => v.gate?.location?.id === locationFilter);
     }
 
+    // Department filter
+    if (departmentFilter !== 'all') {
+      result = result.filter(v => v.department?.id === departmentFilter);
+    }
+
     // Smart filter
     switch (activeSmartFilter) {
       case 'today':
@@ -169,7 +182,7 @@ export default function Dashboard() {
     }
 
     return result;
-  }, [visitors, activeSmartFilter, locationFilter, dateRange]);
+  }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange]);
 
   // Filtered stats
   const filteredStats = useMemo(() => {
@@ -296,6 +309,18 @@ export default function Dashboard() {
                 <SelectItem value="all">All Locations</SelectItem>
                 {locations.map((loc) => (
                   <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="w-44 h-8 text-sm">
+                <Building2 className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                <SelectValue placeholder="All Departments" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border z-50 max-h-60">
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

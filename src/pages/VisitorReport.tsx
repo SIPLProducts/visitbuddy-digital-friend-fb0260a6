@@ -31,7 +31,7 @@ import {
   Filter, Crown, BarChart3, Briefcase, Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor, Location } from '@/types/database';
+import { Visitor, Location, Department } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes, isToday, isThisWeek, startOfMonth } from 'date-fns';
 import { toast } from 'sonner';
@@ -63,6 +63,8 @@ export default function VisitorReport() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
   const [companyFilter, setCompanyFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
@@ -78,6 +80,7 @@ export default function VisitorReport() {
 
   useEffect(() => {
     fetchLocations();
+    fetchDepartments();
   }, []);
 
   useEffect(() => {
@@ -94,6 +97,11 @@ export default function VisitorReport() {
     if (data) {
       setLocations(data as Location[]);
     }
+  };
+
+  const fetchDepartments = async () => {
+    const { data } = await supabase.from('departments').select('*').order('name');
+    if (data) setDepartments(data as Department[]);
   };
 
   const fetchVisitors = async () => {
@@ -396,7 +404,10 @@ export default function VisitorReport() {
     const matchesCompany =
       companyFilter === 'all' || visitor.company === companyFilter;
 
-    return matchesSearch && matchesStatus && matchesLocation && matchesCompany;
+    const matchesDepartment =
+      departmentFilter === 'all' || visitor.department?.id === departmentFilter;
+
+    return matchesSearch && matchesStatus && matchesLocation && matchesCompany && matchesDepartment;
   });
 
   const getStatusColor = (status: string) => {
@@ -417,9 +428,10 @@ export default function VisitorReport() {
     setStatusFilter('all');
     setLocationFilter('all');
     setCompanyFilter('all');
+    setDepartmentFilter('all');
   };
 
-  const hasActiveFilters = searchQuery || statusFilter !== 'all' || locationFilter !== 'all' || companyFilter !== 'all';
+  const hasActiveFilters = searchQuery || statusFilter !== 'all' || locationFilter !== 'all' || companyFilter !== 'all' || departmentFilter !== 'all';
 
   return (
     <MainLayout>
@@ -960,6 +972,21 @@ export default function VisitorReport() {
                   {locations.map((location) => (
                     <SelectItem key={location.id} value={location.id}>
                       {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                <SelectTrigger className="w-48">
+                  <Building2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="All Departments" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border z-50 max-h-60">
+                  <SelectItem value="all">All Departments</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept.id} value={dept.id}>
+                      {dept.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
