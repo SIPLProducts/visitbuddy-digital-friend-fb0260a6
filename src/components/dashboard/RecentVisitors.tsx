@@ -1,13 +1,19 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer, Edit } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { SwipeableCard } from '@/components/shared/SwipeableCard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface RecentVisitorsProps {
   visitors: Visitor[];
@@ -15,6 +21,7 @@ interface RecentVisitorsProps {
 }
 
 export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
+  const navigate = useNavigate();
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
@@ -190,9 +197,35 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                         )}
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-popover border border-border z-50">
+                        <DropdownMenuItem onClick={() => navigate(`/visitors`)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                        {visitor.status === 'checked_in' && (
+                          <DropdownMenuItem onClick={() => handleCheckOut(visitor)}>
+                            <LogOut className="h-4 w-4 mr-2" />
+                            Check Out
+                          </DropdownMenuItem>
+                        )}
+                        {(visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
+                          <DropdownMenuItem onClick={() => handleCheckIn(visitor)}>
+                            <LogIn className="h-4 w-4 mr-2" />
+                            Check In
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => navigate(`/print-badge/${visitor.id}`)}>
+                          <Printer className="h-4 w-4 mr-2" />
+                          Print Badge
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </SwipeableCard>
