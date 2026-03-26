@@ -72,8 +72,6 @@ export default function Dashboard() {
     const { data } = await supabase.from('departments').select('*').order('name');
     if (data) setDepartments(data as Department[]);
   };
-    if (data) setLocations(data as Location[]);
-  };
 
   const fetchDashboardData = async () => {
     const today = new Date().toISOString().split('T')[0];
