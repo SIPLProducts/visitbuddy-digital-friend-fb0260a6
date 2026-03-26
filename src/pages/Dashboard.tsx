@@ -202,35 +202,81 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Smart Filters Bar */}
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-card border">
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Zap className="h-4 w-4 text-primary" />
+            Smart Filters:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {smartFilters.map((filter) => (
+              <Button
+                key={filter.id}
+                variant={activeSmartFilter === filter.id ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveSmartFilter(filter.id)}
+                className={cn(
+                  'gap-1.5 transition-all',
+                  activeSmartFilter === filter.id && 'shadow-md'
+                )}
+              >
+                <filter.icon className="h-3.5 w-3.5" />
+                {filter.label}
+                <Badge variant="secondary" className={cn(
+                  'ml-1 h-5 min-w-[20px] flex items-center justify-center text-[10px] font-bold px-1.5',
+                  activeSmartFilter === filter.id ? 'bg-primary-foreground/20 text-primary-foreground' : ''
+                )}>
+                  {filter.count}
+                </Badge>
+              </Button>
+            ))}
+          </div>
+          <div className="ml-auto">
+            <Select value={locationFilter} onValueChange={setLocationFilter}>
+              <SelectTrigger className="w-44 h-8 text-sm">
+                <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                <SelectValue placeholder="All Locations" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border z-50">
+                <SelectItem value="all">All Locations</SelectItem>
+                {locations.map((loc) => (
+                  <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Today's Visitors"
-            value={stats.todaysVisitors}
+            value={filteredStats.todaysVisitors}
             icon={<Users className="h-6 w-6" />}
             trend={{ value: '+12% from yesterday', positive: true }}
             iconColor="blue"
           />
           <StatCard
             title="Scheduled Appointments"
-            value={stats.scheduledAppointments}
-            subtitle={`${stats.pendingApproval} pending approval`}
+            value={filteredStats.scheduledAppointments}
+            subtitle={`${filteredStats.pendingApproval} pending approval`}
             icon={<Calendar className="h-6 w-6" />}
             iconColor="teal"
           />
           <StatCard
             title="Active Check-ins"
-            value={stats.activeCheckIns}
-            subtitle={`${stats.overstayed} overstayed`}
+            value={filteredStats.activeCheckIns}
+            subtitle={`${filteredStats.overstayed} overstayed`}
             icon={<UserCheck className="h-6 w-6" />}
             iconColor="emerald"
           />
           <StatCard
             title="Avg. Visit Duration"
-            value={stats.avgVisitDuration || '1h 24m'}
+            value={filteredStats.avgVisitDuration}
             icon={<Clock className="h-6 w-6" />}
             trend={{ value: '-8% from last week', positive: false }}
             iconColor="indigo"
+          />
           />
         </div>
 
