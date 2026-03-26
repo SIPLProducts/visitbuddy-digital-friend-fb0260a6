@@ -7,7 +7,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Visitor } from '@/types/database';
-import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin } from 'lucide-react';
+import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface VisitorDetailsDialogProps {
