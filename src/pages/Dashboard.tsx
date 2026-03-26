@@ -10,7 +10,7 @@ import { CombinedStats } from '@/components/dashboard/CombinedStats';
 import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor, Gate, Location } from '@/types/database';
+import { Visitor, Gate, Location, Department } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
