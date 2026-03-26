@@ -8,7 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Shield, Users, Building2, CheckCircle2, Loader2, Crown } from 'lucide-react';
+import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown } from 'lucide-react';
+import authHero from '@/assets/auth-hero.jpg';
+import authCheckin from '@/assets/auth-checkin.jpg';
+import authAccess from '@/assets/auth-access.jpg';
+import authBadge from '@/assets/auth-badge.jpg';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
