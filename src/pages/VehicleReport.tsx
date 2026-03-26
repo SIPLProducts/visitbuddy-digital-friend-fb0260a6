@@ -28,7 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   FileText, Search, Download, Truck, LogIn, LogOut, Clock, 
   CalendarIcon, Upload, FileDown, MapPin, TrendingUp, BarChart3,
-  Filter, Building2
+  Filter, Building2, Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle } from '@/types/vehicle';
