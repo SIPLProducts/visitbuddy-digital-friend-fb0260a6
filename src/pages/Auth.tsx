@@ -32,10 +32,10 @@ const signupSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 type SignupFormData = z.infer<typeof signupSchema>;
 
-const features = [
-  { icon: Shield, title: 'Secure Access Control', description: 'Enterprise-grade security for your facilities' },
-  { icon: Users, title: 'Visitor Management', description: 'Streamlined check-in and tracking' },
-  { icon: Building2, title: 'Multi-Location Support', description: 'Manage all your sites from one platform' },
+const featureImages = [
+  { src: authCheckin, title: 'Visitor Check-In', description: 'Digital kiosk registration' },
+  { src: authAccess, title: 'Access Control', description: 'Secure gate management' },
+  { src: authBadge, title: 'Badge Management', description: 'Instant badge printing' },
 ];
 
 // Demo users for client demonstration
