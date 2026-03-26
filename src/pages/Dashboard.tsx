@@ -184,7 +184,7 @@ export default function Dashboard() {
     }
 
     return result;
-  }, [visitors, activeSmartFilter, locationFilter, dateRange]);
+  }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange]);
 
   // Filtered stats
   const filteredStats = useMemo(() => {
