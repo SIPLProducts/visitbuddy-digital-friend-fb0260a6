@@ -7,7 +7,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Visitor } from '@/types/database';
-import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin } from 'lucide-react';
+import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface VisitorDetailsDialogProps {
@@ -148,7 +148,16 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
                 </div>
               )}
             </div>
-          </div>
+            </div>
+            {(visitor as any).govt_id_number && (
+              <div>
+                <p className="text-xs text-muted-foreground">Govt ID Number</p>
+                <p className="text-sm font-medium flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3" />
+                  {(visitor as any).govt_id_number}
+                </p>
+              </div>
+            )}
 
           {/* Check-in/out Times */}
           <div className="border-t pt-4 space-y-3">
