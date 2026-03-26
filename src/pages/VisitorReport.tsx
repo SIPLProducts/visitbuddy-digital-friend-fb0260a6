@@ -404,7 +404,10 @@ export default function VisitorReport() {
     const matchesCompany =
       companyFilter === 'all' || visitor.company === companyFilter;
 
-    return matchesSearch && matchesStatus && matchesLocation && matchesCompany;
+    const matchesDepartment =
+      departmentFilter === 'all' || visitor.department?.id === departmentFilter;
+
+    return matchesSearch && matchesStatus && matchesLocation && matchesCompany && matchesDepartment;
   });
 
   const getStatusColor = (status: string) => {
