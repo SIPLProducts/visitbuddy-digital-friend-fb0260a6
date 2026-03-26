@@ -21,6 +21,7 @@ interface RecentVisitorsProps {
 }
 
 export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
+  const navigate = useNavigate();
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
