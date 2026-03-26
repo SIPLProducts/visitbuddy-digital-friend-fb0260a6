@@ -802,6 +802,7 @@ export type Database = {
           department_id: string | null
           email: string | null
           gate_id: string | null
+          govt_id_number: string | null
           has_laptop: boolean | null
           has_mobile: boolean | null
           host_id: string | null
@@ -829,6 +830,7 @@ export type Database = {
           department_id?: string | null
           email?: string | null
           gate_id?: string | null
+          govt_id_number?: string | null
           has_laptop?: boolean | null
           has_mobile?: boolean | null
           host_id?: string | null
@@ -856,6 +858,7 @@ export type Database = {
           department_id?: string | null
           email?: string | null
           gate_id?: string | null
+          govt_id_number?: string | null
           has_laptop?: boolean | null
           has_mobile?: boolean | null
           host_id?: string | null

@@ -29,6 +29,7 @@ import { VisitorDetailsDialog } from '@/components/visitors/VisitorDetailsDialog
 import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
 import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
+import { CheckInDialog } from '@/components/visitors/CheckInDialog';
 
 export default function Visitors() {
   const navigate = useNavigate();
@@ -41,6 +42,10 @@ export default function Visitors() {
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
+  const [checkInVisitor, setCheckInVisitor] = useState<Visitor | null>(null);
+  const [checkInLoading, setCheckInLoading] = useState(false);
+  const [checkInAndPrint, setCheckInAndPrint] = useState(false);
 
   useEffect(() => {
     fetchVisitors();
@@ -79,39 +84,46 @@ export default function Visitors() {
     window.open(`/print-badge?id=${visitor.id}`, '_blank');
   };
 
-  const handleCheckIn = async (visitor: Visitor) => {
-    const { error } = await supabase
-      .from('visitors')
-      .update({
-        status: 'checked_in',
-        check_in_time: new Date().toISOString(),
-      })
-      .eq('id', visitor.id);
-
-    if (error) {
-      toast.error('Failed to check in visitor');
-    } else {
-      toast.success(`${visitor.name} checked in successfully`);
-      fetchVisitors();
-    }
+  const handleCheckIn = (visitor: Visitor) => {
+    setCheckInVisitor(visitor);
+    setCheckInAndPrint(false);
+    setCheckInDialogOpen(true);
   };
 
-  const handleCheckInAndPrint = async (visitor: Visitor) => {
+  const handleCheckInAndPrint = (visitor: Visitor) => {
+    setCheckInVisitor(visitor);
+    setCheckInAndPrint(true);
+    setCheckInDialogOpen(true);
+  };
+
+  const handleConfirmCheckIn = async (govtIdNumber: string) => {
+    if (!checkInVisitor) return;
+    setCheckInLoading(true);
+
     const { error } = await supabase
       .from('visitors')
       .update({
-        status: 'checked_in',
+        status: 'checked_in' as const,
         check_in_time: new Date().toISOString(),
+        govt_id_number: govtIdNumber,
       })
-      .eq('id', visitor.id);
+      .eq('id', checkInVisitor.id);
+
+    setCheckInLoading(false);
 
     if (error) {
       toast.error('Failed to check in visitor');
       return;
     }
 
-    toast.success(`${visitor.name} checked in successfully`);
-    window.open(`/print-badge?id=${visitor.id}`, '_blank');
+    toast.success(`${checkInVisitor.name} checked in successfully`);
+    setCheckInDialogOpen(false);
+
+    if (checkInAndPrint) {
+      window.open(`/print-badge?id=${checkInVisitor.id}`, '_blank');
+    }
+
+    setCheckInVisitor(null);
     fetchVisitors();
   };
 
@@ -451,6 +463,13 @@ export default function Visitors() {
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         onSave={fetchVisitors}
+      />
+      <CheckInDialog
+        open={checkInDialogOpen}
+        onOpenChange={setCheckInDialogOpen}
+        visitorName={checkInVisitor?.name || ''}
+        onConfirm={handleConfirmCheckIn}
+        loading={checkInLoading}
       />
     </MainLayout>
   );
