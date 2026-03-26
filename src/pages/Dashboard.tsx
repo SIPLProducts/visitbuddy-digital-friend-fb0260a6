@@ -249,7 +249,44 @@ export default function Dashboard() {
               </Button>
             ))}
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className={cn(
+                  "gap-1.5 h-8 text-sm",
+                  dateRange?.from && "border-primary text-primary"
+                )}>
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>{format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM")}</>
+                    ) : format(dateRange.from, "dd MMM yyyy")
+                  ) : "Date Range"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-popover" align="end">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+                <div className="border-t p-3 flex gap-2 flex-wrap">
+                  <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}>
+                    Last 7 days
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}>
+                    Last 30 days
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setDateRange(undefined)} className="text-destructive">
+                    Clear
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Select value={locationFilter} onValueChange={setLocationFilter}>
               <SelectTrigger className="w-44 h-8 text-sm">
                 <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
