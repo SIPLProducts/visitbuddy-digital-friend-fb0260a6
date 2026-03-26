@@ -161,7 +161,6 @@ export default function Auth() {
         </div>
 
         {/* Footer */}
-        <div className="relative z-10">
         <div className="relative z-10 space-y-1">
           <p className="text-white/50 text-xs">© {new Date().getFullYear()} Sharvi Infotech. All rights reserved.</p>
           <p className="text-white/40 text-xs">Powered by Sharvi Infotech</p>
