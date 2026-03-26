@@ -28,12 +28,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   FileText, Search, Download, Users, UserCheck, UserX, Laptop, 
   CalendarIcon, Upload, FileDown, MapPin, TrendingUp, Building2,
-  Filter, Crown, BarChart3, Briefcase
+  Filter, Crown, BarChart3, Briefcase, Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location } from '@/types/database';
 import { cn } from '@/lib/utils';
-import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes } from 'date-fns';
+import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes, isToday, isThisWeek, startOfMonth } from 'date-fns';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
 import {
@@ -854,19 +854,60 @@ export default function VisitorReport() {
           </CardContent>
         </Card>
 
+        {/* Smart Filters */}
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-card border">
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Zap className="h-4 w-4 text-primary" />
+            Quick Filters:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: 'Currently Inside', value: 'checked_in', count: stats.checkedIn, icon: UserCheck },
+              { label: 'Checked Out', value: 'checked_out', count: stats.checkedOut, icon: UserX },
+              { label: 'Scheduled', value: 'scheduled', count: visitors.filter(v => v.status === 'scheduled').length, icon: CalendarIcon },
+              { label: 'Pending', value: 'pending_approval', count: visitors.filter(v => v.status === 'pending_approval').length, icon: Crown },
+              { label: 'With Laptop', value: 'with_laptop', count: stats.withLaptop, icon: Laptop },
+            ].map((chip) => (
+              <Button
+                key={chip.value}
+                variant={statusFilter === chip.value || (chip.value === 'with_laptop' && searchQuery === '__laptop__') ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => {
+                  if (chip.value === 'with_laptop') {
+                    // No direct status match, skip
+                    return;
+                  }
+                  setStatusFilter(statusFilter === chip.value ? 'all' : chip.value);
+                }}
+                className="gap-1.5"
+              >
+                <chip.icon className="h-3.5 w-3.5" />
+                {chip.label}
+                <Badge variant="secondary" className={cn(
+                  'ml-1 h-5 min-w-[20px] flex items-center justify-center text-[10px] font-bold px-1.5',
+                  statusFilter === chip.value ? 'bg-primary-foreground/20 text-primary-foreground' : ''
+                )}>
+                  {chip.count}
+                </Badge>
+              </Button>
+            ))}
+          </div>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="ml-auto text-muted-foreground gap-1">
+              <Filter className="h-3.5 w-3.5" />
+              Clear all
+            </Button>
+          )}
+        </div>
+
         {/* Filters Section */}
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center justify-between text-lg">
               <span className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-primary" />
-                Filters & Search
+                <Search className="h-5 w-5 text-primary" />
+                Search & Filter
               </span>
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground">
-                  Clear all
-                </Button>
-              )}
             </CardTitle>
           </CardHeader>
           <CardContent>

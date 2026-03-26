@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Users, Calendar, UserCheck, Clock } from 'lucide-react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Users, Calendar, UserCheck, Clock, MapPin, Filter, X, Zap } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -10,13 +10,26 @@ import { CombinedStats } from '@/components/dashboard/CombinedStats';
 import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor, Gate } from '@/types/database';
+import { Visitor, Gate, Location } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { subDays, startOfDay, isToday, isThisWeek } from 'date-fns';
 
 export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [gates, setGates] = useState<Gate[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [activeSmartFilter, setActiveSmartFilter] = useState<string>('today');
+  const [locationFilter, setLocationFilter] = useState('all');
   const [stats, setStats] = useState({
     todaysVisitors: 0,
     scheduledAppointments: 0,
@@ -30,6 +43,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboardData();
+    fetchLocations();
 
     const handleLocationChange = () => {
       fetchDashboardData();
@@ -37,6 +51,11 @@ export default function Dashboard() {
     window.addEventListener('locationChanged', handleLocationChange);
     return () => window.removeEventListener('locationChanged', handleLocationChange);
   }, []);
+
+  const fetchLocations = async () => {
+    const { data } = await supabase.from('locations').select('*').order('name');
+    if (data) setLocations(data as Location[]);
+  };
 
   const fetchDashboardData = async () => {
     const today = new Date().toISOString().split('T')[0];
@@ -103,6 +122,63 @@ export default function Dashboard() {
     setRefreshKey(prev => prev + 1);
   }, []);
 
+  // Smart filtered visitors
+  const filteredVisitors = useMemo(() => {
+    let result = visitors;
+
+    // Location filter
+    if (locationFilter !== 'all') {
+      result = result.filter(v => v.gate?.location?.id === locationFilter);
+    }
+
+    // Smart filter
+    switch (activeSmartFilter) {
+      case 'today':
+        result = result.filter(v => isToday(new Date(v.created_at)));
+        break;
+      case 'this_week':
+        result = result.filter(v => isThisWeek(new Date(v.created_at)));
+        break;
+      case 'inside':
+        result = result.filter(v => v.status === 'checked_in');
+        break;
+      case 'pending':
+        result = result.filter(v => v.status === 'pending_approval');
+        break;
+      case 'checked_out':
+        result = result.filter(v => v.status === 'checked_out');
+        break;
+    }
+
+    return result;
+  }, [visitors, activeSmartFilter, locationFilter]);
+
+  // Filtered stats
+  const filteredStats = useMemo(() => {
+    const todaysVisitors = filteredVisitors.filter(v => isToday(new Date(v.created_at))).length;
+    const activeCheckIns = filteredVisitors.filter(v => v.status === 'checked_in').length;
+    const pendingApproval = filteredVisitors.filter(v => v.status === 'pending_approval').length;
+    const checkedOut = filteredVisitors.filter(v => v.status === 'checked_out').length;
+
+    return {
+      todaysVisitors,
+      activeCheckIns,
+      pendingApproval,
+      checkedOut,
+      scheduledAppointments: stats.scheduledAppointments,
+      avgVisitDuration: stats.avgVisitDuration || '1h 24m',
+      overstayed: stats.overstayed,
+    };
+  }, [filteredVisitors, stats]);
+
+  const smartFilters = [
+    { id: 'today', label: "Today's", icon: Calendar, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
+    { id: 'this_week', label: 'This Week', icon: Calendar, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
+    { id: 'inside', label: 'Currently Inside', icon: UserCheck, count: visitors.filter(v => v.status === 'checked_in').length },
+    { id: 'pending', label: 'Pending', icon: Clock, count: visitors.filter(v => v.status === 'pending_approval').length },
+    { id: 'checked_out', label: 'Checked Out', icon: Users, count: visitors.filter(v => v.status === 'checked_out').length },
+  ];
+
   return (
     <MainLayout>
       <PullToRefresh onRefresh={handleRefresh}>
@@ -126,32 +202,77 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Smart Filters Bar */}
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-card border">
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Zap className="h-4 w-4 text-primary" />
+            Smart Filters:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {smartFilters.map((filter) => (
+              <Button
+                key={filter.id}
+                variant={activeSmartFilter === filter.id ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveSmartFilter(filter.id)}
+                className={cn(
+                  'gap-1.5 transition-all',
+                  activeSmartFilter === filter.id && 'shadow-md'
+                )}
+              >
+                <filter.icon className="h-3.5 w-3.5" />
+                {filter.label}
+                <Badge variant="secondary" className={cn(
+                  'ml-1 h-5 min-w-[20px] flex items-center justify-center text-[10px] font-bold px-1.5',
+                  activeSmartFilter === filter.id ? 'bg-primary-foreground/20 text-primary-foreground' : ''
+                )}>
+                  {filter.count}
+                </Badge>
+              </Button>
+            ))}
+          </div>
+          <div className="ml-auto">
+            <Select value={locationFilter} onValueChange={setLocationFilter}>
+              <SelectTrigger className="w-44 h-8 text-sm">
+                <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                <SelectValue placeholder="All Locations" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border z-50">
+                <SelectItem value="all">All Locations</SelectItem>
+                {locations.map((loc) => (
+                  <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Today's Visitors"
-            value={stats.todaysVisitors}
+            value={filteredStats.todaysVisitors}
             icon={<Users className="h-6 w-6" />}
             trend={{ value: '+12% from yesterday', positive: true }}
             iconColor="blue"
           />
           <StatCard
             title="Scheduled Appointments"
-            value={stats.scheduledAppointments}
-            subtitle={`${stats.pendingApproval} pending approval`}
+            value={filteredStats.scheduledAppointments}
+            subtitle={`${filteredStats.pendingApproval} pending approval`}
             icon={<Calendar className="h-6 w-6" />}
             iconColor="teal"
           />
           <StatCard
             title="Active Check-ins"
-            value={stats.activeCheckIns}
-            subtitle={`${stats.overstayed} overstayed`}
+            value={filteredStats.activeCheckIns}
+            subtitle={`${filteredStats.overstayed} overstayed`}
             icon={<UserCheck className="h-6 w-6" />}
             iconColor="emerald"
           />
           <StatCard
             title="Avg. Visit Duration"
-            value={stats.avgVisitDuration || '1h 24m'}
+            value={filteredStats.avgVisitDuration}
             icon={<Clock className="h-6 w-6" />}
             trend={{ value: '-8% from last week', positive: false }}
             iconColor="indigo"
@@ -159,13 +280,13 @@ export default function Dashboard() {
         </div>
 
         {/* Pending Approvals Widget */}
-        <PendingApprovals visitors={visitors} onRefresh={fetchDashboardData} />
+        <PendingApprovals visitors={filteredVisitors} onRefresh={fetchDashboardData} />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Visitors - Takes 2 columns */}
           <div className="lg:col-span-2">
-            <RecentVisitors visitors={visitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} onRefresh={fetchDashboardData} />
+            <RecentVisitors visitors={filteredVisitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} onRefresh={fetchDashboardData} />
           </div>
 
           {/* Quick Actions */}
