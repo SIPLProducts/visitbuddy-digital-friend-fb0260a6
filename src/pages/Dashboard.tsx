@@ -54,6 +54,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetchDashboardData();
     fetchLocations();
+    fetchDepartments();
 
     const handleLocationChange = () => {
       fetchDashboardData();
