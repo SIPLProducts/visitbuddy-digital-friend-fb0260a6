@@ -80,6 +80,7 @@ export default function VisitorReport() {
 
   useEffect(() => {
     fetchLocations();
+    fetchDepartments();
   }, []);
 
   useEffect(() => {
