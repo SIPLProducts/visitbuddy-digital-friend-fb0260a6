@@ -464,6 +464,13 @@ export default function Visitors() {
         onOpenChange={setEditDialogOpen}
         onSave={fetchVisitors}
       />
+      <CheckInDialog
+        open={checkInDialogOpen}
+        onOpenChange={setCheckInDialogOpen}
+        visitorName={checkInVisitor?.name || ''}
+        onConfirm={handleConfirmCheckIn}
+        loading={checkInLoading}
+      />
     </MainLayout>
   );
 }
