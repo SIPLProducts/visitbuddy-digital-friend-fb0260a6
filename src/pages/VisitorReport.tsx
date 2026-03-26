@@ -104,6 +104,7 @@ export default function VisitorReport() {
     if (data) setDepartments(data as Department[]);
   };
 
+  const fetchVisitors = async () => {
     setLoading(true);
 
     let query = supabase
