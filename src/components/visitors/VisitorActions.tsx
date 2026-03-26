@@ -55,10 +55,12 @@ export function VisitorActions({
             <Eye className="h-4 w-4 mr-2" />
             View Details
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onEdit(visitor)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </DropdownMenuItem>
+          {visitor.status !== 'checked_out' && (
+            <DropdownMenuItem onClick={() => onEdit(visitor)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={() => onPrintBadge(visitor)}>
             <Printer className="h-4 w-4 mr-2" />
             Print Badge
