@@ -141,7 +141,7 @@ export default function Auth() {
             <img src={authHero} alt="Enterprise visitor management lobby" width={1024} height={768} className="w-full h-56 object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
-              <h2 className="text-2xl font-bold text-white mb-1">Secure Visitor Management</h2>
+              <h2 className="text-2xl font-bold text-white mb-1">Secure Visitor & Vehicle Management</h2>
               <p className="text-white/80 text-sm">Enterprise-grade access control for your facilities</p>
             </div>
           </div>
