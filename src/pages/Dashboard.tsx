@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar, UserCheck, Clock, MapPin, Filter, X, Zap } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Filter, X, Zap, CalendarDays } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate, Location } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Select,
   SelectContent,
@@ -20,8 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { subDays, startOfDay, isToday, isThisWeek } from 'date-fns';
+import { subDays, startOfDay, isToday, isThisWeek, format, isWithinInterval } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -30,6 +37,7 @@ export default function Dashboard() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeSmartFilter, setActiveSmartFilter] = useState<string>('today');
   const [locationFilter, setLocationFilter] = useState('all');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [stats, setStats] = useState({
     todaysVisitors: 0,
     scheduledAppointments: 0,
@@ -150,8 +158,18 @@ export default function Dashboard() {
         break;
     }
 
+    // Date range filter
+    if (dateRange?.from) {
+      const from = startOfDay(dateRange.from);
+      const to = dateRange.to ? new Date(new Date(dateRange.to).setHours(23, 59, 59, 999)) : new Date(new Date(from).setHours(23, 59, 59, 999));
+      result = result.filter(v => {
+        const d = new Date(v.created_at);
+        return d >= from && d <= to;
+      });
+    }
+
     return result;
-  }, [visitors, activeSmartFilter, locationFilter]);
+  }, [visitors, activeSmartFilter, locationFilter, dateRange]);
 
   // Filtered stats
   const filteredStats = useMemo(() => {
@@ -172,8 +190,8 @@ export default function Dashboard() {
   }, [filteredVisitors, stats]);
 
   const smartFilters = [
-    { id: 'today', label: "Today's", icon: Calendar, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
-    { id: 'this_week', label: 'This Week', icon: Calendar, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
+    { id: 'today', label: "Today's", icon: CalendarIcon, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
+    { id: 'this_week', label: 'This Week', icon: CalendarDays, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
     { id: 'inside', label: 'Currently Inside', icon: UserCheck, count: visitors.filter(v => v.status === 'checked_in').length },
     { id: 'pending', label: 'Pending', icon: Clock, count: visitors.filter(v => v.status === 'pending_approval').length },
     { id: 'checked_out', label: 'Checked Out', icon: Users, count: visitors.filter(v => v.status === 'checked_out').length },
@@ -231,7 +249,44 @@ export default function Dashboard() {
               </Button>
             ))}
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className={cn(
+                  "gap-1.5 h-8 text-sm",
+                  dateRange?.from && "border-primary text-primary"
+                )}>
+                  <CalendarDays className="h-3.5 w-3.5" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>{format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM")}</>
+                    ) : format(dateRange.from, "dd MMM yyyy")
+                  ) : "Date Range"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-popover" align="end">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+                <div className="border-t p-3 flex gap-2 flex-wrap">
+                  <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}>
+                    Last 7 days
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}>
+                    Last 30 days
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setDateRange(undefined)} className="text-destructive">
+                    Clear
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Select value={locationFilter} onValueChange={setLocationFilter}>
               <SelectTrigger className="w-44 h-8 text-sm">
                 <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
