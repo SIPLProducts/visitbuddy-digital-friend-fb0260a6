@@ -99,7 +99,11 @@ export default function VisitorReport() {
     }
   };
 
-  const fetchVisitors = async () => {
+  const fetchDepartments = async () => {
+    const { data } = await supabase.from('departments').select('*').order('name');
+    if (data) setDepartments(data as Department[]);
+  };
+
     setLoading(true);
 
     let query = supabase
