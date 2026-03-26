@@ -33,7 +33,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location } from '@/types/database';
 import { cn } from '@/lib/utils';
-import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes } from 'date-fns';
+import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes, isToday, isThisWeek, startOfMonth } from 'date-fns';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
 import {
