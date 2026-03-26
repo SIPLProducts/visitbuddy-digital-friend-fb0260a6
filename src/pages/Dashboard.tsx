@@ -158,8 +158,18 @@ export default function Dashboard() {
         break;
     }
 
+    // Date range filter
+    if (dateRange?.from) {
+      const from = startOfDay(dateRange.from);
+      const to = dateRange.to ? new Date(new Date(dateRange.to).setHours(23, 59, 59, 999)) : new Date(new Date(from).setHours(23, 59, 59, 999));
+      result = result.filter(v => {
+        const d = new Date(v.created_at);
+        return d >= from && d <= to;
+      });
+    }
+
     return result;
-  }, [visitors, activeSmartFilter, locationFilter]);
+  }, [visitors, activeSmartFilter, locationFilter, dateRange]);
 
   // Filtered stats
   const filteredStats = useMemo(() => {
