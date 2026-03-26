@@ -63,6 +63,8 @@ export default function VisitorReport() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
   const [companyFilter, setCompanyFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
