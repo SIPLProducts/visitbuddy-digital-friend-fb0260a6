@@ -312,6 +312,18 @@ export default function Dashboard() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="w-44 h-8 text-sm">
+                <Building2 className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                <SelectValue placeholder="All Departments" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border z-50 max-h-60">
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
