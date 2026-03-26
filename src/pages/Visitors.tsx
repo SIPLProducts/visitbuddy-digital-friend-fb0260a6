@@ -29,6 +29,7 @@ import { VisitorDetailsDialog } from '@/components/visitors/VisitorDetailsDialog
 import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
 import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
+import { CheckInDialog } from '@/components/visitors/CheckInDialog';
 
 export default function Visitors() {
   const navigate = useNavigate();
