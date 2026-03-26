@@ -190,8 +190,8 @@ export default function Dashboard() {
   }, [filteredVisitors, stats]);
 
   const smartFilters = [
-    { id: 'today', label: "Today's", icon: Calendar, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
-    { id: 'this_week', label: 'This Week', icon: Calendar, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
+    { id: 'today', label: "Today's", icon: CalendarIcon, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
+    { id: 'this_week', label: 'This Week', icon: CalendarDays, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
     { id: 'inside', label: 'Currently Inside', icon: UserCheck, count: visitors.filter(v => v.status === 'checked_in').length },
     { id: 'pending', label: 'Pending', icon: Clock, count: visitors.filter(v => v.status === 'pending_approval').length },
     { id: 'checked_out', label: 'Checked Out', icon: Users, count: visitors.filter(v => v.status === 'checked_out').length },
