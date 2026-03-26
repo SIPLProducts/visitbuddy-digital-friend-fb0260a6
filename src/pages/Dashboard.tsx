@@ -149,6 +149,11 @@ export default function Dashboard() {
       result = result.filter(v => v.gate?.location?.id === locationFilter);
     }
 
+    // Department filter
+    if (departmentFilter !== 'all') {
+      result = result.filter(v => v.department?.id === departmentFilter);
+    }
+
     // Smart filter
     switch (activeSmartFilter) {
       case 'today':
