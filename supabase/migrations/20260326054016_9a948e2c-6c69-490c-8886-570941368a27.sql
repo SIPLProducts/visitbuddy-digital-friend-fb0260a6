@@ -1,0 +1,1 @@
+ALTER TABLE public.visitors ADD COLUMN govt_id_number TEXT DEFAULT NULL;
