@@ -37,6 +37,8 @@ export default function Dashboard() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeSmartFilter, setActiveSmartFilter] = useState<string>('today');
   const [locationFilter, setLocationFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [stats, setStats] = useState({
     todaysVisitors: 0,
