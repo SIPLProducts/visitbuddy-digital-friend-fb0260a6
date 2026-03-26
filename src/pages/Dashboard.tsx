@@ -122,6 +122,63 @@ export default function Dashboard() {
     setRefreshKey(prev => prev + 1);
   }, []);
 
+  // Smart filtered visitors
+  const filteredVisitors = useMemo(() => {
+    let result = visitors;
+
+    // Location filter
+    if (locationFilter !== 'all') {
+      result = result.filter(v => v.gate?.location?.id === locationFilter);
+    }
+
+    // Smart filter
+    switch (activeSmartFilter) {
+      case 'today':
+        result = result.filter(v => isToday(new Date(v.created_at)));
+        break;
+      case 'this_week':
+        result = result.filter(v => isThisWeek(new Date(v.created_at)));
+        break;
+      case 'inside':
+        result = result.filter(v => v.status === 'checked_in');
+        break;
+      case 'pending':
+        result = result.filter(v => v.status === 'pending_approval');
+        break;
+      case 'checked_out':
+        result = result.filter(v => v.status === 'checked_out');
+        break;
+    }
+
+    return result;
+  }, [visitors, activeSmartFilter, locationFilter]);
+
+  // Filtered stats
+  const filteredStats = useMemo(() => {
+    const todaysVisitors = filteredVisitors.filter(v => isToday(new Date(v.created_at))).length;
+    const activeCheckIns = filteredVisitors.filter(v => v.status === 'checked_in').length;
+    const pendingApproval = filteredVisitors.filter(v => v.status === 'pending_approval').length;
+    const checkedOut = filteredVisitors.filter(v => v.status === 'checked_out').length;
+
+    return {
+      todaysVisitors,
+      activeCheckIns,
+      pendingApproval,
+      checkedOut,
+      scheduledAppointments: stats.scheduledAppointments,
+      avgVisitDuration: stats.avgVisitDuration || '1h 24m',
+      overstayed: stats.overstayed,
+    };
+  }, [filteredVisitors, stats]);
+
+  const smartFilters = [
+    { id: 'today', label: "Today's", icon: Calendar, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
+    { id: 'this_week', label: 'This Week', icon: Calendar, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
+    { id: 'inside', label: 'Currently Inside', icon: UserCheck, count: visitors.filter(v => v.status === 'checked_in').length },
+    { id: 'pending', label: 'Pending', icon: Clock, count: visitors.filter(v => v.status === 'pending_approval').length },
+    { id: 'checked_out', label: 'Checked Out', icon: Users, count: visitors.filter(v => v.status === 'checked_out').length },
+  ];
+
   return (
     <MainLayout>
       <PullToRefresh onRefresh={handleRefresh}>
