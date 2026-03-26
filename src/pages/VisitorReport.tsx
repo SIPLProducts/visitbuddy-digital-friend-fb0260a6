@@ -28,7 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   FileText, Search, Download, Users, UserCheck, UserX, Laptop, 
   CalendarIcon, Upload, FileDown, MapPin, TrendingUp, Building2,
-  Filter, Crown, BarChart3, Briefcase, Zap, UserX
+  Filter, Crown, BarChart3, Briefcase, Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location } from '@/types/database';
