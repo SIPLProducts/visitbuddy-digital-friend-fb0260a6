@@ -43,6 +43,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboardData();
+    fetchLocations();
 
     const handleLocationChange = () => {
       fetchDashboardData();
@@ -50,6 +51,11 @@ export default function Dashboard() {
     window.addEventListener('locationChanged', handleLocationChange);
     return () => window.removeEventListener('locationChanged', handleLocationChange);
   }, []);
+
+  const fetchLocations = async () => {
+    const { data } = await supabase.from('locations').select('*').order('name');
+    if (data) setLocations(data as Location[]);
+  };
 
   const fetchDashboardData = async () => {
     const today = new Date().toISOString().split('T')[0];
