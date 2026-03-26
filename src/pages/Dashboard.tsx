@@ -27,6 +27,9 @@ export default function Dashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [gates, setGates] = useState<Gate[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [activeSmartFilter, setActiveSmartFilter] = useState<string>('today');
+  const [locationFilter, setLocationFilter] = useState('all');
   const [stats, setStats] = useState({
     todaysVisitors: 0,
     scheduledAppointments: 0,
