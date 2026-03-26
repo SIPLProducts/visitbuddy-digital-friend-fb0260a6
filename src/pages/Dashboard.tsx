@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Filter, X, Zap, CalendarDays } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Filter, X, Zap, CalendarDays, Building2 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
