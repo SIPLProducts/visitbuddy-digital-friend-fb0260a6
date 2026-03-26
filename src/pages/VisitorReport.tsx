@@ -31,7 +31,7 @@ import {
   Filter, Crown, BarChart3, Briefcase, Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Visitor, Location } from '@/types/database';
+import { Visitor, Location, Department } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes, isToday, isThisWeek, startOfMonth } from 'date-fns';
 import { toast } from 'sonner';
