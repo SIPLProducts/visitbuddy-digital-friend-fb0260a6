@@ -8,7 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Shield, Users, Building2, CheckCircle2, Loader2, Crown } from 'lucide-react';
+import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown } from 'lucide-react';
+import authHero from '@/assets/auth-hero.jpg';
+import authCheckin from '@/assets/auth-checkin.jpg';
+import authAccess from '@/assets/auth-access.jpg';
+import authBadge from '@/assets/auth-badge.jpg';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -28,10 +32,10 @@ const signupSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 type SignupFormData = z.infer<typeof signupSchema>;
 
-const features = [
-  { icon: Shield, title: 'Secure Access Control', description: 'Enterprise-grade security for your facilities' },
-  { icon: Users, title: 'Visitor Management', description: 'Streamlined check-in and tracking' },
-  { icon: Building2, title: 'Multi-Location Support', description: 'Manage all your sites from one platform' },
+const featureImages = [
+  { src: authCheckin, title: 'Visitor Check-In', description: 'Digital kiosk registration' },
+  { src: authAccess, title: 'Access Control', description: 'Secure gate management' },
+  { src: authBadge, title: 'Badge Management', description: 'Instant badge printing' },
 ];
 
 // Demo users for client demonstration
@@ -131,27 +135,26 @@ export default function Auth() {
           </div>
         </div>
 
-        {/* Features */}
-        <div className="relative z-10 space-y-8">
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-2">
-              Secure Visitor Management
-            </h2>
-            <p className="text-white/70 text-lg">
-              Streamline your facility access control with our enterprise-grade solution.
-            </p>
+        {/* Hero Image & Features */}
+        <div className="relative z-10 space-y-6">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <img src={authHero} alt="Enterprise visitor management lobby" width={1024} height={768} className="w-full h-56 object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4">
+              <h2 className="text-2xl font-bold text-white mb-1">Secure Visitor Management</h2>
+              <p className="text-white/80 text-sm">Enterprise-grade access control for your facilities</p>
+            </div>
           </div>
-          
-          <div className="space-y-6">
-            {features.map((feature) => (
-              <div key={feature.title} className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                  <feature.icon className="w-5 h-5 text-[hsl(195,85%,55%)]" />
+
+          <div className="grid grid-cols-3 gap-3">
+            {featureImages.map((feature) => (
+              <div key={feature.title} className="group">
+                <div className="relative rounded-xl overflow-hidden shadow-lg">
+                  <img src={feature.src} alt={feature.title} width={512} height={512} loading="lazy" className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-black/30" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-white">{feature.title}</h3>
-                  <p className="text-sm text-white/60">{feature.description}</p>
-                </div>
+                <p className="text-xs font-medium text-white mt-2">{feature.title}</p>
+                <p className="text-xs text-white/50">{feature.description}</p>
               </div>
             ))}
           </div>
