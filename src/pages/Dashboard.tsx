@@ -1,14 +1,18 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Filter, X, Zap, CalendarDays, Building2 } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { GateStatus } from '@/components/dashboard/GateStatus';
-import { WeeklyOverview } from '@/components/dashboard/WeeklyOverview';
 import { CombinedStats } from '@/components/dashboard/CombinedStats';
 import { PendingApprovals } from '@/components/dashboard/PendingApprovals';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
+import { LiveClock } from '@/components/dashboard/LiveClock';
+import { SecurityOverview } from '@/components/dashboard/SecurityOverview';
+import { DepartmentDistribution } from '@/components/dashboard/DepartmentDistribution';
+import { VisitorTrendChart } from '@/components/dashboard/VisitorTrendChart';
+import { PeakHoursChart } from '@/components/dashboard/PeakHoursChart';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate, Location, Department } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +31,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { subDays, startOfDay, isToday, isThisWeek, format, isWithinInterval } from 'date-fns';
+import { subDays, startOfDay, isToday, isThisWeek, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
@@ -40,6 +44,7 @@ export default function Dashboard() {
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [vehiclesInside, setVehiclesInside] = useState(0);
   const [stats, setStats] = useState({
     todaysVisitors: 0,
     scheduledAppointments: 0,
@@ -47,9 +52,8 @@ export default function Dashboard() {
     avgVisitDuration: '0h 0m',
     pendingApproval: 0,
     overstayed: 0,
+    todaysVehicles: 0,
   });
-
-  const getSelectedLocationId = () => localStorage.getItem('selectedLocationId') || '';
 
   useEffect(() => {
     fetchDashboardData();
@@ -76,23 +80,21 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     const today = new Date().toISOString().split('T')[0];
 
-    // Fetch visitors with related data (including pending_approval)
     const { data: visitorsData } = await supabase
       .from('visitors')
       .select(`
         *,
-        host:employees(*),
+        host:employees(*, department:departments(*)),
         department:departments(*),
         gate:gates(*, location:locations(*))
       `)
       .in('status', ['checked_in', 'checked_out', 'scheduled', 'pending_approval'])
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(200);
 
     if (visitorsData) {
       setVisitors(visitorsData as unknown as Visitor[]);
 
-      // Calculate stats
       const todaysVisitors = visitorsData.filter(
         (v) => v.created_at.startsWith(today)
       ).length;
@@ -103,15 +105,35 @@ export default function Dashboard() {
         (v) => v.status === 'pending_approval'
       ).length;
 
-      setStats((prev) => ({
+      // Calculate avg visit duration
+      const completedVisits = visitorsData.filter(v => v.check_in_time && v.check_out_time);
+      let avgDuration = '1h 24m';
+      if (completedVisits.length > 0) {
+        const totalMs = completedVisits.reduce((acc, v) => {
+          return acc + (new Date(v.check_out_time!).getTime() - new Date(v.check_in_time!).getTime());
+        }, 0);
+        const avgMs = totalMs / completedVisits.length;
+        const avgHours = Math.floor(avgMs / (1000 * 60 * 60));
+        const avgMins = Math.floor((avgMs % (1000 * 60 * 60)) / (1000 * 60));
+        avgDuration = `${avgHours}h ${avgMins}m`;
+      }
+
+      // Count overstayed
+      const overstayed = visitorsData.filter(v => {
+        if (v.status !== 'checked_in' || !v.check_in_time) return false;
+        return (Date.now() - new Date(v.check_in_time).getTime()) / (1000 * 60 * 60) > 8;
+      }).length;
+
+      setStats(prev => ({
         ...prev,
         todaysVisitors,
         activeCheckIns,
         pendingApproval,
+        avgVisitDuration: avgDuration,
+        overstayed,
       }));
     }
 
-    // Fetch gates
     const { data: gatesData } = await supabase
       .from('gates')
       .select('*')
@@ -121,15 +143,29 @@ export default function Dashboard() {
       setGates(gatesData as Gate[]);
     }
 
-    // Fetch appointments count
     const { count: appointmentsCount } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
       .eq('scheduled_date', today);
 
-    setStats((prev) => ({
+    // Get vehicles inside count
+    const { count: vehicleCount } = await supabase
+      .from('vehicles')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'checked_in');
+
+    // Get today's vehicles
+    const { count: todaysVehicleCount } = await supabase
+      .from('vehicles')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', `${today}T00:00:00`)
+      .lte('created_at', `${today}T23:59:59`);
+
+    setVehiclesInside(vehicleCount || 0);
+    setStats(prev => ({
       ...prev,
       scheduledAppointments: appointmentsCount || 0,
+      todaysVehicles: todaysVehicleCount || 0,
     }));
   };
 
@@ -138,21 +174,17 @@ export default function Dashboard() {
     setRefreshKey(prev => prev + 1);
   }, []);
 
-  // Smart filtered visitors
   const filteredVisitors = useMemo(() => {
     let result = visitors;
 
-    // Location filter
     if (locationFilter !== 'all') {
       result = result.filter(v => v.gate?.location?.id === locationFilter);
     }
 
-    // Department filter
     if (departmentFilter !== 'all') {
       result = result.filter(v => v.department?.id === departmentFilter);
     }
 
-    // Smart filter
     switch (activeSmartFilter) {
       case 'today':
         result = result.filter(v => isToday(new Date(v.created_at)));
@@ -171,7 +203,6 @@ export default function Dashboard() {
         break;
     }
 
-    // Date range filter
     if (dateRange?.from) {
       const from = startOfDay(dateRange.from);
       const to = dateRange.to ? new Date(new Date(dateRange.to).setHours(23, 59, 59, 999)) : new Date(new Date(from).setHours(23, 59, 59, 999));
@@ -184,7 +215,6 @@ export default function Dashboard() {
     return result;
   }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange]);
 
-  // Filtered stats
   const filteredStats = useMemo(() => {
     const todaysVisitors = filteredVisitors.filter(v => isToday(new Date(v.created_at))).length;
     const activeCheckIns = filteredVisitors.filter(v => v.status === 'checked_in').length;
@@ -197,190 +227,218 @@ export default function Dashboard() {
       pendingApproval,
       checkedOut,
       scheduledAppointments: stats.scheduledAppointments,
-      avgVisitDuration: stats.avgVisitDuration || '1h 24m',
+      avgVisitDuration: stats.avgVisitDuration,
       overstayed: stats.overstayed,
     };
   }, [filteredVisitors, stats]);
 
   const smartFilters = [
-    { id: 'today', label: "Today's", icon: CalendarIcon, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
+    { id: 'today', label: "Today", icon: CalendarIcon, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
     { id: 'this_week', label: 'This Week', icon: CalendarDays, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
-    { id: 'inside', label: 'Currently Inside', icon: UserCheck, count: visitors.filter(v => v.status === 'checked_in').length },
+    { id: 'inside', label: 'Inside', icon: UserCheck, count: visitors.filter(v => v.status === 'checked_in').length },
     { id: 'pending', label: 'Pending', icon: Clock, count: visitors.filter(v => v.status === 'pending_approval').length },
-    { id: 'checked_out', label: 'Checked Out', icon: Users, count: visitors.filter(v => v.status === 'checked_out').length },
+    { id: 'checked_out', label: 'Left', icon: Users, count: visitors.filter(v => v.status === 'checked_out').length },
   ];
+
+  const totalGateCapacity = gates.reduce((sum, g) => sum + (g.capacity || 0), 0);
 
   return (
     <MainLayout>
       <PullToRefresh onRefresh={handleRefresh}>
-        <div className="space-y-6">
-        {/* Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1e3a8a] via-[#0891b2] to-[#10b981] p-6 text-white">
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/4" />
-          
-          <div className="relative z-10">
-            <Badge className="bg-white/20 text-white hover:bg-white/30 border-0 mb-3">
-              Dashboard Overview
-            </Badge>
-            <h1 className="text-2xl font-bold mb-1">
-              Welcome back, Admin! 👋
-            </h1>
-            <p className="text-primary-foreground/80">
-              Here's what's happening at your facilities today.
-            </p>
-          </div>
-        </div>
-
-        {/* Smart Filters Bar */}
-        <div className="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-card border">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <Zap className="h-4 w-4 text-primary" />
-            Smart Filters:
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {smartFilters.map((filter) => (
-              <Button
-                key={filter.id}
-                variant={activeSmartFilter === filter.id ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setActiveSmartFilter(filter.id)}
-                className={cn(
-                  'gap-1.5 transition-all',
-                  activeSmartFilter === filter.id && 'shadow-md'
-                )}
-              >
-                <filter.icon className="h-3.5 w-3.5" />
-                {filter.label}
-                <Badge variant="secondary" className={cn(
-                  'ml-1 h-5 min-w-[20px] flex items-center justify-center text-[10px] font-bold px-1.5',
-                  activeSmartFilter === filter.id ? 'bg-primary-foreground/20 text-primary-foreground' : ''
-                )}>
-                  {filter.count}
-                </Badge>
-              </Button>
-            ))}
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className={cn(
-                  "gap-1.5 h-8 text-sm",
-                  dateRange?.from && "border-primary text-primary"
-                )}>
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  {dateRange?.from ? (
-                    dateRange.to ? (
-                      <>{format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM")}</>
-                    ) : format(dateRange.from, "dd MMM yyyy")
-                  ) : "Date Range"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-popover" align="end">
-                <Calendar
-                  initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                  numberOfMonths={2}
-                  className={cn("p-3 pointer-events-auto")}
-                />
-                <div className="border-t p-3 flex gap-2 flex-wrap">
-                  <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}>
-                    Last 7 days
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}>
-                    Last 30 days
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setDateRange(undefined)} className="text-destructive">
-                    Clear
-                  </Button>
+        <div className="space-y-5">
+          {/* Enterprise Header */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[hsl(220,30%,15%)] via-[hsl(195,85%,25%)] to-[hsl(160,84%,30%)] p-6 text-white">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+            <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-white/5 rounded-full blur-2xl translate-y-1/2" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge className="bg-white/15 text-white hover:bg-white/20 border-0 text-[10px] uppercase tracking-wider font-semibold">
+                    <Activity className="h-3 w-3 mr-1" />
+                    Live Dashboard
+                  </Badge>
                 </div>
-              </PopoverContent>
-            </Popover>
-            <Select value={locationFilter} onValueChange={setLocationFilter}>
-              <SelectTrigger className="w-44 h-8 text-sm">
-                <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                <SelectValue placeholder="All Locations" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border border-border z-50">
-                <SelectItem value="all">All Locations</SelectItem>
-                {locations.map((loc) => (
-                  <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-              <SelectTrigger className="w-44 h-8 text-sm">
-                <Building2 className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                <SelectValue placeholder="All Departments" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border border-border z-50 max-h-60">
-                <SelectItem value="all">All Departments</SelectItem>
-                {departments.map((dept) => (
-                  <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Today's Visitors"
-            value={filteredStats.todaysVisitors}
-            icon={<Users className="h-6 w-6" />}
-            trend={{ value: '+12% from yesterday', positive: true }}
-            iconColor="blue"
-          />
-          <StatCard
-            title="Scheduled Appointments"
-            value={filteredStats.scheduledAppointments}
-            subtitle={`${filteredStats.pendingApproval} pending approval`}
-            icon={<Calendar className="h-6 w-6" />}
-            iconColor="teal"
-          />
-          <StatCard
-            title="Active Check-ins"
-            value={filteredStats.activeCheckIns}
-            subtitle={`${filteredStats.overstayed} overstayed`}
-            icon={<UserCheck className="h-6 w-6" />}
-            iconColor="emerald"
-          />
-          <StatCard
-            title="Avg. Visit Duration"
-            value={filteredStats.avgVisitDuration}
-            icon={<Clock className="h-6 w-6" />}
-            trend={{ value: '-8% from last week', positive: false }}
-            iconColor="indigo"
-          />
-        </div>
-
-        {/* Pending Approvals Widget */}
-        <PendingApprovals visitors={filteredVisitors} onRefresh={fetchDashboardData} />
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Visitors - Takes 2 columns */}
-          <div className="lg:col-span-2">
-            <RecentVisitors visitors={filteredVisitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} onRefresh={fetchDashboardData} />
+                <h1 className="text-2xl font-bold tracking-tight">
+                  Command Center
+                </h1>
+                <p className="text-sm text-white/70 mt-1">
+                  Real-time monitoring across all facilities
+                </p>
+              </div>
+              <LiveClock />
+            </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="space-y-6">
+          {/* Smart Filters Bar */}
+          <div className="flex flex-wrap items-center gap-3 p-3.5 rounded-xl bg-card border">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <Zap className="h-3.5 w-3.5 text-primary" />
+              Filters
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {smartFilters.map((filter) => (
+                <Button
+                  key={filter.id}
+                  variant={activeSmartFilter === filter.id ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setActiveSmartFilter(filter.id)}
+                  className={cn(
+                    'gap-1 h-8 text-xs transition-all',
+                    activeSmartFilter === filter.id && 'shadow-md'
+                  )}
+                >
+                  <filter.icon className="h-3 w-3" />
+                  {filter.label}
+                  <Badge variant="secondary" className={cn(
+                    'ml-0.5 h-4 min-w-[16px] flex items-center justify-center text-[9px] font-bold px-1',
+                    activeSmartFilter === filter.id ? 'bg-primary-foreground/20 text-primary-foreground' : ''
+                  )}>
+                    {filter.count}
+                  </Badge>
+                </Button>
+              ))}
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className={cn(
+                    "gap-1.5 h-8 text-xs",
+                    dateRange?.from && "border-primary text-primary"
+                  )}>
+                    <CalendarDays className="h-3 w-3" />
+                    {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>{format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM")}</>
+                      ) : format(dateRange.from, "dd MMM yyyy")
+                    ) : "Date Range"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-popover" align="end">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                    className="p-3 pointer-events-auto"
+                  />
+                  <div className="border-t p-3 flex gap-2 flex-wrap">
+                    <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 7), to: new Date() })}>
+                      Last 7 days
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDateRange({ from: subDays(new Date(), 30), to: new Date() })}>
+                      Last 30 days
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setDateRange(undefined)} className="text-destructive">
+                      Clear
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Select value={locationFilter} onValueChange={setLocationFilter}>
+                <SelectTrigger className="w-40 h-8 text-xs">
+                  <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
+                  <SelectValue placeholder="All Locations" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border z-50">
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {locations.map((loc) => (
+                    <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                <SelectTrigger className="w-40 h-8 text-xs">
+                  <Building2 className="h-3 w-3 mr-1 text-muted-foreground" />
+                  <SelectValue placeholder="All Depts" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border z-50 max-h-60">
+                  <SelectItem value="all">All Departments</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Stats Grid - 6 cards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <StatCard
+              title="Today's Visitors"
+              value={filteredStats.todaysVisitors}
+              icon={<Users className="h-5 w-5" />}
+              trend={{ value: '+12% vs yesterday', positive: true }}
+              iconColor="blue"
+            />
+            <StatCard
+              title="Currently Inside"
+              value={filteredStats.activeCheckIns}
+              subtitle={filteredStats.overstayed > 0 ? `${filteredStats.overstayed} overstayed` : undefined}
+              icon={<UserCheck className="h-5 w-5" />}
+              iconColor="emerald"
+            />
+            <StatCard
+              title="Pending Approval"
+              value={filteredStats.pendingApproval}
+              icon={<ShieldAlert className="h-5 w-5" />}
+              iconColor="amber"
+            />
+            <StatCard
+              title="Appointments"
+              value={filteredStats.scheduledAppointments}
+              icon={<CalendarIcon className="h-5 w-5" />}
+              iconColor="teal"
+            />
+            <StatCard
+              title="Vehicles Today"
+              value={stats.todaysVehicles}
+              subtitle={`${vehiclesInside} inside`}
+              icon={<Truck className="h-5 w-5" />}
+              iconColor="indigo"
+            />
+            <StatCard
+              title="Avg Duration"
+              value={filteredStats.avgVisitDuration}
+              icon={<Clock className="h-5 w-5" />}
+              iconColor="rose"
+            />
+          </div>
+
+          {/* Pending Approvals */}
+          <PendingApprovals visitors={filteredVisitors} onRefresh={fetchDashboardData} />
+
+          {/* Main Grid: Recent Visitors + Security Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="lg:col-span-2">
+              <RecentVisitors visitors={filteredVisitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} onRefresh={fetchDashboardData} />
+            </div>
+            <SecurityOverview
+              visitors={visitors}
+              totalGateCapacity={totalGateCapacity}
+              vehiclesInside={vehiclesInside}
+            />
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="lg:col-span-2">
+              <VisitorTrendChart key={refreshKey} />
+            </div>
+            <div className="space-y-5">
+              <DepartmentDistribution visitors={filteredVisitors} />
+              <PeakHoursChart visitors={visitors} />
+            </div>
+          </div>
+
+          {/* Bottom Row: Quick Actions + Gate Status + Activity Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <QuickActions />
             <GateStatus gates={gates} />
+            <CombinedStats />
           </div>
-        </div>
-
-        {/* Combined Visitor & Vehicle Stats */}
-        <CombinedStats />
-
-        {/* Weekly Overview Chart */}
-        <WeeklyOverview />
         </div>
       </PullToRefresh>
     </MainLayout>
