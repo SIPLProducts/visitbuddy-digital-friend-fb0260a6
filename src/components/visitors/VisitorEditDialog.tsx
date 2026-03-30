@@ -65,7 +65,14 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
   });
 
   useEffect(() => {
-    if (visitor) {
+    if (open) {
+      fetchEmployees();
+      fetchDepartments();
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (visitor && open) {
       setFormData({
         name: visitor.name || '',
         email: visitor.email || '',
@@ -79,20 +86,13 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         has_laptop: visitor.has_laptop || false,
         laptop_brand: visitor.laptop_brand || '',
         laptop_serial: visitor.laptop_serial || '',
-        has_mobile: (visitor as any).has_mobile || false,
-        mobile_brand: (visitor as any).mobile_brand || '',
-        mobile_serial: (visitor as any).mobile_serial || '',
+        has_mobile: visitor.has_mobile || false,
+        mobile_brand: visitor.mobile_brand || '',
+        mobile_serial: visitor.mobile_serial || '',
         accompanying_count: visitor.accompanying_count || 0,
       });
     }
-  }, [visitor]);
-
-  useEffect(() => {
-    if (open) {
-      fetchEmployees();
-      fetchDepartments();
-    }
-  }, [open]);
+  }, [visitor, open]);
 
   const fetchEmployees = async () => {
     const { data } = await supabase
