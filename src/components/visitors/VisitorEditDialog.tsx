@@ -125,6 +125,8 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         purpose: formData.purpose || null,
         host_id: formData.host_id || null,
         department_id: formData.department_id || null,
+        vehicle_type: formData.vehicle_type || 'by_walk',
+        vehicle_number: (formData.vehicle_type && formData.vehicle_type !== 'by_walk') ? formData.vehicle_number || null : null,
         has_laptop: formData.has_laptop,
         laptop_brand: formData.has_laptop ? formData.laptop_brand : null,
         laptop_serial: formData.has_laptop ? formData.laptop_serial : null,
