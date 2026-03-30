@@ -421,6 +421,9 @@ export default function Visitors() {
                         </p>
                       </div>
                     </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {format(new Date(visitor.created_at), 'dd/MM/yyyy')}
+                    </TableCell>
                     <TableCell>
                       {visitor.vehicle_type && visitor.vehicle_type !== 'by_walk' ? (
                         <div className="flex items-center gap-1">
