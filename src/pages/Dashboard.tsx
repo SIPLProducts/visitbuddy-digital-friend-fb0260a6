@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, HeartPulse } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -35,6 +36,9 @@ import { subDays, startOfDay, isToday, isThisWeek, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [gates, setGates] = useState<Gate[]>([]);
@@ -59,13 +63,20 @@ export default function Dashboard() {
     fetchDashboardData();
     fetchLocations();
     fetchDepartments();
+    // Fetch user profile
+    if (user) {
+      supabase.from('profiles').select('full_name').eq('user_id', user.id).single()
+        .then(({ data }) => { if (data) setUserName((data as any).full_name || user.email?.split('@')[0] || ''); });
+      supabase.from('user_location_roles').select('role, is_ho_admin').eq('user_id', user.id).limit(1).single()
+        .then(({ data }) => { if (data) setUserRole((data as any).is_ho_admin ? 'HO Admin' : (data as any).role); });
+    }
 
     const handleLocationChange = () => {
       fetchDashboardData();
     };
     window.addEventListener('locationChanged', handleLocationChange);
     return () => window.removeEventListener('locationChanged', handleLocationChange);
-  }, []);
+  }, [user]);
 
   const fetchLocations = async () => {
     const { data } = await supabase.from('locations').select('*').order('name');
@@ -258,15 +269,32 @@ export default function Dashboard() {
                     <Activity className="h-3 w-3 mr-1" />
                     Live Dashboard
                   </Badge>
+                  {userRole && (
+                    <Badge className="bg-white/15 text-white hover:bg-white/20 border-0 text-[10px] uppercase tracking-wider font-semibold">
+                      {userRole}
+                    </Badge>
+                  )}
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  Command Center
+                  {userName ? `Welcome back, ${userName}` : 'Command Center'}
                 </h1>
                 <p className="text-sm text-white/70 mt-1">
                   Real-time monitoring across all facilities
                 </p>
               </div>
-              <LiveClock />
+              <div className="flex items-center gap-4">
+                {/* Facility Health Score */}
+                <div className="hidden md:flex flex-col items-center bg-white/10 rounded-xl px-4 py-2">
+                  <div className="flex items-center gap-1.5">
+                    <HeartPulse className="h-4 w-4" />
+                    <span className="text-xs text-white/70">Health</span>
+                  </div>
+                  <span className="text-xl font-bold">
+                    {Math.max(0, 100 - (filteredStats.overstayed * 10) - (filteredStats.pendingApproval * 5))}%
+                  </span>
+                </div>
+                <LiveClock />
+              </div>
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -26,7 +27,13 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -37,6 +44,7 @@ import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
 import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInDialog } from '@/components/visitors/CheckInDialog';
+import { logAudit } from '@/lib/auditLog';
 
 export default function Visitors() {
   const navigate = useNavigate();
@@ -46,6 +54,8 @@ export default function Visitors() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
   
   // Dialog states
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
@@ -264,6 +274,56 @@ export default function Visitors() {
     await fetchVisitors();
   }, []);
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredVisitors.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredVisitors.map(v => v.id)));
+    }
+  };
+
+  const handleBulkCheckout = async () => {
+    const checkedIn = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'checked_in');
+    if (checkedIn.length === 0) { toast.error('No checked-in visitors selected'); return; }
+    setBulkLoading(true);
+    const { error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString() }).in('id', checkedIn.map(v => v.id));
+    setBulkLoading(false);
+    if (error) { toast.error('Bulk checkout failed'); return; }
+    await logAudit({ action: 'bulk_checkout', entityType: 'visitor', entityName: `${checkedIn.length} visitors`, details: { count: checkedIn.length } });
+    toast.success(`${checkedIn.length} visitors checked out`);
+    setSelectedIds(new Set());
+    fetchVisitors();
+  };
+
+  const handleBulkApprove = async () => {
+    const pending = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'pending_approval');
+    if (pending.length === 0) { toast.error('No pending visitors selected'); return; }
+    setBulkLoading(true);
+    for (const v of pending) {
+      await supabase.functions.invoke('approve-visitor', { body: { visitorId: v.id, action: 'approve' } });
+    }
+    setBulkLoading(false);
+    await logAudit({ action: 'bulk_approval', entityType: 'visitor', entityName: `${pending.length} visitors`, details: { count: pending.length } });
+    toast.success(`${pending.length} visitors approved`);
+    setSelectedIds(new Set());
+    fetchVisitors();
+  };
+
+  const handleBulkPrint = () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) { toast.error('No visitors selected'); return; }
+    ids.forEach(id => window.open(`/print-badge?id=${id}`, '_blank'));
+    toast.success(`Printing ${ids.length} badges`);
+  };
+
   return (
     <MainLayout>
       <PullToRefresh onRefresh={handleRefresh}>
@@ -276,12 +336,30 @@ export default function Visitors() {
               Manage and track all visitor records
             </p>
           </div>
-          <Link to="/visitors/new">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Visitor
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-1.5" disabled={bulkLoading}>
+                    <CheckSquare className="h-4 w-4" />
+                    Bulk Actions ({selectedIds.size})
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-popover">
+                  <DropdownMenuItem onClick={handleBulkCheckout} className="gap-2"><LogOut className="h-4 w-4" /> Check Out Selected</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleBulkApprove} className="gap-2"><CheckSquare className="h-4 w-4" /> Approve Selected</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleBulkPrint} className="gap-2"><Printer className="h-4 w-4" /> Print Badges</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            <Link to="/visitors/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Visitor
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Filters */}
@@ -348,6 +426,12 @@ export default function Visitors() {
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={filteredVisitors.length > 0 && selectedIds.size === filteredVisitors.length}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
                 <TableHead>Visitor</TableHead>
                 <TableHead>ID</TableHead>
                 <TableHead>Company</TableHead>
@@ -363,19 +447,25 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={10} className="text-center py-8">
+                   <TableCell colSpan={11} className="text-center py-8">
                     Loading visitors...
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8">
+                  <TableCell colSpan={11} className="text-center py-8">
                     No visitors found
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredVisitors.map((visitor) => (
-                  <TableRow key={visitor.id}>
+                  <TableRow key={visitor.id} className={selectedIds.has(visitor.id) ? 'bg-primary/5' : ''}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedIds.has(visitor.id)}
+                        onCheckedChange={() => toggleSelect(visitor.id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
@@ -530,6 +620,8 @@ export default function Visitors() {
         open={checkInDialogOpen}
         onOpenChange={setCheckInDialogOpen}
         visitorName={checkInVisitor?.name || ''}
+        visitorPhone={checkInVisitor?.phone}
+        visitorEmail={checkInVisitor?.email}
         onConfirm={handleConfirmCheckIn}
         loading={checkInLoading}
       />

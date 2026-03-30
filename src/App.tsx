@@ -41,6 +41,8 @@ import Notifications from "./pages/Notifications";
 import AuditLogs from "./pages/AuditLogs";
 import Watchlist from "./pages/Watchlist";
 import EmergencyEvacuation from "./pages/EmergencyEvacuation";
+import BrandingSettings from "./pages/BrandingSettings";
+import ComplianceReport from "./pages/ComplianceReport";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +121,8 @@ const App = () => (
             <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
             <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
             <Route path="/emergency" element={<ProtectedRoute><EmergencyEvacuation /></ProtectedRoute>} />
+            <Route path="/branding" element={<ProtectedRoute><BrandingSettings /></ProtectedRoute>} />
+            <Route path="/compliance" element={<ProtectedRoute><ComplianceReport /></ProtectedRoute>} />
             <Route path="/resource-requirements" element={<ResourceRequirements />} />
             <Route path="/product-features" element={<ProductFeatures />} />
             <Route path="/user-manual" element={<UserManual />} />

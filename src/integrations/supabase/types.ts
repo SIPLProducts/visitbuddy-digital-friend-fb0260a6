@@ -603,6 +603,69 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_settings: {
+        Row: {
+          auto_checkout_hours: number | null
+          badge_footer_text: string | null
+          badge_logo_url: string | null
+          company_name: string
+          created_at: string
+          data_retention_days: number | null
+          email_footer_text: string | null
+          email_header_text: string | null
+          enable_nda: boolean | null
+          enable_photo_capture: boolean | null
+          enable_watchlist_check: boolean | null
+          id: string
+          logo_url: string | null
+          nda_text: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          session_timeout_minutes: number | null
+          updated_at: string
+        }
+        Insert: {
+          auto_checkout_hours?: number | null
+          badge_footer_text?: string | null
+          badge_logo_url?: string | null
+          company_name?: string
+          created_at?: string
+          data_retention_days?: number | null
+          email_footer_text?: string | null
+          email_header_text?: string | null
+          enable_nda?: boolean | null
+          enable_photo_capture?: boolean | null
+          enable_watchlist_check?: boolean | null
+          id?: string
+          logo_url?: string | null
+          nda_text?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          session_timeout_minutes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          auto_checkout_hours?: number | null
+          badge_footer_text?: string | null
+          badge_logo_url?: string | null
+          company_name?: string
+          created_at?: string
+          data_retention_days?: number | null
+          email_footer_text?: string | null
+          email_header_text?: string | null
+          enable_nda?: boolean | null
+          enable_photo_capture?: boolean | null
+          enable_watchlist_check?: boolean | null
+          id?: string
+          logo_url?: string | null
+          nda_text?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          session_timeout_minutes?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_location_roles: {
         Row: {
           created_at: string
@@ -829,6 +892,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      visitor_agreements: {
+        Row: {
+          agreement_text: string
+          agreement_type: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          signature_data: string | null
+          signed_at: string
+          visitor_id: string
+        }
+        Insert: {
+          agreement_text: string
+          agreement_type?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          signature_data?: string | null
+          signed_at?: string
+          visitor_id: string
+        }
+        Update: {
+          agreement_text?: string
+          agreement_type?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          signature_data?: string | null
+          signed_at?: string
+          visitor_id?: string
+        }
+        Relationships: []
       }
       visitor_watchlist: {
         Row: {
