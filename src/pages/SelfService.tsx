@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { UserCheck, Building2, Phone, Mail, Briefcase, Users, Laptop, Camera, CheckCircle2, ArrowRight, ArrowLeft, Shield } from 'lucide-react';
+import { UserCheck, Building2, Phone, Mail, Briefcase, Users, Laptop, Camera, CheckCircle2, ArrowRight, ArrowLeft, Shield, Car } from 'lucide-react';
 import reslLogo from '@/assets/resl-logo.png';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
