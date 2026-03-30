@@ -253,7 +253,11 @@ export default function Visitors() {
     const matchesStatus =
       statusFilter === 'all' || visitor.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const visitorDate = new Date(visitor.created_at);
+    const matchesFromDate = !fromDate || visitorDate >= new Date(fromDate.setHours(0, 0, 0, 0));
+    const matchesToDate = !toDate || visitorDate <= new Date(new Date(toDate).setHours(23, 59, 59, 999));
+
+    return matchesSearch && matchesStatus && matchesFromDate && matchesToDate;
   });
 
   const handleRefresh = useCallback(async () => {
