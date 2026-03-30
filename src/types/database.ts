@@ -96,6 +96,8 @@ export interface Visitor {
   has_mobile: boolean;
   mobile_brand: string | null;
   mobile_serial: string | null;
+  vehicle_type: string | null;
+  vehicle_number: string | null;
   status: VisitorStatus;
   check_in_time: string | null;
   check_out_time: string | null;

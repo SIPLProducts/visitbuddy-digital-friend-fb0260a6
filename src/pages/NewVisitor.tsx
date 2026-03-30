@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2, Smartphone } from 'lucide-react';
+import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2, Smartphone, Car } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
