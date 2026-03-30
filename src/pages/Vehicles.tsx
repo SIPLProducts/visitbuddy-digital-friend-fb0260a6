@@ -308,6 +308,8 @@ export default function Vehicles() {
                   <TableHead>Type</TableHead>
                   <TableHead>Driver</TableHead>
                   <TableHead>Company</TableHead>
+                  <TableHead>Registered On</TableHead>
+                  <TableHead>Last Entry</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Entries</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -316,13 +318,13 @@ export default function Vehicles() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
+                    <TableCell colSpan={10} className="text-center py-8">
                       Loading...
                     </TableCell>
                   </TableRow>
                 ) : filteredVehicles.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                       No vehicles found
                     </TableCell>
                   </TableRow>
@@ -341,6 +343,14 @@ export default function Vehicles() {
                         </div>
                       </TableCell>
                       <TableCell>{vehicle.company || '-'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                        {format(new Date(vehicle.created_at), 'dd/MM/yyyy')}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                        {vehicle.check_in_time
+                          ? format(new Date(vehicle.check_in_time), 'dd/MM/yyyy HH:mm')
+                          : '—'}
+                      </TableCell>
                       <TableCell>{getStatusBadge(vehicle)}</TableCell>
                       <TableCell>
                         <Button
