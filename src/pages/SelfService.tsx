@@ -594,6 +594,12 @@ export default function SelfService() {
                       <span className="text-foreground">{formData.company}</span>
                     </>
                   )}
+                  {formData.vehicleType && formData.vehicleType !== 'by_walk' && (
+                    <>
+                      <span>Vehicle:</span>
+                      <span className="text-foreground capitalize">{formData.vehicleType.replace('_', ' ')} {formData.vehicleNumber && `- ${formData.vehicleNumber}`}</span>
+                    </>
+                  )}
                   {formData.hasLaptop && (
                     <>
                       <span>Laptop:</span>
