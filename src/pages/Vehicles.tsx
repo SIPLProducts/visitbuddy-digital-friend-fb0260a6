@@ -343,6 +343,14 @@ export default function Vehicles() {
                         </div>
                       </TableCell>
                       <TableCell>{vehicle.company || '-'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                        {format(new Date(vehicle.created_at), 'dd/MM/yyyy')}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                        {vehicle.check_in_time
+                          ? format(new Date(vehicle.check_in_time), 'dd/MM/yyyy HH:mm')
+                          : '—'}
+                      </TableCell>
                       <TableCell>{getStatusBadge(vehicle)}</TableCell>
                       <TableCell>
                         <Button
