@@ -38,6 +38,9 @@ import ResourceRequirements from "./pages/ResourceRequirements";
 import ProductFeatures from "./pages/ProductFeatures";
 import UserManual from "./pages/UserManual";
 import Notifications from "./pages/Notifications";
+import AuditLogs from "./pages/AuditLogs";
+import Watchlist from "./pages/Watchlist";
+import EmergencyEvacuation from "./pages/EmergencyEvacuation";
 
 const queryClient = new QueryClient();
 
@@ -113,6 +116,9 @@ const App = () => (
             <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
             <Route path="/proposal-document" element={<ProposalDocument />} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+            <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
+            <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
+            <Route path="/emergency" element={<ProtectedRoute><EmergencyEvacuation /></ProtectedRoute>} />
             <Route path="/resource-requirements" element={<ResourceRequirements />} />
             <Route path="/product-features" element={<ProductFeatures />} />
             <Route path="/user-manual" element={<UserManual />} />

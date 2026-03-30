@@ -24,6 +24,9 @@ import {
   ScanLine,
   ChevronDown,
   X,
+  Shield,
+  ShieldAlert,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -71,9 +74,17 @@ const menuGroups = [
     ],
   },
   {
+    label: 'Security',
+    items: [
+      { icon: ShieldAlert, label: 'Watchlist', path: '/watchlist' },
+      { icon: AlertTriangle, label: 'Emergency', path: '/emergency' },
+    ],
+  },
+  {
     label: 'Insights',
     items: [
       { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+      { icon: Shield, label: 'Audit Trail', path: '/audit-logs' },
     ],
   },
   {
