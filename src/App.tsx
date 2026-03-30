@@ -41,6 +41,8 @@ import Notifications from "./pages/Notifications";
 import AuditLogs from "./pages/AuditLogs";
 import Watchlist from "./pages/Watchlist";
 import EmergencyEvacuation from "./pages/EmergencyEvacuation";
+import BrandingSettings from "./pages/BrandingSettings";
+import ComplianceReport from "./pages/ComplianceReport";
 
 const queryClient = new QueryClient();
 
