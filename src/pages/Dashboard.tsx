@@ -269,15 +269,31 @@ export default function Dashboard() {
                     <Activity className="h-3 w-3 mr-1" />
                     Live Dashboard
                   </Badge>
+                  {userRole && (
+                    <Badge className="bg-white/15 text-white hover:bg-white/20 border-0 text-[10px] uppercase tracking-wider font-semibold">
+                      {userRole}
+                    </Badge>
+                  )}
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  Command Center
+                  {userName ? `Welcome back, ${userName}` : 'Command Center'}
                 </h1>
                 <p className="text-sm text-white/70 mt-1">
                   Real-time monitoring across all facilities
                 </p>
               </div>
-              <LiveClock />
+              <div className="flex items-center gap-4">
+                {/* Facility Health Score */}
+                <div className="hidden md:flex flex-col items-center bg-white/10 rounded-xl px-4 py-2">
+                  <div className="flex items-center gap-1.5">
+                    <HeartPulse className="h-4 w-4" />
+                    <span className="text-xs text-white/70">Health</span>
+                  </div>
+                  <span className="text-xl font-bold">
+                    {Math.max(0, 100 - (filteredStats.overstayed * 10) - (filteredStats.pendingApproval * 5))}%
+                  </span>
+                </div>
+                <LiveClock />
             </div>
           </div>
 
