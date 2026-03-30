@@ -74,9 +74,17 @@ const menuGroups = [
     ],
   },
   {
+    label: 'Security',
+    items: [
+      { icon: ShieldAlert, label: 'Watchlist', path: '/watchlist' },
+      { icon: AlertTriangle, label: 'Emergency', path: '/emergency' },
+    ],
+  },
+  {
     label: 'Insights',
     items: [
       { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+      { icon: Shield, label: 'Audit Trail', path: '/audit-logs' },
     ],
   },
   {
