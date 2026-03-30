@@ -439,6 +439,38 @@ export default function SelfService() {
               <CardDescription>Optional details for security</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Vehicle Type */}
+              <div className="space-y-2">
+                <Label>Mode of Transport</Label>
+                <Select value={formData.vehicleType} onValueChange={(v) => updateField('vehicleType', v)}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="by_walk">By Walk</SelectItem>
+                    <SelectItem value="two_wheeler">Two Wheeler</SelectItem>
+                    <SelectItem value="four_wheeler">Four Wheeler</SelectItem>
+                    <SelectItem value="cab">Cab / Taxi</SelectItem>
+                    <SelectItem value="auto">Auto Rickshaw</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {formData.vehicleType && formData.vehicleType !== 'by_walk' && (
+                <div className="space-y-2">
+                  <Label htmlFor="vehicleNumber">Vehicle Number</Label>
+                  <div className="relative">
+                    <Car className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="vehicleNumber"
+                      placeholder="e.g. KA-01-AB-1234"
+                      value={formData.vehicleNumber}
+                      onChange={(e) => updateField('vehicleNumber', e.target.value)}
+                      className="h-12 pl-10"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="flex items-center space-x-3 p-4 rounded-lg border bg-muted/30">
                 <Checkbox
                   id="hasLaptop"
