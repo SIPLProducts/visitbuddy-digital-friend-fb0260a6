@@ -308,6 +308,8 @@ export default function Vehicles() {
                   <TableHead>Type</TableHead>
                   <TableHead>Driver</TableHead>
                   <TableHead>Company</TableHead>
+                  <TableHead>Registered On</TableHead>
+                  <TableHead>Last Entry</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Entries</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
