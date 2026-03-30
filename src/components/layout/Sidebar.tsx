@@ -24,6 +24,9 @@ import {
   ScanLine,
   ChevronDown,
   X,
+  Shield,
+  ShieldAlert,
+  AlertTriangle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
