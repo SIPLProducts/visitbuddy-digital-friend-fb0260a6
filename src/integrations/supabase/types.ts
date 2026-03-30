@@ -136,6 +136,45 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_name: string | null
+          entity_type: string
+          id: string
+          ip_address: string | null
+          location_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_name?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          location_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_name?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          location_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           active_visitors: number | null
@@ -790,6 +829,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      visitor_watchlist: {
+        Row: {
+          added_by: string | null
+          company: string | null
+          created_at: string
+          email: string | null
+          govt_id_number: string | null
+          id: string
+          is_active: boolean
+          location_id: string | null
+          name: string
+          phone: string | null
+          photo_url: string | null
+          reason: string
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          added_by?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          govt_id_number?: string | null
+          id?: string
+          is_active?: boolean
+          location_id?: string | null
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          reason: string
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string | null
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          govt_id_number?: string | null
+          id?: string
+          is_active?: boolean
+          location_id?: string | null
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          reason?: string
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       visitors: {
         Row: {
