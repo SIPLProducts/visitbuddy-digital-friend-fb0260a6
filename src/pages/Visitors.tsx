@@ -447,19 +447,25 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={10} className="text-center py-8">
+                   <TableCell colSpan={11} className="text-center py-8">
                     Loading visitors...
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8">
+                  <TableCell colSpan={11} className="text-center py-8">
                     No visitors found
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredVisitors.map((visitor) => (
-                  <TableRow key={visitor.id}>
+                  <TableRow key={visitor.id} className={selectedIds.has(visitor.id) ? 'bg-primary/5' : ''}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedIds.has(visitor.id)}
+                        onCheckedChange={() => toggleSelect(visitor.id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
