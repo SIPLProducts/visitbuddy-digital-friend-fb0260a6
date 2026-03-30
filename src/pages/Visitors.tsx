@@ -352,6 +352,7 @@ export default function Visitors() {
                 <TableHead>ID</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead>Host / Department</TableHead>
+                <TableHead>Date of Visit</TableHead>
                 <TableHead>Vehicle</TableHead>
                 <TableHead>Laptop</TableHead>
                 <TableHead>Status</TableHead>
@@ -362,13 +363,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={9} className="text-center py-8">
+                   <TableCell colSpan={10} className="text-center py-8">
                     Loading visitors...
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8">
+                  <TableCell colSpan={10} className="text-center py-8">
                     No visitors found
                   </TableCell>
                 </TableRow>
@@ -419,6 +420,9 @@ export default function Visitors() {
                           {visitor.host?.department?.name || visitor.department?.name || '—'}
                         </p>
                       </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {format(new Date(visitor.created_at), 'dd/MM/yyyy')}
                     </TableCell>
                     <TableCell>
                       {visitor.vehicle_type && visitor.vehicle_type !== 'by_walk' ? (
