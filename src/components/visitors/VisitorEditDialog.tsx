@@ -73,6 +73,8 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         purpose: visitor.purpose || '',
         host_id: visitor.host_id || '',
         department_id: visitor.department_id || '',
+        vehicle_type: visitor.vehicle_type || 'by_walk',
+        vehicle_number: visitor.vehicle_number || '',
         has_laptop: visitor.has_laptop || false,
         laptop_brand: visitor.laptop_brand || '',
         laptop_serial: visitor.laptop_serial || '',
