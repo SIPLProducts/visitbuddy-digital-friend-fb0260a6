@@ -320,7 +320,7 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                   <TableCell colSpan={9} className="text-center py-8">
                     Loading visitors...
                   </TableCell>
                 </TableRow>
