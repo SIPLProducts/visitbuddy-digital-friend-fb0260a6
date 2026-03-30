@@ -344,9 +344,9 @@ export default function Visitors() {
         </div>
 
         {/* Table */}
-        <div className="bg-card rounded-xl border border-border">
+        <div className="bg-card rounded-xl border border-border overflow-auto max-h-[calc(100vh-280px)]">
           <Table>
-            <TableHeader>
+            <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow>
                 <TableHead>Visitor</TableHead>
                 <TableHead>ID</TableHead>
