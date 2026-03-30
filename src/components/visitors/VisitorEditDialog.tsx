@@ -229,7 +229,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
             <div>
               <Label htmlFor="department">Department</Label>
               <Select
-                value={formData.department_id}
+                value={formData.department_id || undefined}
                 onValueChange={(value) => setFormData({ ...formData, department_id: value })}
               >
                 <SelectTrigger>
