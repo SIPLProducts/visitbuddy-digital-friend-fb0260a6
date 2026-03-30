@@ -475,6 +475,52 @@ export default function NewVisitor() {
             </CardContent>
           </Card>
 
+          {/* Vehicle Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="h-5 w-5" />
+                Vehicle Information
+              </CardTitle>
+              <CardDescription>
+                How is the visitor arriving?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Mode of Transport *</Label>
+                  <Select
+                    value={vehicleType}
+                    onValueChange={(value) => form.setValue('vehicle_type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="by_walk">By Walk</SelectItem>
+                      <SelectItem value="two_wheeler">Two Wheeler</SelectItem>
+                      <SelectItem value="four_wheeler">Four Wheeler</SelectItem>
+                      <SelectItem value="cab">Cab / Taxi</SelectItem>
+                      <SelectItem value="auto">Auto Rickshaw</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {vehicleType && vehicleType !== 'by_walk' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="vehicle_number">Vehicle Number</Label>
+                    <Input
+                      id="vehicle_number"
+                      placeholder="e.g. KA-01-AB-1234"
+                      {...form.register('vehicle_number')}
+                    />
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Visit Details */}
           <Card>
             <CardHeader>
