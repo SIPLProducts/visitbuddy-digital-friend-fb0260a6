@@ -126,6 +126,8 @@ export default function NewVisitor() {
       host_id: data.host_id || null,
       department_id: data.department_id || null,
       gate_id: data.gate_id || null,
+      vehicle_type: data.vehicle_type || 'by_walk',
+      vehicle_number: (data.vehicle_type && data.vehicle_type !== 'by_walk') ? data.vehicle_number || null : null,
       has_laptop: data.has_laptop,
       laptop_brand: data.has_laptop ? data.laptop_brand : null,
       laptop_serial: data.has_laptop ? data.laptop_serial : null,
