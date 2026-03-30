@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Visitor } from '@/types/database';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { X } from 'lucide-react';
 
 interface VisitorEditDialogProps {
   visitor: Visitor | null;
