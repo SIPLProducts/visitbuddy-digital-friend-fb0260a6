@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -39,15 +39,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Plus, Video, Building2, User, Clock, MoreVertical, Check, X, Trash2 } from 'lucide-react';
+import { Plus, Building2, User, Clock, MoreVertical, Check, X, Trash2, CalendarDays, CalendarCheck, CalendarClock, CalendarX2, Phone, Mail, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Appointment, Department, Employee } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 export default function Appointments() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,6 +78,7 @@ export default function Appointments() {
 
   useEffect(() => {
     fetchData();
+    fetchTodayStats();
   }, []);
 
   useEffect(() => {
@@ -92,11 +95,24 @@ export default function Appointments() {
     if (empRes.data) setEmployees(empRes.data as unknown as Employee[]);
   };
 
+  const fetchTodayStats = async () => {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    const { data } = await supabase
+      .from('appointments')
+      .select('*')
+      .eq('scheduled_date', dateStr);
+
+    if (data) {
+      setAllAppointments(data as unknown as Appointment[]);
+    }
+  };
+
   const fetchAppointments = async () => {
     if (!selectedDate) return;
 
     setLoading(true);
-    // Use local date to avoid timezone offset issues
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -127,7 +143,7 @@ export default function Appointments() {
       purpose: '',
       host_id: '',
       department_id: '',
-      scheduled_date: selectedDate 
+      scheduled_date: selectedDate
         ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
         : `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`,
       scheduled_time: '10:00',
@@ -168,6 +184,7 @@ export default function Appointments() {
       setIsAddDialogOpen(false);
       resetForm();
       fetchAppointments();
+      fetchTodayStats();
     }
   };
 
@@ -182,6 +199,7 @@ export default function Appointments() {
     } else {
       toast.success(`Appointment ${newStatus}`);
       fetchAppointments();
+      fetchTodayStats();
     }
   };
 
@@ -199,6 +217,7 @@ export default function Appointments() {
       setIsDeleteDialogOpen(false);
       setSelectedAppointment(null);
       fetchAppointments();
+      fetchTodayStats();
     }
   };
 
@@ -209,11 +228,21 @@ export default function Appointments() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'bg-[#dcfce7] text-[#16a34a] border-[#16a34a]/20';
-      case 'pending': return 'bg-amber-100 text-amber-700 border-amber-200';
-      case 'cancelled': return 'bg-rose-100 text-rose-700 border-rose-200';
-      case 'completed': return 'bg-gray-100 text-gray-600 border-gray-300/20';
-      default: return 'bg-gray-100 text-gray-600 border-gray-300/20';
+      case 'confirmed': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+      case 'pending': return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
+      case 'cancelled': return 'bg-rose-500/10 text-rose-600 border-rose-500/20';
+      case 'completed': return 'bg-slate-500/10 text-slate-600 border-slate-500/20';
+      default: return 'bg-slate-500/10 text-slate-600 border-slate-500/20';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'confirmed': return <CalendarCheck className="h-3.5 w-3.5" />;
+      case 'pending': return <CalendarClock className="h-3.5 w-3.5" />;
+      case 'cancelled': return <CalendarX2 className="h-3.5 w-3.5" />;
+      case 'completed': return <Check className="h-3.5 w-3.5" />;
+      default: return <CalendarDays className="h-3.5 w-3.5" />;
     }
   };
 
@@ -236,15 +265,34 @@ export default function Appointments() {
     return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
+  const todayStats = useMemo(() => {
+    const total = allAppointments.length;
+    const confirmed = allAppointments.filter(a => a.status === 'confirmed').length;
+    const pending = allAppointments.filter(a => a.status === 'pending').length;
+    const cancelled = allAppointments.filter(a => a.status === 'cancelled').length;
+    const completed = allAppointments.filter(a => a.status === 'completed').length;
+    return { total, confirmed, pending, cancelled, completed };
+  }, [allAppointments]);
+
   const scheduledCount = appointments.filter((a) => a.status !== 'cancelled').length;
+
+  const getTimeSlotColor = (timeStr: string) => {
+    const hour = parseInt(timeStr.split(':')[0], 10);
+    if (hour < 12) return 'border-l-blue-500';
+    if (hour < 15) return 'border-l-amber-500';
+    return 'border-l-purple-500';
+  };
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Appointments</h1>
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <CalendarDays className="h-6 w-6 text-primary" />
+              Appointments
+            </h1>
             <p className="text-muted-foreground">Schedule and manage visitor appointments</p>
           </div>
           <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
@@ -253,112 +301,219 @@ export default function Appointments() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Today's Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <Card>
+            <CardHeader className="pb-1 pt-4 px-4">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5" />
+                Today's Total
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <p className="text-2xl font-bold">{todayStats.total}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-1 pt-4 px-4">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <CalendarCheck className="h-3.5 w-3.5 text-emerald-500" />
+                Confirmed
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <p className="text-2xl font-bold text-emerald-600">{todayStats.confirmed}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-1 pt-4 px-4">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <CalendarClock className="h-3.5 w-3.5 text-amber-500" />
+                Pending
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <p className="text-2xl font-bold text-amber-600">{todayStats.pending}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-1 pt-4 px-4">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-blue-500" />
+                Completed
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <p className="text-2xl font-bold text-blue-600">{todayStats.completed}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-1 pt-4 px-4">
+              <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                <CalendarX2 className="h-3.5 w-3.5 text-rose-500" />
+                Cancelled
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <p className="text-2xl font-bold text-rose-600">{todayStats.cancelled}</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Calendar */}
-          <div className="bg-card rounded-xl border border-border p-4 shadow-none">
-            <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Select Date
-            </h3>
-            <Calendar 
-              mode="single" 
-              selected={selectedDate} 
-              onSelect={setSelectedDate} 
-              className="rounded-md"
-              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-            />
-          </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                Select Date
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                className="rounded-md pointer-events-auto"
+              />
+            </CardContent>
+          </Card>
 
           {/* Appointments List */}
-          <div className="lg:col-span-2 bg-card rounded-xl border border-border">
-            <div className="flex items-center justify-between p-6 border-b border-border">
-              <div>
-                <h3 className="font-semibold text-foreground">Appointments</h3>
-                <p className="text-sm text-muted-foreground">
-                  {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
-              </div>
-              <Badge variant="secondary">{scheduledCount} scheduled</Badge>
-            </div>
-            <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
-              {loading ? (
-                <div className="p-6 text-center text-muted-foreground">Loading appointments...</div>
-              ) : appointments.length === 0 ? (
-                <div className="p-12 text-center text-muted-foreground">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>No appointments scheduled for this date</p>
+          <div className="lg:col-span-2">
+            <Card className="h-full">
+              <CardHeader className="border-b border-border pb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base font-semibold">Appointments</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {selectedDate ? format(selectedDate, 'EEEE, MMMM d, yyyy') : 'Select a date'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {scheduledCount} scheduled
+                    </Badge>
+                  </div>
                 </div>
-              ) : (
-                appointments.map((appointment) => (
-                  <div key={appointment.id} className="p-4 hover:bg-accent/50 transition-colors">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-[#0891b2] text-white font-medium">
-                          {getInitials(appointment.visitor_name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-medium text-foreground">{appointment.visitor_name}</p>
-                          <Badge variant="outline" className={cn(getStatusColor(appointment.status))}>
-                            {appointment.status}
-                          </Badge>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
-                          {appointment.company && (
-                            <span className="flex items-center gap-1">
-                              <Building2 className="h-3 w-3" />
-                              {appointment.company}
-                            </span>
-                          )}
-                          {appointment.host && (
-                            <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              {appointment.host.name}
-                            </span>
-                          )}
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatTime(appointment.scheduled_time)} ({formatDuration(appointment.duration_minutes)})
-                          </span>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-border max-h-[520px] overflow-y-auto">
+                  {loading ? (
+                    <div className="p-8 text-center text-muted-foreground">Loading appointments...</div>
+                  ) : appointments.length === 0 ? (
+                    <div className="p-12 text-center text-muted-foreground">
+                      <CalendarDays className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                      <p className="font-medium">No appointments scheduled</p>
+                      <p className="text-sm mt-1">
+                        {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'this date'}
+                      </p>
+                    </div>
+                  ) : (
+                    appointments.map((appointment) => (
+                      <div
+                        key={appointment.id}
+                        className={cn(
+                          'p-4 hover:bg-accent/50 transition-colors border-l-4',
+                          getTimeSlotColor(appointment.scheduled_time)
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          <Avatar className="h-10 w-10 shrink-0">
+                            <AvatarFallback className="bg-primary/10 text-primary font-semibold text-sm">
+                              {getInitials(appointment.visitor_name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold text-foreground">{appointment.visitor_name}</p>
+                              <Badge variant="outline" className={cn('gap-1 text-[10px] font-semibold', getStatusColor(appointment.status))}>
+                                {getStatusIcon(appointment.status)}
+                                {appointment.status}
+                              </Badge>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1 font-medium text-foreground/80">
+                                <Clock className="h-3 w-3" />
+                                {formatTime(appointment.scheduled_time)}
+                                <span className="text-muted-foreground font-normal">
+                                  ({formatDuration(appointment.duration_minutes)})
+                                </span>
+                              </span>
+                              {appointment.company && (
+                                <span className="flex items-center gap-1">
+                                  <Building2 className="h-3 w-3" />
+                                  {appointment.company}
+                                </span>
+                              )}
+                              {appointment.host && (
+                                <span className="flex items-center gap-1">
+                                  <User className="h-3 w-3" />
+                                  {appointment.host.name}
+                                </span>
+                              )}
+                              {appointment.purpose && (
+                                <span className="flex items-center gap-1">
+                                  <FileText className="h-3 w-3" />
+                                  {appointment.purpose}
+                                </span>
+                              )}
+                            </div>
+                            {(appointment.visitor_email || appointment.visitor_phone) && (
+                              <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                {appointment.visitor_email && (
+                                  <span className="flex items-center gap-1">
+                                    <Mail className="h-3 w-3" />
+                                    {appointment.visitor_email}
+                                  </span>
+                                )}
+                                {appointment.visitor_phone && (
+                                  <span className="flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    {appointment.visitor_phone}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {appointment.status === 'pending' && (
+                                <>
+                                  <DropdownMenuItem onClick={() => handleStatusUpdate(appointment, 'confirmed')}>
+                                    <Check className="h-4 w-4 mr-2 text-emerald-600" />
+                                    Confirm
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleStatusUpdate(appointment, 'cancelled')}>
+                                    <X className="h-4 w-4 mr-2 text-rose-600" />
+                                    Cancel
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+                              {appointment.status === 'confirmed' && (
+                                <DropdownMenuItem onClick={() => handleStatusUpdate(appointment, 'completed')}>
+                                  <Check className="h-4 w-4 mr-2" />
+                                  Mark Complete
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => openDeleteDialog(appointment)} className="text-destructive">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {appointment.status === 'pending' && (
-                            <>
-                              <DropdownMenuItem onClick={() => handleStatusUpdate(appointment, 'confirmed')}>
-                                <Check className="h-4 w-4 mr-2 text-green-600" />
-                                Confirm
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleStatusUpdate(appointment, 'cancelled')}>
-                                <X className="h-4 w-4 mr-2 text-red-600" />
-                                Cancel
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                          {appointment.status === 'confirmed' && (
-                            <DropdownMenuItem onClick={() => handleStatusUpdate(appointment, 'completed')}>
-                              <Check className="h-4 w-4 mr-2" />
-                              Mark Complete
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem onClick={() => openDeleteDialog(appointment)} className="text-destructive">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
