@@ -310,6 +310,7 @@ export default function Visitors() {
                 <TableHead>ID</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead>Host / Department</TableHead>
+                <TableHead>Vehicle</TableHead>
                 <TableHead>Laptop</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Check-in/out</TableHead>
