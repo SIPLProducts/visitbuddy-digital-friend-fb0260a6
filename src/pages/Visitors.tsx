@@ -426,6 +426,12 @@ export default function Visitors() {
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={filteredVisitors.length > 0 && selectedIds.size === filteredVisitors.length}
+                    onCheckedChange={toggleSelectAll}
+                  />
+                </TableHead>
                 <TableHead>Visitor</TableHead>
                 <TableHead>ID</TableHead>
                 <TableHead>Company</TableHead>
