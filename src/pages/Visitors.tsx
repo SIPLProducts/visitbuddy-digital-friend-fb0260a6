@@ -620,6 +620,8 @@ export default function Visitors() {
         open={checkInDialogOpen}
         onOpenChange={setCheckInDialogOpen}
         visitorName={checkInVisitor?.name || ''}
+        visitorPhone={checkInVisitor?.phone}
+        visitorEmail={checkInVisitor?.email}
         onConfirm={handleConfirmCheckIn}
         loading={checkInLoading}
       />
