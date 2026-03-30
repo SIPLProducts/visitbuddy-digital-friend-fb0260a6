@@ -257,6 +257,42 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
             </div>
           </div>
 
+          {/* Vehicle Section */}
+          <div className="border-t pt-4 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="vehicle_type">Mode of Transport</Label>
+                <Select
+                  value={formData.vehicle_type}
+                  onValueChange={(value) => setFormData({ ...formData, vehicle_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="by_walk">By Walk</SelectItem>
+                    <SelectItem value="two_wheeler">Two Wheeler</SelectItem>
+                    <SelectItem value="four_wheeler">Four Wheeler</SelectItem>
+                    <SelectItem value="cab">Cab / Taxi</SelectItem>
+                    <SelectItem value="auto">Auto Rickshaw</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {formData.vehicle_type && formData.vehicle_type !== 'by_walk' && (
+                <div>
+                  <Label htmlFor="vehicle_number">Vehicle Number</Label>
+                  <Input
+                    id="vehicle_number"
+                    placeholder="e.g. KA-01-AB-1234"
+                    value={formData.vehicle_number}
+                    onChange={(e) => setFormData({ ...formData, vehicle_number: e.target.value })}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Laptop Section */}
           <div className="border-t pt-4 space-y-4">
             <div className="flex items-center justify-between">

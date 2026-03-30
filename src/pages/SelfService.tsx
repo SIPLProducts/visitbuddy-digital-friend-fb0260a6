@@ -219,7 +219,8 @@ export default function SelfService() {
                 setStep(1);
                 setFormData({
                   name: '', phone: '', email: '', company: '', purpose: '',
-                  departmentId: '', hostId: '', hasLaptop: false, laptopBrand: '',
+                  departmentId: '', hostId: '', vehicleType: 'by_walk', vehicleNumber: '',
+                  hasLaptop: false, laptopBrand: '',
                   laptopSerial: '', accompanyingCount: 0, photoUrl: '',
                 });
               }}
