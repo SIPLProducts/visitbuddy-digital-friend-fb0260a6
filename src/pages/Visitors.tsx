@@ -19,12 +19,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Plus, Building2, Laptop, Mail, Car } from 'lucide-react';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 import { VisitorDetailsDialog } from '@/components/visitors/VisitorDetailsDialog';
 import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
 import { VisitorActions } from '@/components/visitors/VisitorActions';
@@ -37,6 +44,8 @@ export default function Visitors() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
+  const [toDate, setToDate] = useState<Date | undefined>(undefined);
   
   // Dialog states
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
@@ -244,7 +253,11 @@ export default function Visitors() {
     const matchesStatus =
       statusFilter === 'all' || visitor.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const visitorDate = new Date(visitor.created_at);
+    const matchesFromDate = !fromDate || visitorDate >= new Date(fromDate.setHours(0, 0, 0, 0));
+    const matchesToDate = !toDate || visitorDate <= new Date(new Date(toDate).setHours(23, 59, 59, 999));
+
+    return matchesSearch && matchesStatus && matchesFromDate && matchesToDate;
   });
 
   const handleRefresh = useCallback(async () => {
@@ -272,11 +285,11 @@ export default function Visitors() {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, company, email, ID, or laptop serial..."
+              placeholder="Search by name, company, email, ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -295,10 +308,39 @@ export default function Visitors() {
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            More Filters
-          </Button>
+
+          {/* From Date */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !fromDate && "text-muted-foreground")}>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {fromDate ? format(fromDate, "dd/MM/yyyy") : "From Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={fromDate} onSelect={setFromDate} initialFocus className="p-3 pointer-events-auto" />
+            </PopoverContent>
+          </Popover>
+
+          {/* To Date */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !toDate && "text-muted-foreground")}>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {toDate ? format(toDate, "dd/MM/yyyy") : "To Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={toDate} onSelect={setToDate} initialFocus className="p-3 pointer-events-auto" />
+            </PopoverContent>
+          </Popover>
+
+          {/* Clear filters */}
+          {(fromDate || toDate) && (
+            <Button variant="ghost" size="icon" onClick={() => { setFromDate(undefined); setToDate(undefined); }} title="Clear date filters">
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
         {/* Table */}

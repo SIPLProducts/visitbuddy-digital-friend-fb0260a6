@@ -20,6 +20,7 @@ import {
 import { Visitor } from '@/types/database';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { X } from 'lucide-react';
 
 interface VisitorEditDialogProps {
   visitor: Visitor | null;
@@ -209,40 +210,68 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
             
             <div>
               <Label htmlFor="host">Host</Label>
-              <Select
-                value={formData.host_id || undefined}
-                onValueChange={(value) => setFormData({ ...formData, host_id: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select host" />
-                </SelectTrigger>
-                <SelectContent>
-                  {employees.map((emp) => (
-                    <SelectItem key={emp.id} value={emp.id}>
-                      {emp.name} {emp.department ? `(${emp.department.name})` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select
+                  value={formData.host_id || undefined}
+                  onValueChange={(value) => setFormData({ ...formData, host_id: value })}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select host" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((emp) => (
+                      <SelectItem key={emp.id} value={emp.id}>
+                        {emp.name} {emp.department ? `(${emp.department.name})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formData.host_id && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 shrink-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => setFormData({ ...formData, host_id: '' })}
+                    title="Clear host"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
             
             <div>
               <Label htmlFor="department">Department</Label>
-              <Select
-                value={formData.department_id || undefined}
-                onValueChange={(value) => setFormData({ ...formData, department_id: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select department" />
-                </SelectTrigger>
-                <SelectContent>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select
+                  value={formData.department_id || undefined}
+                  onValueChange={(value) => setFormData({ ...formData, department_id: value })}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formData.department_id && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-10 w-10 shrink-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => setFormData({ ...formData, department_id: '' })}
+                    title="Clear department"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
             
             <div>
