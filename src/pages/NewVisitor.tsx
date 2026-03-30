@@ -32,6 +32,8 @@ const visitorSchema = z.object({
   host_id: z.string().optional(),
   department_id: z.string().optional(),
   gate_id: z.string().optional(),
+  vehicle_type: z.string().default('by_walk'),
+  vehicle_number: z.string().optional(),
   has_laptop: z.boolean().default(false),
   laptop_brand: z.string().optional(),
   laptop_serial: z.string().optional(),
