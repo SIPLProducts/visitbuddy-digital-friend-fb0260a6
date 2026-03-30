@@ -4,6 +4,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -26,7 +27,13 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -37,6 +44,7 @@ import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
 import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInDialog } from '@/components/visitors/CheckInDialog';
+import { logAudit } from '@/lib/auditLog';
 
 export default function Visitors() {
   const navigate = useNavigate();
