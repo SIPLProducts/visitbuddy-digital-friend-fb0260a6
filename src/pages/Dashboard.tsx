@@ -36,6 +36,9 @@ import { subDays, startOfDay, isToday, isThisWeek, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const [userName, setUserName] = useState('');
+  const [userRole, setUserRole] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [gates, setGates] = useState<Gate[]>([]);
