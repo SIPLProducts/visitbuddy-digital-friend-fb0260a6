@@ -5,6 +5,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { OnboardingTour } from '@/components/onboarding/OnboardingTour';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 
 interface MainLayoutProps {
   children: ReactNode;
