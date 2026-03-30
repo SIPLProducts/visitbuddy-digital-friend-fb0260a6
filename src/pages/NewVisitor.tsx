@@ -87,6 +87,7 @@ export default function NewVisitor() {
 
   const hasLaptop = form.watch('has_laptop');
   const hasMobile = form.watch('has_mobile');
+  const vehicleType = form.watch('vehicle_type');
 
   useEffect(() => {
     fetchFormData();
