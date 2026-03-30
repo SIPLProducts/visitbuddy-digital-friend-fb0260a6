@@ -294,6 +294,7 @@ export default function Dashboard() {
                   </span>
                 </div>
                 <LiveClock />
+              </div>
             </div>
           </div>
 
