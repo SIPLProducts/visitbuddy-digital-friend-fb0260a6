@@ -379,6 +379,21 @@ export default function Visitors() {
                       </div>
                     </TableCell>
                     <TableCell>
+                      {visitor.vehicle_type && visitor.vehicle_type !== 'by_walk' ? (
+                        <div className="flex items-center gap-1">
+                          <Car className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm capitalize">{visitor.vehicle_type.replace('_', ' ')}</p>
+                            {visitor.vehicle_number && (
+                              <p className="text-xs text-muted-foreground">{visitor.vehicle_number}</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">By Walk</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       {visitor.has_laptop ? (
                         <div className="flex items-center gap-1">
                           <Laptop className="h-4 w-4 text-muted-foreground" />
