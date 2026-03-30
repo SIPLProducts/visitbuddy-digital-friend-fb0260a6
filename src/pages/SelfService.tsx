@@ -148,6 +148,8 @@ export default function SelfService() {
         department_id: formData.departmentId || null,
         host_id: formData.hostId || null,
         gate_id: selectedGateId || null,
+        vehicle_type: formData.vehicleType || 'by_walk',
+        vehicle_number: (formData.vehicleType && formData.vehicleType !== 'by_walk') ? formData.vehicleNumber || null : null,
         has_laptop: formData.hasLaptop,
         laptop_brand: formData.hasLaptop ? formData.laptopBrand : null,
         laptop_serial: formData.hasLaptop ? formData.laptopSerial : null,
