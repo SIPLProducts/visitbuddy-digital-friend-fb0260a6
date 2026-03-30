@@ -52,6 +52,8 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
     purpose: '',
     host_id: '',
     department_id: '',
+    vehicle_type: 'by_walk',
+    vehicle_number: '',
     has_laptop: false,
     laptop_brand: '',
     laptop_serial: '',
