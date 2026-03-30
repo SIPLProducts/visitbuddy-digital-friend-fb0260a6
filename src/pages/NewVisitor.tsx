@@ -73,6 +73,8 @@ export default function NewVisitor() {
       phone: '',
       company: '',
       purpose: '',
+      vehicle_type: 'by_walk',
+      vehicle_number: '',
       has_laptop: false,
       laptop_brand: '',
       laptop_serial: '',
