@@ -48,6 +48,8 @@ export default function SelfService() {
     purpose: '',
     departmentId: '',
     hostId: '',
+    vehicleType: 'by_walk',
+    vehicleNumber: '',
     hasLaptop: false,
     laptopBrand: '',
     laptopSerial: '',
