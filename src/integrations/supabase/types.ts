@@ -818,6 +818,8 @@ export type Database = {
           qr_code: string | null
           status: Database["public"]["Enums"]["visitor_status"] | null
           updated_at: string
+          vehicle_number: string | null
+          vehicle_type: string | null
           visitor_id: string
         }
         Insert: {
@@ -846,6 +848,8 @@ export type Database = {
           qr_code?: string | null
           status?: Database["public"]["Enums"]["visitor_status"] | null
           updated_at?: string
+          vehicle_number?: string | null
+          vehicle_type?: string | null
           visitor_id: string
         }
         Update: {
@@ -874,6 +878,8 @@ export type Database = {
           qr_code?: string | null
           status?: Database["public"]["Enums"]["visitor_status"] | null
           updated_at?: string
+          vehicle_number?: string | null
+          vehicle_type?: string | null
           visitor_id?: string
         }
         Relationships: [

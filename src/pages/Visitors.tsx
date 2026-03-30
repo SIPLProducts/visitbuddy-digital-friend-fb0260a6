@@ -20,7 +20,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Search, Filter, Plus, Building2, Laptop, Mail } from 'lucide-react';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -310,6 +310,7 @@ export default function Visitors() {
                 <TableHead>ID</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead>Host / Department</TableHead>
+                <TableHead>Vehicle</TableHead>
                 <TableHead>Laptop</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Check-in/out</TableHead>
@@ -319,13 +320,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                   <TableCell colSpan={9} className="text-center py-8">
                     Loading visitors...
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     No visitors found
                   </TableCell>
                 </TableRow>
@@ -376,6 +377,21 @@ export default function Visitors() {
                           {visitor.host?.department?.name || visitor.department?.name || '—'}
                         </p>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {visitor.vehicle_type && visitor.vehicle_type !== 'by_walk' ? (
+                        <div className="flex items-center gap-1">
+                          <Car className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm capitalize">{visitor.vehicle_type.replace('_', ' ')}</p>
+                            {visitor.vehicle_number && (
+                              <p className="text-xs text-muted-foreground">{visitor.vehicle_number}</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">By Walk</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {visitor.has_laptop ? (

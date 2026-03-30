@@ -7,7 +7,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Visitor } from '@/types/database';
-import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin, ShieldCheck } from 'lucide-react';
+import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin, ShieldCheck, Car } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface VisitorDetailsDialogProps {
@@ -158,6 +158,24 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
                 </p>
               </div>
             )}
+
+          {/* Vehicle Info */}
+          {visitor.vehicle_type && visitor.vehicle_type !== 'by_walk' && (
+            <div className="border-t pt-4 space-y-3">
+              <h4 className="font-medium text-sm text-muted-foreground">Vehicle Information</h4>
+              <div className="flex items-center gap-3 bg-muted/50 p-3 rounded-lg">
+                <Car className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium capitalize">{visitor.vehicle_type.replace('_', ' ')}</p>
+                  {visitor.vehicle_number && (
+                    <p className="text-xs text-muted-foreground">
+                      Number: {visitor.vehicle_number}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Check-in/out Times */}
           <div className="border-t pt-4 space-y-3">

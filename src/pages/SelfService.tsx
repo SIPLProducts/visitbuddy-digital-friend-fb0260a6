@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { UserCheck, Building2, Phone, Mail, Briefcase, Users, Laptop, Camera, CheckCircle2, ArrowRight, ArrowLeft, Shield } from 'lucide-react';
+import { UserCheck, Building2, Phone, Mail, Briefcase, Users, Laptop, Camera, CheckCircle2, ArrowRight, ArrowLeft, Shield, Car } from 'lucide-react';
 import reslLogo from '@/assets/resl-logo.png';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -48,6 +48,8 @@ export default function SelfService() {
     purpose: '',
     departmentId: '',
     hostId: '',
+    vehicleType: 'by_walk',
+    vehicleNumber: '',
     hasLaptop: false,
     laptopBrand: '',
     laptopSerial: '',
@@ -146,6 +148,8 @@ export default function SelfService() {
         department_id: formData.departmentId || null,
         host_id: formData.hostId || null,
         gate_id: selectedGateId || null,
+        vehicle_type: formData.vehicleType || 'by_walk',
+        vehicle_number: (formData.vehicleType && formData.vehicleType !== 'by_walk') ? formData.vehicleNumber || null : null,
         has_laptop: formData.hasLaptop,
         laptop_brand: formData.hasLaptop ? formData.laptopBrand : null,
         laptop_serial: formData.hasLaptop ? formData.laptopSerial : null,
@@ -215,7 +219,8 @@ export default function SelfService() {
                 setStep(1);
                 setFormData({
                   name: '', phone: '', email: '', company: '', purpose: '',
-                  departmentId: '', hostId: '', hasLaptop: false, laptopBrand: '',
+                  departmentId: '', hostId: '', vehicleType: 'by_walk', vehicleNumber: '',
+                  hasLaptop: false, laptopBrand: '',
                   laptopSerial: '', accompanyingCount: 0, photoUrl: '',
                 });
               }}
@@ -434,6 +439,38 @@ export default function SelfService() {
               <CardDescription>Optional details for security</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Vehicle Type */}
+              <div className="space-y-2">
+                <Label>Mode of Transport</Label>
+                <Select value={formData.vehicleType} onValueChange={(v) => updateField('vehicleType', v)}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Select mode" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="by_walk">By Walk</SelectItem>
+                    <SelectItem value="two_wheeler">Two Wheeler</SelectItem>
+                    <SelectItem value="four_wheeler">Four Wheeler</SelectItem>
+                    <SelectItem value="cab">Cab / Taxi</SelectItem>
+                    <SelectItem value="auto">Auto Rickshaw</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {formData.vehicleType && formData.vehicleType !== 'by_walk' && (
+                <div className="space-y-2">
+                  <Label htmlFor="vehicleNumber">Vehicle Number</Label>
+                  <div className="relative">
+                    <Car className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="vehicleNumber"
+                      placeholder="e.g. KA-01-AB-1234"
+                      value={formData.vehicleNumber}
+                      onChange={(e) => updateField('vehicleNumber', e.target.value)}
+                      className="h-12 pl-10"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="flex items-center space-x-3 p-4 rounded-lg border bg-muted/30">
                 <Checkbox
                   id="hasLaptop"
@@ -555,6 +592,12 @@ export default function SelfService() {
                     <>
                       <span>Company:</span>
                       <span className="text-foreground">{formData.company}</span>
+                    </>
+                  )}
+                  {formData.vehicleType && formData.vehicleType !== 'by_walk' && (
+                    <>
+                      <span>Vehicle:</span>
+                      <span className="text-foreground capitalize">{formData.vehicleType.replace('_', ' ')} {formData.vehicleNumber && `- ${formData.vehicleNumber}`}</span>
                     </>
                   )}
                   {formData.hasLaptop && (

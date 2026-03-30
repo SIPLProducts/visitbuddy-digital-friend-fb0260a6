@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2, Smartphone } from 'lucide-react';
+import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2, Smartphone, Car } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
@@ -32,6 +32,8 @@ const visitorSchema = z.object({
   host_id: z.string().optional(),
   department_id: z.string().optional(),
   gate_id: z.string().optional(),
+  vehicle_type: z.string().default('by_walk'),
+  vehicle_number: z.string().optional(),
   has_laptop: z.boolean().default(false),
   laptop_brand: z.string().optional(),
   laptop_serial: z.string().optional(),
@@ -71,6 +73,8 @@ export default function NewVisitor() {
       phone: '',
       company: '',
       purpose: '',
+      vehicle_type: 'by_walk',
+      vehicle_number: '',
       has_laptop: false,
       laptop_brand: '',
       laptop_serial: '',
@@ -83,6 +87,7 @@ export default function NewVisitor() {
 
   const hasLaptop = form.watch('has_laptop');
   const hasMobile = form.watch('has_mobile');
+  const vehicleType = form.watch('vehicle_type');
 
   useEffect(() => {
     fetchFormData();
@@ -121,6 +126,8 @@ export default function NewVisitor() {
       host_id: data.host_id || null,
       department_id: data.department_id || null,
       gate_id: data.gate_id || null,
+      vehicle_type: data.vehicle_type || 'by_walk',
+      vehicle_number: (data.vehicle_type && data.vehicle_type !== 'by_walk') ? data.vehicle_number || null : null,
       has_laptop: data.has_laptop,
       laptop_brand: data.has_laptop ? data.laptop_brand : null,
       laptop_serial: data.has_laptop ? data.laptop_serial : null,
@@ -462,6 +469,52 @@ export default function NewVisitor() {
                       Total: {1 + accompanyingPersons.length}
                     </span>
                     {' '}visitor(s)
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Vehicle Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="h-5 w-5" />
+                Vehicle Information
+              </CardTitle>
+              <CardDescription>
+                How is the visitor arriving?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Mode of Transport *</Label>
+                  <Select
+                    value={vehicleType}
+                    onValueChange={(value) => form.setValue('vehicle_type', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="by_walk">By Walk</SelectItem>
+                      <SelectItem value="two_wheeler">Two Wheeler</SelectItem>
+                      <SelectItem value="four_wheeler">Four Wheeler</SelectItem>
+                      <SelectItem value="cab">Cab / Taxi</SelectItem>
+                      <SelectItem value="auto">Auto Rickshaw</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {vehicleType && vehicleType !== 'by_walk' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="vehicle_number">Vehicle Number</Label>
+                    <Input
+                      id="vehicle_number"
+                      placeholder="e.g. KA-01-AB-1234"
+                      {...form.register('vehicle_number')}
+                    />
                   </div>
                 )}
               </div>
