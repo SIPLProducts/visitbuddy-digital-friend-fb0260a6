@@ -274,6 +274,56 @@ export default function Visitors() {
     await fetchVisitors();
   }, []);
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredVisitors.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredVisitors.map(v => v.id)));
+    }
+  };
+
+  const handleBulkCheckout = async () => {
+    const checkedIn = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'checked_in');
+    if (checkedIn.length === 0) { toast.error('No checked-in visitors selected'); return; }
+    setBulkLoading(true);
+    const { error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString() }).in('id', checkedIn.map(v => v.id));
+    setBulkLoading(false);
+    if (error) { toast.error('Bulk checkout failed'); return; }
+    await logAudit({ action: 'bulk_checkout', entityType: 'visitor', entityName: `${checkedIn.length} visitors`, details: { count: checkedIn.length } });
+    toast.success(`${checkedIn.length} visitors checked out`);
+    setSelectedIds(new Set());
+    fetchVisitors();
+  };
+
+  const handleBulkApprove = async () => {
+    const pending = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'pending_approval');
+    if (pending.length === 0) { toast.error('No pending visitors selected'); return; }
+    setBulkLoading(true);
+    for (const v of pending) {
+      await supabase.functions.invoke('approve-visitor', { body: { visitorId: v.id, action: 'approve' } });
+    }
+    setBulkLoading(false);
+    await logAudit({ action: 'bulk_approval', entityType: 'visitor', entityName: `${pending.length} visitors`, details: { count: pending.length } });
+    toast.success(`${pending.length} visitors approved`);
+    setSelectedIds(new Set());
+    fetchVisitors();
+  };
+
+  const handleBulkPrint = () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) { toast.error('No visitors selected'); return; }
+    ids.forEach(id => window.open(`/print-badge?id=${id}`, '_blank'));
+    toast.success(`Printing ${ids.length} badges`);
+  };
+
   return (
     <MainLayout>
       <PullToRefresh onRefresh={handleRefresh}>
@@ -286,12 +336,30 @@ export default function Visitors() {
               Manage and track all visitor records
             </p>
           </div>
-          <Link to="/visitors/new">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Visitor
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-1.5" disabled={bulkLoading}>
+                    <CheckSquare className="h-4 w-4" />
+                    Bulk Actions ({selectedIds.size})
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-popover">
+                  <DropdownMenuItem onClick={handleBulkCheckout} className="gap-2"><LogOut className="h-4 w-4" /> Check Out Selected</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleBulkApprove} className="gap-2"><CheckSquare className="h-4 w-4" /> Approve Selected</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleBulkPrint} className="gap-2"><Printer className="h-4 w-4" /> Print Badges</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            <Link to="/visitors/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Visitor
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Filters */}
