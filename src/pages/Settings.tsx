@@ -265,7 +265,12 @@ export default function Settings() {
                     </SelectContent>
                   </Select>
                 </div>
-              </CardContent>
+                <Separator />
+                <div className="space-y-2">
+                  <Label>Security Contact Number</Label>
+                  <Input value={settings.security_contact_number || ''} onChange={e => update('security_contact_number', e.target.value)} placeholder="+91 98765 43210" />
+                  <p className="text-xs text-muted-foreground">This number is shared with visitors in auto-checkout notifications so they can contact security if still on premises</p>
+                </div>
             </Card>
           </TabsContent>
 
