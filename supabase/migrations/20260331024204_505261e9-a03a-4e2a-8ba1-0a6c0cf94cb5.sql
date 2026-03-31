@@ -1,0 +1,1 @@
+ALTER TABLE public.visitors ADD COLUMN checkout_method text DEFAULT null;

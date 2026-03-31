@@ -989,6 +989,7 @@ export type Database = {
           badge_printed: boolean | null
           check_in_time: string | null
           check_out_time: string | null
+          checkout_method: string | null
           company: string | null
           created_at: string
           department_id: string | null
@@ -1019,6 +1020,7 @@ export type Database = {
           badge_printed?: boolean | null
           check_in_time?: string | null
           check_out_time?: string | null
+          checkout_method?: string | null
           company?: string | null
           created_at?: string
           department_id?: string | null
@@ -1049,6 +1051,7 @@ export type Database = {
           badge_printed?: boolean | null
           check_in_time?: string | null
           check_out_time?: string | null
+          checkout_method?: string | null
           company?: string | null
           created_at?: string
           department_id?: string | null

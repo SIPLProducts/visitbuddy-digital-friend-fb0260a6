@@ -261,7 +261,7 @@ export default function VisitorReport() {
   }, [visitors]);
 
   const exportToCsv = () => {
-    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Location', 'Status', 'Check In', 'Check Out'];
+    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Location', 'Status', 'Checkout By', 'Check In', 'Check Out'];
     const rows = filteredVisitors.map((v) => [
       v.name,
       v.visitor_id,
@@ -272,6 +272,7 @@ export default function VisitorReport() {
       v.host?.name || '',
       v.gate?.location?.name || '',
       v.status,
+      (v as any).checkout_method || '',
       v.check_in_time ? format(new Date(v.check_in_time), 'yyyy-MM-dd HH:mm:ss') : '',
       v.check_out_time ? format(new Date(v.check_out_time), 'yyyy-MM-dd HH:mm:ss') : '',
     ]);
@@ -1012,6 +1013,7 @@ export default function VisitorReport() {
                 <TableHead>Host</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Checkout By</TableHead>
                 <TableHead>Check In</TableHead>
                 <TableHead>Check Out</TableHead>
                 <TableHead>Laptop</TableHead>
@@ -1020,7 +1022,7 @@ export default function VisitorReport() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                       Loading...
@@ -1029,7 +1031,7 @@ export default function VisitorReport() {
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     No visitors found matching your criteria
                   </TableCell>
                 </TableRow>
@@ -1072,6 +1074,22 @@ export default function VisitorReport() {
                       >
                         {visitor.status.replace('_', ' ')}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {visitor.status === 'checked_out' && (visitor as any).checkout_method ? (
+                        <Badge variant="outline" className={cn('capitalize text-xs',
+                          (visitor as any).checkout_method === 'self' && 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                          (visitor as any).checkout_method === 'security' && 'bg-sky-50 text-sky-700 border-sky-200',
+                          (visitor as any).checkout_method === 'system' && 'bg-amber-50 text-amber-700 border-amber-200',
+                        )}>
+                          {(visitor as any).checkout_method === 'self' ? '🚶 Self' :
+                           (visitor as any).checkout_method === 'security' ? '🛡️ Security' :
+                           (visitor as any).checkout_method === 'system' ? '⚙️ System' :
+                           (visitor as any).checkout_method}
+                        </Badge>
+                      ) : visitor.status === 'checked_out' ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : null}
                     </TableCell>
                     <TableCell className="text-sm">
                       {visitor.check_in_time

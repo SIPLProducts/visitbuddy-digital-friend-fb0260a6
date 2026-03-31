@@ -172,6 +172,7 @@ export default function Visitors() {
       .update({
         status: 'checked_out',
         check_out_time: new Date().toISOString(),
+        checkout_method: 'security',
       })
       .eq('id', visitor.id);
 
@@ -323,7 +324,7 @@ export default function Visitors() {
     const checkedIn = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'checked_in');
     if (checkedIn.length === 0) { toast.error('No checked-in visitors selected'); return; }
     setBulkLoading(true);
-    const { error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString() }).in('id', checkedIn.map(v => v.id));
+    const { error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString(), checkout_method: 'security' }).in('id', checkedIn.map(v => v.id));
     setBulkLoading(false);
     if (error) { toast.error('Bulk checkout failed'); return; }
     await logAudit({ action: 'bulk_checkout', entityType: 'visitor', entityName: `${checkedIn.length} visitors`, details: { count: checkedIn.length } });
@@ -511,6 +512,7 @@ export default function Visitors() {
                 <TableHead>{t('visitors.vehicle')}</TableHead>
                 <TableHead>{t('visitors.laptop')}</TableHead>
                 <TableHead>{t('visitors.status')}</TableHead>
+                <TableHead>Checkout By</TableHead>
                 <TableHead>{t('visitors.checkInOut')}</TableHead>
                 <TableHead className="w-10">{t('visitors.actions')}</TableHead>
               </TableRow>
@@ -518,13 +520,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={11} className="text-center py-8">
+                   <TableCell colSpan={12} className="text-center py-8">
                     {t('visitors.loading')}
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center py-8">
+                  <TableCell colSpan={12} className="text-center py-8">
                     {t('visitors.noVisitors')}
                   </TableCell>
                 </TableRow>
@@ -624,6 +626,22 @@ export default function Visitors() {
                       >
                         {getStatusLabel(visitor.status)}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {visitor.status === 'checked_out' && (visitor as any).checkout_method ? (
+                        <Badge variant="outline" className={cn('capitalize text-xs',
+                          (visitor as any).checkout_method === 'self' && 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                          (visitor as any).checkout_method === 'security' && 'bg-sky-50 text-sky-700 border-sky-200',
+                          (visitor as any).checkout_method === 'system' && 'bg-amber-50 text-amber-700 border-amber-200',
+                        )}>
+                          {(visitor as any).checkout_method === 'self' ? '🚶 Self' :
+                           (visitor as any).checkout_method === 'security' ? '🛡️ Security' :
+                           (visitor as any).checkout_method === 'system' ? '⚙️ System' :
+                           (visitor as any).checkout_method}
+                        </Badge>
+                      ) : visitor.status === 'checked_out' ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : null}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {visitor.check_in_time
