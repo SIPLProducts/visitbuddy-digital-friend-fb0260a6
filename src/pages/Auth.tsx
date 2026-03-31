@@ -227,26 +227,27 @@ export default function Auth() {
           {isLogin && (
             <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-accent/50 to-accent/30 border border-border">
               <p className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Crown className="h-4 w-4 text-[#f59e0b]" />
-                Demo Account
+                <Crown className="h-4 w-4 text-amber-500" />
+                Demo Accounts <span className="text-xs text-muted-foreground font-normal">(click to auto-fill)</span>
               </p>
-              {demoUsers.map((demo) => (
-                <button
-                  key={demo.email}
-                  type="button"
-                  onClick={() => handleDemoLogin(demo.email, demo.password)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:border-primary transition-all hover:shadow-md text-left"
-                >
-                  <div className={`w-10 h-10 rounded-full ${demo.color} flex items-center justify-center shrink-0`}>
-                    <demo.icon className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground">{demo.name}</p>
-                    <p className="text-xs text-muted-foreground">{demo.role} • {demo.location}</p>
-                  </div>
-                  <div className="text-xs text-primary font-medium">Click to login →</div>
-                </button>
-              ))}
+              <div className="grid grid-cols-2 gap-2">
+                {demoUsers.map((demo) => (
+                  <button
+                    key={demo.email}
+                    type="button"
+                    onClick={() => handleDemoLogin(demo.email, demo.password)}
+                    className="flex items-center gap-2.5 p-2.5 rounded-lg bg-card border border-border hover:border-primary transition-all hover:shadow-md text-left"
+                  >
+                    <div className={`w-8 h-8 rounded-full ${demo.color} flex items-center justify-center shrink-0`}>
+                      <demo.icon className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-semibold text-foreground truncate">{demo.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{demo.role} • {demo.location}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
