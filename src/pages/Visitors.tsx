@@ -377,15 +377,15 @@ export default function Visitors() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="All Status" />
+              <SelectValue placeholder={t('visitors.allStatus')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending_approval">Pending Approval</SelectItem>
-              <SelectItem value="checked_in">Checked In</SelectItem>
-              <SelectItem value="checked_out">Checked Out</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="all">{t('visitors.allStatus')}</SelectItem>
+              <SelectItem value="pending_approval">{t('visitors.pendingApproval')}</SelectItem>
+              <SelectItem value="checked_in">{t('visitors.checkedIn')}</SelectItem>
+              <SelectItem value="checked_out">{t('visitors.checkedOut')}</SelectItem>
+              <SelectItem value="scheduled">{t('visitors.scheduled')}</SelectItem>
+              <SelectItem value="cancelled">{t('visitors.cancelled')}</SelectItem>
             </SelectContent>
           </Select>
 
