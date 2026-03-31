@@ -39,6 +39,7 @@ import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { settings: tenantSettings } = useTenantSettings();
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
