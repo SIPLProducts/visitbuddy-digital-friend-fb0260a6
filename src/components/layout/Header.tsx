@@ -140,7 +140,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         <div className="relative w-80 hidden lg:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search visitors, appointments..."
+            placeholder={t('header.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 bg-background h-10"
