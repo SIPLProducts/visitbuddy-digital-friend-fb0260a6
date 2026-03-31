@@ -198,6 +198,7 @@ export default function CheckInOut() {
             .update({
               status: 'checked_out',
               check_out_time: new Date().toISOString(),
+              checkout_method: 'self',
             })
             .eq('id', visitor.id);
 

@@ -324,7 +324,7 @@ export default function Visitors() {
     const checkedIn = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'checked_in');
     if (checkedIn.length === 0) { toast.error('No checked-in visitors selected'); return; }
     setBulkLoading(true);
-    const { error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString() }).in('id', checkedIn.map(v => v.id));
+    const { error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString(), checkout_method: 'security' }).in('id', checkedIn.map(v => v.id));
     setBulkLoading(false);
     if (error) { toast.error('Bulk checkout failed'); return; }
     await logAudit({ action: 'bulk_checkout', entityType: 'visitor', entityName: `${checkedIn.length} visitors`, details: { count: checkedIn.length } });

@@ -197,7 +197,7 @@ Deno.serve(async (req) => {
     const checkoutTime = new Date().toISOString();
     const { error: checkoutError } = await supabase
       .from("visitors")
-      .update({ status: "checked_out", check_out_time: checkoutTime })
+      .update({ status: "checked_out", check_out_time: checkoutTime, checkout_method: "system" })
       .in(
         "id",
         stuckVisitors.map((v) => v.id)
