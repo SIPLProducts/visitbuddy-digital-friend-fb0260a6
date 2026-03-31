@@ -519,7 +519,7 @@ export default function UserManagement() {
         const nameError = validateRequired(fullName, 'Full Name');
         if (nameError) { errors.push({ row: rowNum, field: 'full_name', message: nameError, value: fullName }); failedCount++; continue; }
         if (!password || password.length < 6) { errors.push({ row: rowNum, field: 'password', message: 'Password must be at least 6 characters' }); failedCount++; continue; }
-        if (!['admin', 'manager', 'operator'].includes(role)) { errors.push({ row: rowNum, field: 'role', message: 'Invalid role', value: role }); failedCount++; continue; }
+        if (!['admin', 'manager', 'operator', 'gate_security', 'visitor'].includes(role)) { errors.push({ row: rowNum, field: 'role', message: 'Invalid role', value: role }); failedCount++; continue; }
 
         const location = locations.find(l => l.name.toLowerCase() === locationName?.toLowerCase());
         if (locationName && !location) { errors.push({ row: rowNum, field: 'location_name', message: 'Location not found', value: locationName }); failedCount++; continue; }
