@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown } from 'lucide-react';
+import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown, Building2, Users, UserCheck } from 'lucide-react';
 import authHero from '@/assets/auth-hero.jpg';
 import authCheckin from '@/assets/auth-checkin.jpg';
 import authAccess from '@/assets/auth-access.jpg';
@@ -46,9 +46,39 @@ const demoUsers = [
     name: 'Bala', 
     role: 'HO Admin',
     location: 'All Locations',
-    color: 'bg-[#f59e0b]',
+    color: 'bg-amber-500',
     icon: Crown,
-    description: 'Full access to all locations',
+    description: 'Full access across all locations',
+  },
+  { 
+    email: 'admin.delhi@demo.com', 
+    password: '123456', 
+    name: 'Amit Kumar', 
+    role: 'Admin',
+    location: 'Regional Office - Delhi',
+    color: 'bg-destructive',
+    icon: Shield,
+    description: 'Location admin for Delhi office',
+  },
+  { 
+    email: 'manager@demo.com', 
+    password: '123456', 
+    name: 'Priya Sharma', 
+    role: 'Manager',
+    location: 'Tech Campus - Bangalore',
+    color: 'bg-info',
+    icon: Users,
+    description: 'Manages visitors at Bangalore campus',
+  },
+  { 
+    email: 'operator@demo.com', 
+    password: '123456', 
+    name: 'Rahul Verma', 
+    role: 'Operator',
+    location: 'Manufacturing Plant - Pune',
+    color: 'bg-success',
+    icon: UserCheck,
+    description: 'Gate operator at Pune plant',
   },
 ];
 
