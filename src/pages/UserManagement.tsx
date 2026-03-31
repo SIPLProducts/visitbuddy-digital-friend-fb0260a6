@@ -127,9 +127,13 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [isPasswordResetDialogOpen, setIsPasswordResetDialogOpen] = useState(false);
+  const [isAssignRoleDialogOpen, setIsAssignRoleDialogOpen] = useState(false);
+  const [isEditRoleDialogOpen, setIsEditRoleDialogOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState<UserRoleEntry | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
+  const [assigningRole, setAssigningRole] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showImportResult, setShowImportResult] = useState(false);
@@ -145,6 +149,17 @@ export default function UserManagement() {
 
   // Password reset state
   const [resetEmail, setResetEmail] = useState('');
+
+  // Assign role state
+  const [assignUserId, setAssignUserId] = useState('');
+  const [assignLocationId, setAssignLocationId] = useState('');
+  const [assignRole, setAssignRole] = useState<AppRole>('operator');
+  const [assignIsHoAdmin, setAssignIsHoAdmin] = useState(false);
+
+  // Edit role state
+  const [editRole, setEditRole] = useState<AppRole>('operator');
+  const [editIsHoAdmin, setEditIsHoAdmin] = useState(false);
+  const [editLocationId, setEditLocationId] = useState('');
 
   // Role permissions state
   const [selectedPermLocation, setSelectedPermLocation] = useState('');
