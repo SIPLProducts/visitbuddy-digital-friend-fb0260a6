@@ -19,6 +19,7 @@ interface TenantSettings {
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
   checkout_warning_hour: number;
+  security_contact_number: string | null;
 }
 
 const defaults: TenantSettings = {

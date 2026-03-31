@@ -622,6 +622,7 @@ export type Database = {
           nda_text: string | null
           primary_color: string | null
           secondary_color: string | null
+          security_contact_number: string | null
           session_timeout_minutes: number | null
           updated_at: string
         }
@@ -643,6 +644,7 @@ export type Database = {
           nda_text?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          security_contact_number?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
         }
@@ -664,6 +666,7 @@ export type Database = {
           nda_text?: string | null
           primary_color?: string | null
           secondary_color?: string | null
+          security_contact_number?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
         }
