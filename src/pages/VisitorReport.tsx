@@ -1030,7 +1030,7 @@ export default function VisitorReport() {
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     No visitors found matching your criteria
                   </TableCell>
                 </TableRow>
