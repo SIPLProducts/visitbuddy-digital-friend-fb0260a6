@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, HeartPulse } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, HeartPulse, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -17,6 +17,7 @@ import { PeakHoursChart } from '@/components/dashboard/PeakHoursChart';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate, Location, Department } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -470,6 +471,26 @@ export default function Dashboard() {
               iconColor="rose"
             />
           </div>
+
+          {/* After 6 PM Warning Banner */}
+          {(() => {
+            const nowHour = new Date().getHours();
+            const notCheckedOut = visitors.filter(v => v.status === 'checked_in' && v.check_in_time && isToday(new Date(v.check_in_time)));
+            if (nowHour >= 18 && notCheckedOut.length > 0) {
+              return (
+                <Alert variant="destructive" className="border-amber-500/50 bg-amber-500/10 text-amber-200">
+                  <AlertTriangle className="h-5 w-5 text-amber-400" />
+                  <AlertTitle className="text-amber-300 font-semibold">
+                    {notCheckedOut.length} Visitor(s) Still Checked In After 6 PM
+                  </AlertTitle>
+                  <AlertDescription className="text-amber-200/80 mt-1">
+                    {notCheckedOut.map(v => v.name).join(', ')} — Please verify and process checkout.
+                  </AlertDescription>
+                </Alert>
+              );
+            }
+            return null;
+          })()}
 
           {/* Pending Approvals */}
           <PendingApprovals visitors={filteredVisitors} onRefresh={fetchDashboardData} />
