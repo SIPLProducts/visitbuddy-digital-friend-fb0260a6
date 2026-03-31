@@ -45,6 +45,7 @@ import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInDialog } from '@/components/visitors/CheckInDialog';
 import { logAudit } from '@/lib/auditLog';
+import { useTranslation } from 'react-i18next';
 
 export default function Visitors() {
   const navigate = useNavigate();
