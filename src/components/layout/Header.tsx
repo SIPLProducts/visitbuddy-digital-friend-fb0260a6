@@ -150,7 +150,28 @@ export function Header({ onMenuClick }: HeaderProps) {
 
       {/* Right side */}
       <div className="flex items-center gap-1 md:gap-4 flex-shrink-0">
-        
+        {/* Language Switcher */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-10 w-10" title="Change Language">
+              <Globe className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-popover z-50 max-h-80 overflow-y-auto">
+            <DropdownMenuLabel>{t('settings.language')}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {languages.map((lang) => (
+              <DropdownMenuItem
+                key={lang.code}
+                onClick={() => i18n.changeLanguage(lang.code)}
+                className={i18n.language === lang.code ? 'bg-accent' : ''}
+              >
+                <span className="mr-2 font-medium">{lang.nativeName}</span>
+                <span className="text-xs text-muted-foreground">({lang.name})</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Notifications */}
         <NotificationDropdown />
