@@ -627,6 +627,22 @@ export default function Visitors() {
                         {getStatusLabel(visitor.status)}
                       </Badge>
                     </TableCell>
+                    <TableCell>
+                      {visitor.status === 'checked_out' && (visitor as any).checkout_method ? (
+                        <Badge variant="outline" className={cn('capitalize text-xs',
+                          (visitor as any).checkout_method === 'self' && 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                          (visitor as any).checkout_method === 'security' && 'bg-sky-50 text-sky-700 border-sky-200',
+                          (visitor as any).checkout_method === 'system' && 'bg-amber-50 text-amber-700 border-amber-200',
+                        )}>
+                          {(visitor as any).checkout_method === 'self' ? '🚶 Self' :
+                           (visitor as any).checkout_method === 'security' ? '🛡️ Security' :
+                           (visitor as any).checkout_method === 'system' ? '⚙️ System' :
+                           (visitor as any).checkout_method}
+                        </Badge>
+                      ) : visitor.status === 'checked_out' ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : null}
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {visitor.check_in_time
                         ? `${formatTime(visitor.check_in_time)}${
