@@ -1257,6 +1257,8 @@ export default function UserManagement() {
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="operator">Operator</SelectItem>
+                    <SelectItem value="gate_security">Gate Security</SelectItem>
+                    <SelectItem value="visitor">Visitor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
