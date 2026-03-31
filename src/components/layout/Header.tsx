@@ -188,10 +188,10 @@ export function Header({ onMenuClick }: HeaderProps) {
               </Avatar>
               <div className="text-left hidden lg:block">
                 <p className="text-sm font-medium">
-                  {isHoAdmin ? 'HO Admin' : 'User'}
+                  {isHoAdmin ? t('header.hoAdmin') : t('header.user')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {isHoAdmin ? 'All Locations' : (currentRole ? roleLabels[currentRole] : 'No Role')}
+                  {isHoAdmin ? t('header.allLocations') : (currentRole ? roleLabels[currentRole] : t('header.noRole'))}
                 </p>
               </div>
             </Button>
