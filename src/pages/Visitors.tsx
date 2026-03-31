@@ -97,6 +97,17 @@ export default function Visitors() {
     setLoading(false);
   };
 
+  const fetchFilterOptions = async () => {
+    const [deptRes, locRes, gateRes] = await Promise.all([
+      supabase.from('departments').select('id, name').order('name'),
+      supabase.from('locations').select('id, name').order('name'),
+      supabase.from('gates').select('id, name').order('name'),
+    ]);
+    if (deptRes.data) setDepartments(deptRes.data);
+    if (locRes.data) setLocations(locRes.data);
+    if (gateRes.data) setGates(gateRes.data);
+  };
+
   const handleViewDetails = (visitor: Visitor) => {
     setSelectedVisitor(visitor);
     setDetailsDialogOpen(true);
