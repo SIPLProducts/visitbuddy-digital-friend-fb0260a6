@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown, Building2, Users, UserCheck } from 'lucide-react';
+import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown, Building2, Users, UserCheck, ShieldCheck, User } from 'lucide-react';
 import authHero from '@/assets/auth-hero.jpg';
 import authCheckin from '@/assets/auth-checkin.jpg';
 import authAccess from '@/assets/auth-access.jpg';
