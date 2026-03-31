@@ -58,6 +58,12 @@ export default function Visitors() {
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('all');
+  const [gateFilter, setGateFilter] = useState('all');
+  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [gates, setGates] = useState<{ id: string; name: string }[]>([]);
   
   // Dialog states
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
