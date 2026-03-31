@@ -57,6 +57,7 @@ export default function Dashboard() {
     pendingApproval: 0,
     overstayed: 0,
     todaysVehicles: 0,
+    yesterdaysVisitors: 0,
   });
 
   useEffect(() => {
@@ -75,7 +76,35 @@ export default function Dashboard() {
       fetchDashboardData();
     };
     window.addEventListener('locationChanged', handleLocationChange);
-    return () => window.removeEventListener('locationChanged', handleLocationChange);
+
+    // Real-time subscriptions for live updates
+    const visitorChannel = supabase
+      .channel('dashboard-visitors')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    const vehicleChannel = supabase
+      .channel('dashboard-vehicles')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    const appointmentChannel = supabase
+      .channel('dashboard-appointments')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('locationChanged', handleLocationChange);
+      supabase.removeChannel(visitorChannel);
+      supabase.removeChannel(vehicleChannel);
+      supabase.removeChannel(appointmentChannel);
+    };
   }, [user]);
 
   const fetchLocations = async () => {
@@ -90,6 +119,7 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
     const { data: visitorsData } = await supabase
       .from('visitors')
@@ -100,14 +130,16 @@ export default function Dashboard() {
         gate:gates(*, location:locations(*))
       `)
       .in('status', ['checked_in', 'checked_out', 'scheduled', 'pending_approval'])
-      .order('created_at', { ascending: false })
-      .limit(200);
+      .order('created_at', { ascending: false });
 
     if (visitorsData) {
       setVisitors(visitorsData as unknown as Visitor[]);
 
       const todaysVisitors = visitorsData.filter(
         (v) => v.created_at.startsWith(today)
+      ).length;
+      const yesterdaysVisitors = visitorsData.filter(
+        (v) => v.created_at.startsWith(yesterday)
       ).length;
       const activeCheckIns = visitorsData.filter(
         (v) => v.status === 'checked_in'
@@ -116,9 +148,9 @@ export default function Dashboard() {
         (v) => v.status === 'pending_approval'
       ).length;
 
-      // Calculate avg visit duration
+      // Calculate avg visit duration from completed visits
       const completedVisits = visitorsData.filter(v => v.check_in_time && v.check_out_time);
-      let avgDuration = '1h 24m';
+      let avgDuration = '0h 0m';
       if (completedVisits.length > 0) {
         const totalMs = completedVisits.reduce((acc, v) => {
           return acc + (new Date(v.check_out_time!).getTime() - new Date(v.check_in_time!).getTime());
@@ -129,7 +161,7 @@ export default function Dashboard() {
         avgDuration = `${avgHours}h ${avgMins}m`;
       }
 
-      // Count overstayed
+      // Count overstayed (checked in > 8 hours)
       const overstayed = visitorsData.filter(v => {
         if (v.status !== 'checked_in' || !v.check_in_time) return false;
         return (Date.now() - new Date(v.check_in_time).getTime()) / (1000 * 60 * 60) > 8;
@@ -138,6 +170,7 @@ export default function Dashboard() {
       setStats(prev => ({
         ...prev,
         todaysVisitors,
+        yesterdaysVisitors,
         activeCheckIns,
         pendingApproval,
         avgVisitDuration: avgDuration,
@@ -159,7 +192,7 @@ export default function Dashboard() {
       .select('*', { count: 'exact', head: true })
       .eq('scheduled_date', today);
 
-    // Get vehicles inside count
+    // Get vehicles inside count (all time checked_in, not just today)
     const { count: vehicleCount } = await supabase
       .from('vehicles')
       .select('*', { count: 'exact', head: true })
@@ -398,7 +431,10 @@ export default function Dashboard() {
               title="Today's Visitors"
               value={filteredStats.todaysVisitors}
               icon={<Users className="h-5 w-5" />}
-              trend={{ value: '+12% vs yesterday', positive: true }}
+              trend={stats.yesterdaysVisitors > 0 ? {
+                value: `${stats.todaysVisitors >= stats.yesterdaysVisitors ? '+' : ''}${Math.round(((stats.todaysVisitors - stats.yesterdaysVisitors) / stats.yesterdaysVisitors) * 100)}% vs yesterday`,
+                positive: stats.todaysVisitors >= stats.yesterdaysVisitors,
+              } : undefined}
               iconColor="blue"
             />
             <StatCard
