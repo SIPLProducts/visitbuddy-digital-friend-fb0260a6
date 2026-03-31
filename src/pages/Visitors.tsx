@@ -172,6 +172,7 @@ export default function Visitors() {
       .update({
         status: 'checked_out',
         check_out_time: new Date().toISOString(),
+        checkout_method: 'security',
       })
       .eq('id', visitor.id);
 
