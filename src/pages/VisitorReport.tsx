@@ -261,7 +261,7 @@ export default function VisitorReport() {
   }, [visitors]);
 
   const exportToCsv = () => {
-    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Location', 'Status', 'Check In', 'Check Out'];
+    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Location', 'Status', 'Checkout By', 'Check In', 'Check Out'];
     const rows = filteredVisitors.map((v) => [
       v.name,
       v.visitor_id,
@@ -272,6 +272,7 @@ export default function VisitorReport() {
       v.host?.name || '',
       v.gate?.location?.name || '',
       v.status,
+      (v as any).checkout_method || '',
       v.check_in_time ? format(new Date(v.check_in_time), 'yyyy-MM-dd HH:mm:ss') : '',
       v.check_out_time ? format(new Date(v.check_out_time), 'yyyy-MM-dd HH:mm:ss') : '',
     ]);
