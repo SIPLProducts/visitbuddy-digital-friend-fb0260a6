@@ -1,4 +1,5 @@
 import { ReactNode, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { MobileBottomNav } from './MobileBottomNav';
@@ -22,9 +23,14 @@ export function MainLayout({ children }: MainLayoutProps) {
       <Sidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
       <div className="flex flex-col flex-1 overflow-hidden min-w-0">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className={`flex-1 overflow-y-auto p-4 md:p-6 ${isMobile ? 'pb-20' : ''}`}>
+        <motion.main
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+          className={`flex-1 overflow-y-auto p-4 md:p-6 ${isMobile ? 'pb-20' : ''}`}
+        >
           {children}
-        </main>
+        </motion.main>
       </div>
       
       {/* Mobile Bottom Navigation */}
