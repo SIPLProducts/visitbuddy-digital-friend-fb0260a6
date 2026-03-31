@@ -434,16 +434,16 @@ export default function Visitors() {
                     onCheckedChange={toggleSelectAll}
                   />
                 </TableHead>
-                <TableHead>Visitor</TableHead>
-                <TableHead>ID</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Host / Department</TableHead>
-                <TableHead>Date of Visit</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Laptop</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Check-in/out</TableHead>
-                <TableHead className="w-10">Actions</TableHead>
+                <TableHead>{t('visitors.visitor')}</TableHead>
+                <TableHead>{t('visitors.id')}</TableHead>
+                <TableHead>{t('visitors.company')}</TableHead>
+                <TableHead>{t('visitors.hostDepartment')}</TableHead>
+                <TableHead>{t('visitors.dateOfVisit')}</TableHead>
+                <TableHead>{t('visitors.vehicle')}</TableHead>
+                <TableHead>{t('visitors.laptop')}</TableHead>
+                <TableHead>{t('visitors.status')}</TableHead>
+                <TableHead>{t('visitors.checkInOut')}</TableHead>
+                <TableHead className="w-10">{t('visitors.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
