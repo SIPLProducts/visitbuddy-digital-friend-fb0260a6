@@ -45,7 +45,7 @@ export default function Settings() {
   useEffect(() => {
     supabase.from('tenant_settings').select('*').limit(1).single()
       .then(({ data }) => {
-        if (data) setSettings({ ...data, checkout_warning_hour: (data as any).checkout_warning_hour ?? 18 } as any);
+        if (data) setSettings({ ...data, checkout_warning_hour: (data as any).checkout_warning_hour ?? 18, security_contact_number: (data as any).security_contact_number ?? null } as any);
         setLoading(false);
       });
   }, []);
