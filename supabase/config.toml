@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.send-sms-badge]
 verify_jwt = false
+
+[functions.auto-checkout-reminder]
+verify_jwt = false
