@@ -17,6 +17,7 @@ import { PeakHoursChart } from '@/components/dashboard/PeakHoursChart';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Gate, Location, Department } from '@/types/database';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
