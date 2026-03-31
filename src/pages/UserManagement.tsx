@@ -123,7 +123,6 @@ const roleLabels: Record<AppRole, string> = {
   gate_security: 'Gate Security',
   visitor: 'Visitor',
 };
-};
 
 export default function UserManagement() {
   const { isHoAdmin, loading: rolesLoading } = useUserRoles();
