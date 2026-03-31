@@ -105,6 +105,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onOpenChange }: SidebarProps) {
+  const { t } = useTranslation();
+  const menuGroups = getMenuGroups(t);
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>(menuGroups.map(g => g.label));
   const location = useLocation();
