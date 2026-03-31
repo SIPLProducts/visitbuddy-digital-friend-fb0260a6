@@ -33,6 +33,7 @@ interface TenantSettings {
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
   checkout_warning_hour: number;
+  security_contact_number: string | null;
 }
 
 export default function Settings() {
@@ -44,7 +45,7 @@ export default function Settings() {
   useEffect(() => {
     supabase.from('tenant_settings').select('*').limit(1).single()
       .then(({ data }) => {
-        if (data) setSettings({ ...data, checkout_warning_hour: (data as any).checkout_warning_hour ?? 18 } as any);
+        if (data) setSettings({ ...data, checkout_warning_hour: (data as any).checkout_warning_hour ?? 18, security_contact_number: (data as any).security_contact_number ?? null } as any);
         setLoading(false);
       });
   }, []);
@@ -263,6 +264,12 @@ export default function Settings() {
                       <SelectItem value="22">10:00 PM</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <Label>Security Contact Number</Label>
+                  <Input value={settings.security_contact_number || ''} onChange={e => update('security_contact_number', e.target.value)} placeholder="+91 98765 43210" />
+                  <p className="text-xs text-muted-foreground">This number is shared with visitors in auto-checkout notifications so they can contact security if still on premises</p>
                 </div>
               </CardContent>
             </Card>

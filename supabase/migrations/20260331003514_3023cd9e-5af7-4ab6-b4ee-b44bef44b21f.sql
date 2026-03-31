@@ -1,0 +1,1 @@
+ALTER TABLE public.tenant_settings ADD COLUMN security_contact_number text DEFAULT NULL;
