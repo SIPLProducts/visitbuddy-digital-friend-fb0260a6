@@ -33,7 +33,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown } from 'lucide-react';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -58,6 +58,12 @@ export default function Visitors() {
   const [toDate, setToDate] = useState<Date | undefined>(undefined);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('all');
+  const [gateFilter, setGateFilter] = useState('all');
+  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
+  const [gates, setGates] = useState<{ id: string; name: string }[]>([]);
   
   // Dialog states
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
@@ -70,6 +76,7 @@ export default function Visitors() {
 
   useEffect(() => {
     fetchVisitors();
+    fetchFilterOptions();
   }, []);
 
   const fetchVisitors = async () => {
@@ -88,6 +95,17 @@ export default function Visitors() {
       setVisitors(data as unknown as Visitor[]);
     }
     setLoading(false);
+  };
+
+  const fetchFilterOptions = async () => {
+    const [deptRes, locRes, gateRes] = await Promise.all([
+      supabase.from('departments').select('id, name').order('name'),
+      supabase.from('locations').select('id, name').order('name'),
+      supabase.from('gates').select('id, name').order('name'),
+    ]);
+    if (deptRes.data) setDepartments(deptRes.data);
+    if (locRes.data) setLocations(locRes.data);
+    if (gateRes.data) setGates(gateRes.data);
   };
 
   const handleViewDetails = (visitor: Visitor) => {
@@ -265,11 +283,20 @@ export default function Visitors() {
     const matchesStatus =
       statusFilter === 'all' || visitor.status === statusFilter;
 
+    const matchesDepartment =
+      departmentFilter === 'all' || visitor.department_id === departmentFilter;
+
+    const matchesLocation =
+      locationFilter === 'all' || visitor.gate?.location_id === locationFilter;
+
+    const matchesGate =
+      gateFilter === 'all' || visitor.gate_id === gateFilter;
+
     const visitorDate = new Date(visitor.created_at);
     const matchesFromDate = !fromDate || visitorDate >= new Date(fromDate.setHours(0, 0, 0, 0));
     const matchesToDate = !toDate || visitorDate <= new Date(new Date(toDate).setHours(23, 59, 59, 999));
 
-    return matchesSearch && matchesStatus && matchesFromDate && matchesToDate;
+    return matchesSearch && matchesStatus && matchesDepartment && matchesLocation && matchesGate && matchesFromDate && matchesToDate;
   });
 
   const handleRefresh = useCallback(async () => {
@@ -389,12 +416,54 @@ export default function Visitors() {
             </SelectContent>
           </Select>
 
+          {/* Department Filter */}
+          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+            <SelectTrigger className="w-44">
+              <Building2 className="h-4 w-4 mr-1.5 text-muted-foreground" />
+              <SelectValue placeholder={t('dashboard.allDepartments')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('dashboard.allDepartments')}</SelectItem>
+              {departments.map(d => (
+                <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Location Filter */}
+          <Select value={locationFilter} onValueChange={setLocationFilter}>
+            <SelectTrigger className="w-44">
+              <MapPin className="h-4 w-4 mr-1.5 text-muted-foreground" />
+              <SelectValue placeholder={t('dashboard.allLocations')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('dashboard.allLocations')}</SelectItem>
+              {locations.map(l => (
+                <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Gate Filter */}
+          <Select value={gateFilter} onValueChange={setGateFilter}>
+            <SelectTrigger className="w-40">
+              <DoorOpen className="h-4 w-4 mr-1.5 text-muted-foreground" />
+              <SelectValue placeholder={t('gates.title')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('gates.title')}</SelectItem>
+              {gates.map(g => (
+                <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           {/* From Date */}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !fromDate && "text-muted-foreground")}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {fromDate ? format(fromDate, "dd/MM/yyyy") : "From Date"}
+                {fromDate ? format(fromDate, "dd/MM/yyyy") : t('visitors.fromDate')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -407,7 +476,7 @@ export default function Visitors() {
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !toDate && "text-muted-foreground")}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {toDate ? format(toDate, "dd/MM/yyyy") : "To Date"}
+                {toDate ? format(toDate, "dd/MM/yyyy") : t('visitors.toDate')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -416,8 +485,8 @@ export default function Visitors() {
           </Popover>
 
           {/* Clear filters */}
-          {(fromDate || toDate) && (
-            <Button variant="ghost" size="icon" onClick={() => { setFromDate(undefined); setToDate(undefined); }} title="Clear date filters">
+          {(fromDate || toDate || departmentFilter !== 'all' || locationFilter !== 'all' || gateFilter !== 'all') && (
+            <Button variant="ghost" size="icon" onClick={() => { setFromDate(undefined); setToDate(undefined); setDepartmentFilter('all'); setLocationFilter('all'); setGateFilter('all'); }} title="Clear all filters">
               <X className="h-4 w-4" />
             </Button>
           )}
