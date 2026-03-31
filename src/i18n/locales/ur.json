@@ -64,7 +64,14 @@
     "quickCheckIn": "فوری چیک-ان",
     "schedule": "شیڈول",
     "newAppointment": "نئی ملاقات",
-    "generateReport": "رپورٹ بنائیں"
+    "generateReport": "رپورٹ بنائیں",
+    "recentVisitors": "حالیہ وزیٹرز",
+    "gateStatus": "گیٹ کی حالت",
+    "pendingApprovals": "زیر التوا منظوریاں",
+    "securityOverview": "سیکیورٹی جائزہ",
+    "departmentDistribution": "شعبہ تقسیم",
+    "visitorTrend": "وزیٹر رجحان",
+    "peakHours": "مصروف اوقات"
   },
   "visitors": {
     "title": "وزیٹرز",

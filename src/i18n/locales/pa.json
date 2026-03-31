@@ -64,7 +64,14 @@
     "quickCheckIn": "ਤੇਜ਼ ਚੈੱਕ-ਇਨ",
     "schedule": "ਸ਼ੈਡਿਊਲ",
     "newAppointment": "ਨਵੀਂ ਮੁਲਾਕਾਤ",
-    "generateReport": "ਰਿਪੋਰਟ ਬਣਾਓ"
+    "generateReport": "ਰਿਪੋਰਟ ਬਣਾਓ",
+    "recentVisitors": "ਹਾਲੀਆ ਮਹਿਮਾਨ",
+    "gateStatus": "ਗੇਟ ਸਥਿਤੀ",
+    "pendingApprovals": "ਬਕਾਇਆ ਮਨਜ਼ੂਰੀਆਂ",
+    "securityOverview": "ਸੁਰੱਖਿਆ ਸੰਖੇਪ",
+    "departmentDistribution": "ਵਿਭਾਗ ਵੰਡ",
+    "visitorTrend": "ਮਹਿਮਾਨ ਰੁਝਾਨ",
+    "peakHours": "ਰੁਝੇਵੇਂ ਦੇ ਘੰਟੇ"
   },
   "visitors": {
     "title": "ਮਹਿਮਾਨ",
