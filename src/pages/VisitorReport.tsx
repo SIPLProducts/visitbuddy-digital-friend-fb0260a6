@@ -1012,6 +1012,7 @@ export default function VisitorReport() {
                 <TableHead>Host</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Checkout By</TableHead>
                 <TableHead>Check In</TableHead>
                 <TableHead>Check Out</TableHead>
                 <TableHead>Laptop</TableHead>
