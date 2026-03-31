@@ -83,6 +83,54 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AppRoutes() {
+  const location = useLocation();
+
+  return (
+    <PageTransition>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/visitors" element={<ProtectedRoute><Visitors /></ProtectedRoute>} />
+        <Route path="/visitors/new" element={<ProtectedRoute><NewVisitor /></ProtectedRoute>} />
+        <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
+        <Route path="/check-in-out" element={<ProtectedRoute><CheckInOut /></ProtectedRoute>} />
+        <Route path="/badge-printing" element={<ProtectedRoute><BadgePrinting /></ProtectedRoute>} />
+        <Route path="/print-badge" element={<PrintBadge />} />
+        <Route path="/self-service" element={<SelfService />} />
+        <Route path="/approve-visitor" element={<ApproveVisitor />} />
+        <Route path="/install" element={<Install />} />
+        <Route path="/visitor-report" element={<ProtectedRoute><VisitorReport /></ProtectedRoute>} />
+        <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
+        <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+        <Route path="/locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
+        <Route path="/gates" element={<ProtectedRoute><Gates /></ProtectedRoute>} />
+        <Route path="/gate-qr-codes" element={<ProtectedRoute><GateQRCodes /></ProtectedRoute>} />
+        <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+        <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
+        <Route path="/vehicles/new" element={<ProtectedRoute><NewVehicle /></ProtectedRoute>} />
+        <Route path="/vehicles/gate" element={<ProtectedRoute><VehicleGate /></ProtectedRoute>} />
+        <Route path="/vehicles/report" element={<ProtectedRoute><VehicleReport /></ProtectedRoute>} />
+        <Route path="/vehicle-types" element={<ProtectedRoute><VehicleTypes /></ProtectedRoute>} />
+        <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
+        <Route path="/proposal-document" element={<ProposalDocument />} />
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+        <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
+        <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
+        <Route path="/emergency" element={<ProtectedRoute><EmergencyEvacuation /></ProtectedRoute>} />
+        <Route path="/branding" element={<ProtectedRoute><BrandingSettings /></ProtectedRoute>} />
+        <Route path="/compliance" element={<ProtectedRoute><ComplianceReport /></ProtectedRoute>} />
+        <Route path="/resource-requirements" element={<ResourceRequirements />} />
+        <Route path="/product-features" element={<ProductFeatures />} />
+        <Route path="/user-manual" element={<UserManual />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </PageTransition>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -90,45 +138,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/visitors" element={<ProtectedRoute><Visitors /></ProtectedRoute>} />
-            <Route path="/visitors/new" element={<ProtectedRoute><NewVisitor /></ProtectedRoute>} />
-            <Route path="/appointments" element={<ProtectedRoute><Appointments /></ProtectedRoute>} />
-            <Route path="/check-in-out" element={<ProtectedRoute><CheckInOut /></ProtectedRoute>} />
-            <Route path="/badge-printing" element={<ProtectedRoute><BadgePrinting /></ProtectedRoute>} />
-            <Route path="/print-badge" element={<PrintBadge />} />
-            <Route path="/self-service" element={<SelfService />} />
-            <Route path="/approve-visitor" element={<ApproveVisitor />} />
-            <Route path="/install" element={<Install />} />
-            <Route path="/visitor-report" element={<ProtectedRoute><VisitorReport /></ProtectedRoute>} />
-            <Route path="/departments" element={<ProtectedRoute><Departments /></ProtectedRoute>} />
-            <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
-            <Route path="/locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
-            <Route path="/gates" element={<ProtectedRoute><Gates /></ProtectedRoute>} />
-            <Route path="/gate-qr-codes" element={<ProtectedRoute><GateQRCodes /></ProtectedRoute>} />
-            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
-            <Route path="/vehicles" element={<ProtectedRoute><Vehicles /></ProtectedRoute>} />
-            <Route path="/vehicles/new" element={<ProtectedRoute><NewVehicle /></ProtectedRoute>} />
-            <Route path="/vehicles/gate" element={<ProtectedRoute><VehicleGate /></ProtectedRoute>} />
-            <Route path="/vehicles/report" element={<ProtectedRoute><VehicleReport /></ProtectedRoute>} />
-            <Route path="/vehicle-types" element={<ProtectedRoute><VehicleTypes /></ProtectedRoute>} />
-            <Route path="/help" element={<ProtectedRoute><Help /></ProtectedRoute>} />
-            <Route path="/proposal-document" element={<ProposalDocument />} />
-            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-            <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
-            <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
-            <Route path="/emergency" element={<ProtectedRoute><EmergencyEvacuation /></ProtectedRoute>} />
-            <Route path="/branding" element={<ProtectedRoute><BrandingSettings /></ProtectedRoute>} />
-            <Route path="/compliance" element={<ProtectedRoute><ComplianceReport /></ProtectedRoute>} />
-            <Route path="/resource-requirements" element={<ResourceRequirements />} />
-            <Route path="/product-features" element={<ProductFeatures />} />
-            <Route path="/user-manual" element={<UserManual />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
