@@ -358,7 +358,7 @@ export default function Visitors() {
             <Link to="/visitors/new">
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                New Visitor
+                {t('visitors.newVisitor')}
               </Button>
             </Link>
           </div>
