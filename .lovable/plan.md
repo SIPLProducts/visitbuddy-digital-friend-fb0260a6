@@ -1,56 +1,62 @@
 
 
-# Auto-Checkout Notifications: Email to Admins + WhatsApp/SMS to Visitors
+# Add Multi-Language (i18n) Support — English + Indian Languages
 
 ## Overview
-Enhance the `auto-checkout-reminder` edge function to:
-1. **Email admins** a summary of visitors not checked out (using Resend, already configured)
-2. **WhatsApp/SMS visitors** with a polite message: "You didn't check out from [company]. We assume you've left and are checking out on your behalf. If you're still inside, please contact [bridge number]. Thank you."
-3. **Auto-checkout** the visitors after sending notifications (update status to `checked_out`)
+Add internationalization with English as default and all major Indian languages in the dropdown. Language switcher in both the header (globe icon) and Settings page.
+
+## Languages
+- **English** (en) — default
+- **Hindi** (hi) — हिन्दी
+- **Tamil** (ta) — தமிழ்
+- **Telugu** (te) — తెలుగు
+- **Kannada** (kn) — ಕನ್ನಡ
+- **Malayalam** (ml) — മലയാളം
+- **Bengali** (bn) — বাংলা
+- **Marathi** (mr) — मराठी
+- **Gujarati** (gu) — ગુજરાતી
+- **Punjabi** (pa) — ਪੰਜਾਬੀ
+- **Odia** (or) — ଓଡ଼ିଆ
+- **Assamese** (as) — অসমীয়া
+- **Urdu** (ur) — اردو
 
 ## Changes
 
-### 1. Update `auto-checkout-reminder` Edge Function
-**File:** `supabase/functions/auto-checkout-reminder/index.ts`
+### 1. Install dependencies
+- `react-i18next`, `i18next`, `i18next-browser-languagedetector`
 
-- Expand visitor query to include `phone` and `email` fields
-- Fetch tenant settings including `company_name` (for the message) and a bridge/security contact number
-- **For each visitor with a phone number:** Send WhatsApp via Twilio (reusing the same Twilio credentials already configured: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_NUMBER`, `TWILIO_SMS_NUMBER`)
-  - WhatsApp message: "Dear [Name], you did not check out from [Company]. We are assuming you are no longer inside the premises. We are doing the checkout on your behalf. In case you are still inside, please contact us at [bridge number]. Thank you — [Company] Security"
-  - Fallback to SMS if WhatsApp number not configured
-- **For admin emails:** Use Resend API (already configured: `RESEND_API_KEY`) to send a summary email to admin users listing all visitors not checked out
-- **Auto-checkout:** Update each visitor's status to `checked_out` and set `check_out_time` after notifications are sent
-- Keep existing in-app notification logic
+### 2. Create i18n config (`src/i18n/index.ts`)
+- Initialize i18next with browser language detector, localStorage key `visiguard_lang`, fallback to English
 
-### 2. Add `security_contact_number` to tenant_settings
-**Migration:** Add column `security_contact_number text DEFAULT NULL` to `tenant_settings`
+### 3. Create translation JSON files (`src/i18n/locales/`)
+- One file per language (en.json, hi.json, ta.json, te.json, kn.json, ml.json, bn.json, mr.json, gu.json, pa.json, or.json, as.json, ur.json)
+- Keys cover: sidebar nav labels, dashboard headings, common buttons (Save, Cancel, Search, Add, Delete), visitor form labels, table headers, settings tabs, notification messages
 
-### 3. Add Security Contact Number field in Settings page
-**File:** `src/pages/Settings.tsx`
-- Add a "Security Contact Number" input field in the Security tab
-- This number is included in the auto-checkout message sent to visitors ("please contact us at...")
+### 4. Import i18n in `src/main.tsx`
+- Add `import './i18n'` before App render
 
-### 4. Update `useTenantSettings.ts`
-- Add `security_contact_number` to the interface and defaults
+### 5. Add Globe language switcher to Header (`src/components/layout/Header.tsx`)
+- Globe icon dropdown showing all languages with native script names
+- Changes language via `i18next.changeLanguage()`
 
-## Message Template (WhatsApp/SMS to Visitors)
-```
-Dear [Visitor Name],
+### 6. Add Language dropdown in Settings (`src/pages/Settings.tsx`)
+- Language selector in General tab
 
-You did not check out from [Company Name]. We are assuming you are no longer inside the premises and are completing the checkout on your behalf.
+### 7. RTL support for Urdu
+- Set `dir="rtl"` on `<html>` when Urdu is selected (in `src/App.tsx`)
 
-If you are still inside the facility, please contact our security desk at [Security Contact Number].
+### 8. Update key components with `useTranslation()`
+- Sidebar nav labels, Header text, Dashboard headings, Visitors page, Settings page labels
 
-Thank you,
-[Company Name] Security
-```
-
-## Email Template (to Admins)
-HTML email listing all visitors not checked out with their name, company, check-in time, and visitor ID. Subject: "⚠️ Auto-Checkout Alert — [count] Visitor(s) Not Checked Out"
-
-## Files Modified
-1. SQL migration — add `security_contact_number` column
-2. `supabase/functions/auto-checkout-reminder/index.ts` — add email/WhatsApp/SMS + auto-checkout
-3. `src/pages/Settings.tsx` — add security contact number field
-4. `src/hooks/useTenantSettings.ts` — add new field
+## Files (18 total)
+1. `package.json` — add i18n deps
+2. `src/i18n/index.ts` — config
+3. `src/i18n/locales/en.json` through `ur.json` — 13 translation files
+4. `src/main.tsx` — import i18n
+5. `src/components/layout/Header.tsx` — language switcher
+6. `src/components/layout/Sidebar.tsx` — translated nav
+7. `src/pages/Settings.tsx` — language dropdown
+8. `src/pages/Dashboard.tsx` — translated labels
+9. `src/pages/Visitors.tsx` — translated table/buttons
+10. `src/App.tsx` — RTL handler for Urdu
 
