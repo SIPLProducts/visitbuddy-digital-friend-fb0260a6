@@ -40,6 +40,7 @@ const defaults: TenantSettings = {
   enable_photo_capture: true,
   enable_watchlist_check: true,
   checkout_warning_hour: 18,
+  security_contact_number: null,
 };
 
 export function useTenantSettings() {
