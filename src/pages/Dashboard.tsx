@@ -76,7 +76,35 @@ export default function Dashboard() {
       fetchDashboardData();
     };
     window.addEventListener('locationChanged', handleLocationChange);
-    return () => window.removeEventListener('locationChanged', handleLocationChange);
+
+    // Real-time subscriptions for live updates
+    const visitorChannel = supabase
+      .channel('dashboard-visitors')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    const vehicleChannel = supabase
+      .channel('dashboard-vehicles')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    const appointmentChannel = supabase
+      .channel('dashboard-appointments')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
+    return () => {
+      window.removeEventListener('locationChanged', handleLocationChange);
+      supabase.removeChannel(visitorChannel);
+      supabase.removeChannel(vehicleChannel);
+      supabase.removeChannel(appointmentChannel);
+    };
   }, [user]);
 
   const fetchLocations = async () => {
