@@ -232,7 +232,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200 min-h-[44px]"
         >
           <Bell className="h-[18px] w-[18px] flex-shrink-0" />
-          {(!collapsed || isMobile) && <span className="text-sm font-medium">Notifications</span>}
+          {(!collapsed || isMobile) && <span className="text-sm font-medium">{t('sidebar.notifications')}</span>}
         </Link>
         <button
           onClick={() => {
