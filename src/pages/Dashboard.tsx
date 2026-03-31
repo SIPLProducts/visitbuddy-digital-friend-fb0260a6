@@ -431,7 +431,10 @@ export default function Dashboard() {
               title="Today's Visitors"
               value={filteredStats.todaysVisitors}
               icon={<Users className="h-5 w-5" />}
-              trend={{ value: '+12% vs yesterday', positive: true }}
+              trend={stats.yesterdaysVisitors > 0 ? {
+                value: `${stats.todaysVisitors >= stats.yesterdaysVisitors ? '+' : ''}${Math.round(((stats.todaysVisitors - stats.yesterdaysVisitors) / stats.yesterdaysVisitors) * 100)}% vs yesterday`,
+                positive: stats.todaysVisitors >= stats.yesterdaysVisitors,
+              } : undefined}
               iconColor="blue"
             />
             <StatCard
