@@ -44,6 +44,26 @@ export default function Vehicles() {
 
   useEffect(() => {
     fetchVehicles();
+
+    // Real-time subscriptions for live updates
+    const vehicleChannel = supabase
+      .channel('vehicles-page-vehicles')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
+        fetchVehicles();
+      })
+      .subscribe();
+
+    const entryChannel = supabase
+      .channel('vehicles-page-entries')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicle_entries' }, () => {
+        fetchVehicles();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(vehicleChannel);
+      supabase.removeChannel(entryChannel);
+    };
   }, []);
 
   const fetchVehicles = async () => {
