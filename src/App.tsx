@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { PageTransition } from "@/components/layout/PageTransition";
+import { useTranslation } from "react-i18next";
 
 // Pages
 import Auth from "./pages/Auth";
@@ -131,10 +133,19 @@ function AppRoutes() {
   );
 }
 
+function RtlHandler() {
+  const { i18n } = useTranslation();
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ur' ? 'rtl' : 'ltr';
+  }, [i18n.language]);
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
+        <RtlHandler />
         <Toaster />
         <Sonner />
         <BrowserRouter>
