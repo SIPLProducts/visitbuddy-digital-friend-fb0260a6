@@ -112,12 +112,17 @@ const roleColors: Record<AppRole, string> = {
   admin: 'bg-destructive text-destructive-foreground',
   manager: 'bg-info text-info-foreground',
   operator: 'bg-success text-success-foreground',
+  gate_security: 'bg-warning text-warning-foreground',
+  visitor: 'bg-secondary text-secondary-foreground',
 };
 
 const roleLabels: Record<AppRole, string> = {
   admin: 'Admin',
   manager: 'Manager',
   operator: 'Operator',
+  gate_security: 'Gate Security',
+  visitor: 'Visitor',
+};
 };
 
 export default function UserManagement() {
