@@ -1,4 +1,5 @@
 import { ReactNode, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { MobileBottomNav } from './MobileBottomNav';
