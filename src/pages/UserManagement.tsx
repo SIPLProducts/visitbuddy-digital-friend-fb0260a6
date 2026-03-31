@@ -127,9 +127,13 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [isCreateUserDialogOpen, setIsCreateUserDialogOpen] = useState(false);
   const [isPasswordResetDialogOpen, setIsPasswordResetDialogOpen] = useState(false);
+  const [isAssignRoleDialogOpen, setIsAssignRoleDialogOpen] = useState(false);
+  const [isEditRoleDialogOpen, setIsEditRoleDialogOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState<UserRoleEntry | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
+  const [assigningRole, setAssigningRole] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showImportResult, setShowImportResult] = useState(false);
@@ -145,6 +149,17 @@ export default function UserManagement() {
 
   // Password reset state
   const [resetEmail, setResetEmail] = useState('');
+
+  // Assign role state
+  const [assignUserId, setAssignUserId] = useState('');
+  const [assignLocationId, setAssignLocationId] = useState('');
+  const [assignRole, setAssignRole] = useState<AppRole>('operator');
+  const [assignIsHoAdmin, setAssignIsHoAdmin] = useState(false);
+
+  // Edit role state
+  const [editRole, setEditRole] = useState<AppRole>('operator');
+  const [editIsHoAdmin, setEditIsHoAdmin] = useState(false);
+  const [editLocationId, setEditLocationId] = useState('');
 
   // Role permissions state
   const [selectedPermLocation, setSelectedPermLocation] = useState('');
@@ -337,6 +352,87 @@ export default function UserManagement() {
       toast.error(error.message || 'Failed to send password reset email');
     } finally {
       setSendingReset(false);
+    }
+  };
+
+  const handleAssignRole = async () => {
+    if (!assignUserId || !assignLocationId) {
+      toast.error('Please select a user and location');
+      return;
+    }
+
+    setAssigningRole(true);
+    try {
+      // Check if role already exists
+      const { data: existing } = await supabase
+        .from('user_location_roles')
+        .select('id')
+        .eq('user_id', assignUserId)
+        .eq('location_id', assignLocationId)
+        .maybeSingle();
+
+      if (existing) {
+        toast.error('This user already has a role at this location. Edit it instead.');
+        setAssigningRole(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('user_location_roles')
+        .insert({
+          user_id: assignUserId,
+          location_id: assignLocationId,
+          role: assignRole,
+          is_ho_admin: assignIsHoAdmin,
+        });
+
+      if (error) throw error;
+
+      toast.success('Role assigned successfully!');
+      setIsAssignRoleDialogOpen(false);
+      setAssignUserId('');
+      setAssignLocationId('');
+      setAssignRole('operator');
+      setAssignIsHoAdmin(false);
+      fetchData();
+    } catch (error: any) {
+      console.error('Error assigning role:', error);
+      toast.error(error.message || 'Failed to assign role');
+    } finally {
+      setAssigningRole(false);
+    }
+  };
+
+  const handleOpenEditRole = (role: UserRoleEntry) => {
+    setEditingRole(role);
+    setEditRole(role.role);
+    setEditIsHoAdmin(role.is_ho_admin);
+    setEditLocationId(role.location_id);
+    setIsEditRoleDialogOpen(true);
+  };
+
+  const handleUpdateRole = async () => {
+    if (!editingRole) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_location_roles')
+        .update({
+          role: editRole,
+          is_ho_admin: editIsHoAdmin,
+          location_id: editLocationId,
+        })
+        .eq('id', editingRole.id);
+
+      if (error) throw error;
+
+      toast.success('Role updated successfully!');
+      setIsEditRoleDialogOpen(false);
+      setEditingRole(null);
+      fetchData();
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      toast.error(error.message || 'Failed to update role');
     }
   };
 
@@ -787,7 +883,154 @@ export default function UserManagement() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {/* Assign Role Dialog */}
+            <Dialog open={isAssignRoleDialogOpen} onOpenChange={setIsAssignRoleDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Shield className="h-4 w-4" />
+                  Assign Role
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[450px]">
+                <DialogHeader>
+                  <DialogTitle>Assign Role to User</DialogTitle>
+                  <DialogDescription>
+                    Add a new role at a specific location for an existing user
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>User</Label>
+                    <Select value={assignUserId} onValueChange={setAssignUserId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select user" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50 max-h-60">
+                        {Object.values(userGroups).map((group) => (
+                          <SelectItem key={group.user_id} value={group.user_id}>
+                            {group.profile?.full_name || 'Unknown User'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Location</Label>
+                    <Select value={assignLocationId} onValueChange={setAssignLocationId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        {locations.map((loc) => (
+                          <SelectItem key={loc.id} value={loc.id}>
+                            {loc.name} {loc.city && `(${loc.city})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <Select value={assignRole} onValueChange={(v) => setAssignRole(v as AppRole)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        <SelectItem value="admin">Admin - Full access</SelectItem>
+                        <SelectItem value="manager">Manager - Manage visitors</SelectItem>
+                        <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                    <Checkbox
+                      id="assignHoAdmin"
+                      checked={assignIsHoAdmin}
+                      onCheckedChange={(checked) => setAssignIsHoAdmin(checked === true)}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label htmlFor="assignHoAdmin" className="text-sm font-medium cursor-pointer">
+                        HO Admin
+                      </label>
+                      <p className="text-xs text-muted-foreground">
+                        Can access all locations and manage user roles
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsAssignRoleDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={handleAssignRole} disabled={assigningRole}>
+                    {assigningRole ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Assigning...</>
+                    ) : 'Assign Role'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
+
+          {/* Edit Role Dialog */}
+          <Dialog open={isEditRoleDialogOpen} onOpenChange={setIsEditRoleDialogOpen}>
+            <DialogContent className="sm:max-w-[450px]">
+              <DialogHeader>
+                <DialogTitle>Edit User Role</DialogTitle>
+                <DialogDescription>
+                  Update role and permissions for {editingRole?.profile?.full_name || 'user'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Select value={editLocationId} onValueChange={setEditLocationId}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border z-50">
+                      {locations.map((loc) => (
+                        <SelectItem key={loc.id} value={loc.id}>
+                          {loc.name} {loc.city && `(${loc.city})`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Role</Label>
+                  <Select value={editRole} onValueChange={(v) => setEditRole(v as AppRole)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border z-50">
+                      <SelectItem value="admin">Admin - Full access</SelectItem>
+                      <SelectItem value="manager">Manager - Manage visitors</SelectItem>
+                      <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                  <Checkbox
+                    id="editHoAdmin"
+                    checked={editIsHoAdmin}
+                    onCheckedChange={(checked) => setEditIsHoAdmin(checked === true)}
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <label htmlFor="editHoAdmin" className="text-sm font-medium cursor-pointer">
+                      HO Admin
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Can access all locations and manage user roles
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsEditRoleDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleUpdateRole}>Update Role</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Stats */}
@@ -943,14 +1186,26 @@ export default function UserManagement() {
                             )}
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive hover:text-destructive"
-                              onClick={() => handleDeleteRole(role.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center justify-end gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-muted-foreground hover:text-foreground"
+                                onClick={() => handleOpenEditRole(role)}
+                                title="Edit role"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => handleDeleteRole(role.id)}
+                                title="Delete role"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
