@@ -416,12 +416,54 @@ export default function Visitors() {
             </SelectContent>
           </Select>
 
+          {/* Department Filter */}
+          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+            <SelectTrigger className="w-44">
+              <Building2 className="h-4 w-4 mr-1.5 text-muted-foreground" />
+              <SelectValue placeholder={t('dashboard.allDepartments')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('dashboard.allDepartments')}</SelectItem>
+              {departments.map(d => (
+                <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Location Filter */}
+          <Select value={locationFilter} onValueChange={setLocationFilter}>
+            <SelectTrigger className="w-44">
+              <MapPin className="h-4 w-4 mr-1.5 text-muted-foreground" />
+              <SelectValue placeholder={t('dashboard.allLocations')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('dashboard.allLocations')}</SelectItem>
+              {locations.map(l => (
+                <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Gate Filter */}
+          <Select value={gateFilter} onValueChange={setGateFilter}>
+            <SelectTrigger className="w-40">
+              <DoorOpen className="h-4 w-4 mr-1.5 text-muted-foreground" />
+              <SelectValue placeholder={t('gates.title')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('gates.title')}</SelectItem>
+              {gates.map(g => (
+                <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           {/* From Date */}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !fromDate && "text-muted-foreground")}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {fromDate ? format(fromDate, "dd/MM/yyyy") : "From Date"}
+                {fromDate ? format(fromDate, "dd/MM/yyyy") : t('visitors.fromDate')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -434,7 +476,7 @@ export default function Visitors() {
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !toDate && "text-muted-foreground")}>
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {toDate ? format(toDate, "dd/MM/yyyy") : "To Date"}
+                {toDate ? format(toDate, "dd/MM/yyyy") : t('visitors.toDate')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -443,8 +485,8 @@ export default function Visitors() {
           </Popover>
 
           {/* Clear filters */}
-          {(fromDate || toDate) && (
-            <Button variant="ghost" size="icon" onClick={() => { setFromDate(undefined); setToDate(undefined); }} title="Clear date filters">
+          {(fromDate || toDate || departmentFilter !== 'all' || locationFilter !== 'all' || gateFilter !== 'all') && (
+            <Button variant="ghost" size="icon" onClick={() => { setFromDate(undefined); setToDate(undefined); setDepartmentFilter('all'); setLocationFilter('all'); setGateFilter('all'); }} title="Clear all filters">
               <X className="h-4 w-4" />
             </Button>
           )}
