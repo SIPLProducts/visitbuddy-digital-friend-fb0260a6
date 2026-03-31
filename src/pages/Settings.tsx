@@ -78,26 +78,26 @@ export default function Settings() {
   return (
     <MainLayout>
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2"><SettingsIcon className="h-6 w-6 text-primary" /> Settings</h1>
-            <p className="text-sm text-muted-foreground mt-1">Manage branding, policies, security, notifications, and more</p>
+            <h1 className="text-2xl font-bold flex items-center gap-2"><SettingsIcon className="h-6 w-6 text-primary" /> {t('settings.title')}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t('settings.subtitle')}</p>
           </div>
           <Button onClick={handleSave} disabled={saving} className="gap-1.5">
             {saving ? <Check className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            {saving ? 'Saving...' : 'Save All'}
+            {saving ? t('settings.saving') : t('settings.saveAll')}
           </Button>
         </div>
 
         <Tabs defaultValue="general" className="space-y-6">
           <TabsList className="flex-wrap">
-            <TabsTrigger value="general" className="gap-1.5"><Building2 className="h-4 w-4" /> General</TabsTrigger>
-            <TabsTrigger value="branding" className="gap-1.5"><Palette className="h-4 w-4" /> Branding</TabsTrigger>
-            <TabsTrigger value="policies" className="gap-1.5"><FileText className="h-4 w-4" /> Policies</TabsTrigger>
-            <TabsTrigger value="security" className="gap-1.5"><Shield className="h-4 w-4" /> Security</TabsTrigger>
-            <TabsTrigger value="data" className="gap-1.5"><Database className="h-4 w-4" /> Data</TabsTrigger>
-            <TabsTrigger value="notifications" className="gap-1.5"><Bell className="h-4 w-4" /> Notifications</TabsTrigger>
-            <TabsTrigger value="help" className="gap-1.5"><HelpCircle className="h-4 w-4" /> Help</TabsTrigger>
+            <TabsTrigger value="general" className="gap-1.5"><Building2 className="h-4 w-4" /> {t('settings.general')}</TabsTrigger>
+            <TabsTrigger value="branding" className="gap-1.5"><Palette className="h-4 w-4" /> {t('settings.branding')}</TabsTrigger>
+            <TabsTrigger value="policies" className="gap-1.5"><FileText className="h-4 w-4" /> {t('settings.policies')}</TabsTrigger>
+            <TabsTrigger value="security" className="gap-1.5"><Shield className="h-4 w-4" /> {t('settings.security')}</TabsTrigger>
+            <TabsTrigger value="data" className="gap-1.5"><Database className="h-4 w-4" /> {t('settings.data')}</TabsTrigger>
+            <TabsTrigger value="notifications" className="gap-1.5"><Bell className="h-4 w-4" /> {t('settings.notifications')}</TabsTrigger>
+            <TabsTrigger value="help" className="gap-1.5"><HelpCircle className="h-4 w-4" /> {t('settings.help')}</TabsTrigger>
           </TabsList>
 
           {/* General Tab */}
