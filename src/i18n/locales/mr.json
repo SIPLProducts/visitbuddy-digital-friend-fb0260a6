@@ -64,7 +64,14 @@
     "quickCheckIn": "जलद चेक-इन",
     "schedule": "वेळापत्रक",
     "newAppointment": "नवीन भेट",
-    "generateReport": "अहवाल तयार करा"
+    "generateReport": "अहवाल तयार करा",
+    "recentVisitors": "अलीकडील अभ्यागत",
+    "gateStatus": "गेट स्थिती",
+    "pendingApprovals": "प्रलंबित मंजुरी",
+    "securityOverview": "सुरक्षा आढावा",
+    "departmentDistribution": "विभाग वितरण",
+    "visitorTrend": "अभ्यागत कल",
+    "peakHours": "व्यस्त तास"
   },
   "visitors": {
     "title": "अभ्यागत",
