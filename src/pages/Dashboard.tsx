@@ -57,6 +57,7 @@ export default function Dashboard() {
     pendingApproval: 0,
     overstayed: 0,
     todaysVehicles: 0,
+    yesterdaysVisitors: 0,
   });
 
   useEffect(() => {
