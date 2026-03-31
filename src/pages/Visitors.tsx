@@ -512,6 +512,7 @@ export default function Visitors() {
                 <TableHead>{t('visitors.vehicle')}</TableHead>
                 <TableHead>{t('visitors.laptop')}</TableHead>
                 <TableHead>{t('visitors.status')}</TableHead>
+                <TableHead>Checkout By</TableHead>
                 <TableHead>{t('visitors.checkInOut')}</TableHead>
                 <TableHead className="w-10">{t('visitors.actions')}</TableHead>
               </TableRow>
