@@ -333,9 +333,9 @@ export default function Visitors() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Visitors</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t('visitors.title')}</h1>
             <p className="text-muted-foreground">
-              Manage and track all visitor records
+              {t('visitors.subtitle')}
             </p>
           </div>
           <div className="flex items-center gap-2">
