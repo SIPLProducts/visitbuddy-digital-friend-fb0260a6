@@ -6,42 +6,45 @@ import {
   FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const actions = [
-  {
-    icon: UserPlus,
-    label: 'New Visitor',
-    description: 'Register visitor',
-    path: '/visitors/new',
-    colorClass: 'bg-[#3b82f6] text-white hover:bg-[#2563eb]',
-  },
-  {
-    icon: QrCode,
-    label: 'Scan QR',
-    description: 'Quick check-in',
-    path: '/check-in-out',
-    colorClass: 'bg-[#14b8a6] text-white hover:bg-[#0d9488]',
-  },
-  {
-    icon: CalendarPlus,
-    label: 'Schedule',
-    description: 'New appointment',
-    path: '/appointments',
-    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
-  },
-  {
-    icon: FileText,
-    label: 'Reports',
-    description: 'Generate report',
-    path: '/visitor-report',
-    colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 export function QuickActions() {
+  const { t } = useTranslation();
+
+  const actions = [
+    {
+      icon: UserPlus,
+      label: t('dashboard.newVisitor'),
+      description: t('dashboard.registerVisitor'),
+      path: '/visitors/new',
+      colorClass: 'bg-[#3b82f6] text-white hover:bg-[#2563eb]',
+    },
+    {
+      icon: QrCode,
+      label: t('dashboard.scanQr'),
+      description: t('dashboard.quickCheckIn'),
+      path: '/check-in-out',
+      colorClass: 'bg-[#14b8a6] text-white hover:bg-[#0d9488]',
+    },
+    {
+      icon: CalendarPlus,
+      label: t('dashboard.schedule'),
+      description: t('dashboard.newAppointment'),
+      path: '/appointments',
+      colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
+    },
+    {
+      icon: FileText,
+      label: t('sidebar.reports'),
+      description: t('dashboard.generateReport'),
+      path: '/visitor-report',
+      colorClass: 'bg-accent hover:bg-accent/80 text-foreground',
+    },
+  ];
+
   return (
     <div className="bg-card rounded-xl border border-border p-6">
-      <h3 className="font-semibold text-foreground mb-4">Quick Actions</h3>
+      <h3 className="font-semibold text-foreground mb-4">{t('dashboard.quickActions')}</h3>
       <div className="grid grid-cols-2 gap-3">
         {actions.map((action) => (
           <Link

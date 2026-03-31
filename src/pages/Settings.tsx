@@ -104,23 +104,23 @@ export default function Settings() {
           <TabsContent value="general">
             <Card>
               <CardHeader>
-                <CardTitle>Organization Details</CardTitle>
+                <CardTitle>{t('settings.organizationDetails')}</CardTitle>
                 <CardDescription>Configure your organization's basic information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Company Name</Label>
+                    <Label>{t('settings.companyName')}</Label>
                     <Input value={settings.company_name} onChange={e => update('company_name', e.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Company Logo URL</Label>
+                    <Label>{t('settings.companyLogo')}</Label>
                     <Input value={settings.logo_url || ''} onChange={e => update('logo_url', e.target.value)} placeholder="https://..." />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Timezone</Label>
+                    <Label>{t('settings.timezone')}</Label>
                     <Select defaultValue="asia-kolkata">
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-popover">
@@ -131,7 +131,7 @@ export default function Settings() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Date Format</Label>
+                    <Label>{t('settings.dateFormat')}</Label>
                     <Select defaultValue="dd-mm-yyyy">
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent className="bg-popover">
@@ -141,6 +141,24 @@ export default function Settings() {
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
+                <Separator />
+                {/* Language Selector */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium flex items-center gap-2"><Globe className="h-4 w-4 text-primary" /> {t('settings.language')}</p>
+                    <p className="text-sm text-muted-foreground">{t('settings.languageDescription')}</p>
+                  </div>
+                  <Select value={i18n.language} onValueChange={(val) => i18n.changeLanguage(val)}>
+                    <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-popover max-h-80">
+                      {languages.map((lang) => (
+                        <SelectItem key={lang.code} value={lang.code}>
+                          {lang.nativeName} ({lang.name})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
