@@ -355,6 +355,87 @@ export default function UserManagement() {
     }
   };
 
+  const handleAssignRole = async () => {
+    if (!assignUserId || !assignLocationId) {
+      toast.error('Please select a user and location');
+      return;
+    }
+
+    setAssigningRole(true);
+    try {
+      // Check if role already exists
+      const { data: existing } = await supabase
+        .from('user_location_roles')
+        .select('id')
+        .eq('user_id', assignUserId)
+        .eq('location_id', assignLocationId)
+        .maybeSingle();
+
+      if (existing) {
+        toast.error('This user already has a role at this location. Edit it instead.');
+        setAssigningRole(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('user_location_roles')
+        .insert({
+          user_id: assignUserId,
+          location_id: assignLocationId,
+          role: assignRole,
+          is_ho_admin: assignIsHoAdmin,
+        });
+
+      if (error) throw error;
+
+      toast.success('Role assigned successfully!');
+      setIsAssignRoleDialogOpen(false);
+      setAssignUserId('');
+      setAssignLocationId('');
+      setAssignRole('operator');
+      setAssignIsHoAdmin(false);
+      fetchData();
+    } catch (error: any) {
+      console.error('Error assigning role:', error);
+      toast.error(error.message || 'Failed to assign role');
+    } finally {
+      setAssigningRole(false);
+    }
+  };
+
+  const handleOpenEditRole = (role: UserRoleEntry) => {
+    setEditingRole(role);
+    setEditRole(role.role);
+    setEditIsHoAdmin(role.is_ho_admin);
+    setEditLocationId(role.location_id);
+    setIsEditRoleDialogOpen(true);
+  };
+
+  const handleUpdateRole = async () => {
+    if (!editingRole) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_location_roles')
+        .update({
+          role: editRole,
+          is_ho_admin: editIsHoAdmin,
+          location_id: editLocationId,
+        })
+        .eq('id', editingRole.id);
+
+      if (error) throw error;
+
+      toast.success('Role updated successfully!');
+      setIsEditRoleDialogOpen(false);
+      setEditingRole(null);
+      fetchData();
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      toast.error(error.message || 'Failed to update role');
+    }
+  };
+
   const handleDownloadTemplate = () => {
     downloadCsvTemplate(
       ['email', 'full_name', 'password', 'location_name', 'role', 'is_ho_admin'],
