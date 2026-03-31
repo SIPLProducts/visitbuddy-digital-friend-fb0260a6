@@ -45,6 +45,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
   const isMobile = useIsMobile();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     fetchLocations();
