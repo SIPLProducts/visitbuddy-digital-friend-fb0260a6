@@ -90,7 +90,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="h-14 md:h-16 border-b border-border bg-card px-3 md:px-6 flex items-center justify-between gap-2 safe-area-top">
+    <header className="h-14 md:h-16 border-b border-border/60 bg-card/70 backdrop-blur-xl px-3 md:px-6 flex items-center justify-between gap-2 safe-area-top sticky top-0 z-30">
       {/* Left side - Menu button (mobile) + Location + Search */}
       <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
         {/* Mobile menu button */}
