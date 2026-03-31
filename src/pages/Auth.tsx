@@ -250,7 +250,7 @@ export default function Auth() {
                 <Crown className="h-4 w-4 text-amber-500" />
                 Demo Accounts <span className="text-xs text-muted-foreground font-normal">(click to auto-fill)</span>
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {demoUsers.map((demo) => (
                   <button
                     key={demo.email}
