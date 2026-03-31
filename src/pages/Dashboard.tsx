@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, HeartPulse, AlertTriangle } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -319,16 +319,6 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className="flex items-center gap-4">
-                {/* Facility Health Score */}
-                <div className="hidden md:flex flex-col items-center bg-white/10 rounded-xl px-4 py-2">
-                  <div className="flex items-center gap-1.5">
-                    <HeartPulse className="h-4 w-4" />
-                    <span className="text-xs text-white/70">Health</span>
-                  </div>
-                  <span className="text-xl font-bold">
-                    {Math.max(0, 100 - (filteredStats.overstayed * 10) - (filteredStats.pendingApproval * 5))}%
-                  </span>
-                </div>
                 <LiveClock />
               </div>
             </div>
