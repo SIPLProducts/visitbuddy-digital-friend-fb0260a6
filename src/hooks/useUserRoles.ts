@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
-export type AppRole = 'admin' | 'manager' | 'operator';
+export type AppRole = 'admin' | 'manager' | 'operator' | 'gate_security' | 'visitor';
 
 export interface UserLocationRole {
   id: string;

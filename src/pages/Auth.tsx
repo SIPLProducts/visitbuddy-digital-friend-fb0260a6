@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown, Building2, Users, UserCheck } from 'lucide-react';
+import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown, Building2, Users, UserCheck, ShieldCheck, User } from 'lucide-react';
 import authHero from '@/assets/auth-hero.jpg';
 import authCheckin from '@/assets/auth-checkin.jpg';
 import authAccess from '@/assets/auth-access.jpg';
@@ -75,10 +75,30 @@ const demoUsers = [
     password: '123456', 
     name: 'Rahul Verma', 
     role: 'Operator',
-    location: 'Manufacturing Plant - Pune',
+    location: 'Mfg Plant - Pune',
     color: 'bg-success',
     icon: UserCheck,
     description: 'Gate operator at Pune plant',
+  },
+  { 
+    email: 'security@demo.com', 
+    password: '123456', 
+    name: 'Suresh Patil', 
+    role: 'Gate Security',
+    location: 'Mfg Plant - Pune',
+    color: 'bg-warning',
+    icon: ShieldCheck,
+    description: 'Check-in/out & vehicle gate',
+  },
+  { 
+    email: 'visitor@demo.com', 
+    password: '123456', 
+    name: 'Ananya Reddy', 
+    role: 'Visitor',
+    location: 'Tech Campus - BLR',
+    color: 'bg-secondary',
+    icon: User,
+    description: 'View-only visitor access',
   },
 ];
 
@@ -230,7 +250,7 @@ export default function Auth() {
                 <Crown className="h-4 w-4 text-amber-500" />
                 Demo Accounts <span className="text-xs text-muted-foreground font-normal">(click to auto-fill)</span>
               </p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 {demoUsers.map((demo) => (
                   <button
                     key={demo.email}

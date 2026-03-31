@@ -112,12 +112,16 @@ const roleColors: Record<AppRole, string> = {
   admin: 'bg-destructive text-destructive-foreground',
   manager: 'bg-info text-info-foreground',
   operator: 'bg-success text-success-foreground',
+  gate_security: 'bg-warning text-warning-foreground',
+  visitor: 'bg-secondary text-secondary-foreground',
 };
 
 const roleLabels: Record<AppRole, string> = {
   admin: 'Admin',
   manager: 'Manager',
   operator: 'Operator',
+  gate_security: 'Gate Security',
+  visitor: 'Visitor',
 };
 
 export default function UserManagement() {
@@ -515,7 +519,7 @@ export default function UserManagement() {
         const nameError = validateRequired(fullName, 'Full Name');
         if (nameError) { errors.push({ row: rowNum, field: 'full_name', message: nameError, value: fullName }); failedCount++; continue; }
         if (!password || password.length < 6) { errors.push({ row: rowNum, field: 'password', message: 'Password must be at least 6 characters' }); failedCount++; continue; }
-        if (!['admin', 'manager', 'operator'].includes(role)) { errors.push({ row: rowNum, field: 'role', message: 'Invalid role', value: role }); failedCount++; continue; }
+        if (!['admin', 'manager', 'operator', 'gate_security', 'visitor'].includes(role)) { errors.push({ row: rowNum, field: 'role', message: 'Invalid role', value: role }); failedCount++; continue; }
 
         const location = locations.find(l => l.name.toLowerCase() === locationName?.toLowerCase());
         if (locationName && !location) { errors.push({ row: rowNum, field: 'location_name', message: 'Location not found', value: locationName }); failedCount++; continue; }
@@ -912,6 +916,8 @@ export default function UserManagement() {
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="manager">Manager</SelectItem>
                         <SelectItem value="operator">Operator</SelectItem>
+                        <SelectItem value="gate_security">Gate Security</SelectItem>
+                        <SelectItem value="visitor">Visitor</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -1084,6 +1090,8 @@ export default function UserManagement() {
                       <SelectItem value="admin">Admin - Full access</SelectItem>
                       <SelectItem value="manager">Manager - Manage visitors</SelectItem>
                       <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                      <SelectItem value="gate_security">Gate Security - Gate check-in/out</SelectItem>
+                      <SelectItem value="visitor">Visitor - View only access</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1249,6 +1257,8 @@ export default function UserManagement() {
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="operator">Operator</SelectItem>
+                    <SelectItem value="gate_security">Gate Security</SelectItem>
+                    <SelectItem value="visitor">Visitor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1296,6 +1306,8 @@ export default function UserManagement() {
                     <SelectItem value="admin">Admin</SelectItem>
                     <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="operator">Operator</SelectItem>
+                    <SelectItem value="gate_security">Gate Security</SelectItem>
+                    <SelectItem value="visitor">Visitor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
