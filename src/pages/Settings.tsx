@@ -10,10 +10,12 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock } from 'lucide-react';
+import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 import { logAudit } from '@/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { languages } from '@/i18n';
 
 interface TenantSettings {
   id: string;
