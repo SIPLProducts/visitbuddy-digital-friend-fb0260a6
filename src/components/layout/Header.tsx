@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Building2, ChevronDown, Crown, Menu } from 'lucide-react';
+import { Search, Plus, Building2, ChevronDown, Crown, Menu, Globe } from 'lucide-react';
 import { NotificationDropdown } from '@/components/layout/NotificationDropdown';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,8 @@ import { useUserRoles } from '@/hooks/useUserRoles';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
+import { languages } from '@/i18n';
 
 interface Location {
   id: string;
