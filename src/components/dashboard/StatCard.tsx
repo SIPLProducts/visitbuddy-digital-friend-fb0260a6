@@ -38,7 +38,7 @@ export function StatCard({ title, value, subtitle, icon, trend, className, iconC
   return (
     <div
       className={cn(
-        'group relative bg-card rounded-xl border border-border p-5 transition-all duration-200',
+        'group relative bg-card/80 backdrop-blur-sm rounded-xl border border-border/60 p-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02]',
         accentBorderClasses[iconColor],
         onClick && 'cursor-pointer hover:shadow-md',
         className

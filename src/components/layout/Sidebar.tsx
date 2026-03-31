@@ -128,15 +128,15 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">V</span>
+      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-sidebar-primary flex items-center justify-center shadow-lg shadow-primary/30">
+            <span className="text-primary-foreground font-bold text-sm font-display">V</span>
           </div>
           {(!collapsed || isMobile) && (
             <div>
-              <h1 className="font-bold text-foreground">VisiGuard</h1>
-              <p className="text-xs text-muted-foreground">Enterprise VMS</p>
+              <h1 className="font-bold text-sidebar-foreground font-display text-base tracking-tight">VisiGuard</h1>
+              <p className="text-[10px] text-sidebar-foreground/50 font-medium uppercase tracking-widest">Enterprise VMS</p>
             </div>
           )}
         </div>
@@ -145,7 +145,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             variant="ghost"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className="h-8 w-8"
+            className="h-8 w-8 text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
@@ -153,8 +153,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto scrollbar-thin py-2">
-        <div className="space-y-1 px-2">
+      <nav className="flex-1 overflow-y-auto scrollbar-thin py-3">
+        <div className="space-y-1 px-3">
           {menuGroups.map((group) => {
             return (
               <Collapsible
@@ -163,7 +163,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                 onOpenChange={() => (!collapsed || isMobile) && toggleGroup(group.label)}
               >
                 {(!collapsed || isMobile) && (
-                  <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors">
+                  <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 text-[10px] font-semibold text-sidebar-foreground/40 uppercase tracking-[0.15em] hover:text-sidebar-foreground/70 transition-colors">
                     <span>{group.label}</span>
                     <ChevronDown
                       className={cn(
@@ -182,13 +182,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                         to={item.path}
                         onClick={handleLinkClick}
                         className={cn(
-                          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px]',
+                          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 min-h-[44px]',
                           isActive
-                            ? 'bg-primary text-primary-foreground'
-                            : 'text-muted-foreground hover:bg-accent hover:text-foreground active:bg-accent/80'
+                            ? 'bg-sidebar-primary/15 text-sidebar-primary border border-sidebar-primary/20 shadow-sm shadow-sidebar-primary/10'
+                            : 'text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                         )}
                       >
-                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        <item.icon className={cn("h-[18px] w-[18px] flex-shrink-0", isActive && "text-sidebar-primary")} />
                         {(!collapsed || isMobile) && <span className="text-sm font-medium">{item.label}</span>}
                       </Link>
                     );
@@ -203,14 +203,14 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
                           key={item.path}
                           to={item.path}
                           className={cn(
-                            'flex items-center justify-center px-3 py-2.5 rounded-lg transition-colors min-h-[44px]',
+                            'flex items-center justify-center px-3 py-2.5 rounded-lg transition-all duration-200 min-h-[44px]',
                             isActive
-                              ? 'bg-primary text-primary-foreground'
-                              : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                              ? 'bg-sidebar-primary/15 text-sidebar-primary shadow-sm shadow-sidebar-primary/10'
+                              : 'text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                           )}
                           title={item.label}
                         >
-                          <item.icon className="h-5 w-5 flex-shrink-0" />
+                          <item.icon className={cn("h-[18px] w-[18px] flex-shrink-0", isActive && "text-sidebar-primary")} />
                         </Link>
                       );
                     })}
@@ -223,13 +223,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-border p-2 space-y-1">
+      <div className="border-t border-sidebar-border p-3 space-y-0.5">
         <Link
           to="/notifications"
           onClick={handleLinkClick}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors min-h-[44px]"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200 min-h-[44px]"
         >
-          <Bell className="h-5 w-5 flex-shrink-0" />
+          <Bell className="h-[18px] w-[18px] flex-shrink-0" />
           {(!collapsed || isMobile) && <span className="text-sm font-medium">Notifications</span>}
         </Link>
         <button
@@ -237,9 +237,9 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
             handleLinkClick();
             signOut();
           }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors min-h-[44px]"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 min-h-[44px]"
         >
-          <LogOut className="h-5 w-5 flex-shrink-0" />
+          <LogOut className="h-[18px] w-[18px] flex-shrink-0" />
           {(!collapsed || isMobile) && <span className="text-sm font-medium">Logout</span>}
         </button>
       </div>
@@ -250,7 +250,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className="w-[280px] p-0 flex flex-col">
+        <SheetContent side="left" className="w-[280px] p-0 flex flex-col bg-sidebar border-sidebar-border">
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>
@@ -264,7 +264,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col bg-card border-r border-border transition-all duration-300',
+        'hidden md:flex flex-col bg-sidebar border-r border-sidebar-border transition-all duration-300',
         collapsed ? 'w-16' : 'w-64'
       )}
     >
