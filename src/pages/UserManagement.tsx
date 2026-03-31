@@ -883,7 +883,154 @@ export default function UserManagement() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+
+            {/* Assign Role Dialog */}
+            <Dialog open={isAssignRoleDialogOpen} onOpenChange={setIsAssignRoleDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Shield className="h-4 w-4" />
+                  Assign Role
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[450px]">
+                <DialogHeader>
+                  <DialogTitle>Assign Role to User</DialogTitle>
+                  <DialogDescription>
+                    Add a new role at a specific location for an existing user
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>User</Label>
+                    <Select value={assignUserId} onValueChange={setAssignUserId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select user" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50 max-h-60">
+                        {Object.values(userGroups).map((group) => (
+                          <SelectItem key={group.user_id} value={group.user_id}>
+                            {group.profile?.full_name || 'Unknown User'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Location</Label>
+                    <Select value={assignLocationId} onValueChange={setAssignLocationId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        {locations.map((loc) => (
+                          <SelectItem key={loc.id} value={loc.id}>
+                            {loc.name} {loc.city && `(${loc.city})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Role</Label>
+                    <Select value={assignRole} onValueChange={(v) => setAssignRole(v as AppRole)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border border-border z-50">
+                        <SelectItem value="admin">Admin - Full access</SelectItem>
+                        <SelectItem value="manager">Manager - Manage visitors</SelectItem>
+                        <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                    <Checkbox
+                      id="assignHoAdmin"
+                      checked={assignIsHoAdmin}
+                      onCheckedChange={(checked) => setAssignIsHoAdmin(checked === true)}
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label htmlFor="assignHoAdmin" className="text-sm font-medium cursor-pointer">
+                        HO Admin
+                      </label>
+                      <p className="text-xs text-muted-foreground">
+                        Can access all locations and manage user roles
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsAssignRoleDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={handleAssignRole} disabled={assigningRole}>
+                    {assigningRole ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Assigning...</>
+                    ) : 'Assign Role'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
+
+          {/* Edit Role Dialog */}
+          <Dialog open={isEditRoleDialogOpen} onOpenChange={setIsEditRoleDialogOpen}>
+            <DialogContent className="sm:max-w-[450px]">
+              <DialogHeader>
+                <DialogTitle>Edit User Role</DialogTitle>
+                <DialogDescription>
+                  Update role and permissions for {editingRole?.profile?.full_name || 'user'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Select value={editLocationId} onValueChange={setEditLocationId}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border z-50">
+                      {locations.map((loc) => (
+                        <SelectItem key={loc.id} value={loc.id}>
+                          {loc.name} {loc.city && `(${loc.city})`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Role</Label>
+                  <Select value={editRole} onValueChange={(v) => setEditRole(v as AppRole)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border z-50">
+                      <SelectItem value="admin">Admin - Full access</SelectItem>
+                      <SelectItem value="manager">Manager - Manage visitors</SelectItem>
+                      <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                  <Checkbox
+                    id="editHoAdmin"
+                    checked={editIsHoAdmin}
+                    onCheckedChange={(checked) => setEditIsHoAdmin(checked === true)}
+                  />
+                  <div className="grid gap-1.5 leading-none">
+                    <label htmlFor="editHoAdmin" className="text-sm font-medium cursor-pointer">
+                      HO Admin
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Can access all locations and manage user roles
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsEditRoleDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleUpdateRole}>Update Role</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Stats */}
