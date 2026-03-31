@@ -49,6 +49,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function Visitors() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
