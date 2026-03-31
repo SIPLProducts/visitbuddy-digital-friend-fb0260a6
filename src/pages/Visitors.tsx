@@ -283,11 +283,20 @@ export default function Visitors() {
     const matchesStatus =
       statusFilter === 'all' || visitor.status === statusFilter;
 
+    const matchesDepartment =
+      departmentFilter === 'all' || visitor.department_id === departmentFilter;
+
+    const matchesLocation =
+      locationFilter === 'all' || visitor.gate?.location_id === locationFilter;
+
+    const matchesGate =
+      gateFilter === 'all' || visitor.gate_id === gateFilter;
+
     const visitorDate = new Date(visitor.created_at);
     const matchesFromDate = !fromDate || visitorDate >= new Date(fromDate.setHours(0, 0, 0, 0));
     const matchesToDate = !toDate || visitorDate <= new Date(new Date(toDate).setHours(23, 59, 59, 999));
 
-    return matchesSearch && matchesStatus && matchesFromDate && matchesToDate;
+    return matchesSearch && matchesStatus && matchesDepartment && matchesLocation && matchesGate && matchesFromDate && matchesToDate;
   });
 
   const handleRefresh = useCallback(async () => {
