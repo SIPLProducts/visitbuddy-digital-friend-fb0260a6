@@ -76,6 +76,7 @@ export default function Visitors() {
 
   useEffect(() => {
     fetchVisitors();
+    fetchFilterOptions();
   }, []);
 
   const fetchVisitors = async () => {
