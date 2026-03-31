@@ -16,10 +16,28 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Get today's date in IST (UTC+5:30)
+    // Fetch configurable warning hour from tenant settings
+    const { data: tenantData } = await supabase
+      .from("tenant_settings")
+      .select("checkout_warning_hour")
+      .limit(1)
+      .single();
+    const warningHour = tenantData?.checkout_warning_hour ?? 18;
+
+    // Get current IST hour
     const now = new Date();
     const istOffset = 5.5 * 60 * 60 * 1000;
     const istNow = new Date(now.getTime() + istOffset);
+    const currentISTHour = istNow.getUTCHours();
+
+    // Only send notifications if current IST hour >= configured warning hour
+    if (currentISTHour < warningHour) {
+      return new Response(
+        JSON.stringify({ message: `Not yet ${warningHour}:00 IST, skipping`, currentISTHour }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const todayIST = istNow.toISOString().split("T")[0];
 
     // Find visitors checked in today who haven't checked out

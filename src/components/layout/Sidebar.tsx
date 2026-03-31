@@ -92,7 +92,7 @@ const menuGroups = [
     label: 'Administration',
     items: [
       { icon: UserCog, label: 'User Management', path: '/users' },
-      { icon: Settings, label: 'Branding & Config', path: '/branding' },
+      
       { icon: Settings, label: 'Settings', path: '/settings' },
       { icon: HelpCircle, label: 'Help & Support', path: '/help' },
     ],
