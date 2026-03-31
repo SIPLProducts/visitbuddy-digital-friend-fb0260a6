@@ -73,7 +73,7 @@ export function CheckInDialog({
     if (!enableWatchlist) return;
     setCheckingWatchlist(true);
     const { data } = await supabase.from('visitor_watchlist')
-      .select('name, severity, reason')
+      .select('name, severity, reason, phone, email')
       .eq('is_active', true);
     
     if (data) {
