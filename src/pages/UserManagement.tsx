@@ -1090,6 +1090,8 @@ export default function UserManagement() {
                       <SelectItem value="admin">Admin - Full access</SelectItem>
                       <SelectItem value="manager">Manager - Manage visitors</SelectItem>
                       <SelectItem value="operator">Operator - Basic operations</SelectItem>
+                      <SelectItem value="gate_security">Gate Security - Gate check-in/out</SelectItem>
+                      <SelectItem value="visitor">Visitor - View only access</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
