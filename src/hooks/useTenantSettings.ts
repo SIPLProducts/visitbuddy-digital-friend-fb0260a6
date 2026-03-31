@@ -18,6 +18,7 @@ interface TenantSettings {
   enable_nda: boolean;
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
+  checkout_warning_hour: number;
 }
 
 const defaults: TenantSettings = {
@@ -37,6 +38,7 @@ const defaults: TenantSettings = {
   enable_nda: true,
   enable_photo_capture: true,
   enable_watchlist_check: true,
+  checkout_warning_hour: 18,
 };
 
 export function useTenantSettings() {

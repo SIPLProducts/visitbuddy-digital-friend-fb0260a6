@@ -120,7 +120,7 @@ function AppRoutes() {
         <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
         <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
         <Route path="/emergency" element={<ProtectedRoute><EmergencyEvacuation /></ProtectedRoute>} />
-        <Route path="/branding" element={<ProtectedRoute><BrandingSettings /></ProtectedRoute>} />
+        
         <Route path="/compliance" element={<ProtectedRoute><ComplianceReport /></ProtectedRoute>} />
         <Route path="/resource-requirements" element={<ResourceRequirements />} />
         <Route path="/product-features" element={<ProductFeatures />} />

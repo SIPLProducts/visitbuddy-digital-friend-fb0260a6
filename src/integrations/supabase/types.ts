@@ -608,6 +608,7 @@ export type Database = {
           auto_checkout_hours: number | null
           badge_footer_text: string | null
           badge_logo_url: string | null
+          checkout_warning_hour: number | null
           company_name: string
           created_at: string
           data_retention_days: number | null
@@ -628,6 +629,7 @@ export type Database = {
           auto_checkout_hours?: number | null
           badge_footer_text?: string | null
           badge_logo_url?: string | null
+          checkout_warning_hour?: number | null
           company_name?: string
           created_at?: string
           data_retention_days?: number | null
@@ -648,6 +650,7 @@ export type Database = {
           auto_checkout_hours?: number | null
           badge_footer_text?: string | null
           badge_logo_url?: string | null
+          checkout_warning_hour?: number | null
           company_name?: string
           created_at?: string
           data_retention_days?: number | null

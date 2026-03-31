@@ -472,16 +472,18 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* After 6 PM Warning Banner */}
+          {/* Configurable Checkout Warning Banner */}
           {(() => {
             const nowHour = new Date().getHours();
+            const warningHour = tenantSettings?.checkout_warning_hour ?? 18;
+            const warningTimeLabel = warningHour > 12 ? `${warningHour - 12} PM` : warningHour === 12 ? '12 PM' : `${warningHour} AM`;
             const notCheckedOut = visitors.filter(v => v.status === 'checked_in' && v.check_in_time && isToday(new Date(v.check_in_time)));
-            if (nowHour >= 18 && notCheckedOut.length > 0) {
+            if (nowHour >= warningHour && notCheckedOut.length > 0) {
               return (
                 <Alert variant="destructive" className="border-amber-500/50 bg-amber-500/10 text-amber-200">
                   <AlertTriangle className="h-5 w-5 text-amber-400" />
                   <AlertTitle className="text-amber-300 font-semibold">
-                    {notCheckedOut.length} Visitor(s) Still Checked In After 6 PM
+                    {notCheckedOut.length} Visitor(s) Still Checked In After {warningTimeLabel}
                   </AlertTitle>
                   <AlertDescription className="text-amber-200/80 mt-1">
                     {notCheckedOut.map(v => v.name).join(', ')} — Please verify and process checkout.

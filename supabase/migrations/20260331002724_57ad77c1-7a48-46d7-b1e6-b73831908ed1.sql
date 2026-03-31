@@ -1,0 +1,1 @@
+ALTER TABLE public.tenant_settings ADD COLUMN checkout_warning_hour integer DEFAULT 18;
