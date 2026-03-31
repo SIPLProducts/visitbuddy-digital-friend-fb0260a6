@@ -197,28 +197,28 @@ export function Header({ onMenuClick }: HeaderProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('header.myAccount')}</DropdownMenuLabel>
             {isHoAdmin && (
               <div className="px-2 py-1">
                 <Badge className="bg-[#f59e0b] text-white gap-1">
                   <Crown className="h-3 w-3" />
-                  HO Admin
+                  {t('header.hoAdmin')}
                 </Badge>
               </div>
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to="/users" className="w-full">User Management</Link>
+              <Link to="/users" className="w-full">{t('header.userManagement')}</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/settings" className="w-full">Settings</Link>
+              <Link to="/settings" className="w-full">{t('header.settings')}</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/help" className="w-full">Help & Support</Link>
+              <Link to="/help" className="w-full">{t('header.helpSupport')}</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut} className="text-destructive">
-              Logout
+              {t('header.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

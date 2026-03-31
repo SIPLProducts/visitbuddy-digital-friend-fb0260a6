@@ -133,10 +133,19 @@ function AppRoutes() {
   );
 }
 
+function RtlHandler() {
+  const { i18n } = useTranslation();
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ur' ? 'rtl' : 'ltr';
+  }, [i18n.language]);
+  return null;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
+        <RtlHandler />
         <Toaster />
         <Sonner />
         <BrowserRouter>
