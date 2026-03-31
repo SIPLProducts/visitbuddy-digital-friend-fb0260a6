@@ -45,9 +45,11 @@ import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInDialog } from '@/components/visitors/CheckInDialog';
 import { logAudit } from '@/lib/auditLog';
+import { useTranslation } from 'react-i18next';
 
 export default function Visitors() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -331,9 +333,9 @@ export default function Visitors() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Visitors</h1>
+            <h1 className="text-2xl font-bold text-foreground">{t('visitors.title')}</h1>
             <p className="text-muted-foreground">
-              Manage and track all visitor records
+              {t('visitors.subtitle')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -356,7 +358,7 @@ export default function Visitors() {
             <Link to="/visitors/new">
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                New Visitor
+                {t('visitors.newVisitor')}
               </Button>
             </Link>
           </div>
@@ -367,7 +369,7 @@ export default function Visitors() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by name, company, email, ID..."
+              placeholder={t('visitors.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -375,15 +377,15 @@ export default function Visitors() {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="All Status" />
+              <SelectValue placeholder={t('visitors.allStatus')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending_approval">Pending Approval</SelectItem>
-              <SelectItem value="checked_in">Checked In</SelectItem>
-              <SelectItem value="checked_out">Checked Out</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="all">{t('visitors.allStatus')}</SelectItem>
+              <SelectItem value="pending_approval">{t('visitors.pendingApproval')}</SelectItem>
+              <SelectItem value="checked_in">{t('visitors.checkedIn')}</SelectItem>
+              <SelectItem value="checked_out">{t('visitors.checkedOut')}</SelectItem>
+              <SelectItem value="scheduled">{t('visitors.scheduled')}</SelectItem>
+              <SelectItem value="cancelled">{t('visitors.cancelled')}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -432,29 +434,29 @@ export default function Visitors() {
                     onCheckedChange={toggleSelectAll}
                   />
                 </TableHead>
-                <TableHead>Visitor</TableHead>
-                <TableHead>ID</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Host / Department</TableHead>
-                <TableHead>Date of Visit</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Laptop</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Check-in/out</TableHead>
-                <TableHead className="w-10">Actions</TableHead>
+                <TableHead>{t('visitors.visitor')}</TableHead>
+                <TableHead>{t('visitors.id')}</TableHead>
+                <TableHead>{t('visitors.company')}</TableHead>
+                <TableHead>{t('visitors.hostDepartment')}</TableHead>
+                <TableHead>{t('visitors.dateOfVisit')}</TableHead>
+                <TableHead>{t('visitors.vehicle')}</TableHead>
+                <TableHead>{t('visitors.laptop')}</TableHead>
+                <TableHead>{t('visitors.status')}</TableHead>
+                <TableHead>{t('visitors.checkInOut')}</TableHead>
+                <TableHead className="w-10">{t('visitors.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
                    <TableCell colSpan={11} className="text-center py-8">
-                    Loading visitors...
+                    {t('visitors.loading')}
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={11} className="text-center py-8">
-                    No visitors found
+                    {t('visitors.noVisitors')}
                   </TableCell>
                 </TableRow>
               ) : (

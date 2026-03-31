@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
   Users,
@@ -38,63 +39,62 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const menuGroups = [
+const getMenuGroups = (t: (key: string) => string) => [
   {
-    label: 'Overview',
+    label: t('sidebar.overview'),
     items: [
-      { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+      { icon: LayoutDashboard, label: t('sidebar.dashboard'), path: '/' },
     ],
   },
   {
-    label: 'Visitor Management',
+    label: t('sidebar.visitorManagement'),
     items: [
-      { icon: Users, label: 'Visitors', path: '/visitors' },
-      { icon: Truck, label: 'Vehicles', path: '/vehicles' },
-      { icon: Calendar, label: 'Appointments', path: '/appointments' },
-      { icon: QrCode, label: 'Check-in/Out', path: '/check-in-out' },
-      { icon: Printer, label: 'Badge Printing', path: '/badge-printing' },
+      { icon: Users, label: t('sidebar.visitors'), path: '/visitors' },
+      { icon: Truck, label: t('sidebar.vehicles'), path: '/vehicles' },
+      { icon: Calendar, label: t('sidebar.appointments'), path: '/appointments' },
+      { icon: QrCode, label: t('sidebar.checkInOut'), path: '/check-in-out' },
+      { icon: Printer, label: t('sidebar.badgePrinting'), path: '/badge-printing' },
     ],
   },
   {
-    label: 'Reports',
+    label: t('sidebar.reports'),
     items: [
-      { icon: FileText, label: 'Visitor Report', path: '/visitor-report' },
-      { icon: FileText, label: 'Vehicle Report', path: '/vehicles/report' },
-      { icon: FileText, label: 'Compliance', path: '/compliance' },
+      { icon: FileText, label: t('sidebar.visitorReport'), path: '/visitor-report' },
+      { icon: FileText, label: t('sidebar.vehicleReport'), path: '/vehicles/report' },
+      { icon: FileText, label: t('sidebar.compliance'), path: '/compliance' },
     ],
   },
   {
-    label: 'Organization',
+    label: t('sidebar.organization'),
     items: [
-      { icon: Building2, label: 'Departments', path: '/departments' },
-      { icon: UserRound, label: 'Employees', path: '/employees' },
-      { icon: MapPin, label: 'Locations', path: '/locations' },
-      { icon: DoorOpen, label: 'Gates', path: '/gates' },
-      { icon: ScanLine, label: 'Gate QR Codes', path: '/gate-qr-codes' },
-      { icon: Truck, label: 'Vehicle Types', path: '/vehicle-types' },
+      { icon: Building2, label: t('sidebar.departments'), path: '/departments' },
+      { icon: UserRound, label: t('sidebar.employees'), path: '/employees' },
+      { icon: MapPin, label: t('sidebar.locations'), path: '/locations' },
+      { icon: DoorOpen, label: t('sidebar.gates'), path: '/gates' },
+      { icon: ScanLine, label: t('sidebar.gateQrCodes'), path: '/gate-qr-codes' },
+      { icon: Truck, label: t('sidebar.vehicleTypes'), path: '/vehicle-types' },
     ],
   },
   {
-    label: 'Security',
+    label: t('sidebar.security'),
     items: [
-      { icon: ShieldAlert, label: 'Watchlist', path: '/watchlist' },
-      { icon: AlertTriangle, label: 'Emergency', path: '/emergency' },
+      { icon: ShieldAlert, label: t('sidebar.watchlist'), path: '/watchlist' },
+      { icon: AlertTriangle, label: t('sidebar.emergency'), path: '/emergency' },
     ],
   },
   {
-    label: 'Insights',
+    label: t('sidebar.insights'),
     items: [
-      { icon: BarChart3, label: 'Analytics', path: '/analytics' },
-      { icon: Shield, label: 'Audit Trail', path: '/audit-logs' },
+      { icon: BarChart3, label: t('sidebar.analytics'), path: '/analytics' },
+      { icon: Shield, label: t('sidebar.auditTrail'), path: '/audit-logs' },
     ],
   },
   {
-    label: 'Administration',
+    label: t('sidebar.administration'),
     items: [
-      { icon: UserCog, label: 'User Management', path: '/users' },
-      
-      { icon: Settings, label: 'Settings', path: '/settings' },
-      { icon: HelpCircle, label: 'Help & Support', path: '/help' },
+      { icon: UserCog, label: t('sidebar.userManagement'), path: '/users' },
+      { icon: Settings, label: t('sidebar.settings'), path: '/settings' },
+      { icon: HelpCircle, label: t('sidebar.helpSupport'), path: '/help' },
     ],
   },
 ];
@@ -105,6 +105,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ open, onOpenChange }: SidebarProps) {
+  const { t } = useTranslation();
+  const menuGroups = getMenuGroups(t);
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>(menuGroups.map(g => g.label));
   const location = useLocation();
@@ -230,7 +232,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200 min-h-[44px]"
         >
           <Bell className="h-[18px] w-[18px] flex-shrink-0" />
-          {(!collapsed || isMobile) && <span className="text-sm font-medium">Notifications</span>}
+          {(!collapsed || isMobile) && <span className="text-sm font-medium">{t('sidebar.notifications')}</span>}
         </Link>
         <button
           onClick={() => {
@@ -240,7 +242,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 min-h-[44px]"
         >
           <LogOut className="h-[18px] w-[18px] flex-shrink-0" />
-          {(!collapsed || isMobile) && <span className="text-sm font-medium">Logout</span>}
+          {(!collapsed || isMobile) && <span className="text-sm font-medium">{t('sidebar.logout')}</span>}
         </button>
       </div>
     </>
