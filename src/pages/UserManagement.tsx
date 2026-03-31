@@ -884,12 +884,12 @@ export default function UserManagement() {
               </DialogContent>
             </Dialog>
 
-            {/* Assign Role Dialog */}
+            {/* Create Role Dialog */}
             <Dialog open={isAssignRoleDialogOpen} onOpenChange={setIsAssignRoleDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2">
+                <Button className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
                   <Shield className="h-4 w-4" />
-                  Assign Role
+                  Create Role
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[450px]">
