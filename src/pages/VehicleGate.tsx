@@ -288,6 +288,57 @@ export default function VehicleGate() {
           </div>
         </div>
 
+        {/* ANPR Alerts Banner */}
+        {anprAlerts.length > 0 && (
+          <div className="space-y-2">
+            {anprAlerts.slice(0, 3).map((alert) => (
+              <div
+                key={alert.id}
+                className={cn(
+                  'flex items-center justify-between p-3 rounded-lg text-sm border',
+                  alert.match_status === 'unmatched'
+                    ? 'bg-destructive/5 border-destructive/20'
+                    : 'bg-emerald-500/5 border-emerald-500/20'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  {alert.match_status === 'unmatched' ? (
+                    <AlertTriangle className="h-4 w-4 text-destructive" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  )}
+                  <span className="font-mono font-semibold">{alert.plate_number}</span>
+                  <Badge variant="secondary" className="text-[10px]">
+                    {alert.match_status === 'auto_checked_in' ? 'Auto In' : alert.match_status === 'auto_checked_out' ? 'Auto Out' : alert.match_status}
+                  </Badge>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {format(new Date(alert.event_time), 'hh:mm:ss a')}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Camera Feed + Gate Controls */}
+        {gateCamera && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Video className="h-4 w-4" />
+                Live Camera - {gateCamera.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CameraFeed
+                cameraUrl={gateCamera.url}
+                cameraType={gateCamera.type as 'snapshot' | 'mjpeg' | 'hls'}
+                gateName={gateCamera.name}
+              />
+            </CardContent>
+          </Card>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Search/Scan Section */}
           <div className="space-y-4">
