@@ -12,6 +12,8 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     const cameraUrl = url.searchParams.get("url");
+    const authUser = url.searchParams.get("user");
+    const authPass = url.searchParams.get("pass");
 
     if (!cameraUrl) {
       return new Response(
@@ -20,12 +22,18 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Fetch the image from the camera
-    const response = await fetch(cameraUrl, {
-      headers: {
-        // Some cameras need basic auth from header instead of URL
-      },
-    });
+    const fetchHeaders: Record<string, string> = {
+      // Required for ngrok free tier to skip browser warning
+      "ngrok-skip-browser-warning": "true",
+    };
+
+    // Add Basic Auth if credentials provided
+    if (authUser && authPass) {
+      const credentials = btoa(`${authUser}:${authPass}`);
+      fetchHeaders["Authorization"] = `Basic ${credentials}`;
+    }
+
+    const response = await fetch(cameraUrl, { headers: fetchHeaders });
 
     if (!response.ok) {
       return new Response(
