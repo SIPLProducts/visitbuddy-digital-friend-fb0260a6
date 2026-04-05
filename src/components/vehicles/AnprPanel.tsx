@@ -95,7 +95,15 @@ export function AnprPanel({ onVehicleAction }: { onVehicleAction?: () => void })
         body: { gate_id: selectedGate.id },
       });
 
-      if (error) throw error;
+      if (error) {
+        const errMsg = error?.message || 'Scan failed';
+        if (errMsg.includes('503') || errMsg.includes('502')) {
+          toast.error('Camera temporarily unavailable, will retry...');
+        } else {
+          toast.error(`ANPR scan failed: ${errMsg}`);
+        }
+        throw error;
+      }
 
       if (data?.plates?.length > 0) {
         setLastResults(data.plates);
