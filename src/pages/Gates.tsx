@@ -81,6 +81,9 @@ export default function Gates() {
     operating_hours: '06:00 - 22:00',
     has_qr: true,
     status: 'active' as 'active' | 'inactive',
+    camera_url: '',
+    camera_type: 'snapshot',
+    camera_enabled: false,
   });
 
   useEffect(() => {
@@ -117,6 +120,9 @@ export default function Gates() {
       operating_hours: '06:00 - 22:00',
       has_qr: true,
       status: 'active',
+      camera_url: '',
+      camera_type: 'snapshot',
+      camera_enabled: false,
     });
   };
 
@@ -136,6 +142,9 @@ export default function Gates() {
       operating_hours: formData.operating_hours,
       has_qr: formData.has_qr,
       status: formData.status,
+      camera_url: formData.camera_url || null,
+      camera_type: formData.camera_type,
+      camera_enabled: formData.camera_enabled,
     });
 
     setLoading(false);
@@ -164,6 +173,9 @@ export default function Gates() {
         operating_hours: formData.operating_hours,
         has_qr: formData.has_qr,
         status: formData.status,
+        camera_url: formData.camera_url || null,
+        camera_type: formData.camera_type,
+        camera_enabled: formData.camera_enabled,
       })
       .eq('id', selectedGate.id);
 
@@ -218,6 +230,9 @@ export default function Gates() {
       operating_hours: gate.operating_hours,
       has_qr: gate.has_qr,
       status: gate.status,
+      camera_url: gate.camera_url || '',
+      camera_type: gate.camera_type || 'snapshot',
+      camera_enabled: gate.camera_enabled || false,
     });
     setIsEditDialogOpen(true);
   };

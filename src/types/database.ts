@@ -74,6 +74,9 @@ export interface Gate {
   capacity: number;
   current_visitors: number;
   operating_hours: string;
+  camera_url: string | null;
+  camera_type: string;
+  camera_enabled: boolean;
   created_at: string;
   updated_at: string;
   location?: Location;
