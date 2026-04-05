@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Truck, Plus, Search, MoreVertical, LogIn, LogOut, Trash2, QrCode, FileText, History, Clock } from 'lucide-react';
+import { AnprPanel } from '@/components/vehicles/AnprPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle, VehicleEntry } from '@/types/vehicle';
 import { toast } from 'sonner';
@@ -305,6 +306,9 @@ export default function Vehicles() {
             </CardContent>
           </Card>
         </div>
+
+        {/* ANPR Camera Scanner */}
+        <AnprPanel onVehicleAction={fetchVehicles} />
 
         {/* Search */}
         <div className="relative max-w-md">
