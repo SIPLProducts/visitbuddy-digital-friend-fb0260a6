@@ -39,6 +39,7 @@ export function CameraFeed({ cameraUrl, cameraType, gateName, className, compact
   };
 
   const handleImageLoad = () => {
+    console.log(`[CameraFeed] Image loaded for ${gateName}`);
     setIsConnected(true);
     setRetryCount(0);
   };
