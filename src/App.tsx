@@ -44,6 +44,7 @@ import Notifications from "./pages/Notifications";
 import AuditLogs from "./pages/AuditLogs";
 import Watchlist from "./pages/Watchlist";
 import EmergencyEvacuation from "./pages/EmergencyEvacuation";
+import CameraMonitor from "./pages/CameraMonitor";
 
 import ComplianceReport from "./pages/ComplianceReport";
 
@@ -122,6 +123,7 @@ function AppRoutes() {
         <Route path="/audit-logs" element={<ProtectedRoute><AuditLogs /></ProtectedRoute>} />
         <Route path="/watchlist" element={<ProtectedRoute><Watchlist /></ProtectedRoute>} />
         <Route path="/emergency" element={<ProtectedRoute><EmergencyEvacuation /></ProtectedRoute>} />
+        <Route path="/camera-monitor" element={<ProtectedRoute><CameraMonitor /></ProtectedRoute>} />
         
         <Route path="/compliance" element={<ProtectedRoute><ComplianceReport /></ProtectedRoute>} />
         <Route path="/resource-requirements" element={<ResourceRequirements />} />

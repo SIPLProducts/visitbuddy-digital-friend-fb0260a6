@@ -81,6 +81,9 @@ export default function Gates() {
     operating_hours: '06:00 - 22:00',
     has_qr: true,
     status: 'active' as 'active' | 'inactive',
+    camera_url: '',
+    camera_type: 'snapshot',
+    camera_enabled: false,
   });
 
   useEffect(() => {
@@ -117,6 +120,9 @@ export default function Gates() {
       operating_hours: '06:00 - 22:00',
       has_qr: true,
       status: 'active',
+      camera_url: '',
+      camera_type: 'snapshot',
+      camera_enabled: false,
     });
   };
 
@@ -136,6 +142,9 @@ export default function Gates() {
       operating_hours: formData.operating_hours,
       has_qr: formData.has_qr,
       status: formData.status,
+      camera_url: formData.camera_url || null,
+      camera_type: formData.camera_type,
+      camera_enabled: formData.camera_enabled,
     });
 
     setLoading(false);
@@ -164,6 +173,9 @@ export default function Gates() {
         operating_hours: formData.operating_hours,
         has_qr: formData.has_qr,
         status: formData.status,
+        camera_url: formData.camera_url || null,
+        camera_type: formData.camera_type,
+        camera_enabled: formData.camera_enabled,
       })
       .eq('id', selectedGate.id);
 
@@ -218,6 +230,9 @@ export default function Gates() {
       operating_hours: gate.operating_hours,
       has_qr: gate.has_qr,
       status: gate.status,
+      camera_url: gate.camera_url || '',
+      camera_type: gate.camera_type || 'snapshot',
+      camera_enabled: gate.camera_enabled || false,
     });
     setIsEditDialogOpen(true);
   };
@@ -425,6 +440,40 @@ export default function Gates() {
           />
           <Label>Active</Label>
         </div>
+      </div>
+
+      {/* Camera Configuration */}
+      <div className="border-t pt-4 mt-4">
+        <div className="flex items-center gap-2 mb-3">
+          <Switch checked={formData.camera_enabled} onCheckedChange={(v) => setFormData({ ...formData, camera_enabled: v })} />
+          <Label className="font-medium">Enable Camera</Label>
+        </div>
+        {formData.camera_enabled && (
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label>Camera URL</Label>
+              <Input
+                placeholder="http://192.168.29.85/cgi-bin/snapshot.cgi"
+                value={formData.camera_url}
+                onChange={(e) => setFormData({ ...formData, camera_url: e.target.value })}
+              />
+              <p className="text-[10px] text-muted-foreground">Enter the HTTP snapshot/MJPEG/HLS URL of your IP camera</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Stream Type</Label>
+              <Select value={formData.camera_type} onValueChange={(v) => setFormData({ ...formData, camera_type: v })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="snapshot">Snapshot (polling)</SelectItem>
+                  <SelectItem value="mjpeg">MJPEG Stream</SelectItem>
+                  <SelectItem value="hls">HLS Stream</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -7,12 +7,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Search, Truck, LogIn, LogOut, Clock, History, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Truck, LogIn, LogOut, Clock, History, Loader2, Video, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle, VehicleEntry } from '@/types/vehicle';
 import { toast } from 'sonner';
 import { format, formatDistanceToNow } from 'date-fns';
 import { QrScanner } from '@/components/checkin/QrScanner';
+import { CameraFeed } from '@/components/camera/CameraFeed';
+import { cn } from '@/lib/utils';
 
 export default function VehicleGate() {
   const navigate = useNavigate();
@@ -25,6 +27,55 @@ export default function VehicleGate() {
   const [isScanning, setIsScanning] = useState(false);
   const [purpose, setPurpose] = useState('');
   const [remarks, setRemarks] = useState('');
+  const [gateCamera, setGateCamera] = useState<{ url: string; type: string; name: string } | null>(null);
+  const [anprAlerts, setAnprAlerts] = useState<Array<{ id: string; plate_number: string; match_status: string; event_time: string }>>([]);
+
+  // Fetch gate camera config
+  useEffect(() => {
+    const fetchGateCamera = async () => {
+      const { data } = await supabase
+        .from('gates')
+        .select('name, camera_url, camera_type, camera_enabled')
+        .eq('camera_enabled', true)
+        .limit(1)
+        .single();
+      if (data && data.camera_url) {
+        setGateCamera({ url: data.camera_url, type: data.camera_type || 'snapshot', name: data.name });
+      }
+    };
+    fetchGateCamera();
+
+    // Subscribe to ANPR events
+    const channel = supabase
+      .channel('anpr-vehicle-gate')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'anpr_events',
+      }, async (payload) => {
+        const event = payload.new as any;
+        setAnprAlerts(prev => [event, ...prev].slice(0, 5));
+        
+        if (event.match_status !== 'unmatched' && event.matched_vehicle_id) {
+          // Auto-populate the matched vehicle
+          const { data: vehicleData } = await supabase
+            .from('vehicles')
+            .select('*, gate:gates(*), location:locations(*)')
+            .eq('id', event.matched_vehicle_id)
+            .single();
+          if (vehicleData) {
+            setSelectedVehicle(vehicleData as unknown as Vehicle);
+            await fetchVehicleEntries(vehicleData.id);
+            toast.success(`🚗 Plate detected: ${event.plate_number} - Vehicle matched!`);
+          }
+        } else {
+          toast.error(`⚠️ Unknown vehicle detected: ${event.plate_number}`);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
@@ -236,6 +287,57 @@ export default function VehicleGate() {
             </p>
           </div>
         </div>
+
+        {/* ANPR Alerts Banner */}
+        {anprAlerts.length > 0 && (
+          <div className="space-y-2">
+            {anprAlerts.slice(0, 3).map((alert) => (
+              <div
+                key={alert.id}
+                className={cn(
+                  'flex items-center justify-between p-3 rounded-lg text-sm border',
+                  alert.match_status === 'unmatched'
+                    ? 'bg-destructive/5 border-destructive/20'
+                    : 'bg-emerald-500/5 border-emerald-500/20'
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  {alert.match_status === 'unmatched' ? (
+                    <AlertTriangle className="h-4 w-4 text-destructive" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  )}
+                  <span className="font-mono font-semibold">{alert.plate_number}</span>
+                  <Badge variant="secondary" className="text-[10px]">
+                    {alert.match_status === 'auto_checked_in' ? 'Auto In' : alert.match_status === 'auto_checked_out' ? 'Auto Out' : alert.match_status}
+                  </Badge>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {format(new Date(alert.event_time), 'hh:mm:ss a')}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Camera Feed + Gate Controls */}
+        {gateCamera && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Video className="h-4 w-4" />
+                Live Camera - {gateCamera.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CameraFeed
+                cameraUrl={gateCamera.url}
+                cameraType={gateCamera.type as 'snapshot' | 'mjpeg' | 'hls'}
+                gateName={gateCamera.name}
+              />
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Search/Scan Section */}
