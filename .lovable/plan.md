@@ -1,62 +1,62 @@
 
 
-# Add Multi-Language (i18n) Support — English + Indian Languages
+# CCTV Camera + ANPR Vehicle Plate Matching Integration
 
 ## Overview
-Add internationalization with English as default and all major Indian languages in the dropdown. Language switcher in both the header (globe icon) and Settings page.
+Connect the CCTV/IP camera at `192.168.29.85` to the VisiGuard application. The camera feed will display on the VehicleGate page, and detected vehicle plates will be matched against registered vehicles for automatic check-in/check-out.
 
-## Languages
-- **English** (en) — default
-- **Hindi** (hi) — हिन्दी
-- **Tamil** (ta) — தமிழ்
-- **Telugu** (te) — తెలుగు
-- **Kannada** (kn) — ಕನ್ನಡ
-- **Malayalam** (ml) — മലയാളം
-- **Bengali** (bn) — বাংলা
-- **Marathi** (mr) — मराठी
-- **Gujarati** (gu) — ગુજરાતી
-- **Punjabi** (pa) — ਪੰਜਾਬੀ
-- **Odia** (or) — ଓଡ଼ିଆ
-- **Assamese** (as) — অসমীয়া
-- **Urdu** (ur) — اردو
+## Important Browser Limitation
+Browsers cannot access RTSP streams directly. The camera at `192.168.29.85` likely exposes:
+- **Snapshot URL**: `http://192.168.29.85/cgi-bin/snapshot.cgi` (or similar vendor-specific path)
+- **MJPEG stream**: `http://192.168.29.85/video/mjpg.cgi`
 
-## Changes
+The exact URL depends on the camera brand (Hikvision, Dahua, Axis, etc.). We will make this configurable per gate.
 
-### 1. Install dependencies
-- `react-i18next`, `i18next`, `i18next-browser-languagedetector`
+## Technical Plan
 
-### 2. Create i18n config (`src/i18n/index.ts`)
-- Initialize i18next with browser language detector, localStorage key `visiguard_lang`, fallback to English
+### 1. Database: Add camera + ANPR tables
+**Migration:**
+- Add to `gates` table: `camera_url` (text), `camera_type` (text: snapshot/mjpeg/hls), `camera_enabled` (boolean)
+- Create `anpr_events` table: `id`, `plate_number`, `gate_id`, `image_url`, `matched_vehicle_id` (nullable), `match_status` (matched/unmatched/auto_checked_in), `event_time`, `location_id`, `created_at`
+- Enable realtime on `anpr_events`
 
-### 3. Create translation JSON files (`src/i18n/locales/`)
-- One file per language (en.json, hi.json, ta.json, te.json, kn.json, ml.json, bn.json, mr.json, gu.json, pa.json, or.json, as.json, ur.json)
-- Keys cover: sidebar nav labels, dashboard headings, common buttons (Save, Cancel, Search, Add, Delete), visitor form labels, table headers, settings tabs, notification messages
+### 2. Edge Function: `anpr-webhook`
+Receives HTTP POST from the ANPR camera/software with `{plate_number, gate_id, image_url}`:
+- Searches `vehicles` table for matching `vehicle_number`
+- Logs to `anpr_events` with match result
+- If matched + `auto_allow = true`: auto creates vehicle entry
+- Returns match result (can trigger boom barrier relay)
 
-### 4. Import i18n in `src/main.tsx`
-- Add `import './i18n'` before App render
+### 3. New Component: `CameraFeed.tsx`
+- Supports snapshot (polling `<img>` every 1-2 sec), MJPEG (`<img>` direct stream), and HLS (`hls.js` + `<video>`)
+- Default camera URL pre-filled as `http://192.168.29.85`
+- Fullscreen toggle, connection status indicator
 
-### 5. Add Globe language switcher to Header (`src/components/layout/Header.tsx`)
-- Globe icon dropdown showing all languages with native script names
-- Changes language via `i18next.changeLanguage()`
+### 4. Update `VehicleGate.tsx`
+- Add live camera feed panel showing the gate camera
+- Subscribe to `anpr_events` via Realtime
+- When plate detected: auto-search vehicle, show match/alert banner
+- Show recent ANPR events list with match status
 
-### 6. Add Language dropdown in Settings (`src/pages/Settings.tsx`)
-- Language selector in General tab
+### 5. Update `Gates.tsx`
+- Add camera configuration fields in gate edit dialog (URL, type, enabled toggle, test button)
+- Pre-fill `192.168.29.85` as default
 
-### 7. RTL support for Urdu
-- Set `dir="rtl"` on `<html>` when Urdu is selected (in `src/App.tsx`)
+### 6. New Page: `CameraMonitor.tsx`
+- Grid view of all camera-enabled gates with live feeds
+- Route: `/camera-monitor`
 
-### 8. Update key components with `useTranslation()`
-- Sidebar nav labels, Header text, Dashboard headings, Visitors page, Settings page labels
+### 7. Navigation + Routes
+- Add `/camera-monitor` route in `App.tsx`
+- Add "Camera Monitor" to Sidebar under Security
 
-## Files (18 total)
-1. `package.json` — add i18n deps
-2. `src/i18n/index.ts` — config
-3. `src/i18n/locales/en.json` through `ur.json` — 13 translation files
-4. `src/main.tsx` — import i18n
-5. `src/components/layout/Header.tsx` — language switcher
-6. `src/components/layout/Sidebar.tsx` — translated nav
-7. `src/pages/Settings.tsx` — language dropdown
-8. `src/pages/Dashboard.tsx` — translated labels
-9. `src/pages/Visitors.tsx` — translated table/buttons
-10. `src/App.tsx` — RTL handler for Urdu
+## Files to Create/Modify (8 files)
+1. **Migration SQL** — gates columns + anpr_events table + realtime
+2. `supabase/functions/anpr-webhook/index.ts` — webhook endpoint
+3. `src/components/camera/CameraFeed.tsx` — reusable camera component
+4. `src/pages/CameraMonitor.tsx` — multi-camera dashboard
+5. `src/pages/VehicleGate.tsx` — embed camera feed + realtime ANPR alerts
+6. `src/pages/Gates.tsx` — camera config fields in edit dialog
+7. `src/App.tsx` — add route
+8. `src/components/layout/Sidebar.tsx` — add nav link
 
