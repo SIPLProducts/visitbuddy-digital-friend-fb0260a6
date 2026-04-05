@@ -76,14 +76,14 @@ async function makeDigestAuthHeader(
   const nc = "00000001";
   const cnonce = crypto.randomUUID().replace(/-/g, "").substring(0, 16);
 
-  const ha1 = await md5(`${username}:${realm}:${password}`);
-  const ha2 = await md5(`${method}:${uri}`);
+  const ha1 = md5(`${username}:${realm}:${password}`);
+  const ha2 = md5(`${method}:${uri}`);
 
   let response: string;
   if (qop === "auth" || qop.includes("auth")) {
-    response = await md5(`${ha1}:${nonce}:${nc}:${cnonce}:auth:${ha2}`);
+    response = md5(`${ha1}:${nonce}:${nc}:${cnonce}:auth:${ha2}`);
   } else {
-    response = await md5(`${ha1}:${nonce}:${ha2}`);
+    response = md5(`${ha1}:${nonce}:${ha2}`);
   }
 
   let header = `Digest username="${username}", realm="${realm}", nonce="${nonce}", uri="${uri}", response="${response}"`;
