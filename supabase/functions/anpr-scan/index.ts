@@ -83,54 +83,139 @@ function makeDigestAuthHeader(
   return header;
 }
 
-async function fetchCameraSnapshot(cameraUrl: string, user?: string, pass?: string): Promise<ArrayBuffer> {
-  const maxRetries = 3;
-  
+type SnapshotResult =
+  | { ok: true; imageBuffer: ArrayBuffer }
+  | { ok: false; retryable: boolean; status?: number; error: string };
+
+const retryableCameraStatuses = new Set([408, 425, 429, 500, 502, 503, 504]);
+const textDecoder = new TextDecoder();
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function withCacheBuster(url: string, attempt: number): string {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set("_ts", `${Date.now()}-${attempt}`);
+    return parsed.toString();
+  } catch {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}_ts=${Date.now()}-${attempt}`;
+  }
+}
+
+function isLikelyImageResponse(contentType: string, bytes: Uint8Array): boolean {
+  if (contentType.startsWith("image/")) return true;
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return true;
+  if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return true;
+  if (bytes.length >= 6 && bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) return true;
+  if (bytes.length >= 12 && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return true;
+  return false;
+}
+
+async function fetchCameraSnapshot(cameraUrl: string, user?: string, pass?: string): Promise<SnapshotResult> {
+  const maxRetries = 5;
+  let backoffMs = 1000;
+  let lastStatus: number | undefined;
+  let lastError = "Camera temporarily unavailable";
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const requestUrl = withCacheBuster(cameraUrl, attempt);
+
     try {
-      const headers: Record<string, string> = { "ngrok-skip-browser-warning": "true" };
-      
+      const headers: Record<string, string> = {
+        "ngrok-skip-browser-warning": "true",
+        "Accept": "image/*,*/*;q=0.8",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+      };
+
       if (user && pass) {
         headers["Authorization"] = `Basic ${btoa(`${user}:${pass}`)}`;
       }
 
-      let response = await fetch(cameraUrl, { headers });
+      let response = await fetch(requestUrl, { headers });
 
-      // Handle Digest Auth
       if (response.status === 401 && user && pass) {
         const wwwAuth = response.headers.get("www-authenticate") || "";
         await response.arrayBuffer();
+
         if (wwwAuth.toLowerCase().startsWith("digest")) {
           const challenge = parseDigestChallenge(wwwAuth);
-          const parsed = new URL(cameraUrl);
+          const parsed = new URL(requestUrl);
           const uri = parsed.pathname + parsed.search;
           const digestHeader = makeDigestAuthHeader(user, pass, "GET", uri, challenge);
-          response = await fetch(cameraUrl, {
-            headers: { "ngrok-skip-browser-warning": "true", Authorization: digestHeader },
+
+          response = await fetch(requestUrl, {
+            headers: {
+              ...headers,
+              Authorization: digestHeader,
+            },
           });
         }
       }
 
-      // Retry on 502/503/504 (ngrok transient errors)
-      if ([502, 503, 504].includes(response.status)) {
-        await response.arrayBuffer(); // consume body
-        if (attempt < maxRetries) {
-          console.log(`Camera returned ${response.status}, retrying (${attempt}/${maxRetries})...`);
-          await new Promise(r => setTimeout(r, 1500 * attempt));
-          continue;
-        }
-        throw new Error(`Camera returned ${response.status} after ${maxRetries} retries`);
+      const contentType = (response.headers.get("content-type") || "").toLowerCase();
+      const imageBuffer = await response.arrayBuffer();
+      const bytes = new Uint8Array(imageBuffer);
+
+      if (response.ok && isLikelyImageResponse(contentType, bytes)) {
+        return { ok: true, imageBuffer };
       }
 
-      if (!response.ok) throw new Error(`Camera returned ${response.status}`);
-      return response.arrayBuffer();
+      const preview = textDecoder.decode(bytes.slice(0, 180)).replace(/\s+/g, " ").trim();
+      const looksLikeNgrokHtml = preview.toLowerCase().includes("ngrok") || preview.toLowerCase().includes("<!doctype html");
+      const isRetryable = retryableCameraStatuses.has(response.status) || looksLikeNgrokHtml;
+
+      lastStatus = response.status || undefined;
+      lastError = response.ok
+        ? `Camera returned non-image content${contentType ? ` (${contentType})` : ""}`
+        : `Camera returned ${response.status}`;
+
+      if (isRetryable && attempt < maxRetries) {
+        console.log(
+          `Camera unavailable on attempt ${attempt}/${maxRetries} (status=${response.status || "n/a"}, contentType=${contentType || "unknown"}). Retrying in ${backoffMs}ms... Preview: ${preview}`
+        );
+        await delay(backoffMs);
+        backoffMs *= 2;
+        continue;
+      }
+
+      return {
+        ok: false,
+        retryable: isRetryable,
+        status: response.status || undefined,
+        error: isRetryable
+          ? `Camera temporarily unavailable after ${maxRetries} attempts`
+          : lastError,
+      };
     } catch (err) {
-      if (attempt >= maxRetries) throw err;
-      console.log(`Camera fetch error on attempt ${attempt}: ${err.message}, retrying...`);
-      await new Promise(r => setTimeout(r, 1500 * attempt));
+      const message = err instanceof Error ? err.message : "Unknown camera fetch error";
+      lastError = message;
+
+      if (attempt < maxRetries) {
+        console.log(`Camera fetch error on attempt ${attempt}/${maxRetries}: ${message}. Retrying in ${backoffMs}ms...`);
+        await delay(backoffMs);
+        backoffMs *= 2;
+        continue;
+      }
+
+      return {
+        ok: false,
+        retryable: true,
+        status: lastStatus,
+        error: `Camera temporarily unavailable after ${maxRetries} attempts`,
+      };
     }
   }
-  throw new Error("Camera fetch failed after all retries");
+
+  return {
+    ok: false,
+    retryable: true,
+    status: lastStatus,
+    error: lastError,
+  };
 }
 
 Deno.serve(async (req) => {
@@ -191,7 +276,24 @@ Deno.serve(async (req) => {
 
     // Fetch camera snapshot
     console.log(`Fetching snapshot from gate: ${gate.name}`);
-    const imageBuffer = await fetchCameraSnapshot(cleanUrl, authUser, authPass);
+    const snapshotResult = await fetchCameraSnapshot(cleanUrl, authUser, authPass);
+    if (!snapshotResult.ok) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          retryable: snapshotResult.retryable,
+          status: snapshotResult.retryable ? "camera_unavailable" : "camera_error",
+          plates: [],
+          error: snapshotResult.error,
+        }),
+        {
+          status: snapshotResult.retryable ? 200 : 502,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const imageBuffer = snapshotResult.imageBuffer;
     const base64Image = btoa(
       String.fromCharCode(...new Uint8Array(imageBuffer))
     );

@@ -105,6 +105,18 @@ export function AnprPanel({ onVehicleAction }: { onVehicleAction?: () => void })
         throw error;
       }
 
+      if (data?.status === 'camera_unavailable') {
+        if (!autoScanRef.current) {
+          toast.warning(data.error || 'Camera temporarily unavailable, please retry.');
+        }
+        return;
+      }
+
+      if (data?.status === 'camera_error') {
+        toast.error(data.error || 'Camera error');
+        return;
+      }
+
       if (data?.plates?.length > 0) {
         setLastResults(data.plates);
         setScanCount(prev => prev + 1);

@@ -97,6 +97,18 @@ export default function CameraMonitor() {
 
       if (error) throw error;
 
+      if (data?.status === 'camera_unavailable') {
+        if (!autoScanRef.current) {
+          toast.warning(data.error || 'Camera temporarily unavailable, please retry.');
+        }
+        return;
+      }
+
+      if (data?.status === 'camera_error') {
+        toast.error(data.error || 'Camera error');
+        return;
+      }
+
       if (data?.plates && data.plates.length > 0) {
         setLastScanResult(data.plates);
         setScanCount(prev => prev + 1);
