@@ -22,20 +22,32 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Build the actual fetch URL with credentials embedded if provided
+    let fetchUrl = cameraUrl;
+    if (authUser && authPass) {
+      const parsed = new URL(cameraUrl);
+      parsed.username = authUser;
+      parsed.password = authPass;
+      fetchUrl = parsed.toString();
+    }
+
     const fetchHeaders: Record<string, string> = {
       // Required for ngrok free tier to skip browser warning
       "ngrok-skip-browser-warning": "true",
     };
 
-    // Add Basic Auth if credentials provided
+    // Also add Basic Auth header as fallback
     if (authUser && authPass) {
       const credentials = btoa(`${authUser}:${authPass}`);
       fetchHeaders["Authorization"] = `Basic ${credentials}`;
     }
 
-    const response = await fetch(cameraUrl, { headers: fetchHeaders });
+    const response = await fetch(fetchUrl, { headers: fetchHeaders });
 
     if (!response.ok) {
+      // Log for debugging
+      const body = await response.text();
+      console.error(`Camera error: status=${response.status}, body=${body.substring(0, 200)}`);
       return new Response(
         JSON.stringify({ error: `Camera returned ${response.status}` }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -54,6 +66,7 @@ Deno.serve(async (req) => {
       },
     });
   } catch (err) {
+    console.error("Camera proxy error:", err);
     return new Response(
       JSON.stringify({ error: err.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
