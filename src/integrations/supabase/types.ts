@@ -64,6 +64,64 @@ export type Database = {
           },
         ]
       }
+      anpr_events: {
+        Row: {
+          created_at: string
+          event_time: string
+          gate_id: string | null
+          id: string
+          image_url: string | null
+          location_id: string | null
+          match_status: string
+          matched_vehicle_id: string | null
+          plate_number: string
+        }
+        Insert: {
+          created_at?: string
+          event_time?: string
+          gate_id?: string | null
+          id?: string
+          image_url?: string | null
+          location_id?: string | null
+          match_status?: string
+          matched_vehicle_id?: string | null
+          plate_number: string
+        }
+        Update: {
+          created_at?: string
+          event_time?: string
+          gate_id?: string | null
+          id?: string
+          image_url?: string | null
+          location_id?: string | null
+          match_status?: string
+          matched_vehicle_id?: string | null
+          plate_number?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anpr_events_gate_id_fkey"
+            columns: ["gate_id"]
+            isOneToOne: false
+            referencedRelation: "gates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anpr_events_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anpr_events_matched_vehicle_id_fkey"
+            columns: ["matched_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           company: string | null
@@ -285,6 +343,9 @@ export type Database = {
       gates: {
         Row: {
           building: string | null
+          camera_enabled: boolean | null
+          camera_type: string | null
+          camera_url: string | null
           capacity: number | null
           created_at: string
           current_visitors: number | null
@@ -299,6 +360,9 @@ export type Database = {
         }
         Insert: {
           building?: string | null
+          camera_enabled?: boolean | null
+          camera_type?: string | null
+          camera_url?: string | null
           capacity?: number | null
           created_at?: string
           current_visitors?: number | null
@@ -313,6 +377,9 @@ export type Database = {
         }
         Update: {
           building?: string | null
+          camera_enabled?: boolean | null
+          camera_type?: string | null
+          camera_url?: string | null
           capacity?: number | null
           created_at?: string
           current_visitors?: number | null
