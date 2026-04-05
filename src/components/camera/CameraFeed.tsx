@@ -33,11 +33,13 @@ export function CameraFeed({ cameraUrl, cameraType, gateName, className, compact
   }, [cameraType]);
 
   const handleImageError = () => {
+    console.error(`[CameraFeed] Image failed for ${gateName}. URL:`, getImageSrc());
     setIsConnected(false);
     setRetryCount(prev => prev + 1);
   };
 
   const handleImageLoad = () => {
+    console.log(`[CameraFeed] Image loaded for ${gateName}`);
     setIsConnected(true);
     setRetryCount(0);
   };
