@@ -52,11 +52,17 @@ export function CameraFeed({ cameraUrl, cameraType, gateName, className, compact
     setIsFullscreen(!isFullscreen);
   };
 
+  const getProxyUrl = (url: string) => {
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    return `https://${projectId}.supabase.co/functions/v1/camera-proxy?url=${encodeURIComponent(url)}`;
+  };
+
   const getImageSrc = () => {
+    const proxied = getProxyUrl(cameraUrl);
     if (cameraType === 'snapshot') {
-      return `${cameraUrl}${cameraUrl.includes('?') ? '&' : '?'}t=${lastRefresh}`;
+      return `${proxied}&t=${lastRefresh}`;
     }
-    return cameraUrl;
+    return proxied;
   };
 
   if (!cameraUrl) {
