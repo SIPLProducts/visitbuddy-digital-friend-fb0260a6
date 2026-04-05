@@ -7,12 +7,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Search, Truck, LogIn, LogOut, Clock, History, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Truck, LogIn, LogOut, Clock, History, Loader2, Video, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle, VehicleEntry } from '@/types/vehicle';
 import { toast } from 'sonner';
 import { format, formatDistanceToNow } from 'date-fns';
 import { QrScanner } from '@/components/checkin/QrScanner';
+import { CameraFeed } from '@/components/camera/CameraFeed';
+import { cn } from '@/lib/utils';
 
 export default function VehicleGate() {
   const navigate = useNavigate();
@@ -25,6 +27,55 @@ export default function VehicleGate() {
   const [isScanning, setIsScanning] = useState(false);
   const [purpose, setPurpose] = useState('');
   const [remarks, setRemarks] = useState('');
+  const [gateCamera, setGateCamera] = useState<{ url: string; type: string; name: string } | null>(null);
+  const [anprAlerts, setAnprAlerts] = useState<Array<{ id: string; plate_number: string; match_status: string; event_time: string }>>([]);
+
+  // Fetch gate camera config
+  useEffect(() => {
+    const fetchGateCamera = async () => {
+      const { data } = await supabase
+        .from('gates')
+        .select('name, camera_url, camera_type, camera_enabled')
+        .eq('camera_enabled', true)
+        .limit(1)
+        .single();
+      if (data && data.camera_url) {
+        setGateCamera({ url: data.camera_url, type: data.camera_type || 'snapshot', name: data.name });
+      }
+    };
+    fetchGateCamera();
+
+    // Subscribe to ANPR events
+    const channel = supabase
+      .channel('anpr-vehicle-gate')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'anpr_events',
+      }, async (payload) => {
+        const event = payload.new as any;
+        setAnprAlerts(prev => [event, ...prev].slice(0, 5));
+        
+        if (event.match_status !== 'unmatched' && event.matched_vehicle_id) {
+          // Auto-populate the matched vehicle
+          const { data: vehicleData } = await supabase
+            .from('vehicles')
+            .select('*, gate:gates(*), location:locations(*)')
+            .eq('id', event.matched_vehicle_id)
+            .single();
+          if (vehicleData) {
+            setSelectedVehicle(vehicleData as unknown as Vehicle);
+            await fetchVehicleEntries(vehicleData.id);
+            toast.success(`🚗 Plate detected: ${event.plate_number} - Vehicle matched!`);
+          }
+        } else {
+          toast.error(`⚠️ Unknown vehicle detected: ${event.plate_number}`);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
