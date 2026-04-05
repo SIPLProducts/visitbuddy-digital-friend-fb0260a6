@@ -1,0 +1,1 @@
+UPDATE gates SET camera_url = 'https://admin:Spts%40123@ranunculaceous-thermostatically-julius.ngrok-free.dev/cgi-bin/snapshot.cgi?channel=1' WHERE camera_enabled = true;
