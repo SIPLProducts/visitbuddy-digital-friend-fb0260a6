@@ -84,31 +84,53 @@ function makeDigestAuthHeader(
 }
 
 async function fetchCameraSnapshot(cameraUrl: string, user?: string, pass?: string): Promise<ArrayBuffer> {
-  const headers: Record<string, string> = { "ngrok-skip-browser-warning": "true" };
+  const maxRetries = 3;
   
-  if (user && pass) {
-    headers["Authorization"] = `Basic ${btoa(`${user}:${pass}`)}`;
-  }
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const headers: Record<string, string> = { "ngrok-skip-browser-warning": "true" };
+      
+      if (user && pass) {
+        headers["Authorization"] = `Basic ${btoa(`${user}:${pass}`)}`;
+      }
 
-  let response = await fetch(cameraUrl, { headers });
+      let response = await fetch(cameraUrl, { headers });
 
-  // Handle Digest Auth
-  if (response.status === 401 && user && pass) {
-    const wwwAuth = response.headers.get("www-authenticate") || "";
-    await response.arrayBuffer();
-    if (wwwAuth.toLowerCase().startsWith("digest")) {
-      const challenge = parseDigestChallenge(wwwAuth);
-      const parsed = new URL(cameraUrl);
-      const uri = parsed.pathname + parsed.search;
-      const digestHeader = makeDigestAuthHeader(user, pass, "GET", uri, challenge);
-      response = await fetch(cameraUrl, {
-        headers: { "ngrok-skip-browser-warning": "true", Authorization: digestHeader },
-      });
+      // Handle Digest Auth
+      if (response.status === 401 && user && pass) {
+        const wwwAuth = response.headers.get("www-authenticate") || "";
+        await response.arrayBuffer();
+        if (wwwAuth.toLowerCase().startsWith("digest")) {
+          const challenge = parseDigestChallenge(wwwAuth);
+          const parsed = new URL(cameraUrl);
+          const uri = parsed.pathname + parsed.search;
+          const digestHeader = makeDigestAuthHeader(user, pass, "GET", uri, challenge);
+          response = await fetch(cameraUrl, {
+            headers: { "ngrok-skip-browser-warning": "true", Authorization: digestHeader },
+          });
+        }
+      }
+
+      // Retry on 502/503/504 (ngrok transient errors)
+      if ([502, 503, 504].includes(response.status)) {
+        await response.arrayBuffer(); // consume body
+        if (attempt < maxRetries) {
+          console.log(`Camera returned ${response.status}, retrying (${attempt}/${maxRetries})...`);
+          await new Promise(r => setTimeout(r, 1500 * attempt));
+          continue;
+        }
+        throw new Error(`Camera returned ${response.status} after ${maxRetries} retries`);
+      }
+
+      if (!response.ok) throw new Error(`Camera returned ${response.status}`);
+      return response.arrayBuffer();
+    } catch (err) {
+      if (attempt >= maxRetries) throw err;
+      console.log(`Camera fetch error on attempt ${attempt}: ${err.message}, retrying...`);
+      await new Promise(r => setTimeout(r, 1500 * attempt));
     }
   }
-
-  if (!response.ok) throw new Error(`Camera returned ${response.status}`);
-  return response.arrayBuffer();
+  throw new Error("Camera fetch failed after all retries");
 }
 
 Deno.serve(async (req) => {
