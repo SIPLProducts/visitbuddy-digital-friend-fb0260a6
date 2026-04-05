@@ -28,6 +28,7 @@ import {
   Shield,
   ShieldAlert,
   AlertTriangle,
+  Video,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -80,6 +81,7 @@ const getMenuGroups = (t: (key: string) => string) => [
     items: [
       { icon: ShieldAlert, label: t('sidebar.watchlist'), path: '/watchlist' },
       { icon: AlertTriangle, label: t('sidebar.emergency'), path: '/emergency' },
+      { icon: Video, label: 'Camera Monitor', path: '/camera-monitor' },
     ],
   },
   {
