@@ -54,6 +54,21 @@ export function CameraFeed({ cameraUrl, cameraType, gateName, className, compact
 
   const getProxyUrl = (url: string) => {
     const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    // Extract credentials from URL if present (e.g., http://user:pass@host/path)
+    try {
+      const parsed = new URL(url);
+      if (parsed.username || parsed.password) {
+        const user = decodeURIComponent(parsed.username);
+        const pass = decodeURIComponent(parsed.password);
+        // Rebuild URL without credentials
+        parsed.username = '';
+        parsed.password = '';
+        const cleanUrl = parsed.toString();
+        return `https://${projectId}.supabase.co/functions/v1/camera-proxy?url=${encodeURIComponent(cleanUrl)}&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`;
+      }
+    } catch {
+      // URL parsing failed, use as-is
+    }
     return `https://${projectId}.supabase.co/functions/v1/camera-proxy?url=${encodeURIComponent(url)}`;
   };
 
