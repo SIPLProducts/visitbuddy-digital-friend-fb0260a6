@@ -1,39 +1,41 @@
 
 
-# Update ANPR Camera Qty to be Gate-Dependent + Add Kiosk/Badge Hardware
+# Compress Phase 1 to 4 Weeks
 
 ## What's Changing
 
-1. **ANPR camera quantity** updated to clearly show it depends on gates: "1 per gate (Entry gate + Exit gate)" with a note explaining the formula
-2. **Visitor check-in hardware** added: Self-Service Kiosk, Badge Printer, Badge/QR Scanner
-3. Both documents (Excel + Word) updated and regenerated as v2 files
+- **Phase 1**: Compressed from 8 weeks → 4 weeks (Weeks 1-4)
+- **Phase 2**: Stays 6 weeks, shifted to Weeks 5-10
+- **Total project**: 14 weeks → 10 weeks
 
-## Changes
+## Updated Timeline
 
-### Excel (`gen_gantt_xlsx.py`) — Sheet 3: Hardware Requirements
+### Phase 1: VisiGuard Deployment (Weeks 1-4)
+| Week | Tasks |
+|------|-------|
+| 1 | Discovery, requirements gathering, infrastructure setup |
+| 2 | Location/gate/department config, site deployment |
+| 3 | User training, UAT & issue fixing |
+| 4 | Go-live & hypercare start |
 
-Split into two sections with title rows:
+### Phase 2: ANPR Integration (Weeks 5-10) — unchanged content
+| Week | Tasks |
+|------|-------|
+| 5 | Hardware procurement & site survey |
+| 6 | Camera installation & networking |
+| 7 | ANPR software config & AI model setup |
+| 8 | Integration testing & calibration |
+| 9 | Pilot run & fine-tuning |
+| 10 | Full ANPR go-live & handover |
 
-**Section 1: Visitor Check-In Hardware (HO + Sites)**
-| Equipment | Specification | Qty / Notes | Est. Unit Cost |
-|-----------|--------------|-------------|----------------|
-| Self-Service Kiosk | 10-15" touchscreen tablet with camera, wall/stand mount | 1 per location (HO + each site) | As per vendor quote |
-| Badge Printer (Thermal) | Direct thermal, 100x150mm badge, USB/LAN | 1 per location | As per vendor quote |
-| Badge/QR Scanner | USB/Bluetooth 2D barcode + QR handheld scanner | 1 per gate | As per vendor quote |
+## Files to Update
 
-**Section 2: ANPR & Gate Automation Hardware (Phase 2)**
-- ANPR Camera qty changed to: **"1 per gate (e.g., 2 gates = 2 cameras)"**
-- Boom Barrier qty changed to: **"1 per gate"**
-- Add a note row: *"Note: Camera and barrier quantities scale with the number of gates. Each gate (entry or exit) requires 1 ANPR camera + 1 boom barrier."*
+1. **Excel** (`VisiGuard_Implementation_Gantt_v3.xlsx`) — Gantt chart columns reduced to 10 weeks, task rows updated, Sheet 2 task details updated
+2. **Word** (`VisiGuard_Implementation_Timeline_v3.docx`) — Phase 1 table compressed to 4 weeks, Phase 2 shifted, summary stats updated (10 weeks total)
 
-### Word (`gen_timeline_docx.js`) — Hardware Requirements section
-
-- Add a "Visitor Check-In Hardware" table before the ANPR table with same 3 items
-- Update ANPR Camera row qty to "1 per gate (entry + exit)"
-- Add a note paragraph explaining gate-based scaling
-
-### Output
-- `VisiGuard_Implementation_Gantt_v2.xlsx`
-- `VisiGuard_Implementation_Timeline_v2.docx`
-- QA both via image conversion
+## Technical Approach
+- Update Python script for Excel generation with new week ranges and 10-column Gantt
+- Update Node.js script for Word generation with compressed Phase 1 tasks
+- Output as v3 files to `/mnt/documents/`
+- QA via image conversion
 
