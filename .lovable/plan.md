@@ -1,79 +1,39 @@
 
 
-# VisiGuard Implementation Timeline & Gantt Chart Documents
+# Update ANPR Camera Qty to be Gate-Dependent + Add Kiosk/Badge Hardware
 
-## What We're Building
+## What's Changing
 
-Two professional documents (Word + Excel) for customer sharing, covering a **two-phase implementation**:
+1. **ANPR camera quantity** updated to clearly show it depends on gates: "1 per gate (Entry gate + Exit gate)" with a note explaining the formula
+2. **Visitor check-in hardware** added: Self-Service Kiosk, Badge Printer, Badge/QR Scanner
+3. Both documents (Excel + Word) updated and regenerated as v2 files
 
-- **Phase 1**: VisiGuard VMS deployment across all sites, training, and issue fixing
-- **Phase 2**: ANPR camera integration (hardware + software)
+## Changes
 
-Both documents will include weekly timelines, task breakdowns, deliverables, and a visual Gantt chart.
+### Excel (`gen_gantt_xlsx.py`) — Sheet 3: Hardware Requirements
 
----
+Split into two sections with title rows:
 
-## Document Structure
+**Section 1: Visitor Check-In Hardware (HO + Sites)**
+| Equipment | Specification | Qty / Notes | Est. Unit Cost |
+|-----------|--------------|-------------|----------------|
+| Self-Service Kiosk | 10-15" touchscreen tablet with camera, wall/stand mount | 1 per location (HO + each site) | As per vendor quote |
+| Badge Printer (Thermal) | Direct thermal, 100x150mm badge, USB/LAN | 1 per location | As per vendor quote |
+| Badge/QR Scanner | USB/Bluetooth 2D barcode + QR handheld scanner | 1 per gate | As per vendor quote |
 
-### Word Document (.docx) — "VisiGuard_Implementation_Timeline.docx"
+**Section 2: ANPR & Gate Automation Hardware (Phase 2)**
+- ANPR Camera qty changed to: **"1 per gate (e.g., 2 gates = 2 cameras)"**
+- Boom Barrier qty changed to: **"1 per gate"**
+- Add a note row: *"Note: Camera and barrier quantities scale with the number of gates. Each gate (entry or exit) requires 1 ANPR camera + 1 boom barrier."*
 
-1. **Cover Page** — RESL branding, project title, date
-2. **Project Overview** — Two-phase summary with objectives
-3. **Phase 1: VisiGuard Deployment** (Weeks 1-8)
-   - Week-by-week task breakdown with deliverables
-   - Discovery, setup, configuration, site rollout, training, UAT, go-live, hypercare
-4. **Phase 2: ANPR Integration** (Weeks 9-14)
-   - Camera hardware procurement & installation
-   - ANPR software configuration, testing, go-live
-5. **Gantt Chart Table** — Visual week-by-week grid with colored cells showing task durations across both phases
-6. **Deliverables Summary** — Consolidated list of all deliverables per phase
-7. **Hardware Requirements** — ANPR cameras, networking, boom barriers (referencing existing resource specs)
+### Word (`gen_timeline_docx.js`) — Hardware Requirements section
 
-### Excel Document (.xlsx) — "VisiGuard_Implementation_Gantt.xlsx"
+- Add a "Visitor Check-In Hardware" table before the ANPR table with same 3 items
+- Update ANPR Camera row qty to "1 per gate (entry + exit)"
+- Add a note paragraph explaining gate-based scaling
 
-**Sheet 1: Gantt Chart**
-- Rows = Tasks grouped by Phase 1 and Phase 2
-- Columns = Week 1 through Week 14
-- Color-coded cells (blue for Phase 1, green for Phase 2)
-- Task owners, deliverables columns
-
-**Sheet 2: Task Details**
-- Detailed task list with: Task ID, Phase, Task Name, Description, Duration, Start Week, End Week, Owner, Deliverables, Status, Dependencies
-
-**Sheet 3: Hardware Requirements**
-- ANPR camera specs, networking equipment, installation requirements
-
----
-
-## Technical Approach
-
-1. **Word**: Generate using `docx` npm library (Node.js script) following existing branding patterns (navy `#1e3a8a`, cyan `#0891b2` colors, Arial font)
-2. **Excel**: Generate using Python `openpyxl` following existing `gen_excel.py` styling patterns
-3. **Gantt visualization**: Colored cell fills in Excel to represent task duration bars
-4. Both files output to `/mnt/documents/`
-
----
-
-## Timeline Content
-
-### Phase 1: VisiGuard Deployment (Weeks 1-8)
-| Week | Task | Deliverables |
-|------|------|-------------|
-| 1 | Discovery & requirements gathering | Project plan, scope document |
-| 2 | Infrastructure setup & database config | Configured environment |
-| 3 | Location, gate, department setup | System configuration |
-| 4-5 | Site-by-site deployment & rollout | Deployed sites |
-| 6 | User training sessions | Training materials, trained users |
-| 7 | UAT & issue fixing | UAT sign-off |
-| 8 | Go-live & hypercare start | Live system, support SLA |
-
-### Phase 2: ANPR Integration (Weeks 9-14)
-| Week | Task | Deliverables |
-|------|------|-------------|
-| 9 | Hardware procurement & site survey | Hardware order, site plan |
-| 10 | Camera installation & networking | Installed cameras |
-| 11 | ANPR software config & AI model setup | Configured ANPR system |
-| 12 | Integration testing & calibration | Test results |
-| 13 | Pilot run & fine-tuning | Pilot report |
-| 14 | Full ANPR go-live & handover | Live ANPR, documentation |
+### Output
+- `VisiGuard_Implementation_Gantt_v2.xlsx`
+- `VisiGuard_Implementation_Timeline_v2.docx`
+- QA both via image conversion
 
