@@ -1,62 +1,79 @@
 
 
-# CCTV Camera + ANPR Vehicle Plate Matching Integration
+# VisiGuard Implementation Timeline & Gantt Chart Documents
 
-## Overview
-Connect the CCTV/IP camera at `192.168.29.85` to the VisiGuard application. The camera feed will display on the VehicleGate page, and detected vehicle plates will be matched against registered vehicles for automatic check-in/check-out.
+## What We're Building
 
-## Important Browser Limitation
-Browsers cannot access RTSP streams directly. The camera at `192.168.29.85` likely exposes:
-- **Snapshot URL**: `http://192.168.29.85/cgi-bin/snapshot.cgi` (or similar vendor-specific path)
-- **MJPEG stream**: `http://192.168.29.85/video/mjpg.cgi`
+Two professional documents (Word + Excel) for customer sharing, covering a **two-phase implementation**:
 
-The exact URL depends on the camera brand (Hikvision, Dahua, Axis, etc.). We will make this configurable per gate.
+- **Phase 1**: VisiGuard VMS deployment across all sites, training, and issue fixing
+- **Phase 2**: ANPR camera integration (hardware + software)
 
-## Technical Plan
+Both documents will include weekly timelines, task breakdowns, deliverables, and a visual Gantt chart.
 
-### 1. Database: Add camera + ANPR tables
-**Migration:**
-- Add to `gates` table: `camera_url` (text), `camera_type` (text: snapshot/mjpeg/hls), `camera_enabled` (boolean)
-- Create `anpr_events` table: `id`, `plate_number`, `gate_id`, `image_url`, `matched_vehicle_id` (nullable), `match_status` (matched/unmatched/auto_checked_in), `event_time`, `location_id`, `created_at`
-- Enable realtime on `anpr_events`
+---
 
-### 2. Edge Function: `anpr-webhook`
-Receives HTTP POST from the ANPR camera/software with `{plate_number, gate_id, image_url}`:
-- Searches `vehicles` table for matching `vehicle_number`
-- Logs to `anpr_events` with match result
-- If matched + `auto_allow = true`: auto creates vehicle entry
-- Returns match result (can trigger boom barrier relay)
+## Document Structure
 
-### 3. New Component: `CameraFeed.tsx`
-- Supports snapshot (polling `<img>` every 1-2 sec), MJPEG (`<img>` direct stream), and HLS (`hls.js` + `<video>`)
-- Default camera URL pre-filled as `http://192.168.29.85`
-- Fullscreen toggle, connection status indicator
+### Word Document (.docx) — "VisiGuard_Implementation_Timeline.docx"
 
-### 4. Update `VehicleGate.tsx`
-- Add live camera feed panel showing the gate camera
-- Subscribe to `anpr_events` via Realtime
-- When plate detected: auto-search vehicle, show match/alert banner
-- Show recent ANPR events list with match status
+1. **Cover Page** — RESL branding, project title, date
+2. **Project Overview** — Two-phase summary with objectives
+3. **Phase 1: VisiGuard Deployment** (Weeks 1-8)
+   - Week-by-week task breakdown with deliverables
+   - Discovery, setup, configuration, site rollout, training, UAT, go-live, hypercare
+4. **Phase 2: ANPR Integration** (Weeks 9-14)
+   - Camera hardware procurement & installation
+   - ANPR software configuration, testing, go-live
+5. **Gantt Chart Table** — Visual week-by-week grid with colored cells showing task durations across both phases
+6. **Deliverables Summary** — Consolidated list of all deliverables per phase
+7. **Hardware Requirements** — ANPR cameras, networking, boom barriers (referencing existing resource specs)
 
-### 5. Update `Gates.tsx`
-- Add camera configuration fields in gate edit dialog (URL, type, enabled toggle, test button)
-- Pre-fill `192.168.29.85` as default
+### Excel Document (.xlsx) — "VisiGuard_Implementation_Gantt.xlsx"
 
-### 6. New Page: `CameraMonitor.tsx`
-- Grid view of all camera-enabled gates with live feeds
-- Route: `/camera-monitor`
+**Sheet 1: Gantt Chart**
+- Rows = Tasks grouped by Phase 1 and Phase 2
+- Columns = Week 1 through Week 14
+- Color-coded cells (blue for Phase 1, green for Phase 2)
+- Task owners, deliverables columns
 
-### 7. Navigation + Routes
-- Add `/camera-monitor` route in `App.tsx`
-- Add "Camera Monitor" to Sidebar under Security
+**Sheet 2: Task Details**
+- Detailed task list with: Task ID, Phase, Task Name, Description, Duration, Start Week, End Week, Owner, Deliverables, Status, Dependencies
 
-## Files to Create/Modify (8 files)
-1. **Migration SQL** — gates columns + anpr_events table + realtime
-2. `supabase/functions/anpr-webhook/index.ts` — webhook endpoint
-3. `src/components/camera/CameraFeed.tsx` — reusable camera component
-4. `src/pages/CameraMonitor.tsx` — multi-camera dashboard
-5. `src/pages/VehicleGate.tsx` — embed camera feed + realtime ANPR alerts
-6. `src/pages/Gates.tsx` — camera config fields in edit dialog
-7. `src/App.tsx` — add route
-8. `src/components/layout/Sidebar.tsx` — add nav link
+**Sheet 3: Hardware Requirements**
+- ANPR camera specs, networking equipment, installation requirements
+
+---
+
+## Technical Approach
+
+1. **Word**: Generate using `docx` npm library (Node.js script) following existing branding patterns (navy `#1e3a8a`, cyan `#0891b2` colors, Arial font)
+2. **Excel**: Generate using Python `openpyxl` following existing `gen_excel.py` styling patterns
+3. **Gantt visualization**: Colored cell fills in Excel to represent task duration bars
+4. Both files output to `/mnt/documents/`
+
+---
+
+## Timeline Content
+
+### Phase 1: VisiGuard Deployment (Weeks 1-8)
+| Week | Task | Deliverables |
+|------|------|-------------|
+| 1 | Discovery & requirements gathering | Project plan, scope document |
+| 2 | Infrastructure setup & database config | Configured environment |
+| 3 | Location, gate, department setup | System configuration |
+| 4-5 | Site-by-site deployment & rollout | Deployed sites |
+| 6 | User training sessions | Training materials, trained users |
+| 7 | UAT & issue fixing | UAT sign-off |
+| 8 | Go-live & hypercare start | Live system, support SLA |
+
+### Phase 2: ANPR Integration (Weeks 9-14)
+| Week | Task | Deliverables |
+|------|------|-------------|
+| 9 | Hardware procurement & site survey | Hardware order, site plan |
+| 10 | Camera installation & networking | Installed cameras |
+| 11 | ANPR software config & AI model setup | Configured ANPR system |
+| 12 | Integration testing & calibration | Test results |
+| 13 | Pilot run & fine-tuning | Pilot report |
+| 14 | Full ANPR go-live & handover | Live ANPR, documentation |
 
