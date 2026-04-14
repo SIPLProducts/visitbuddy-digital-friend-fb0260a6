@@ -706,6 +706,7 @@ export default function Visitors() {
         </div>
           </>
         )}
+        </div>
       </PullToRefresh>
 
       {/* Dialogs */}
