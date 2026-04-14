@@ -126,7 +126,7 @@ export default function SelfService() {
       setFormData(prev => ({ ...prev, photoUrl: url }));
       toast.success('Photo captured successfully');
     } else {
-      toast.error('Failed to upload photo');
+      toast.error('Failed to upload photo. Please try again or continue without a photo.');
     }
     setShowCamera(false);
   };
