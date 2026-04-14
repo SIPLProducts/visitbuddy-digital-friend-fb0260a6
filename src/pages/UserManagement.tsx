@@ -832,6 +832,10 @@ export default function UserManagement() {
               <Users className="h-4 w-4" />
               Assign Users
             </TabsTrigger>
+            <TabsTrigger value="by-location" className="gap-2">
+              <MapPin className="h-4 w-4" />
+              Users by Location
+            </TabsTrigger>
           </TabsList>
 
           {/* ========== Tab 1: Roles ========== */}
