@@ -231,7 +231,9 @@ export default function Dashboard() {
   }, []);
 
   const filteredVisitors = useMemo(() => {
-    let result = visitors;
+    let result = isRestrictedRole && hostEmployeeId
+      ? visitors.filter(v => v.host_id === hostEmployeeId)
+      : visitors;
 
     if (locationFilter !== 'all') {
       result = result.filter(v => v.gate?.location?.id === locationFilter);
@@ -269,7 +271,7 @@ export default function Dashboard() {
     }
 
     return result;
-  }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange]);
+  }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange, isRestrictedRole, hostEmployeeId]);
 
   // Base filtered by location + department only (for chip counts)
   const locationDeptFiltered = useMemo(() => {
