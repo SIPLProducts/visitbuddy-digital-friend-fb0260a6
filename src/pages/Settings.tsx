@@ -71,7 +71,7 @@ export default function Settings() {
   };
 
   if (loading || !settings) {
-    return <MainLayout><div className="flex items-center justify-center h-64"><p className="text-muted-foreground">Loading...</p></div></MainLayout>;
+    return <div className="flex items-center justify-center h-64"><p className="text-muted-foreground">Loading...</p></div>;
   }
 
   return (
