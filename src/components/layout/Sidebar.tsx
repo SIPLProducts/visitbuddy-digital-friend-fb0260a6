@@ -115,6 +115,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const { signOut } = useAuth();
   const isMobile = useIsMobile();
 
+  // Auto-close mobile drawer on navigation
+  useEffect(() => {
+    if (isMobile && onOpenChange) {
+      onOpenChange(false);
+    }
+  }, [location.pathname]);
+
   const toggleGroup = (label: string) => {
     setOpenGroups(prev =>
       prev.includes(label)
