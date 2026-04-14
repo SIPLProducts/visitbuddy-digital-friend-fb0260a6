@@ -1,28 +1,43 @@
 
+## What I found
 
-# Fix Test Email Edge Function
+- The test-email function is running, but the email provider is rejecting the request with a `403` sandbox restriction — this is why the UI shows a generic edge-function error.
+- The current function sends from `VisiGuard VMS <onboarding@resend.dev>`, which only allows test delivery to the owner address `bala@sharviinfotech.com` until a sending domain is verified.
+- The recipient in your screenshot is `chandra910091@gmail.com`, so that request is expected to fail right now.
+- `src/pages/Settings.tsx` only surfaces the generic `non-2xx` error, so the real reason is hidden.
+- The saved SMTP fields are not the current cause of failure: `supabase/functions/test-email/index.ts` now uses the email provider API, and only reads `email_config` for display text.
+- This project already has a custom domain available (`visiguard.sharvisoftwareservices.com`), but it is not yet configured as an email-sending domain.
 
-## Problem
-The `test-email` edge function uses the `denomailer` SMTP library, which fails in the Deno edge runtime with `InvalidData: received corrupt message of type InvalidContentType` when connecting to Gmail SMTP (`smtp.gmail.com:587`). This is a known incompatibility — STARTTLS on port 587 doesn't work with `denomailer` in Supabase edge functions.
+## Plan
 
-## Fix
-Replace `denomailer` with the **Resend HTTP API**. The `RESEND_API_KEY` secret is already configured. This is a simple HTTP `fetch` call — no TCP/SMTP sockets needed.
+### 1. Configure the sending domain
+- Set up the project’s existing custom domain for email sending.
+- After that, use a sender address on that verified domain instead of `onboarding@resend.dev`.
 
-### Changes
+### 2. Fix the test-email function behavior
+- Update `supabase/functions/test-email/index.ts` to:
+  - use the verified sender address when available
+  - detect the sandbox restriction explicitly
+  - return a clear, user-friendly response for that case instead of a raw `500`
+  - optionally fall back to `bala@sharviinfotech.com` for temporary test delivery, matching the badge-email pattern
 
-**1. Rewrite `supabase/functions/test-email/index.ts`**
-- Remove `denomailer` import
-- Use `fetch` to call `https://api.resend.com/emails`
-- Authenticate with `RESEND_API_KEY` from environment
-- Still read `email_config` from the database for sender info display in the email body
-- Use `onboarding@resend.dev` as the `from` address (Resend sandbox default — works without domain verification)
-- Keep the same request/response contract so the Settings UI needs no changes
+### 3. Improve the Settings UI
+- Update `src/pages/Settings.tsx` so the toast shows the real backend message instead of only “Edge Function returned a non-2xx status code”.
+- Add helper text in the email test dialog/card explaining:
+  - before domain verification, test emails only work to Bala’s address
+  - after domain setup, any recipient can be used
+- Clarify that delivery depends on the verified sender domain, not just the saved SMTP form fields.
 
-**2. Deploy the updated function**
+### 4. Verify end to end
+- Test with `bala@sharviinfotech.com` to confirm the function succeeds immediately.
+- Test with another email before domain verification to confirm the app shows a clear explanation instead of the generic edge-function error.
+- Test again after domain setup to confirm real delivery to external recipients.
 
-**3. Test with `curl_edge_functions`** to verify it returns 200
+## Technical details
 
-### Technical details
-- The `from` address must use a Resend-verified domain. Since we don't have one, `onboarding@resend.dev` is the sandbox fallback — it works for testing but emails may land in spam.
-- No frontend changes needed — `Settings.tsx` already calls `supabase.functions.invoke('test-email', { body: { receiver_email } })`.
-
+- Relevant files:
+  - `supabase/functions/test-email/index.ts`
+  - `src/pages/Settings.tsx`
+  - pattern reference: `supabase/functions/send-email-badge/index.ts`
+- I do not plan to switch back to direct Gmail SMTP sending in the edge function, because that was the earlier runtime compatibility issue.
+- The permanent fix is verified-domain sending plus better error handling, not another SMTP retry.
