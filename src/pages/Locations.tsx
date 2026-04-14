@@ -639,9 +639,11 @@ export default function Locations() {
             <div className="col-span-full text-center py-12">
               <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
               <p className="text-muted-foreground">No locations configured</p>
-              <Button variant="outline" className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
-                Add Your First Location
-              </Button>
+              {isHoAdmin && (
+                <Button variant="outline" className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
+                  Add Your First Location
+                </Button>
+              )}
             </div>
           ) : (
             locations.map((location) => (
