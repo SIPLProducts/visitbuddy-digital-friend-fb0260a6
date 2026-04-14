@@ -249,7 +249,10 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 140mm;
+    width: 100%;
+    display: flex !important;
+    justify-content: center;
+    gap: 12mm;
   }
   
   body:has(#printable-badge) .no-print {
