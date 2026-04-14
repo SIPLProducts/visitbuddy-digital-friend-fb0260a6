@@ -53,6 +53,7 @@ import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail, validatePhone, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
 
 export default function Locations() {
+  const { isHoAdmin } = useUserRoles();
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
