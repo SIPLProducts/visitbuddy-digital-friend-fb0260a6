@@ -544,7 +544,7 @@ export default function VisitorReport() {
                   <Users className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                  <p className="text-2xl font-bold text-foreground">{filteredStats.total}</p>
                   <p className="text-sm text-muted-foreground">Total Visitors</p>
                 </div>
               </div>
@@ -557,7 +557,7 @@ export default function VisitorReport() {
                   <UserCheck className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats.checkedIn}</p>
+                  <p className="text-2xl font-bold text-foreground">{filteredStats.checkedIn}</p>
                   <p className="text-sm text-muted-foreground">Currently Inside</p>
                 </div>
               </div>
@@ -570,7 +570,7 @@ export default function VisitorReport() {
                   <UserX className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats.checkedOut}</p>
+                  <p className="text-2xl font-bold text-foreground">{filteredStats.checkedOut}</p>
                   <p className="text-sm text-muted-foreground">Checked Out</p>
                 </div>
               </div>
@@ -583,7 +583,7 @@ export default function VisitorReport() {
                   <Laptop className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats.withLaptop}</p>
+                  <p className="text-2xl font-bold text-foreground">{filteredStats.withLaptop}</p>
                   <p className="text-sm text-muted-foreground">With Laptop</p>
                 </div>
               </div>
@@ -596,7 +596,7 @@ export default function VisitorReport() {
                   <TrendingUp className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{stats.avgDuration}</p>
+                  <p className="text-2xl font-bold text-foreground">{filteredStats.avgDuration}</p>
                   <p className="text-sm text-muted-foreground">Avg. Duration</p>
                 </div>
               </div>
@@ -864,11 +864,11 @@ export default function VisitorReport() {
           </div>
           <div className="flex flex-wrap gap-2">
             {[
-              { label: 'Currently Inside', value: 'checked_in', count: stats.checkedIn, icon: UserCheck },
-              { label: 'Checked Out', value: 'checked_out', count: stats.checkedOut, icon: UserX },
+              { label: 'Currently Inside', value: 'checked_in', count: filteredStats.checkedIn, icon: UserCheck },
+              { label: 'Checked Out', value: 'checked_out', count: filteredStats.checkedOut, icon: UserX },
               { label: 'Scheduled', value: 'scheduled', count: visitors.filter(v => v.status === 'scheduled').length, icon: CalendarIcon },
               { label: 'Pending', value: 'pending_approval', count: visitors.filter(v => v.status === 'pending_approval').length, icon: Crown },
-              { label: 'With Laptop', value: 'with_laptop', count: stats.withLaptop, icon: Laptop },
+              { label: 'With Laptop', value: 'with_laptop', count: filteredStats.withLaptop, icon: Laptop },
             ].map((chip) => (
               <Button
                 key={chip.value}
