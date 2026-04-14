@@ -191,7 +191,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   {isHoAdmin ? t('header.hoAdmin') : t('header.user')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {isHoAdmin ? t('header.allLocations') : (currentRole ? roleLabels[currentRole] : t('header.noRole'))}
+                  {rolesLoading ? '...' : isHoAdmin ? t('header.allLocations') : (currentRole ? roleLabels[currentRole] : t('header.noRole'))}
                 </p>
               </div>
             </Button>

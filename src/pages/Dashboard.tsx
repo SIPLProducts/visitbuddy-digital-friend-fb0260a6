@@ -70,8 +70,8 @@ export default function Dashboard() {
     if (user) {
       supabase.from('profiles').select('full_name').eq('user_id', user.id).single()
         .then(({ data }) => { if (data) setUserName((data as any).full_name || user.email?.split('@')[0] || ''); });
-      supabase.from('user_location_roles').select('role, is_ho_admin').eq('user_id', user.id).limit(1).single()
-        .then(({ data }) => { if (data) setUserRole((data as any).is_ho_admin ? 'HO Admin' : (data as any).role); });
+      supabase.from('user_location_roles').select('role, is_ho_admin').eq('user_id', user.id).limit(1)
+        .then(({ data }) => { if (data && data.length > 0) setUserRole((data[0] as any).is_ho_admin ? 'HO Admin' : (data[0] as any).role); else setUserRole('User'); });
     }
 
     const handleLocationChange = () => {
