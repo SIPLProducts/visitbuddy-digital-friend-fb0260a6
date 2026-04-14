@@ -142,10 +142,14 @@ export default function Settings() {
       toast.error('Please enter a valid email address');
       return;
     }
+    if (!emailConfig.id) {
+      toast.error('Please save your SMTP configuration first');
+      return;
+    }
     setSendingTest(true);
     try {
-      const { data, error } = await supabase.functions.invoke('test-email', {
-        body: { receiver_email: testEmail },
+      const { data, error } = await supabase.functions.invoke('test-smtp', {
+        body: { smtp_config_id: emailConfig.id, to_email: testEmail },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -609,10 +613,6 @@ export default function Settings() {
               <DialogDescription>Enter the recipient email address to send a test email.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <div className="rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800 flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-                <span>Currently in sandbox mode. Test emails can only be sent to <strong>bala@sharviinfotech.com</strong>. To send to any address, a verified sending domain is required.</span>
-              </div>
               <div className="space-y-2">
                 <Label>Receiver Email</Label>
                 <Input

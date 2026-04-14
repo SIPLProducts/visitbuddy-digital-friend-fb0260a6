@@ -287,6 +287,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_active: boolean | null
           sender_email: string
           sender_name: string
           smtp_host: string
@@ -299,6 +300,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_active?: boolean | null
           sender_email: string
           sender_name?: string
           smtp_host: string
@@ -311,6 +313,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_active?: boolean | null
           sender_email?: string
           sender_name?: string
           smtp_host?: string
@@ -319,6 +322,75 @@ export type Database = {
           smtp_username?: string
           updated_at?: string
           use_tls?: boolean
+        }
+        Relationships: []
+      }
+      email_logs: {
+        Row: {
+          body: string | null
+          cc: string[] | null
+          id: string
+          recipients: string[]
+          sent_at: string | null
+          status: string | null
+          subject: string
+          template: string | null
+        }
+        Insert: {
+          body?: string | null
+          cc?: string[] | null
+          id?: string
+          recipients: string[]
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          template?: string | null
+        }
+        Update: {
+          body?: string | null
+          cc?: string[] | null
+          id?: string
+          recipients?: string[]
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          template?: string | null
+        }
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          body_template: string
+          cc_emails: string[] | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          subject_template: string
+          template_key: string
+          to_emails: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          body_template: string
+          cc_emails?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          subject_template: string
+          template_key: string
+          to_emails?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          body_template?: string
+          cc_emails?: string[] | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          subject_template?: string
+          template_key?: string
+          to_emails?: string[] | null
+          updated_at?: string | null
         }
         Relationships: []
       }
