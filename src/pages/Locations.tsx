@@ -395,8 +395,14 @@ export default function Locations() {
     setIsEditDialogOpen(true);
   };
 
-  const openDeleteDialog = (location: Location) => {
+  const openDeleteDialog = async (location: Location) => {
     setSelectedLocation(location);
+    // Check for user roles assigned to this location
+    const { data: roles } = await supabase
+      .from('user_location_roles')
+      .select('user_id, role, is_ho_admin')
+      .eq('location_id', location.id);
+    setRolesAtLocation((roles || []).map(r => ({ user_id: r.user_id, role: r.role, is_ho_admin: r.is_ho_admin })));
     setIsDeleteDialogOpen(true);
   };
 
