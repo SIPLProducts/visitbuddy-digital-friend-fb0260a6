@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useAuth } from '@/hooks/useAuth';
@@ -28,40 +28,15 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
   const { user } = useAuth();
   const { userRoles, isHoAdmin } = useUserRoles();
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
-  const [hostEmployeeId, setHostEmployeeId] = useState<string | null>(null);
-  
+
   const isGateSecurityOnly = useMemo(() => {
     if (isHoAdmin) return false;
     return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
   }, [userRoles, isHoAdmin]);
-
-  const isManagerOnly = useMemo(() => {
-    if (isHoAdmin) return false;
-    return userRoles.length > 0 && userRoles.some(r => r.role === 'manager') && !userRoles.some(r => r.role === 'admin');
-  }, [userRoles, isHoAdmin]);
-
-  // Look up employee ID for manager users
-  useEffect(() => {
-    if (isManagerOnly && user?.email) {
-      supabase
-        .from('employees')
-        .select('id')
-        .eq('email', user.email)
-        .maybeSingle()
-        .then(({ data }) => {
-          setHostEmployeeId(data?.id || null);
-        });
-    }
-  }, [isManagerOnly, user?.email]);
   
   const pendingVisitors = useMemo(() => {
-    const pending = visitors.filter(v => v.status === 'pending_approval');
-    // For managers, only show visitors assigned to them as host
-    if (isManagerOnly && hostEmployeeId) {
-      return pending.filter(v => v.host_id === hostEmployeeId);
-    }
-    return pending;
-  }, [visitors, isManagerOnly, hostEmployeeId]);
+    return visitors.filter(v => v.status === 'pending_approval');
+  }, [visitors]);
 
   const getInitials = (name: string) => {
     return name
