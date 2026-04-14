@@ -1,54 +1,44 @@
 
 
-# Auto-Select Location for Single-Location Users
+# Auto-Show Approved Visitors for Security Check-In
 
 ## Problem
-Currently, the header fetches **all** locations from the database regardless of the user's role assignments. Users with only one assigned location still see the full location dropdown and must select manually.
+When a host approves a visitor whose Date of Visit is today, the security user doesn't automatically see the visitor ready for check-in. They have to manually refresh the Visitors page. The Dashboard has realtime updates but the Visitors page does not.
 
-## Fix — `src/components/layout/Header.tsx`
+## Changes
 
-### 1. Filter locations by user's assigned locations
-For non-HO-Admin users, instead of fetching all locations, filter to only show locations the user has roles for:
+### 1. Add Realtime Subscription to `src/pages/Visitors.tsx`
+Subscribe to `postgres_changes` on the `visitors` table so that when a host approves a visitor (status changes from `pending_approval` to `scheduled`), the list auto-refreshes for security users.
 
 ```tsx
-const fetchLocations = async () => {
-  try {
-    if (isHoAdmin) {
-      // HO Admin sees all locations
-      const { data } = await supabase.from('locations').select('id, name, city').order('name');
-      setLocations(data || []);
-    } else {
-      // Regular users only see their assigned locations
-      const assignedLocationIds = userRoles.map(r => r.location_id);
-      if (assignedLocationIds.length === 0) return;
-      const { data } = await supabase
-        .from('locations')
-        .select('id, name, city')
-        .in('id', assignedLocationIds)
-        .order('name');
-      setLocations(data || []);
-    }
-  } catch (error) {
-    console.error('Error fetching locations:', error);
+// Inside useEffect, add realtime channel
+const channel = supabase
+  .channel('visitors-page-realtime')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
+    fetchVisitors();
+  })
+  .subscribe();
+
+return () => { supabase.removeChannel(channel); };
+```
+
+### 2. Default filter for Gate Security role in `src/pages/Visitors.tsx`
+For gate security users, default the status filter to show `scheduled` visitors (ready for check-in) so approved visitors for today appear prominently. Also default the date filter to today.
+
+```tsx
+// After role detection
+useEffect(() => {
+  if (isGateSecurityOnly) {
+    setStatusFilter('scheduled');
+    setFromDate(new Date());
+    setToDate(new Date());
   }
-};
+}, [isGateSecurityOnly]);
 ```
 
-### 2. Auto-select and hide dropdown for single-location users
-- If the user has exactly **one** location, auto-set it and skip the dropdown selector entirely (just show the location name as static text).
-- If 2+ locations, show the dropdown as usual.
+### 3. No database changes needed
+The approve-visitor edge function already sets status to `scheduled` and sends notifications to gate security users. The check-in button logic already checks `isScheduledToday` correctly.
 
-```tsx
-{locations.length === 1 ? (
-  <div className="flex items-center gap-2 text-sm">
-    <Building2 className="h-4 w-4 text-muted-foreground" />
-    <span className="font-medium">{locations[0].name}</span>
-  </div>
-) : (
-  <Select ...>...</Select>
-)}
-```
-
-### Files Changed
-- `src/components/layout/Header.tsx`
+## Result
+When a host approves a visitor with today's Date of Visit, the security user's Visitors page will automatically refresh and show the visitor with a "Check In" action available — no manual refresh needed.
 
