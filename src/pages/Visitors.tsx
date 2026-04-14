@@ -316,6 +316,11 @@ export default function Visitors() {
   };
 
   const filteredVisitors = visitors.filter((visitor) => {
+    // Host-based filtering for Manager/Operator roles
+    if (isRestrictedRole && hostEmployeeId && visitor.host_id !== hostEmployeeId) {
+      return false;
+    }
+
     const matchesSearch =
       visitor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       visitor.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
