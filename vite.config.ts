@@ -80,9 +80,13 @@ export default defineConfig(({ mode }) => ({
           }
         ]
       },
+      devOptions: {
+        enabled: false,
+      },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit
+        navigateFallbackDenylist: [/^\/~oauth/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.qrserver\.com\/.*/i,
