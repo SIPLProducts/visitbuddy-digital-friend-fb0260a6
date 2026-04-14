@@ -720,15 +720,17 @@ export default function Locations() {
                     )}
                   </div>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 gap-2" onClick={() => openEditDialog(location)}>
-                      <Edit className="h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => openDeleteDialog(location)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  {isHoAdmin && (
+                    <div className="flex gap-2">
+                      <Button variant="outline" className="flex-1 gap-2" onClick={() => openEditDialog(location)}>
+                        <Edit className="h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => openDeleteDialog(location)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))
