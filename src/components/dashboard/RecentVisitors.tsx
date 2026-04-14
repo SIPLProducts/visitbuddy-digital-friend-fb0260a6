@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer, Edit } from 'lucide-react';
+import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ import { SwipeableCard } from '@/components/shared/SwipeableCard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { CheckInCaptureDialog } from '@/components/visitors/CheckInCaptureDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +30,8 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
     if (isHoAdmin) return true;
     return userRoles.some(r => r.role === 'gate_security');
   }, [userRoles, isHoAdmin]);
+  const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
+  const [captureVisitor, setCaptureVisitor] = useState<Visitor | null>(null);
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':

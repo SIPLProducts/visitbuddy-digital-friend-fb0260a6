@@ -42,7 +42,7 @@ import { VisitorDetailsDialog } from '@/components/visitors/VisitorDetailsDialog
 import { VisitorEditDialog } from '@/components/visitors/VisitorEditDialog';
 import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
-import { CheckInDialog } from '@/components/visitors/CheckInDialog';
+import { CheckInCaptureDialog } from '@/components/visitors/CheckInCaptureDialog';
 import { logAudit } from '@/lib/auditLog';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useTranslation } from 'react-i18next';
@@ -79,10 +79,9 @@ export default function Visitors() {
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [checkInDialogOpen, setCheckInDialogOpen] = useState(false);
-  const [checkInVisitor, setCheckInVisitor] = useState<Visitor | null>(null);
-  const [checkInLoading, setCheckInLoading] = useState(false);
-  const [checkInAndPrint, setCheckInAndPrint] = useState(false);
+  const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
+  const [captureVisitor, setCaptureVisitor] = useState<Visitor | null>(null);
+  const [captureAutoPrint, setCaptureAutoPrint] = useState(false);
   const [showNewVisitorForm, setShowNewVisitorForm] = useState(false);
 
   useEffect(() => {
@@ -135,46 +134,15 @@ export default function Visitors() {
   };
 
   const handleCheckIn = (visitor: Visitor) => {
-    setCheckInVisitor(visitor);
-    setCheckInAndPrint(false);
-    setCheckInDialogOpen(true);
+    setCaptureVisitor(visitor);
+    setCaptureAutoPrint(false);
+    setCaptureDialogOpen(true);
   };
 
   const handleCheckInAndPrint = (visitor: Visitor) => {
-    setCheckInVisitor(visitor);
-    setCheckInAndPrint(true);
-    setCheckInDialogOpen(true);
-  };
-
-  const handleConfirmCheckIn = async (govtIdNumber: string) => {
-    if (!checkInVisitor) return;
-    setCheckInLoading(true);
-
-    const { error } = await supabase
-      .from('visitors')
-      .update({
-        status: 'checked_in' as const,
-        check_in_time: new Date().toISOString(),
-        govt_id_number: govtIdNumber,
-      })
-      .eq('id', checkInVisitor.id);
-
-    setCheckInLoading(false);
-
-    if (error) {
-      toast.error('Failed to check in visitor');
-      return;
-    }
-
-    toast.success(`${checkInVisitor.name} checked in successfully`);
-    setCheckInDialogOpen(false);
-
-    if (checkInAndPrint) {
-      window.open(`/print-badge?id=${checkInVisitor.id}`, '_blank');
-    }
-
-    setCheckInVisitor(null);
-    fetchVisitors();
+    setCaptureVisitor(visitor);
+    setCaptureAutoPrint(true);
+    setCaptureDialogOpen(true);
   };
 
   const handleCheckOut = async (visitor: Visitor) => {
@@ -736,14 +704,12 @@ export default function Visitors() {
         onOpenChange={setEditDialogOpen}
         onSave={fetchVisitors}
       />
-      <CheckInDialog
-        open={checkInDialogOpen}
-        onOpenChange={setCheckInDialogOpen}
-        visitorName={checkInVisitor?.name || ''}
-        visitorPhone={checkInVisitor?.phone}
-        visitorEmail={checkInVisitor?.email}
-        onConfirm={handleConfirmCheckIn}
-        loading={checkInLoading}
+      <CheckInCaptureDialog
+        open={captureDialogOpen}
+        onOpenChange={setCaptureDialogOpen}
+        visitor={captureVisitor}
+        onComplete={fetchVisitors}
+        autoPrint={captureAutoPrint}
       />
     </>
   );
