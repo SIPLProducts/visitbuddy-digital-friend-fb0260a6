@@ -275,6 +275,7 @@ export default function CheckInOut() {
   );
 
   return (
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -524,5 +525,6 @@ export default function CheckInOut() {
           )}
         </DialogContent>
       </Dialog>
+    </>
   );
 }

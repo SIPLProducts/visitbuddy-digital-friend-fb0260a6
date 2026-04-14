@@ -478,6 +478,7 @@ export default function Gates() {
   );
 
   return (
+    <>
       <div className="space-y-6">
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -708,5 +709,6 @@ export default function Gates() {
         result={importResult}
         entityName="Gates"
       />
+    </>
   );
 }

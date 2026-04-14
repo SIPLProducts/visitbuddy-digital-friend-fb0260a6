@@ -354,6 +354,7 @@ export default function Visitors() {
   };
 
   return (
+    <>
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="space-y-6">
         {/* Header */}
@@ -712,5 +713,6 @@ export default function Visitors() {
         onConfirm={handleConfirmCheckIn}
         loading={checkInLoading}
       />
+    </>
   );
 }
