@@ -90,6 +90,8 @@ export function Header({ onMenuClick }: HeaderProps) {
     admin: 'Admin',
     manager: 'Manager',
     operator: 'Operator',
+    gate_security: 'Gate Security',
+    visitor: 'Visitor',
   };
 
   return (
