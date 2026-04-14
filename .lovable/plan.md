@@ -1,21 +1,28 @@
 
-# Fix Bala's HO Admin Role (Again) + Permanent Safeguard
 
-## Root cause confirmed
-`user_location_roles.location_id` previously had `ON DELETE CASCADE`. When you deleted the locations that Bala's role was linked to, the database automatically deleted Bala's role row too. The migration to change this to `RESTRICT` was applied, but **after** the damage was done.
+# Fix Test Email Edge Function
 
-The RESTRICT constraint is now active — so going forward, trying to delete a location that has role assignments will fail with an error instead of silently deleting roles.
+## Problem
+The `test-email` edge function uses the `denomailer` SMTP library, which fails in the Deno edge runtime with `InvalidData: received corrupt message of type InvalidContentType` when connecting to Gmail SMTP (`smtp.gmail.com:587`). This is a known incompatibility — STARTTLS on port 587 doesn't work with `denomailer` in Supabase edge functions.
 
-## Plan
+## Fix
+Replace `denomailer` with the **Resend HTTP API**. The `RESEND_API_KEY` secret is already configured. This is a simple HTTP `fetch` call — no TCP/SMTP sockets needed.
 
-### 1. Re-insert Bala as HO Admin
-Insert one row into `user_location_roles` linking Bala to "Corporate Headquarters" (which still exists) with `role = 'admin'` and `is_ho_admin = true`.
+### Changes
 
-### 2. Improve the Location deletion UI
-Update `src/pages/Locations.tsx` so that when a user tries to delete a location, it first checks if any roles are assigned to that location and warns the user before attempting deletion. This prevents the confusing RESTRICT error from the database.
+**1. Rewrite `supabase/functions/test-email/index.ts`**
+- Remove `denomailer` import
+- Use `fetch` to call `https://api.resend.com/emails`
+- Authenticate with `RESEND_API_KEY` from environment
+- Still read `email_config` from the database for sender info display in the email body
+- Use `onboarding@resend.dev` as the `from` address (Resend sandbox default — works without domain verification)
+- Keep the same request/response contract so the Settings UI needs no changes
 
-### 3. No other changes needed
-The FK is already RESTRICT. The `is_ho_admin` function, `useUserRoles` hook, and Header display are all working correctly — they just need data to work with.
+**2. Deploy the updated function**
 
-## Technical detail
-The link: `user_location_roles.location_id → locations.id`. Every role assignment is tied to a specific location. If that location disappears, the role disappears (old CASCADE) or the deletion is blocked (new RESTRICT).
+**3. Test with `curl_edge_functions`** to verify it returns 200
+
+### Technical details
+- The `from` address must use a Resend-verified domain. Since we don't have one, `onboarding@resend.dev` is the sandbox fallback — it works for testing but emails may land in spam.
+- No frontend changes needed — `Settings.tsx` already calls `supabase.functions.invoke('test-email', { body: { receiver_email } })`.
+
