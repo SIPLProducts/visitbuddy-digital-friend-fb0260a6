@@ -1,57 +1,45 @@
 
 
-# Replace Resend with Nodemailer SMTP for Email Sending
+# Fix Filters Not Updating Data in Dashboard & Visitor Report
 
-## Problem
-The current `test-email` edge function uses the Resend API, which has sandbox restrictions. The user has a working nodemailer-based implementation from another project that sends via the user's own SMTP config (e.g. Gmail with App Password).
+## Root Cause
+Multiple components and computed values read from the raw `visitors` array instead of `filteredVisitors`, making it appear that filters have no effect.
+
+## Bugs Found
+
+### Dashboard (`src/pages/Dashboard.tsx`)
+1. **Smart filter badge counts (lines 282-287)** — all 5 chip counts use `visitors.filter(...)` instead of the full dataset. When location/department filters are active, these counts should reflect the filtered subset.
+2. **`filteredStats.avgVisitDuration` and `filteredStats.overstayed` (lines 276-278)** — these pass through from the raw `stats` object computed in `fetchDashboardData`. They never recalculate when filters change.
+3. **`filteredStats.scheduledAppointments` (line 275)** — comes from a separate count query, not filtered by location/department at all.
+4. **`SecurityOverview` (line 495-499)** — receives raw `visitors`, ignoring all filters.
+5. **`PeakHoursChart` (line 509)** — receives raw `visitors`, ignoring all filters.
+6. **`VisitorTrendChart` (line 505)** — fetches its own data independently, never respects filters.
+
+### Visitor Report (`src/pages/VisitorReport.tsx`)
+1. **Quick filter chip counts (lines 869-870)** — "Scheduled" and "Pending" counts use `visitors.filter(...)` instead of `filteredVisitors`.
+2. **"With Laptop" chip (line 878-881)** — click handler returns early, does nothing.
 
 ## Plan
 
-### 1. Rename existing `email_config` table to `smtp_config` schema
-Create a migration to:
-- Add `is_active` and `plant` columns to the existing `email_config` table (to match the user's schema)
-- OR create a new `smtp_config` table and migrate data — but since `email_config` already has the same core fields, we'll **keep `email_config`** and just add `is_active BOOLEAN DEFAULT true` to avoid breaking existing code
+### 1. Fix Dashboard `filteredStats` to compute from filtered data
+Recompute `avgVisitDuration` and `overstayed` from `filteredVisitors` directly in the `filteredStats` useMemo, instead of passing through from `stats`.
 
-Also create two new tables:
-- `email_templates` — stores reusable templates with `{{placeholder}}` support
-- `email_logs` — audit trail for all sent emails
+### 2. Fix Dashboard smart filter badge counts
+Change lines 282-287 to use a base set that respects location + department filters (but not the smart filter itself, since the chip shows the count for that category).
 
-### 2. Rewrite `test-email` edge function → `test-smtp`
-Create `supabase/functions/test-smtp/index.ts` using `npm:nodemailer@6.9.10`:
-- Accepts `{ smtp_config_id, to_email }`
-- Fetches SMTP credentials from `email_config` table
-- Creates nodemailer transporter with `secure: port === 465`, `tls: { rejectUnauthorized: false }`
-- Sends test email and returns success/error as JSON (always HTTP 200 to avoid generic errors)
+### 3. Fix Dashboard chart components
+Pass `filteredVisitors` instead of `visitors` to `SecurityOverview` and `PeakHoursChart`. For `VisitorTrendChart`, pass location/department filter values as props so it can filter its own queries.
 
-### 3. Create `send-email` edge function
-Create `supabase/functions/send-email/index.ts`:
-- Accepts `{ template_key, variables }`
-- Fetches template from `email_templates`, replaces `{{placeholders}}`
-- Fetches active SMTP config, sends via nodemailer
-- Logs result to `email_logs`
+### 4. Fix Visitor Report chip counts
+Change "Scheduled" and "Pending" chip counts to use `filteredVisitors` instead of `visitors`.
 
-### 4. Update Settings UI (`src/pages/Settings.tsx`)
-- Change `handleTestEmail` to invoke `test-smtp` with `{ smtp_config_id: emailConfig.id, to_email: testEmail }`
-- Remove the Resend sandbox warning alert
-- Remove references to the old `test-email` function
+### 5. Fix "With Laptop" quick filter
+Make the chip toggle a separate `laptopFilter` boolean state, or integrate it into the existing filter logic so clicking it actually filters the table.
 
-### 5. Delete old `test-email` edge function
-Remove `supabase/functions/test-email/index.ts` after the new function is deployed.
-
-### 6. Update other email-sending functions
-Update `send-email-badge`, `send-whatsapp-badge`, etc. to use the new `send-email` function or read from `email_config` with nodemailer instead of Resend, so all email sending goes through the user's configured SMTP.
-
-## Technical details
-
-- **Why nodemailer over denomailer**: `denomailer` uses `Deno.startTls` which is blocked in Supabase Edge Runtime. `npm:nodemailer@6.9.10` works via Deno's npm compatibility.
-- **Why `tls: { rejectUnauthorized: false }`**: Supports self-signed certs common in enterprise environments.
-- **Why HTTP 200 on errors**: Prevents the Supabase JS client from throwing generic "non-2xx" exceptions; the real error is in JSON body.
-- **Gmail setup**: Host `smtp.gmail.com`, port 587, username = full email, password = 16-char App Password.
-
-## Files affected
-- `supabase/functions/test-smtp/index.ts` (new)
-- `supabase/functions/send-email/index.ts` (new)
-- `supabase/functions/test-email/index.ts` (delete)
-- `src/pages/Settings.tsx` (update test email call)
-- Database migration: add `email_templates`, `email_logs` tables; add `is_active` to `email_config`
+## Files to edit
+- `src/pages/Dashboard.tsx` — fix filteredStats, chip counts, component props
+- `src/pages/VisitorReport.tsx` — fix chip counts, laptop filter
+- `src/components/dashboard/VisitorTrendChart.tsx` — accept optional filter props
+- `src/components/dashboard/SecurityOverview.tsx` — already accepts visitors prop, just needs correct data passed
+- `src/components/dashboard/PeakHoursChart.tsx` — already accepts visitors prop, just needs correct data passed
 
