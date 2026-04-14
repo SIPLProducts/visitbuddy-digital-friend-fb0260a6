@@ -92,6 +92,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       mobile_brand: '',
       mobile_serial: '',
       accompanying_count: 0,
+      scheduled_date: new Date(),
     },
   });
 
