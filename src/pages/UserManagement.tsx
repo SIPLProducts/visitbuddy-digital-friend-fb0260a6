@@ -125,7 +125,7 @@ const roleLabels: Record<AppRole, string> = {
 };
 
 export default function UserManagement() {
-  const { isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { isHoAdmin, isLocationAdmin, userRoles: myRoles, loading: rolesLoading } = useUserRoles();
   const [userRoles, setUserRoles] = useState<UserRoleEntry[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -649,15 +649,22 @@ export default function UserManagement() {
     );
   }
 
-  if (!isHoAdmin) {
+  if (!isHoAdmin && !isLocationAdmin) {
     return (
         <div className="flex flex-col items-center justify-center h-64 gap-4">
           <Shield className="h-16 w-16 text-muted-foreground" />
           <h2 className="text-xl font-semibold">Access Denied</h2>
-          <p className="text-muted-foreground">Only HO Admins can manage user roles and permissions.</p>
+          <p className="text-muted-foreground">Only Admins can manage user roles and permissions.</p>
         </div>
     );
   }
+
+  // Scope locations for Location Admins
+  const adminLocationIds = myRoles.filter(r => r.role === 'admin').map(r => r.location_id);
+  const accessibleLocations = isHoAdmin ? locations : locations.filter(l => adminLocationIds.includes(l.id));
+
+  // Filter displayed roles for Location Admins
+  const scopedUserRoles = isHoAdmin ? userRoles : userRoles.filter(r => adminLocationIds.includes(r.location_id));
 
   return (
       <div className="space-y-6">
