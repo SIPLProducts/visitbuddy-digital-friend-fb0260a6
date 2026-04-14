@@ -1132,6 +1132,7 @@ export default function UserManagement() {
                   )}
                 </div>
 
+                {isHoAdmin && (
                 <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
                   <Checkbox
                     id="createRoleHoAdmin"
@@ -1143,6 +1144,7 @@ export default function UserManagement() {
                     <p className="text-xs text-muted-foreground">Can access all locations and manage user roles</p>
                   </div>
                 </div>
+                )}
               </div>
             )}
 
@@ -1273,6 +1275,7 @@ export default function UserManagement() {
                   </SelectContent>
                 </Select>
               </div>
+              {isHoAdmin && (
               <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
                 <Checkbox id="assignHoAdmin" checked={assignIsHoAdmin} onCheckedChange={(checked) => setAssignIsHoAdmin(checked === true)} />
                 <div className="grid gap-1.5 leading-none">
@@ -1280,6 +1283,7 @@ export default function UserManagement() {
                   <p className="text-xs text-muted-foreground">Can access all locations and manage user roles</p>
                 </div>
               </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAssignUserDialogOpen(false)}>Cancel</Button>
@@ -1322,6 +1326,7 @@ export default function UserManagement() {
                   </SelectContent>
                 </Select>
               </div>
+              {isHoAdmin && (
               <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
                 <Checkbox id="editHoAdmin" checked={editIsHoAdmin} onCheckedChange={(checked) => setEditIsHoAdmin(checked === true)} />
                 <div className="grid gap-1.5 leading-none">
@@ -1329,6 +1334,7 @@ export default function UserManagement() {
                   <p className="text-xs text-muted-foreground">Can access all locations and manage user roles</p>
                 </div>
               </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsEditRoleDialogOpen(false)}>Cancel</Button>
