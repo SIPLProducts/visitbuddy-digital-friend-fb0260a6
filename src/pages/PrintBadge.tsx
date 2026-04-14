@@ -42,32 +42,38 @@ interface VisitorData {
   } | null;
 }
 
+const safeFormat = (date: Date, fmt: string): string => {
+  try {
+    if (isNaN(date.getTime())) return 'N/A';
+    return format(date, fmt);
+  } catch {
+    return 'N/A';
+  }
+};
+
 export default function PrintBadge() {
   const [searchParams] = useSearchParams();
   const [visitor, setVisitor] = useState<VisitorData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const visitorId = searchParams.get('id');
 
   useEffect(() => {
     if (visitorId) {
       fetchVisitor();
+    } else {
+      setError('No visitor ID provided in the URL.');
+      setLoading(false);
     }
   }, [visitorId]);
 
-  useEffect(() => {
-    // Auto-print when visitor data is loaded
-    if (visitor && !loading) {
-      setTimeout(() => {
-        window.print();
-      }, 500);
-    }
-  }, [visitor, loading]);
-
   const fetchVisitor = async () => {
     try {
+      setError(null);
+      setLoading(true);
       console.log('Fetching visitor with ID:', visitorId);
-      const { data, error } = await supabase
+      const { data, error: queryError } = await supabase
         .from('visitors')
         .select(`
           *,
@@ -78,23 +84,34 @@ export default function PrintBadge() {
         .eq('id', visitorId)
         .single();
 
-      if (error) {
-        console.error('Error fetching visitor:', error);
+      if (queryError) {
+        console.error('Error fetching visitor:', queryError);
+        setError(`Could not load visitor data: ${queryError.message}`);
         setLoading(false);
         return;
       }
 
-      if (data) {
-        console.log('Visitor data loaded:', data.name);
-        setVisitor(data as unknown as VisitorData);
-        // Mark badge as printed
+      if (!data) {
+        setError('Visitor not found.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Visitor data loaded:', data.name);
+      setVisitor(data as unknown as VisitorData);
+
+      // Mark badge as printed (non-blocking)
+      try {
         await supabase
           .from('visitors')
           .update({ badge_printed: true })
           .eq('id', visitorId);
+      } catch (e) {
+        console.warn('Could not mark badge as printed:', e);
       }
     } catch (err) {
       console.error('Fetch visitor error:', err);
+      setError('An unexpected error occurred while loading the badge.');
     } finally {
       setLoading(false);
     }
@@ -140,6 +157,63 @@ export default function PrintBadge() {
     );
   }
 
+  if (error) {
+    return (
+      <div style={{ 
+        padding: '40px', 
+        textAlign: 'center', 
+        fontFamily: 'Arial, sans-serif',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f5f5f5'
+      }}>
+        <div style={{
+          background: 'white',
+          padding: '32px',
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          maxWidth: '400px'
+        }}>
+          <p style={{ fontSize: '48px', margin: '0 0 16px' }}>⚠️</p>
+          <h2 style={{ margin: '0 0 8px', color: '#1f2937' }}>Badge Error</h2>
+          <p style={{ color: '#6b7280', margin: '0 0 20px' }}>{error}</p>
+          <button
+            onClick={() => fetchVisitor()}
+            style={{
+              padding: '10px 24px',
+              background: '#0891b2',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              cursor: 'pointer',
+              marginRight: '8px'
+            }}
+          >
+            Retry
+          </button>
+          <button
+            onClick={() => window.history.back()}
+            style={{
+              padding: '10px 24px',
+              background: '#6b7280',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              cursor: 'pointer'
+            }}
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!visitor) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
@@ -156,7 +230,6 @@ export default function PrintBadge() {
   }));
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrData}&format=png`;
 
-  // Get location details from department or gate
   const location = visitor.department?.location || visitor.gate?.location;
   const geoAddress = location?.geo_address;
   const latitude = location?.latitude;
@@ -164,7 +237,6 @@ export default function PrintBadge() {
   const emergencyContact = location?.emergency_contact;
   const assemblyPoint = location?.assembly_point;
   
-  // Generate Google Maps navigation URL
   const getNavigationUrl = () => {
     if (latitude && longitude) {
       return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
@@ -175,8 +247,6 @@ export default function PrintBadge() {
   };
   
   const navigationUrl = getNavigationUrl();
-  
-  // Generate QR code for navigation
   const navigationQrUrl = navigationUrl 
     ? `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(navigationUrl)}&format=png`
     : null;
@@ -188,15 +258,8 @@ export default function PrintBadge() {
           size: 100mm 150mm; 
           margin: 5mm; 
         }
-        * { 
-          margin: 0; 
-          padding: 0; 
-          box-sizing: border-box; 
-        }
         body { 
           font-family: Arial, Helvetica, sans-serif; 
-          background: white; 
-          color: black;
         }
         @media print {
           .no-print { display: none !important; }
@@ -330,7 +393,7 @@ export default function PrintBadge() {
           line-height: 1.3;
         }
         .guidelines-text p {
-          margin-bottom: 2px;
+          margin: 0 0 2px;
         }
         .qr-box {
           width: 96px;
@@ -401,10 +464,7 @@ export default function PrintBadge() {
           </button>
           <button 
             className="print-btn" 
-            onClick={() => {
-              // Trigger print dialog - user can choose "Save as PDF" from there
-              window.print();
-            }}
+            onClick={() => window.print()}
             style={{ margin: 0, background: '#059669' }}
             onMouseOver={(e) => (e.currentTarget.style.background = '#047857')}
             onMouseOut={(e) => (e.currentTarget.style.background = '#059669')}
@@ -414,7 +474,6 @@ export default function PrintBadge() {
         </div>
 
         <div className="badge">
-          {/* Header */}
           <div className="header">
             <div className="logo-box">
               <img src={reslLogo} alt="RESL" />
@@ -422,7 +481,6 @@ export default function PrintBadge() {
             <div className="company-text">Resustainability</div>
           </div>
 
-          {/* Title + Photo */}
           <div className="title-row">
             <div className="title-content">
               <h2>SAFETY PERMIT</h2>
@@ -437,7 +495,6 @@ export default function PrintBadge() {
             </div>
           </div>
 
-          {/* Details */}
           <div className="details">
             <div className="detail-row">
               <span className="detail-label">Serial No</span>
@@ -445,11 +502,11 @@ export default function PrintBadge() {
             </div>
             <div className="detail-row">
               <span className="detail-label">Date</span>
-              <span className="detail-value">: {format(checkInTime, 'dd/MM/yyyy')}</span>
+              <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
             </div>
             <div className="detail-row">
               <span className="detail-label">Time</span>
-              <span className="detail-value">: {format(checkInTime, 'HH:mm')}</span>
+              <span className="detail-value">: {safeFormat(checkInTime, 'HH:mm')}</span>
             </div>
             <div className="detail-row">
               <span className="detail-label">Name</span>
@@ -490,11 +547,10 @@ export default function PrintBadge() {
             </div>
             <div className="detail-row">
               <span className="detail-label">Validity</span>
-              <span className="detail-value">: {format(checkInTime, 'dd/MM/yyyy')}</span>
+              <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
             </div>
           </div>
 
-          {/* Signatures */}
           <div className="signatures">
             <div className="sig-box">
               <div className="sig-line"></div>
@@ -510,7 +566,6 @@ export default function PrintBadge() {
             </div>
           </div>
 
-          {/* Location with Navigation */}
           {(geoAddress || navigationUrl) && (
             <div className="location-row">
               <span className="location-icon">📍</span>
@@ -524,7 +579,6 @@ export default function PrintBadge() {
             </div>
           )}
 
-          {/* Safety Guidelines */}
           <div className="guidelines">
             <div className="guidelines-text">
               <p>1. Your safety is your responsibility.</p>
