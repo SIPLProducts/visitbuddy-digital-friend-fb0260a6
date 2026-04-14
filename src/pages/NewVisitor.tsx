@@ -45,6 +45,7 @@ const visitorSchema = z.object({
   mobile_serial: z.string().optional(),
   accompanying_count: z.number().min(0).max(50).default(0),
   scheduled_date: z.date().optional().default(() => new Date()),
+  govt_id_number: z.string().optional(),
 });
 
 type VisitorFormData = z.infer<typeof visitorSchema>;
@@ -145,6 +146,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       mobile_serial: data.has_mobile ? data.mobile_serial : null,
       accompanying_count: data.accompanying_count || 0,
       scheduled_date: data.scheduled_date ? format(data.scheduled_date, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+      govt_id_number: data.govt_id_number || null,
       status: 'scheduled' as const,
     }]).select('id').single();
 
@@ -329,6 +331,14 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                     />
                   </div>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="govt_id_number">Aadhaar Number</Label>
+                <Input
+                  id="govt_id_number"
+                  placeholder="1234 5678 9012"
+                  {...form.register('govt_id_number')}
+                />
               </div>
               
               {/* WhatsApp Badge Option */}
