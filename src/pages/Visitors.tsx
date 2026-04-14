@@ -463,13 +463,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={12} className="text-center py-8">
+                   <TableCell colSpan={13} className="text-center py-8">
                     {t('visitors.loading')}
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8">
+                  <TableCell colSpan={13} className="text-center py-8">
                     {t('visitors.noVisitors')}
                   </TableCell>
                 </TableRow>
