@@ -136,7 +136,8 @@ export default function VisitorReport() {
       visitor.visitor_id.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus =
-      statusFilter === 'all' || visitor.status === statusFilter;
+      statusFilter === 'all' || 
+      (statusFilter === 'with_laptop' ? visitor.has_laptop === true : visitor.status === statusFilter);
 
     const matchesLocation =
       locationFilter === 'all' || visitor.gate?.location?.id === locationFilter;
@@ -866,8 +867,8 @@ export default function VisitorReport() {
             {[
               { label: 'Currently Inside', value: 'checked_in', count: filteredStats.checkedIn, icon: UserCheck },
               { label: 'Checked Out', value: 'checked_out', count: filteredStats.checkedOut, icon: UserX },
-              { label: 'Scheduled', value: 'scheduled', count: visitors.filter(v => v.status === 'scheduled').length, icon: CalendarIcon },
-              { label: 'Pending', value: 'pending_approval', count: visitors.filter(v => v.status === 'pending_approval').length, icon: Crown },
+              { label: 'Scheduled', value: 'scheduled', count: filteredVisitors.filter(v => v.status === 'scheduled').length, icon: CalendarIcon },
+              { label: 'Pending', value: 'pending_approval', count: filteredVisitors.filter(v => v.status === 'pending_approval').length, icon: Crown },
               { label: 'With Laptop', value: 'with_laptop', count: filteredStats.withLaptop, icon: Laptop },
             ].map((chip) => (
               <Button
@@ -876,7 +877,7 @@ export default function VisitorReport() {
                 size="sm"
                 onClick={() => {
                   if (chip.value === 'with_laptop') {
-                    // No direct status match, skip
+                    setStatusFilter(statusFilter === 'with_laptop' ? 'all' : 'with_laptop');
                     return;
                   }
                   setStatusFilter(statusFilter === chip.value ? 'all' : chip.value);

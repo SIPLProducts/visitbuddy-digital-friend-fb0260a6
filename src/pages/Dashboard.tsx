@@ -261,11 +261,42 @@ export default function Dashboard() {
     return result;
   }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange]);
 
+  // Base filtered by location + department only (for chip counts)
+  const locationDeptFiltered = useMemo(() => {
+    let result = visitors;
+    if (locationFilter !== 'all') {
+      result = result.filter(v => v.gate?.location?.id === locationFilter);
+    }
+    if (departmentFilter !== 'all') {
+      result = result.filter(v => v.department?.id === departmentFilter);
+    }
+    return result;
+  }, [visitors, locationFilter, departmentFilter]);
+
   const filteredStats = useMemo(() => {
     const todaysVisitors = filteredVisitors.filter(v => isToday(new Date(v.created_at))).length;
     const activeCheckIns = filteredVisitors.filter(v => v.status === 'checked_in').length;
     const pendingApproval = filteredVisitors.filter(v => v.status === 'pending_approval').length;
     const checkedOut = filteredVisitors.filter(v => v.status === 'checked_out').length;
+
+    // Compute avg duration from filtered data
+    const completedVisits = filteredVisitors.filter(v => v.check_in_time && v.check_out_time);
+    let avgVisitDuration = '0h 0m';
+    if (completedVisits.length > 0) {
+      const totalMs = completedVisits.reduce((acc, v) => {
+        return acc + (new Date(v.check_out_time!).getTime() - new Date(v.check_in_time!).getTime());
+      }, 0);
+      const avgMs = totalMs / completedVisits.length;
+      const avgHours = Math.floor(avgMs / (1000 * 60 * 60));
+      const avgMins = Math.floor((avgMs % (1000 * 60 * 60)) / (1000 * 60));
+      avgVisitDuration = `${avgHours}h ${avgMins}m`;
+    }
+
+    // Compute overstayed from filtered data
+    const overstayed = filteredVisitors.filter(v => {
+      if (v.status !== 'checked_in' || !v.check_in_time) return false;
+      return (Date.now() - new Date(v.check_in_time).getTime()) / (1000 * 60 * 60) > 8;
+    }).length;
 
     return {
       todaysVisitors,
@@ -273,17 +304,17 @@ export default function Dashboard() {
       pendingApproval,
       checkedOut,
       scheduledAppointments: stats.scheduledAppointments,
-      avgVisitDuration: stats.avgVisitDuration,
-      overstayed: stats.overstayed,
+      avgVisitDuration,
+      overstayed,
     };
   }, [filteredVisitors, stats]);
 
   const smartFilters = [
-    { id: 'today', label: "Today", icon: CalendarIcon, count: visitors.filter(v => isToday(new Date(v.created_at))).length },
-    { id: 'this_week', label: 'This Week', icon: CalendarDays, count: visitors.filter(v => isThisWeek(new Date(v.created_at))).length },
-    { id: 'inside', label: 'Inside', icon: UserCheck, count: visitors.filter(v => v.status === 'checked_in').length },
-    { id: 'pending', label: 'Pending', icon: Clock, count: visitors.filter(v => v.status === 'pending_approval').length },
-    { id: 'checked_out', label: 'Left', icon: Users, count: visitors.filter(v => v.status === 'checked_out').length },
+    { id: 'today', label: "Today", icon: CalendarIcon, count: locationDeptFiltered.filter(v => isToday(new Date(v.created_at))).length },
+    { id: 'this_week', label: 'This Week', icon: CalendarDays, count: locationDeptFiltered.filter(v => isThisWeek(new Date(v.created_at))).length },
+    { id: 'inside', label: 'Inside', icon: UserCheck, count: locationDeptFiltered.filter(v => v.status === 'checked_in').length },
+    { id: 'pending', label: 'Pending', icon: Clock, count: locationDeptFiltered.filter(v => v.status === 'pending_approval').length },
+    { id: 'checked_out', label: 'Left', icon: Users, count: locationDeptFiltered.filter(v => v.status === 'checked_out').length },
   ];
 
   const totalGateCapacity = gates.reduce((sum, g) => sum + (g.capacity || 0), 0);
@@ -493,7 +524,7 @@ export default function Dashboard() {
               <RecentVisitors visitors={filteredVisitors.filter(v => v.status !== 'pending_approval').slice(0, 10)} onRefresh={fetchDashboardData} />
             </div>
             <SecurityOverview
-              visitors={visitors}
+              visitors={filteredVisitors}
               totalGateCapacity={totalGateCapacity}
               vehiclesInside={vehiclesInside}
             />
@@ -502,11 +533,11 @@ export default function Dashboard() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2">
-              <VisitorTrendChart key={refreshKey} />
+              <VisitorTrendChart key={refreshKey} locationFilter={locationFilter} departmentFilter={departmentFilter} />
             </div>
             <div className="space-y-5">
               <DepartmentDistribution visitors={filteredVisitors} />
-              <PeakHoursChart visitors={visitors} />
+              <PeakHoursChart visitors={filteredVisitors} />
             </div>
           </div>
 
