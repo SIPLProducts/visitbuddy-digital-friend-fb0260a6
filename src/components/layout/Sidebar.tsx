@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/collapsible';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useScreenPermissions } from '@/hooks/useScreenPermissions';
 
 const getMenuGroups = (t: (key: string) => string) => [
   {
@@ -108,12 +109,23 @@ interface SidebarProps {
 
 export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const { t } = useTranslation();
-  const menuGroups = getMenuGroups(t);
+  const allMenuGroups = getMenuGroups(t);
   const [collapsed, setCollapsed] = useState(false);
-  const [openGroups, setOpenGroups] = useState<string[]>(menuGroups.map(g => g.label));
+  const [openGroups, setOpenGroups] = useState<string[]>(allMenuGroups.map(g => g.label));
   const location = useLocation();
   const { signOut } = useAuth();
   const isMobile = useIsMobile();
+  const { canViewScreen, loading: permissionsLoading } = useScreenPermissions();
+
+  // Filter menu groups based on screen permissions
+  const menuGroups = useMemo(() => {
+    return allMenuGroups
+      .map(group => ({
+        ...group,
+        items: group.items.filter(item => canViewScreen(item.path)),
+      }))
+      .filter(group => group.items.length > 0);
+  }, [allMenuGroups, canViewScreen]);
 
   // Auto-close mobile drawer on navigation
   useEffect(() => {
