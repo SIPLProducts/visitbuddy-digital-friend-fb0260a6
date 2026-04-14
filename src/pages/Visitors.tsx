@@ -188,6 +188,11 @@ export default function Visitors() {
   };
 
   const handleApprove = async (visitor: Visitor) => {
+    if (visitor.status !== 'pending_approval') {
+      toast.info(`${visitor.name} is already ${visitor.status === 'scheduled' ? 'approved' : visitor.status}`);
+      fetchVisitors();
+      return;
+    }
     try {
       const { data, error } = await supabase.functions.invoke('approve-visitor', {
         body: { visitorId: visitor.id, action: 'approve' },
@@ -201,6 +206,11 @@ export default function Visitors() {
   };
 
   const handleReject = async (visitor: Visitor) => {
+    if (visitor.status !== 'pending_approval') {
+      toast.info(`${visitor.name} is no longer pending approval`);
+      fetchVisitors();
+      return;
+    }
     try {
       const { data, error } = await supabase.functions.invoke('approve-visitor', {
         body: { visitorId: visitor.id, action: 'reject' },
