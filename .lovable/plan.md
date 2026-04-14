@@ -1,26 +1,22 @@
 
 
-# Fix Two Badges Printing Side-by-Side on A4 Landscape
+# Single Badge on Right Side of A4 Landscape
 
-## Problem
-The print preview doesn't show the two badges correctly. The `index.css` print rules set `#printable-badge` to `position: absolute` and `width: 100%`, but the individual `.badge` children don't have print-specific width constraints. Combined with the inline styles in `PrintBadge.tsx`, the badges may overflow or not appear properly.
-
-## Solution
-Ensure both `index.css` and `PrintBadge.tsx` print styles are aligned — the container uses flexbox with centered layout, and each badge is sized to ~125mm so both fit on A4 landscape (297mm wide) with a 12mm gap between them.
+## What changes
+Print only **one** badge, positioned on the **right half** of the A4 landscape sheet. This way the user can print on the left half first (by feeding the paper), then flip/re-feed and print the second visitor on the right half — getting two badges on one physical sheet.
 
 ## Changes
 
-### 1. `src/index.css` — Update print rules for `#printable-badge`
-- Add `.badge` child sizing: `width: 125mm !important`
-- Keep `position: absolute; left: 0; top: 0` for proper print positioning
-- Ensure `align-items: flex-start` so badges align to top
+### 1. `src/pages/PrintBadge.tsx`
+- Remove the `[0, 1].map(...)` loop — render only **one** badge
+- Update inline print CSS: remove dual-badge flex/gap rules, set badge width to ~130mm, and add `margin-left: auto` to push it to the right side
 
-### 2. `src/pages/PrintBadge.tsx` — Ensure print CSS doesn't conflict
-- Verify the inline `@media print` block's `.badge` width matches `index.css`
-- Add `!important` to `.print-container` flex rules to override any defaults
-- Ensure both badges render identically with proper gap
+### 2. `src/index.css`
+- Update `#printable-badge` print rules: use `display: flex`, `justify-content: flex-end` to position content on the right
+- Update `.badge` width to ~130mm
+- Remove the `flex-shrink` and gap rules meant for two badges
 
 ## Files Changed
-- `src/index.css` — Add `.badge` width rule inside the `#printable-badge` print block
-- `src/pages/PrintBadge.tsx` — Sync inline print styles with global rules
+- `src/pages/PrintBadge.tsx` — Single badge, right-aligned print layout
+- `src/index.css` — Right-align print container
 
