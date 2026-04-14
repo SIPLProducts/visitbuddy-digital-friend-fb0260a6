@@ -1,21 +1,30 @@
 
 
-# Notify Gate Security Users on Visitor Approval
+# Restrict Check-In/Check-Out to Gate Security Role Only
 
 ## Summary
-After a visitor is approved (status changes from `pending_approval` to `scheduled`), insert a notification for all `gate_security` users at the visitor's location so they know to proceed with check-in.
+Only users with the `gate_security` role should see and use Check-In / Check-Out actions. All other roles (admin, manager, operator) will no longer see these options.
 
 ## Changes
 
-### `supabase/functions/approve-visitor/index.ts`
-After the successful status update to `scheduled` (around line 111), add logic to:
-1. Determine the visitor's `location_id` from the gate relation (`visitor.gate?.location_id` is already fetched in the query)
-2. Query `user_location_roles` for all users with `role = 'gate_security'` at that location
-3. Insert a notification row for each gate security user into the `notifications` table with:
-   - `title`: "Visitor Approved"
-   - `message`: "{visitor.name} has been approved by host. Ready for check-in."
-   - `type`: "success"
-   - `user_id`: each gate security user's `user_id`
+### 1. `src/pages/Visitors.tsx`
+- Add an `isGateSecurity` flag (true if user has `gate_security` role OR is HO admin)
+- Pass this flag to `VisitorActions` as a new prop `canCheckInOut`
+- Only call check-in/check-out handlers when the user has gate security role
 
-This uses the service role client already available in the function, so no RLS issues. Gate security users will receive the notification in real-time via the existing realtime subscription on the `notifications` table.
+### 2. `src/components/visitors/VisitorActions.tsx`
+- Add optional `canCheckInOut` prop (defaults to `true` for backward compat)
+- Hide "Check In & Print" button, "Check In", and "Check Out" dropdown items when `canCheckInOut` is `false`
+
+### 3. `src/components/dashboard/RecentVisitors.tsx`
+- Import `useUserRoles` hook
+- Add `isGateSecurity` check
+- Hide check-in/check-out swipe actions and dropdown menu items for non-gate-security users
+- Keep "View Details" and "Print Badge" visible for all roles
+
+### 4. `src/pages/Vehicles.tsx` (vehicle check-in/out)
+- Same pattern: import `useUserRoles`, add gate security check
+- Hide vehicle check-in/check-out dropdown items for non-gate-security roles
+
+Note: HO Admin will retain access to all actions as an override.
 
