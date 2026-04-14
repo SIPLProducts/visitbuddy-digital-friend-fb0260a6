@@ -20,7 +20,11 @@ import {
 import { Visitor } from '@/types/database';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { X } from 'lucide-react';
+import { X, CalendarIcon } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 interface VisitorEditDialogProps {
   visitor: Visitor | null;
@@ -62,6 +66,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
     mobile_brand: '',
     mobile_serial: '',
     accompanying_count: 0,
+    scheduled_date: new Date(),
   });
 
   useEffect(() => {
@@ -90,6 +95,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         mobile_brand: visitor.mobile_brand || '',
         mobile_serial: visitor.mobile_serial || '',
         accompanying_count: visitor.accompanying_count || 0,
+        scheduled_date: visitor.scheduled_date ? parseISO(visitor.scheduled_date) : new Date(),
       });
     }
   }, [visitor, open]);
@@ -135,6 +141,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         mobile_brand: formData.has_mobile ? formData.mobile_brand : null,
         mobile_serial: formData.has_mobile ? formData.mobile_serial : null,
         accompanying_count: formData.accompanying_count,
+        scheduled_date: formData.scheduled_date ? format(formData.scheduled_date, 'yyyy-MM-dd') : null,
       })
       .eq('id', visitor.id);
 
@@ -283,6 +290,34 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
                 value={formData.accompanying_count}
                 onChange={(e) => setFormData({ ...formData, accompanying_count: parseInt(e.target.value) || 0 })}
               />
+            </div>
+            
+            <div className="col-span-2">
+              <Label>Date of Visit</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !formData.scheduled_date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.scheduled_date ? format(formData.scheduled_date, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={formData.scheduled_date}
+                    onSelect={(date) => setFormData({ ...formData, scheduled_date: date || new Date() })}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 

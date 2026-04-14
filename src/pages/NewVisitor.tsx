@@ -14,7 +14,11 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2, Smartphone, Car } from 'lucide-react';
+import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, Plus, Trash2, Smartphone, Car, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
@@ -40,6 +44,7 @@ const visitorSchema = z.object({
   mobile_brand: z.string().optional(),
   mobile_serial: z.string().optional(),
   accompanying_count: z.number().min(0).max(50).default(0),
+  scheduled_date: z.date().optional().default(() => new Date()),
 });
 
 type VisitorFormData = z.infer<typeof visitorSchema>;
@@ -139,6 +144,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       mobile_brand: data.has_mobile ? data.mobile_brand : null,
       mobile_serial: data.has_mobile ? data.mobile_serial : null,
       accompanying_count: data.accompanying_count || 0,
+      scheduled_date: data.scheduled_date ? format(data.scheduled_date, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
       status: 'scheduled' as const,
     }]).select('id').single();
 
@@ -598,6 +604,32 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                   placeholder="Meeting, Interview, Delivery, etc."
                   {...form.register('purpose')}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Date of Visit</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !form.watch('scheduled_date') && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.watch('scheduled_date') ? format(form.watch('scheduled_date')!, 'PPP') : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={form.watch('scheduled_date')}
+                      onSelect={(date) => form.setValue('scheduled_date', date || new Date())}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </CardContent>
           </Card>
