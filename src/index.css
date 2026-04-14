@@ -251,15 +251,12 @@
     top: 0;
     width: 100%;
     display: flex !important;
-    flex-direction: row !important;
-    justify-content: center !important;
+    justify-content: flex-end !important;
     align-items: flex-start !important;
-    gap: 12mm !important;
   }
 
   body:has(#printable-badge) .badge {
-    width: 125mm !important;
-    flex-shrink: 0 !important;
+    width: 130mm !important;
   }
   
   body:has(#printable-badge) .no-print {

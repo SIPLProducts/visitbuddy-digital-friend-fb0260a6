@@ -265,16 +265,14 @@ export default function PrintBadge() {
           .no-print { display: none !important; }
           .print-container {
             display: flex !important;
-            flex-direction: row !important;
-            justify-content: center !important;
+            justify-content: flex-end !important;
             align-items: flex-start !important;
-            gap: 12mm !important;
             padding: 0 !important;
             margin: 0 !important;
             width: 100% !important;
           }
           .badge {
-            width: 125mm !important;
+            width: 130mm !important;
             margin: 0 !important;
             page-break-inside: avoid;
           }
@@ -507,7 +505,7 @@ export default function PrintBadge() {
         </div>
 
         <div className="print-container" id="printable-badge">
-          {[0, 1].map((copy) => (
+          {[0].map((copy) => (
             <div className="badge" key={copy}>
               <div className="header">
                 <div className="logo-box">
