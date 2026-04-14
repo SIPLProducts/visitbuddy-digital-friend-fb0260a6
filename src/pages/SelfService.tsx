@@ -618,7 +618,7 @@ export default function SelfService() {
                   disabled={isSubmitting}
                   className="flex-1 h-12"
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit Check-in'}
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
                 </Button>
               </div>
             </CardContent>
