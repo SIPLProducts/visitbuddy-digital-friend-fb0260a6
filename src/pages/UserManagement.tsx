@@ -125,7 +125,7 @@ const roleLabels: Record<AppRole, string> = {
 };
 
 export default function UserManagement() {
-  const { isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { isHoAdmin, isLocationAdmin, userRoles: myRoles, loading: rolesLoading } = useUserRoles();
   const [userRoles, setUserRoles] = useState<UserRoleEntry[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -649,15 +649,22 @@ export default function UserManagement() {
     );
   }
 
-  if (!isHoAdmin) {
+  if (!isHoAdmin && !isLocationAdmin) {
     return (
         <div className="flex flex-col items-center justify-center h-64 gap-4">
           <Shield className="h-16 w-16 text-muted-foreground" />
           <h2 className="text-xl font-semibold">Access Denied</h2>
-          <p className="text-muted-foreground">Only HO Admins can manage user roles and permissions.</p>
+          <p className="text-muted-foreground">Only Admins can manage user roles and permissions.</p>
         </div>
     );
   }
+
+  // Scope locations for Location Admins
+  const adminLocationIds = myRoles.filter(r => r.role === 'admin').map(r => r.location_id);
+  const accessibleLocations = isHoAdmin ? locations : locations.filter(l => adminLocationIds.includes(l.id));
+
+  // Filter displayed roles for Location Admins
+  const scopedUserRoles = isHoAdmin ? userRoles : userRoles.filter(r => adminLocationIds.includes(r.location_id));
 
   return (
       <div className="space-y-6">
@@ -904,7 +911,7 @@ export default function UserManagement() {
                     <Select value={selectedPermLocation} onValueChange={setSelectedPermLocation}>
                       <SelectTrigger><SelectValue placeholder="Select location" /></SelectTrigger>
                       <SelectContent className="bg-popover border border-border z-50">
-                        {locations.map((location) => (
+                        {accessibleLocations.map((location) => (
                           <SelectItem key={location.id} value={location.id}>
                             {location.name} {location.city && `(${location.city})`}
                           </SelectItem>
@@ -1021,14 +1028,14 @@ export default function UserManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUserRoles.length === 0 ? (
+                    {filteredUserRoles.filter(r => isHoAdmin || adminLocationIds.includes(r.location_id)).length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                           {searchQuery ? 'No users found matching your search' : 'No user roles assigned yet.'}
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredUserRoles.map((role) => (
+                      filteredUserRoles.filter(r => isHoAdmin || adminLocationIds.includes(r.location_id)).map((role) => (
                         <TableRow key={role.id}>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -1103,7 +1110,7 @@ export default function UserManagement() {
                 <div className="space-y-2">
                   <Label>Select Locations * <span className="text-xs text-muted-foreground">(one or multiple)</span></Label>
                   <div className="border rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
-                    {locations.map((loc) => (
+                    {accessibleLocations.map((loc) => (
                       <div key={loc.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={`loc-${loc.id}`}
@@ -1125,6 +1132,7 @@ export default function UserManagement() {
                   )}
                 </div>
 
+                {isHoAdmin && (
                 <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
                   <Checkbox
                     id="createRoleHoAdmin"
@@ -1136,6 +1144,7 @@ export default function UserManagement() {
                     <p className="text-xs text-muted-foreground">Can access all locations and manage user roles</p>
                   </div>
                 </div>
+                )}
               </div>
             )}
 
@@ -1245,7 +1254,7 @@ export default function UserManagement() {
                 <Select value={assignLocationId} onValueChange={setAssignLocationId}>
                   <SelectTrigger><SelectValue placeholder="Select location" /></SelectTrigger>
                   <SelectContent className="bg-popover border border-border z-50">
-                    {locations.map((loc) => (
+                    {accessibleLocations.map((loc) => (
                       <SelectItem key={loc.id} value={loc.id}>
                         {loc.name} {loc.city && `(${loc.city})`}
                       </SelectItem>
@@ -1266,6 +1275,7 @@ export default function UserManagement() {
                   </SelectContent>
                 </Select>
               </div>
+              {isHoAdmin && (
               <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
                 <Checkbox id="assignHoAdmin" checked={assignIsHoAdmin} onCheckedChange={(checked) => setAssignIsHoAdmin(checked === true)} />
                 <div className="grid gap-1.5 leading-none">
@@ -1273,6 +1283,7 @@ export default function UserManagement() {
                   <p className="text-xs text-muted-foreground">Can access all locations and manage user roles</p>
                 </div>
               </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAssignUserDialogOpen(false)}>Cancel</Button>
@@ -1296,7 +1307,7 @@ export default function UserManagement() {
                 <Select value={editLocationId} onValueChange={setEditLocationId}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent className="bg-popover border border-border z-50">
-                    {locations.map((loc) => (
+                    {accessibleLocations.map((loc) => (
                       <SelectItem key={loc.id} value={loc.id}>{loc.name} {loc.city && `(${loc.city})`}</SelectItem>
                     ))}
                   </SelectContent>
@@ -1315,6 +1326,7 @@ export default function UserManagement() {
                   </SelectContent>
                 </Select>
               </div>
+              {isHoAdmin && (
               <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
                 <Checkbox id="editHoAdmin" checked={editIsHoAdmin} onCheckedChange={(checked) => setEditIsHoAdmin(checked === true)} />
                 <div className="grid gap-1.5 leading-none">
@@ -1322,6 +1334,7 @@ export default function UserManagement() {
                   <p className="text-xs text-muted-foreground">Can access all locations and manage user roles</p>
                 </div>
               </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsEditRoleDialogOpen(false)}>Cancel</Button>
