@@ -1,28 +1,29 @@
 
 
-# Show Approve/Reject Actions for Hosts In-App
+# Show Approve/Reject for All Roles Except Gate Security
 
 ## Problem
-When a visitor is created with `pending_approval` status, the host only gets approve/reject links via WhatsApp. Inside the app (Dashboard and Visitors page), pending visitors are visible but there are **no Approve or Reject buttons** — the host has no way to act on them from within the application.
+Currently, approve/reject is restricted to managers only. The user wants ALL roles (HO Admin, Admin, Manager, Operator) to have approve/reject capability — excluding only Gate Security.
 
 ## Changes
 
-### 1. Add Approve/Reject to `src/components/visitors/VisitorActions.tsx`
-Add "Approve" and "Reject" dropdown menu items when `visitor.status === 'pending_approval'`. These will call the existing `approve-visitor` edge function.
+### 1. `src/pages/Visitors.tsx` — Line 221
+Update `canApproveReject` to allow all roles except gate security:
+```tsx
+// Before
+const canApproveReject = isHoAdmin || isManagerOnly || userRoles.some(r => r.role === 'admin');
 
-New props: `onApprove` and `onReject` callbacks.
+// After
+const canApproveReject = !isGateSecurityOnly;
+```
 
-### 2. Add Approve/Reject handlers in `src/pages/Visitors.tsx`
-Add `handleApprove` and `handleReject` functions that invoke the `approve-visitor` edge function, then refresh the list. Pass these as props to `VisitorActions`.
+### 2. `src/components/dashboard/PendingApprovals.tsx` — Line 120
+The widget already hides for gate security (`isGateSecurityOnly`). Remove the manager-only host filtering so all non-security roles see all pending visitors:
+- Remove the `isManagerOnly` check that filters by `hostEmployeeId`
+- Keep the gate security exclusion as-is
+- All other roles (HO Admin, Admin, Manager, Operator) will see pending visitors and can approve/reject
 
-### 3. Add inline Approve/Reject buttons to `src/components/dashboard/PendingApprovals.tsx`
-Add Approve and Reject buttons next to each pending visitor in the dashboard widget, so hosts can approve directly from the dashboard without navigating to the Visitors page.
-
-### 4. Filter pending visitors by host for manager role
-For managers (who are hosts), filter the `PendingApprovals` widget to only show visitors where the `host_id` matches the logged-in user's employee record. This requires looking up the employee by auth user email and filtering accordingly.
-
-## Files Changed
-- `src/components/visitors/VisitorActions.tsx` — Add approve/reject menu items
-- `src/pages/Visitors.tsx` — Add approve/reject handlers
-- `src/components/dashboard/PendingApprovals.tsx` — Add inline approve/reject buttons + host filtering
+### Files Changed
+- `src/pages/Visitors.tsx` — Update `canApproveReject` condition
+- `src/components/dashboard/PendingApprovals.tsx` — Remove manager-only filtering restriction
 
