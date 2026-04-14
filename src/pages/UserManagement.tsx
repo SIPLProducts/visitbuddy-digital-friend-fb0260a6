@@ -1078,6 +1078,100 @@ export default function UserManagement() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* ========== Tab 4: Users by Location ========== */}
+          <TabsContent value="by-location" className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              View all users grouped by their assigned location.
+            </p>
+
+            {/* Search */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search users, locations, or roles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+            </div>
+
+            {(() => {
+              const query = searchQuery.toLowerCase();
+              const grouped = scopedUserRoles.reduce((acc, role) => {
+                const locId = role.location_id;
+                if (!acc[locId]) acc[locId] = { location: role.location, roles: [] };
+                acc[locId].roles.push(role);
+                return acc;
+              }, {} as Record<string, { location: Location; roles: UserRoleEntry[] }>);
+
+              const filteredGroups = Object.entries(grouped)
+                .map(([locId, group]) => {
+                  const filteredRoles = group.roles.filter(r => {
+                    if (!query) return true;
+                    const name = r.profile?.full_name?.toLowerCase() || '';
+                    const locName = r.location?.name?.toLowerCase() || '';
+                    const roleName = roleLabels[r.role]?.toLowerCase() || '';
+                    return name.includes(query) || locName.includes(query) || roleName.includes(query);
+                  });
+                  return { locId, location: group.location, roles: filteredRoles };
+                })
+                .filter(g => g.roles.length > 0);
+
+              if (filteredGroups.length === 0) {
+                return (
+                  <Card>
+                    <CardContent className="py-8 text-center text-muted-foreground">
+                      {searchQuery ? 'No users found matching your search' : 'No user roles assigned yet.'}
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              return filteredGroups.map(({ locId, location, roles }) => (
+                <Card key={locId}>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Building2 className="h-5 w-5 text-muted-foreground" />
+                      {location?.name || 'Unknown Location'}
+                      {location?.city && <span className="text-sm font-normal text-muted-foreground">({location.city})</span>}
+                    </CardTitle>
+                    <CardDescription>{roles.length} user(s) at this location</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>User</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>HO Admin</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {roles.map((role) => (
+                          <TableRow key={role.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                                  {(role.profile?.full_name || 'U')[0].toUpperCase()}
+                                </div>
+                                <span className="font-medium">{role.profile?.full_name || 'Unknown User'}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge className={roleColors[role.role]}>{roleLabels[role.role]}</Badge>
+                            </TableCell>
+                            <TableCell>
+                              {role.is_ho_admin ? (
+                                <Badge variant="outline" className="gap-1"><Crown className="h-3 w-3" />Yes</Badge>
+                              ) : (
+                                <span className="text-muted-foreground text-sm">—</span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              ));
+            })()}
+          </TabsContent>
         </Tabs>
 
         {/* ===== Create Role Step Wizard Dialog ===== */}
