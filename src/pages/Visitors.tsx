@@ -674,24 +674,28 @@ export default function Visitors() {
                     </TableCell>
                     <TableCell>
                       {visitor.status === 'pending_approval' ? (
-                        <div className="flex items-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
-                            onClick={() => handleApprove(visitor)}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs border-red-300 text-red-700 hover:bg-red-50"
-                            onClick={() => handleReject(visitor)}
-                          >
-                            Reject
-                          </Button>
-                        </div>
+                        isGateSecurityOnly ? (
+                          <Badge variant="secondary" className="text-xs">Awaiting Approval</Badge>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                              onClick={() => handleApprove(visitor)}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs border-red-300 text-red-700 hover:bg-red-50"
+                              onClick={() => handleReject(visitor)}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        )
                       ) : (
                         <VisitorActions
                           visitor={visitor}
