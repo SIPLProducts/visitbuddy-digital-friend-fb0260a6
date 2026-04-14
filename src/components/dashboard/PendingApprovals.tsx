@@ -28,31 +28,11 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
   const { user } = useAuth();
   const { userRoles, isHoAdmin } = useUserRoles();
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
-  const [hostEmployeeId, setHostEmployeeId] = useState<string | null>(null);
-  
+
   const isGateSecurityOnly = useMemo(() => {
     if (isHoAdmin) return false;
     return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
   }, [userRoles, isHoAdmin]);
-
-  const isManagerOnly = useMemo(() => {
-    if (isHoAdmin) return false;
-    return userRoles.length > 0 && userRoles.some(r => r.role === 'manager') && !userRoles.some(r => r.role === 'admin');
-  }, [userRoles, isHoAdmin]);
-
-  // Look up employee ID for manager users
-  useEffect(() => {
-    if (isManagerOnly && user?.email) {
-      supabase
-        .from('employees')
-        .select('id')
-        .eq('email', user.email)
-        .maybeSingle()
-        .then(({ data }) => {
-          setHostEmployeeId(data?.id || null);
-        });
-    }
-  }, [isManagerOnly, user?.email]);
   
   const pendingVisitors = useMemo(() => {
     return visitors.filter(v => v.status === 'pending_approval');
