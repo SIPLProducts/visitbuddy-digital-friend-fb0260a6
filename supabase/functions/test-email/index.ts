@@ -24,8 +24,8 @@ serve(async (req: Request) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
     if (!resendApiKey) {
       return new Response(
-        JSON.stringify({ error: "RESEND_API_KEY is not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "RESEND_API_KEY is not configured. Please configure it in your backend secrets." }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -74,23 +74,34 @@ serve(async (req: Request) => {
 
     if (!response.ok) {
       console.error("Resend API error:", JSON.stringify(resendData));
+
+      // Handle sandbox restriction specifically
+      if (response.status === 403 && resendData.message?.includes("only send testing emails")) {
+        return new Response(
+          JSON.stringify({
+            error: `Sandbox restriction: Test emails can currently only be sent to the verified owner email (bala@sharviinfotech.com). To send to any recipient, a sending domain must be verified. Please try again with bala@sharviinfotech.com as the recipient.`,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       return new Response(
         JSON.stringify({ error: `Email sending failed: ${resendData.message || JSON.stringify(resendData)}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     console.log(`Test email sent successfully to ${receiver_email}`);
 
     return new Response(
-      JSON.stringify({ success: true, message: `Test email sent to ${receiver_email}` }),
+      JSON.stringify({ success: true, message: `Test email sent successfully to ${receiver_email}` }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
     console.error("Test email error:", error);
     return new Response(
       JSON.stringify({ error: `Failed to send test email: ${error.message}` }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

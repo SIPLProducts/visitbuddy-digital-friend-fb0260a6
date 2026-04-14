@@ -606,9 +606,13 @@ export default function Settings() {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2"><Send className="h-5 w-5" /> Send Test Email</DialogTitle>
-              <DialogDescription>Enter the recipient email address to send a test email and verify your SMTP configuration.</DialogDescription>
+              <DialogDescription>Enter the recipient email address to send a test email.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
+              <div className="rounded-md bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800 flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                <span>Currently in sandbox mode. Test emails can only be sent to <strong>bala@sharviinfotech.com</strong>. To send to any address, a verified sending domain is required.</span>
+              </div>
               <div className="space-y-2">
                 <Label>Receiver Email</Label>
                 <Input
