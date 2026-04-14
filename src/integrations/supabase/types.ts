@@ -1187,6 +1187,7 @@ export type Database = {
           photo_url: string | null
           purpose: string | null
           qr_code: string | null
+          scheduled_date: string | null
           status: Database["public"]["Enums"]["visitor_status"] | null
           updated_at: string
           vehicle_number: string | null
@@ -1218,6 +1219,7 @@ export type Database = {
           photo_url?: string | null
           purpose?: string | null
           qr_code?: string | null
+          scheduled_date?: string | null
           status?: Database["public"]["Enums"]["visitor_status"] | null
           updated_at?: string
           vehicle_number?: string | null
@@ -1249,6 +1251,7 @@ export type Database = {
           photo_url?: string | null
           purpose?: string | null
           qr_code?: string | null
+          scheduled_date?: string | null
           status?: Database["public"]["Enums"]["visitor_status"] | null
           updated_at?: string
           vehicle_number?: string | null
