@@ -135,76 +135,79 @@ export function SafetyPermitBadge({
         </div>
       </div>
 
-      {/* Details Grid */}
-      <div className="text-xs divide-y divide-gray-300">
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Serial No</span>
-          <span className="flex-1">: {visitor.visitor_id}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Date</span>
-          <span className="flex-1">: {format(checkInTime, 'dd/MM/yyyy')}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Time</span>
-          <span className="flex-1">: {format(checkInTime, 'HH:mm')}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Name</span>
-          <span className="flex-1 font-medium">: {visitor.name}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Mobile</span>
-          <span className="flex-1">: {visitor.phone || 'N/A'}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Company</span>
-          <span className="flex-1">: {visitor.company || 'N/A'}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Dept. To Meet</span>
-          <span className="flex-1">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
-        </div>
-        {(floorNumber || buildingSection) && (
+      {/* Details + Signatures Side by Side */}
+      <div className="flex">
+        {/* Details (Left) */}
+        <div className="flex-1 text-xs divide-y divide-gray-300">
           <div className="flex p-1.5">
-            <span className="w-24 font-semibold">Location</span>
-            <span className="flex-1">: {[
-              floorNumber && `Floor ${floorNumber}`,
-              buildingSection
-            ].filter(Boolean).join(', ')}</span>
+            <span className="w-24 font-semibold">Serial No</span>
+            <span className="flex-1">: {visitor.visitor_id}</span>
           </div>
-        )}
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Host</span>
-          <span className="flex-1">: {visitor.host?.name || 'N/A'}</span>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Date</span>
+            <span className="flex-1">: {format(checkInTime, 'dd/MM/yyyy')}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Time</span>
+            <span className="flex-1">: {format(checkInTime, 'HH:mm')}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Name</span>
+            <span className="flex-1 font-medium">: {visitor.name}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Mobile</span>
+            <span className="flex-1">: {visitor.phone || 'N/A'}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Company</span>
+            <span className="flex-1">: {visitor.company || 'N/A'}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Dept. To Meet</span>
+            <span className="flex-1">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
+          </div>
+          {(floorNumber || buildingSection) && (
+            <div className="flex p-1.5">
+              <span className="w-24 font-semibold">Location</span>
+              <span className="flex-1">: {[
+                floorNumber && `Floor ${floorNumber}`,
+                buildingSection
+              ].filter(Boolean).join(', ')}</span>
+            </div>
+          )}
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Host</span>
+            <span className="flex-1">: {visitor.host?.name || 'N/A'}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Purpose</span>
+            <span className="flex-1">: {visitor.purpose || 'N/A'}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">IT Asset</span>
+            <span className="flex-1">: {visitor.has_laptop ? 'Laptop' : 'NA'}</span>
+          </div>
+          <div className="flex p-1.5">
+            <span className="w-24 font-semibold">Validity</span>
+            <span className="flex-1">: {format(checkInTime, 'dd/MM/yyyy')}</span>
+          </div>
         </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Purpose</span>
-          <span className="flex-1">: {visitor.purpose || 'N/A'}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">IT Asset</span>
-          <span className="flex-1">: {visitor.has_laptop ? 'Laptop' : 'NA'}</span>
-        </div>
-        <div className="flex p-1.5">
-          <span className="w-24 font-semibold">Validity</span>
-          <span className="flex-1">: {format(checkInTime, 'dd/MM/yyyy')}</span>
-        </div>
-      </div>
 
-      {/* Signatures Section */}
-      <div className="grid grid-cols-3 border-t-2 border-gray-800 text-center text-xs">
-        <div className="p-2 border-r border-gray-300">
-          <div className="h-8 border-b border-dashed border-gray-400 mb-1"></div>
-          <p className="font-semibold italic">Security Signature</p>
-        </div>
-        <div className="p-2 border-r border-gray-300">
-          <div className="h-8 border-b border-dashed border-gray-400 mb-1"></div>
-          <p className="font-semibold italic">Visitor Signature</p>
-        </div>
-        <div className="p-2">
-          <div className="h-8 border-b border-dashed border-gray-400 mb-1"></div>
-          <p className="font-semibold italic">Officer Signature</p>
+        {/* Signatures (Right) */}
+        <div className="w-[100px] border-l-2 border-gray-800 flex flex-col text-center text-[9px]">
+          <div className="flex-1 p-1.5 border-b border-gray-300 flex flex-col justify-end">
+            <div className="h-6 border-b border-dashed border-gray-400 mb-1"></div>
+            <p className="font-semibold italic">Security</p>
+          </div>
+          <div className="flex-1 p-1.5 border-b border-gray-300 flex flex-col justify-end">
+            <div className="h-6 border-b border-dashed border-gray-400 mb-1"></div>
+            <p className="font-semibold italic">Visitor</p>
+          </div>
+          <div className="flex-1 p-1.5 flex flex-col justify-end">
+            <div className="h-6 border-b border-dashed border-gray-400 mb-1"></div>
+            <p className="font-semibold italic">Officer</p>
+          </div>
         </div>
       </div>
 
