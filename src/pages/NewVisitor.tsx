@@ -147,7 +147,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       accompanying_count: data.accompanying_count || 0,
       scheduled_date: data.scheduled_date ? format(data.scheduled_date, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
       govt_id_number: data.govt_id_number || null,
-      status: 'scheduled' as const,
+      status: 'pending_approval' as const,
     }]).select('id').single();
 
     if (error) {
@@ -177,39 +177,24 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       }
     }
 
-    // Send WhatsApp badge if enabled and phone number provided
-    if (sendWhatsApp && data.phone) {
+    // Notify host for approval via WhatsApp (same flow as self-service)
+    if (insertedVisitor && data.host_id) {
       try {
-        // Get host and department names for the message
-        const selectedHost = employees.find(e => e.id === data.host_id);
-        const selectedDept = departments.find(d => d.id === data.department_id);
-        const selectedGate = gates.find(g => g.id === data.gate_id);
-
-        const { data: whatsappResult, error: whatsappError } = await supabase.functions.invoke('send-whatsapp-badge', {
-          body: {
-            visitorName: data.name,
-            visitorId: visitorId,
-            phone: data.phone,
-            company: data.company,
-            purpose: data.purpose,
-            hostName: selectedHost?.name,
-            departmentName: selectedDept?.name,
-            gateName: selectedGate?.name,
-          }
+        const { error: notifyError } = await supabase.functions.invoke('notify-host', {
+          body: { visitorId: insertedVisitor.id }
         });
-
-        if (whatsappError) {
-          console.error('WhatsApp error:', whatsappError);
-          toast.warning('Visitor registered but WhatsApp message failed to send');
+        if (notifyError) {
+          console.error('Host notification error:', notifyError);
+          toast.warning('Visitor registered but host notification failed');
         } else {
-          toast.success('Visitor registered & badge sent to WhatsApp! 📱');
+          toast.success('Visitor registered — pending host approval. Host has been notified! 📱');
         }
       } catch (err) {
-        console.error('WhatsApp send error:', err);
-        toast.warning('Visitor registered but WhatsApp message failed');
+        console.error('Host notify error:', err);
+        toast.warning('Visitor registered but host notification failed');
       }
     } else {
-      toast.success('Visitor registered successfully');
+      toast.success('Visitor registered — pending host approval');
     }
 
     setLoading(false);
