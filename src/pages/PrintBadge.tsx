@@ -506,136 +506,140 @@ export default function PrintBadge() {
           </button>
         </div>
 
-        <div className="badge" id="printable-badge">
-          <div className="header">
-            <div className="logo-box">
-              <img src={reslLogo} alt="RESL" />
-            </div>
-            <div className="company-text">Resustainability</div>
-          </div>
+        <div className="print-container" id="printable-badge">
+          {[0, 1].map((copy) => (
+            <div className="badge" key={copy}>
+              <div className="header">
+                <div className="logo-box">
+                  <img src={reslLogo} alt="RESL" />
+                </div>
+                <div className="company-text">Resustainability</div>
+              </div>
 
-          <div className="title-row">
-            <div className="title-content">
-              <h2>SAFETY PERMIT</h2>
-              <p>VISITOR</p>
-            </div>
-            <div className="photo-box">
-              {visitor.photo_url ? (
-                <img src={visitor.photo_url} alt={visitor.name} />
-              ) : (
-                <div className="photo-placeholder">{getInitials(visitor.name)}</div>
-              )}
-            </div>
-          </div>
+              <div className="title-row">
+                <div className="title-content">
+                  <h2>SAFETY PERMIT</h2>
+                  <p>VISITOR</p>
+                </div>
+                <div className="photo-box">
+                  {visitor.photo_url ? (
+                    <img src={visitor.photo_url} alt={visitor.name} />
+                  ) : (
+                    <div className="photo-placeholder">{getInitials(visitor.name)}</div>
+                  )}
+                </div>
+              </div>
 
-          <div className="details-signatures-row">
-            <div className="details">
-              <div className="detail-row">
-                <span className="detail-label">Serial No</span>
-                <span className="detail-value">: {visitor.visitor_id}</span>
+              <div className="details-signatures-row">
+                <div className="details">
+                  <div className="detail-row">
+                    <span className="detail-label">Serial No</span>
+                    <span className="detail-value">: {visitor.visitor_id}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Date</span>
+                    <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Time</span>
+                    <span className="detail-value">: {safeFormat(checkInTime, 'HH:mm')}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Name</span>
+                    <span className="detail-value" style={{ fontWeight: 500 }}>: {visitor.name}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Mobile</span>
+                    <span className="detail-value">: {visitor.phone || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Company</span>
+                    <span className="detail-value">: {visitor.company || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Dept. To Meet</span>
+                    <span className="detail-value">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
+                  </div>
+                  {(visitor.department?.floor_number || visitor.department?.building_section) && (
+                    <div className="detail-row">
+                      <span className="detail-label">Location</span>
+                      <span className="detail-value">: {[
+                        visitor.department?.floor_number && `Floor ${visitor.department.floor_number}`,
+                        visitor.department?.building_section
+                      ].filter(Boolean).join(', ') || 'N/A'}</span>
+                    </div>
+                  )}
+                  <div className="detail-row">
+                    <span className="detail-label">Host</span>
+                    <span className="detail-value">: {visitor.host?.name || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Purpose</span>
+                    <span className="detail-value">: {visitor.purpose || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">IT Asset</span>
+                    <span className="detail-value">: {visitor.has_laptop ? 'Laptop' : 'NA'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Validity</span>
+                    <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
+                  </div>
+                </div>
+
+                <div className="signatures">
+                  <div className="sig-box">
+                    <div className="sig-line"></div>
+                    <p className="sig-label">Security</p>
+                  </div>
+                  <div className="sig-box">
+                    <div className="sig-line"></div>
+                    <p className="sig-label">Visitor</p>
+                  </div>
+                  <div className="sig-box">
+                    <div className="sig-line"></div>
+                    <p className="sig-label">Officer</p>
+                  </div>
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="detail-label">Date</span>
-                <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Time</span>
-                <span className="detail-value">: {safeFormat(checkInTime, 'HH:mm')}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Name</span>
-                <span className="detail-value" style={{ fontWeight: 500 }}>: {visitor.name}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Mobile</span>
-                <span className="detail-value">: {visitor.phone || 'N/A'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Company</span>
-                <span className="detail-value">: {visitor.company || 'N/A'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Dept. To Meet</span>
-                <span className="detail-value">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
-              </div>
-              {(visitor.department?.floor_number || visitor.department?.building_section) && (
-                <div className="detail-row">
-                  <span className="detail-label">Location</span>
-                  <span className="detail-value">: {[
-                    visitor.department?.floor_number && `Floor ${visitor.department.floor_number}`,
-                    visitor.department?.building_section
-                  ].filter(Boolean).join(', ') || 'N/A'}</span>
+
+              {(geoAddress || navigationUrl) && (
+                <div className="location-row">
+                  <span className="location-icon">📍</span>
+                  <div className="location-text">
+                    <p className="address">{geoAddress || location?.name || 'Location'}</p>
+                    <p className="nav-hint">Scan QR to navigate →</p>
+                  </div>
+                  {navigationQrUrl && (
+                    <img src={navigationQrUrl} alt="Navigate" className="nav-qr" />
+                  )}
                 </div>
               )}
-              <div className="detail-row">
-                <span className="detail-label">Host</span>
-                <span className="detail-value">: {visitor.host?.name || 'N/A'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Purpose</span>
-                <span className="detail-value">: {visitor.purpose || 'N/A'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">IT Asset</span>
-                <span className="detail-value">: {visitor.has_laptop ? 'Laptop' : 'NA'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Validity</span>
-                <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
-              </div>
-            </div>
 
-            <div className="signatures">
-              <div className="sig-box">
-                <div className="sig-line"></div>
-                <p className="sig-label">Security</p>
-              </div>
-              <div className="sig-box">
-                <div className="sig-line"></div>
-                <p className="sig-label">Visitor</p>
-              </div>
-              <div className="sig-box">
-                <div className="sig-line"></div>
-                <p className="sig-label">Officer</p>
+              <div className="guidelines">
+                <div className="guidelines-text">
+                  <p>1. Your safety is your responsibility.</p>
+                  <p>2. Always follow the safety procedures.</p>
+                  <p>3. Always keep company work place clean.</p>
+                  <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
+                  {emergencyContact && (
+                    <p style={{ marginTop: '4px', fontWeight: 600, color: '#dc2626' }}>
+                      🆘 Emergency: {emergencyContact}
+                    </p>
+                  )}
+                  {assemblyPoint && (
+                    <p style={{ marginTop: '2px', fontWeight: 600, color: '#0369a1' }}>
+                      🚨 Assembly Point: {assemblyPoint}
+                    </p>
+                  )}
+                </div>
+                <div className="qr-box">
+                  <img src={qrCodeUrl} alt="QR Code" />
+                  <span className="qr-label">Check-out</span>
+                </div>
               </div>
             </div>
-          </div>
-
-          {(geoAddress || navigationUrl) && (
-            <div className="location-row">
-              <span className="location-icon">📍</span>
-              <div className="location-text">
-                <p className="address">{geoAddress || location?.name || 'Location'}</p>
-                <p className="nav-hint">Scan QR to navigate →</p>
-              </div>
-              {navigationQrUrl && (
-                <img src={navigationQrUrl} alt="Navigate" className="nav-qr" />
-              )}
-            </div>
-          )}
-
-          <div className="guidelines">
-            <div className="guidelines-text">
-              <p>1. Your safety is your responsibility.</p>
-              <p>2. Always follow the safety procedures.</p>
-              <p>3. Always keep company work place clean.</p>
-              <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
-              {emergencyContact && (
-                <p style={{ marginTop: '4px', fontWeight: 600, color: '#dc2626' }}>
-                  🆘 Emergency: {emergencyContact}
-                </p>
-              )}
-              {assemblyPoint && (
-                <p style={{ marginTop: '2px', fontWeight: 600, color: '#0369a1' }}>
-                  🚨 Assembly Point: {assemblyPoint}
-                </p>
-              )}
-            </div>
-            <div className="qr-box">
-              <img src={qrCodeUrl} alt="QR Code" />
-              <span className="qr-label">Check-out</span>
-            </div>
-          </div>
+          ))}
         </div>
 
         <button className="no-print print-btn" onClick={() => window.history.back()}>
