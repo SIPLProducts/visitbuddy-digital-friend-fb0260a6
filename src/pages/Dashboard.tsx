@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { useHostEmployee } from '@/hooks/useHostEmployee';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -38,6 +40,14 @@ import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { hostEmployeeId } = useHostEmployee();
+  const isRestrictedRole = useMemo(() => {
+    if (rolesLoading) return false;
+    if (isHoAdmin) return false;
+    if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
+    return true;
+  }, [userRoles, isHoAdmin, rolesLoading]);
   const { settings: tenantSettings } = useTenantSettings();
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
@@ -221,7 +231,9 @@ export default function Dashboard() {
   }, []);
 
   const filteredVisitors = useMemo(() => {
-    let result = visitors;
+    let result = isRestrictedRole && hostEmployeeId
+      ? visitors.filter(v => v.host_id === hostEmployeeId)
+      : visitors;
 
     if (locationFilter !== 'all') {
       result = result.filter(v => v.gate?.location?.id === locationFilter);
@@ -259,11 +271,13 @@ export default function Dashboard() {
     }
 
     return result;
-  }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange]);
+  }, [visitors, activeSmartFilter, locationFilter, departmentFilter, dateRange, isRestrictedRole, hostEmployeeId]);
 
   // Base filtered by location + department only (for chip counts)
   const locationDeptFiltered = useMemo(() => {
-    let result = visitors;
+    let result = isRestrictedRole && hostEmployeeId
+      ? visitors.filter(v => v.host_id === hostEmployeeId)
+      : visitors;
     if (locationFilter !== 'all') {
       result = result.filter(v => v.gate?.location?.id === locationFilter);
     }
@@ -271,7 +285,7 @@ export default function Dashboard() {
       result = result.filter(v => v.department?.id === departmentFilter);
     }
     return result;
-  }, [visitors, locationFilter, departmentFilter]);
+  }, [visitors, locationFilter, departmentFilter, isRestrictedRole, hostEmployeeId]);
 
   const filteredStats = useMemo(() => {
     const todaysVisitors = filteredVisitors.filter(v => isToday(new Date(v.created_at))).length;

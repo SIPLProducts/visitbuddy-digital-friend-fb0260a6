@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
@@ -41,6 +41,9 @@ import {
   Legend,
 } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { useHostEmployee } from '@/hooks/useHostEmployee';
 import { Location } from '@/types/database';
 import { format, subDays } from 'date-fns';
 import { DateRange } from 'react-day-picker';
@@ -69,6 +72,15 @@ interface TrendData {
 }
 
 export default function Analytics() {
+  const { user } = useAuth();
+  const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { hostEmployeeId } = useHostEmployee();
+  const isRestrictedRole = useMemo(() => {
+    if (rolesLoading) return false;
+    if (isHoAdmin) return false;
+    if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
+    return true;
+  }, [userRoles, isHoAdmin, rolesLoading]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationStats, setLocationStats] = useState<LocationStats[]>([]);
   const [trendData, setTrendData] = useState<TrendData[]>([]);
@@ -111,6 +123,7 @@ export default function Analytics() {
       .select(`
         id,
         created_at,
+        host_id,
         gate:gates(location_id)
       `);
 
@@ -123,7 +136,12 @@ export default function Analytics() {
       visitorsQuery = visitorsQuery.lte('created_at', endOfDay.toISOString());
     }
 
-    const { data: visitorsData } = await visitorsQuery;
+    let { data: visitorsData } = await visitorsQuery;
+
+    // Host-based filtering for Manager/Operator roles
+    if (isRestrictedRole && hostEmployeeId && visitorsData) {
+      visitorsData = visitorsData.filter((v: any) => v.host_id === hostEmployeeId);
+    }
 
     // Fetch vehicles grouped by location with date filter
     let vehiclesQuery = supabase

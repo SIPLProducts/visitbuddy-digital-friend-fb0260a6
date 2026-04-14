@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { useHostEmployee } from '@/hooks/useHostEmployee';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -54,6 +57,15 @@ import {
 const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16'];
 
 export default function VisitorReport() {
+  const { user } = useAuth();
+  const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { hostEmployeeId } = useHostEmployee();
+  const isRestrictedRole = useMemo(() => {
+    if (rolesLoading) return false;
+    if (isHoAdmin) return false;
+    if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
+    return true;
+  }, [userRoles, isHoAdmin, rolesLoading]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
@@ -129,6 +141,11 @@ export default function VisitorReport() {
   };
 
   const filteredVisitors = visitors.filter((visitor) => {
+    // Host-based filtering for Manager/Operator roles
+    if (isRestrictedRole && hostEmployeeId && visitor.host_id !== hostEmployeeId) {
+      return false;
+    }
+
     const matchesSearch =
       visitor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       visitor.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||

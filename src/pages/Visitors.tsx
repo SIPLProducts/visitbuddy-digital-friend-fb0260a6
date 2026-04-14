@@ -46,6 +46,7 @@ import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInCaptureDialog } from '@/components/visitors/CheckInCaptureDialog';
 import { logAudit } from '@/lib/auditLog';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useHostEmployee } from '@/hooks/useHostEmployee';
 import { useTranslation } from 'react-i18next';
 import NewVisitor from './NewVisitor';
 
@@ -54,16 +55,23 @@ export default function Visitors() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { hostEmployeeId } = useHostEmployee();
   const [searchParams] = useSearchParams();
   const isGateSecurityOnly = useMemo(() => {
-    if (rolesLoading) return false; // Default to showing all actions until roles load
+    if (rolesLoading) return false;
     if (isHoAdmin) return false;
     return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
-  }, [userRoles, isHoAdmin]);
+  }, [userRoles, isHoAdmin, rolesLoading]);
   const isGateSecurity = useMemo(() => {
     if (isHoAdmin) return true;
     return userRoles.some(r => r.role === 'gate_security');
   }, [userRoles, isHoAdmin]);
+  const isRestrictedRole = useMemo(() => {
+    if (rolesLoading) return false;
+    if (isHoAdmin) return false;
+    if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
+    return true; // Manager or Operator
+  }, [userRoles, isHoAdmin, rolesLoading]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -308,6 +316,11 @@ export default function Visitors() {
   };
 
   const filteredVisitors = visitors.filter((visitor) => {
+    // Host-based filtering for Manager/Operator roles
+    if (isRestrictedRole && hostEmployeeId && visitor.host_id !== hostEmployeeId) {
+      return false;
+    }
+
     const matchesSearch =
       visitor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       visitor.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
