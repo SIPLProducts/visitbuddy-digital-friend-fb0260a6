@@ -472,6 +472,8 @@ export default function UserManagement() {
         .update({ role: editRole, is_ho_admin: editIsHoAdmin, location_id: editLocationId })
         .eq('id', editingRole.id);
       if (error) throw error;
+      const profile = profiles.find(p => p.user_id === editingRole.user_id);
+      logAudit({ action: 'user_role_changed', entityType: 'user', entityId: editingRole.user_id, entityName: profile?.full_name || editingRole.user_id, details: { change: 'updated', oldRole: editingRole.role, newRole: editRole, is_ho_admin: editIsHoAdmin, location_id: editLocationId }, locationId: editLocationId });
       toast.success('Role updated successfully!');
       setIsEditRoleDialogOpen(false);
       setEditingRole(null);
