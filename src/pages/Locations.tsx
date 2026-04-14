@@ -72,6 +72,7 @@ export default function Locations() {
   const [isImportResultOpen, setIsImportResultOpen] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [rolesAtLocation, setRolesAtLocation] = useState<{ user_id: string; role: string; is_ho_admin: boolean; email?: string }[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -394,8 +395,14 @@ export default function Locations() {
     setIsEditDialogOpen(true);
   };
 
-  const openDeleteDialog = (location: Location) => {
+  const openDeleteDialog = async (location: Location) => {
     setSelectedLocation(location);
+    // Check for user roles assigned to this location
+    const { data: roles } = await supabase
+      .from('user_location_roles')
+      .select('user_id, role, is_ho_admin')
+      .eq('location_id', location.id);
+    setRolesAtLocation((roles || []).map(r => ({ user_id: r.user_id, role: r.role, is_ho_admin: r.is_ho_admin })));
     setIsDeleteDialogOpen(true);
   };
 
@@ -780,6 +787,13 @@ export default function Locations() {
             <AlertDialogTitle>Delete Location</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete "{selectedLocation?.name}"? This will permanently remove all associated data including gates, departments, employees, visitors, vehicles, and ANPR events. This action cannot be undone.
+              {rolesAtLocation.length > 0 && (
+                <span className="block mt-2 font-semibold text-destructive">
+                  ⚠️ {rolesAtLocation.length} user role(s) are assigned to this location
+                  {rolesAtLocation.some(r => r.is_ho_admin) && ' (including HO Admin)'}
+                  . These roles will be removed!
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
