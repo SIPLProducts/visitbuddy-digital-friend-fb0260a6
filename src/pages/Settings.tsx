@@ -256,7 +256,7 @@ export default function Settings() {
                   <Select value={i18n.language} onValueChange={lng => i18n.changeLanguage(lng)}>
                     <SelectTrigger className="w-full md:w-64"><SelectValue /></SelectTrigger>
                     <SelectContent className="bg-popover">
-                      {languages.map(l => <SelectItem key={l.code} value={l.code}>{l.flag} {l.name}</SelectItem>)}
+                      {languages.map(l => <SelectItem key={l.code} value={l.code}>{l.nativeName} ({l.name})</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>

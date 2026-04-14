@@ -11,7 +11,7 @@ export type AuditAction =
   | 'user_created' | 'user_updated' | 'user_deleted' | 'user_role_changed'
   | 'badge_printed' | 'bulk_checkout' | 'bulk_approval'
   | 'watchlist_added' | 'watchlist_updated' | 'watchlist_removed'
-  | 'settings_changed' | 'login' | 'logout';
+  | 'settings_changed' | 'email_config_saved' | 'email_config_deleted' | 'login' | 'logout';
 
 export type EntityType = 
   | 'visitor' | 'vehicle' | 'appointment' | 'employee' | 'department' 
