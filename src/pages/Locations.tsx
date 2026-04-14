@@ -227,6 +227,7 @@ export default function Locations() {
       await supabase.from('gates').delete().eq('location_id', locationId);
       await supabase.from('role_screen_permissions').delete().eq('location_id', locationId);
       await supabase.from('visitor_watchlist').delete().eq('location_id', locationId);
+      await supabase.from('user_location_roles').delete().eq('location_id', locationId);
 
       // Finally delete the location
       const { error } = await supabase.from('locations').delete().eq('id', locationId);
