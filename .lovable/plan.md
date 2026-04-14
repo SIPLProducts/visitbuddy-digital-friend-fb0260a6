@@ -1,29 +1,23 @@
 
 
-# Show New Visitor Form Inline on the Visitors Page
+# Show Register Vehicle Form Inline on the Vehicles Page
 
-## What changes
-Instead of navigating to a separate `/visitors/new` route, clicking "New Visitor" will toggle an inline form panel directly on the Visitors page. The form content stays the same.
+Same pattern as the inline New Visitor form.
 
-## Plan
+## Changes
 
-### 1. Add inline mode state to `Visitors.tsx`
-- Add `const [showNewVisitorForm, setShowNewVisitorForm] = useState(false)` 
-- Replace the `<Link to="/visitors/new">` button with an `onClick` that sets `showNewVisitorForm(true)`
-- When `showNewVisitorForm` is true, render the `NewVisitor` component above the visitors table (or replace the table view)
-- Pass an `onClose` callback to navigate back to the list view and refresh data
+### 1. Refactor `src/pages/NewVehicle.tsx`
+- Accept optional `inline?: boolean` and `onClose?: () => void` props
+- When `inline` is true: hide the back arrow/header, call `onClose()` instead of `navigate('/vehicles')` after successful submission
+- When not inline: keep existing standalone behavior
 
-### 2. Refactor `NewVisitor.tsx` to support inline mode
-- Accept optional props: `inline?: boolean` and `onClose?: () => void`
-- When `inline` is true, hide the back arrow/navigation header and use `onClose()` instead of `navigate('/visitors')` after successful submission
-- When not inline (direct route `/visitors/new`), keep existing behavior unchanged
-
-### 3. Update QuickActions and route
-- Change QuickActions path from `/visitors/new` to `/visitors` and add a query param like `?new=true`, or simply keep `/visitors/new` route working for direct access
-- Keep the `/visitors/new` route in `App.tsx` as a fallback for direct URL access
+### 2. Update `src/pages/Vehicles.tsx`
+- Add `showNewVehicleForm` state
+- Replace `navigate('/vehicles/new')` button (line 273) with `onClick={() => setShowNewVehicleForm(true)}`
+- When `showNewVehicleForm` is true, render `<NewVehicle inline onClose={() => { setShowNewVehicleForm(false); fetchVehicles(); }} />` above the vehicle table in a card container
+- Import `NewVehicle` component
 
 ## Files affected
-- `src/pages/Visitors.tsx` — add state toggle, render NewVisitor inline
-- `src/pages/NewVisitor.tsx` — accept `inline`/`onClose` props, conditional navigation
-- `src/components/dashboard/QuickActions.tsx` — optionally update path
+- `src/pages/NewVehicle.tsx` — add inline/onClose props, conditional header/navigation
+- `src/pages/Vehicles.tsx` — add state toggle, render inline form
 
