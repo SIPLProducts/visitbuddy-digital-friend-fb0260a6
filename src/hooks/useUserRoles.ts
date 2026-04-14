@@ -35,6 +35,10 @@ export function useUserRoles() {
   useEffect(() => {
     if (user) {
       fetchUserRoles();
+    } else {
+      setUserRoles([]);
+      setIsHoAdmin(false);
+      setLoading(false);
     }
   }, [user]);
 
