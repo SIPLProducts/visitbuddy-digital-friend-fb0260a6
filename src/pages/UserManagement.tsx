@@ -60,6 +60,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { logAudit } from '@/lib/auditLog';
 import { toast } from 'sonner';
 import { useUserRoles, AppRole } from '@/hooks/useUserRoles';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail } from '@/components/shared/CsvImportResult';
@@ -254,7 +255,7 @@ export default function UserManagement() {
 
   const handleDeleteRole = async (roleId: string) => {
     try {
-      const roleToDelete = roles.find(r => r.id === roleId);
+      const roleToDelete = userRoles.find(r => r.id === roleId);
       const { error } = await supabase
         .from('user_location_roles')
         .delete()
