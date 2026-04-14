@@ -1,17 +1,22 @@
 
 
-# Remove Policy Agreement Popup from Check-In
+# Hide Check-In & Approve Actions for Gate Security on Pending Visitors
 
 ## Summary
-The user doesn't want the Policy Agreement / NDA popup during check-in. The check-in should proceed directly without showing any dialog.
+For users with the `gate_security` role, hide the "Approve/Reject" buttons and "Check In & Print" actions for visitors that are still in `pending_approval` status. Gate Security should only see View Details for pending visitors. Check-in actions should only appear once the host has approved (status = `scheduled`).
 
 ## Changes
 
-### `src/components/visitors/CheckInDialog.tsx`
-- Remove the NDA/signature section entirely — no policy agreement, no signature pad, no checkbox
-- Keep only the watchlist check (security feature) and a simple confirmation dialog
-- The dialog should just show "Confirm check-in for {visitorName}" with Cancel and Confirm buttons
-- Watchlist alerts still display if a match is found
+### 1. `src/pages/Visitors.tsx`
+- Import `useUserRoles` hook to detect the current user's role
+- In the actions column (around line 670), add a role check: if the user is `gate_security`, do NOT show the Approve/Reject buttons for `pending_approval` visitors — show only a "Pending Approval" label or View Details instead
+- The existing `VisitorActions` component already correctly shows "Check In & Print" only for `scheduled` status, so no change needed there
 
-This simplifies the check-in to: open dialog → confirm (with watchlist warning if applicable) → done.
+### 2. `src/components/visitors/VisitorActions.tsx`
+- No changes needed — the component already gates "Check In & Print" behind `visitor.status === 'scheduled'`, which only happens after host approval
+
+## Technical Detail
+- `useUserRoles()` provides `userRoles` array with role info; check if any role is `gate_security` and none are `admin`/`manager`/`operator`
+- For gate_security users viewing `pending_approval` visitors: show a disabled "Awaiting Approval" badge instead of Approve/Reject buttons
+- All other roles (admin, manager, operator) continue to see Approve/Reject as before
 
