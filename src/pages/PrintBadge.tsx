@@ -260,9 +260,32 @@ export default function PrintBadge() {
         @media print {
           @page { 
             size: A4 landscape; 
-            margin: 10mm; 
+            margin: 8mm; 
           }
           .no-print { display: none !important; }
+          .print-container {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: center !important;
+            align-items: flex-start !important;
+            gap: 12mm !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+          }
+          .badge {
+            width: 125mm !important;
+            margin: 0 !important;
+            page-break-inside: avoid;
+          }
+        }
+        .print-container {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: flex-start;
+          gap: 24px;
+          flex-wrap: wrap;
         }
         .badge {
           background: white;
@@ -270,7 +293,6 @@ export default function PrintBadge() {
           border-radius: 8px;
           overflow: hidden;
           width: 350px;
-          margin: 0 auto;
         }
         .header {
           display: flex;
