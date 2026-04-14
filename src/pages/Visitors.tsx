@@ -450,6 +450,7 @@ export default function Visitors() {
                 <TableHead>{t('visitors.id')}</TableHead>
                 <TableHead>{t('visitors.company')}</TableHead>
                 <TableHead>{t('visitors.hostDepartment')}</TableHead>
+                <TableHead>Created Date</TableHead>
                 <TableHead>{t('visitors.dateOfVisit')}</TableHead>
                 <TableHead>{t('visitors.vehicle')}</TableHead>
                 <TableHead>{t('visitors.laptop')}</TableHead>
@@ -462,13 +463,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={12} className="text-center py-8">
+                   <TableCell colSpan={13} className="text-center py-8">
                     {t('visitors.loading')}
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8">
+                  <TableCell colSpan={13} className="text-center py-8">
                     {t('visitors.noVisitors')}
                   </TableCell>
                 </TableRow>
@@ -528,6 +529,9 @@ export default function Visitors() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                       {format(new Date(visitor.created_at), 'dd/MM/yyyy')}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {visitor.scheduled_date ? format(new Date(visitor.scheduled_date + 'T00:00:00'), 'dd/MM/yyyy') : '—'}
                     </TableCell>
                     <TableCell>
                       {visitor.vehicle_type && visitor.vehicle_type !== 'by_walk' ? (
