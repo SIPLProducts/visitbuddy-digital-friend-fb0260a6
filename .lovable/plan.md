@@ -1,88 +1,38 @@
 
-Fix the sidebar flash by making the app shell persistent instead of re-mounting on every route change.
 
-## What’s actually causing the flash
-The earlier transition change reduced the blank screen, but the sidebar can still flash because of two structural issues:
+# Fix Visitor Report and Filters
 
-1. `PageTransition` currently wraps the entire `Routes` tree in `src/App.tsx`, so the whole screen fades on every navigation.
-2. Each protected page renders its own `<MainLayout>`, so the sidebar/header are unmounted and mounted again on every page click.
+## Issues Found
 
-That means the sidebar is not staying “fixed”; it is being recreated.
+### 1. Visitors Page — Date Filter Mutates State (Critical Bug)
+**Line 296**: `new Date(fromDate.setHours(0, 0, 0, 0))` calls `.setHours()` directly on the `fromDate` state object, which **mutates it in place**. On every re-render, the date gets corrupted, causing filters to behave unpredictably.
 
-## Implementation plan
-
-### 1. Create one persistent protected layout
-Refactor routing in `src/App.tsx` to use a shared protected layout route with `Outlet`.
-
-Target structure:
-```text
-BrowserRouter
-└─ Routes
-   ├─ public routes
-   └─ protected layout route
-      └─ MainLayout
-         └─ PageTransition
-            └─ Outlet (current page content only)
+**Fix**: Clone the date before modifying:
+```ts
+const matchesFromDate = !fromDate || visitorDate >= new Date(new Date(fromDate).setHours(0, 0, 0, 0));
+const matchesToDate = !toDate || visitorDate <= new Date(new Date(toDate).setHours(23, 59, 59, 999));
 ```
 
-Result:
-- Sidebar/Header/Mobile nav mount once
-- Only the inner page content changes
+### 2. Visitors Page — Location Filter May Not Match
+The query `gate:gates(*)` returns gate columns including `location_id`, but `visitor.gate` can be `null` for visitors without a gate. The filter `visitor.gate?.location_id === locationFilter` silently returns `undefined !== 'some-id'` which is correct behavior (filters them out). This is actually working correctly.
 
-### 2. Move the animation to page content only
-Keep `PageTransition`, but use it around the routed page content inside the persistent layout instead of around the full `Routes` tree.
+### 3. VisitorReport — Filters Applied Only Client-Side After Fetch
+The report fetches visitors filtered only by date range from the database, then applies status/location/company/department filters client-side on the `filteredVisitors` array. This is correct, but the **stats cards show unfiltered totals** (they use `stats` which is computed from the full `visitors` array, not `filteredVisitors`). When a user applies a filter, the stats don't update — making it look broken.
 
-Also remove the route-level remount trigger in `App.tsx` (`key={location.pathname}` on `Routes`) so navigation doesn’t rebuild the full shell.
+**Fix**: Recompute stats based on `filteredVisitors` instead of the raw `visitors` array, or add a memo that recalculates when filters change.
 
-### 3. Convert protected pages to content-only pages
-Update all protected pages that currently return:
-- `<MainLayout> ...page content... </MainLayout>`
+### 4. VisitorReport — Charts Don't Reflect Filters
+Same issue: `chartData` is computed from `visitors` (unfiltered), not `filteredVisitors`. When filters are active, charts show all data.
 
-So they return only their inner content.
+**Fix**: Update `chartData` and `stats` useMemo to use `filteredVisitors` instead of `visitors`.
 
-This affects the protected pages such as:
-- Dashboard
-- Visitors / New Visitor
-- Appointments
-- Check In/Out
-- Badge Printing
-- Reports
-- Departments / Employees / Locations / Gates
-- Analytics
-- Settings
-- Users
-- Vehicles / Vehicle Types / Vehicle Report / Vehicle Gate
-- Notifications / Audit Logs / Watchlist / Emergency / Camera Monitor
-- other authenticated pages using `MainLayout`
+## Files to Change
 
-### 4. Keep public/full-screen routes unchanged
-Routes like these should remain outside the shared shell:
-- `/auth`
-- `/print-badge`
-- `/self-service`
-- `/approve-visitor`
-- `/install`
-- proposal/manual/document-style routes that intentionally don’t use the app shell
+- **`src/pages/Visitors.tsx`** — Fix date filter state mutation (line 296-297)
+- **`src/pages/VisitorReport.tsx`** — Make stats and charts reactive to active filters by computing from `filteredVisitors`
 
-### 5. Small sidebar polish
-In `Sidebar.tsx`, add a pathname-change close behavior for mobile drawer if needed, so the sheet never lingers during navigation.
+## Expected Result
+- Date filters on Visitors page work reliably without state corruption
+- Visitor Report stats cards and charts update when filters are applied
+- All dropdown filters (status, location, department, company) visibly affect the displayed data
 
-## Files to update
-- `src/App.tsx`
-- `src/components/layout/MainLayout.tsx`
-- `src/components/layout/PageTransition.tsx`
-- `src/components/layout/Sidebar.tsx` (minor polish)
-- protected page files currently importing/using `MainLayout`
-
-## Expected result
-After this refactor:
-- sidebar no longer flashes on page click
-- header/sidebar stay visually stable
-- only the main content area transitions
-- navigation feels much smoother on desktop and mobile
-
-## QA to run after implementation
-- Click multiple sidebar links quickly on desktop and confirm sidebar/header never fade or blink
-- Test mobile drawer navigation and confirm it closes cleanly
-- Verify public routes still render without the app shell
-- Check scroll behavior inside the main content area after route changes
