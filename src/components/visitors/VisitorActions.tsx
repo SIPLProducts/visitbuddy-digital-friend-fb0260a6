@@ -20,6 +20,7 @@ interface VisitorActionsProps {
   onApprove?: (visitor: Visitor) => void;
   onReject?: (visitor: Visitor) => void;
   canCheckInOut?: boolean;
+  canEdit?: boolean;
 }
 
 export function VisitorActions({
@@ -33,6 +34,7 @@ export function VisitorActions({
   onApprove,
   onReject,
   canCheckInOut = true,
+  canEdit = true,
 }: VisitorActionsProps) {
   const today = new Date().toISOString().split('T')[0];
   const isScheduledToday = !visitor.scheduled_date || visitor.scheduled_date === today;
@@ -88,7 +90,7 @@ export function VisitorActions({
             <Eye className="h-4 w-4 mr-2" />
             View Details
           </DropdownMenuItem>
-          {visitor.status !== 'checked_out' && (
+          {canEdit && visitor.status !== 'checked_out' && (
             <DropdownMenuItem onClick={() => onEdit(visitor)}>
               <Edit className="h-4 w-4 mr-2" />
               Edit
