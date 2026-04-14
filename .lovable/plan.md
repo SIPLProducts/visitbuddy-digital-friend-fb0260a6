@@ -1,25 +1,27 @@
 
 
-# Add Aadhaar Number to Registration Form & Remove from Check-In
+# Set New Visitor Status to "Pending Approval" & Trigger Host Notification
 
 ## Summary
-Add an Aadhaar/Government ID field in the visitor registration form so it's collected upfront. Remove the ID entry step from the check-in dialog since it will already be captured during registration.
+When a visitor is created via the normal registration form, set status to `pending_approval` instead of `scheduled`. Then call the `notify-host` edge function so the host receives a WhatsApp/SMS with approve/reject links — the same flow that already works for self-service visitors.
 
 ## Changes
 
 ### 1. `src/pages/NewVisitor.tsx`
-- Add `govt_id_number: z.string().optional()` to the Zod schema
-- Add an "Aadhaar Number" input field after the Phone/Company row in the Personal Information card
-- Include `govt_id_number` in the insert payload
+- Change `status: 'scheduled'` to `status: 'pending_approval'` in the insert payload (line 150)
+- After successful insert, invoke the `notify-host` edge function with the new visitor's ID and host details (similar to the self-service flow) so the host gets the approval request
+- Update success toast to say "Visitor registered — pending host approval"
+- Skip the WhatsApp badge send (badge should only be sent after approval, which the `approve-visitor` function already handles)
 
-### 2. `src/components/visitors/CheckInDialog.tsx`
-- Remove the `govtIdNumber` state and the ID entry step entirely
-- Remove the two-step flow (`id` → `nda`). Instead, go directly to NDA step if enabled, or confirm immediately
-- Update `onConfirm` call to pass empty string (since ID is no longer collected here)
-- Simplify the dialog to show only the NDA/signature step (if enabled) or a simple confirmation
+### 2. No database or edge function changes needed
+- The `visitors` table already supports `pending_approval` status
+- The `notify-host` edge function already sends approval links to the host
+- The `approve-visitor` edge function already handles approval → status change to `scheduled` + badge delivery
+- The `PendingApprovals` dashboard widget already shows pending visitors
 
-### 3. `src/components/visitors/VisitorEditDialog.tsx`
-- Add `govt_id_number` field to the edit form so it can be updated after registration
-
-No database changes needed — `govt_id_number` column already exists on the `visitors` table.
+## Flow after change
+1. Operator fills form → visitor created with `pending_approval`
+2. Host notified via WhatsApp/SMS with approve/reject links
+3. Host approves → status becomes `scheduled`, badge sent automatically
+4. Visitor shows up and gets checked in
 
