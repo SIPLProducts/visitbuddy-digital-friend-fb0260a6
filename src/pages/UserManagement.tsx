@@ -911,7 +911,7 @@ export default function UserManagement() {
                     <Select value={selectedPermLocation} onValueChange={setSelectedPermLocation}>
                       <SelectTrigger><SelectValue placeholder="Select location" /></SelectTrigger>
                       <SelectContent className="bg-popover border border-border z-50">
-                        {locations.map((location) => (
+                        {accessibleLocations.map((location) => (
                           <SelectItem key={location.id} value={location.id}>
                             {location.name} {location.city && `(${location.city})`}
                           </SelectItem>
@@ -1110,7 +1110,7 @@ export default function UserManagement() {
                 <div className="space-y-2">
                   <Label>Select Locations * <span className="text-xs text-muted-foreground">(one or multiple)</span></Label>
                   <div className="border rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
-                    {locations.map((loc) => (
+                    {accessibleLocations.map((loc) => (
                       <div key={loc.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={`loc-${loc.id}`}
@@ -1252,7 +1252,7 @@ export default function UserManagement() {
                 <Select value={assignLocationId} onValueChange={setAssignLocationId}>
                   <SelectTrigger><SelectValue placeholder="Select location" /></SelectTrigger>
                   <SelectContent className="bg-popover border border-border z-50">
-                    {locations.map((loc) => (
+                    {accessibleLocations.map((loc) => (
                       <SelectItem key={loc.id} value={loc.id}>
                         {loc.name} {loc.city && `(${loc.city})`}
                       </SelectItem>
@@ -1303,7 +1303,7 @@ export default function UserManagement() {
                 <Select value={editLocationId} onValueChange={setEditLocationId}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent className="bg-popover border border-border z-50">
-                    {locations.map((loc) => (
+                    {accessibleLocations.map((loc) => (
                       <SelectItem key={loc.id} value={loc.id}>{loc.name} {loc.city && `(${loc.city})`}</SelectItem>
                     ))}
                   </SelectContent>
