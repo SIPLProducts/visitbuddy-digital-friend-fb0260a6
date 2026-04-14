@@ -404,6 +404,8 @@ export default function Visitors() {
           </div>
         )}
 
+        {!showNewVisitorForm && (
+          <>
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 max-w-md">
@@ -702,6 +704,8 @@ export default function Visitors() {
             </TableBody>
           </Table>
         </div>
+          </>
+        )}
         </div>
       </PullToRefresh>
 
