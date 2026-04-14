@@ -101,6 +101,7 @@ export interface Visitor {
   mobile_serial: string | null;
   vehicle_type: string | null;
   vehicle_number: string | null;
+  scheduled_date: string | null;
   status: VisitorStatus;
   check_in_time: string | null;
   check_out_time: string | null;

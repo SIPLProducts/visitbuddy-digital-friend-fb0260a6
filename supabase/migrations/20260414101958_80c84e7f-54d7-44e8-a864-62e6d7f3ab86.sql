@@ -1,0 +1,1 @@
+ALTER TABLE public.visitors ADD COLUMN scheduled_date date NULL DEFAULT CURRENT_DATE;
