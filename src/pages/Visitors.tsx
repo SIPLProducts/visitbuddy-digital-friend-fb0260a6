@@ -46,6 +46,7 @@ import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInCaptureDialog } from '@/components/visitors/CheckInCaptureDialog';
 import { logAudit } from '@/lib/auditLog';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useHostEmployee } from '@/hooks/useHostEmployee';
 import { useTranslation } from 'react-i18next';
 import NewVisitor from './NewVisitor';
 
