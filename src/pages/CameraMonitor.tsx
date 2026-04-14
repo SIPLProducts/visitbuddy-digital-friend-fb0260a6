@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -196,7 +195,6 @@ export default function CameraMonitor() {
   };
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
@@ -356,6 +354,5 @@ export default function CameraMonitor() {
           </CardContent>
         </Card>
       </div>
-    </MainLayout>
   );
 }

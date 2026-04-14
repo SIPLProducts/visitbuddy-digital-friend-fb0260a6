@@ -27,10 +27,8 @@ export function MainLayout({ children }: MainLayoutProps) {
         </main>
       </div>
       
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
       
-      {/* Onboarding Tour */}
       {showOnboarding && (
         <OnboardingTour 
           onComplete={completeOnboarding} 

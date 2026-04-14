@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
@@ -114,6 +114,13 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
   const location = useLocation();
   const { signOut } = useAuth();
   const isMobile = useIsMobile();
+
+  // Auto-close mobile drawer on navigation
+  useEffect(() => {
+    if (isMobile && onOpenChange) {
+      onOpenChange(false);
+    }
+  }, [location.pathname]);
 
   const toggleGroup = (label: string) => {
     setOpenGroups(prev =>

@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -75,7 +74,6 @@ export default function ComplianceReport() {
   };
 
   return (
-    <MainLayout>
       <div className="space-y-5">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -142,6 +140,5 @@ export default function ComplianceReport() {
           </CardContent>
         </Card>
       </div>
-    </MainLayout>
   );
 }

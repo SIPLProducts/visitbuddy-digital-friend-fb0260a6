@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -634,28 +633,23 @@ export default function UserManagement() {
 
   if (rolesLoading || loading) {
     return (
-      <MainLayout>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      </MainLayout>
     );
   }
 
   if (!isHoAdmin) {
     return (
-      <MainLayout>
         <div className="flex flex-col items-center justify-center h-64 gap-4">
           <Shield className="h-16 w-16 text-muted-foreground" />
           <h2 className="text-xl font-semibold">Access Denied</h2>
           <p className="text-muted-foreground">Only HO Admins can manage user roles and permissions.</p>
         </div>
-      </MainLayout>
     );
   }
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
@@ -1329,6 +1323,5 @@ export default function UserManagement() {
         {/* CSV Import Result */}
         <CsvImportResult open={showImportResult} onOpenChange={setShowImportResult} result={importResult} entityName="Users" />
       </div>
-    </MainLayout>
   );
 }

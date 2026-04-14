@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -443,7 +442,7 @@ export default function Employees() {
   );
 
   return (
-    <MainLayout>
+    <>
       <div className="space-y-6">
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -712,6 +711,6 @@ export default function Employees() {
         result={importResult}
         entityName="Employees"
       />
-    </MainLayout>
+    </>
   );
 }

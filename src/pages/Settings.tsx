@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,11 +71,10 @@ export default function Settings() {
   };
 
   if (loading || !settings) {
-    return <MainLayout><div className="flex items-center justify-center h-64"><p className="text-muted-foreground">Loading...</p></div></MainLayout>;
+    return <div className="flex items-center justify-center h-64"><p className="text-muted-foreground">Loading...</p></div>;
   }
 
   return (
-    <MainLayout>
       <div className="max-w-4xl mx-auto space-y-6">
          <div className="flex items-center justify-between">
           <div>
@@ -390,6 +388,5 @@ export default function Settings() {
           </TabsContent>
         </Tabs>
       </div>
-    </MainLayout>
   );
 }

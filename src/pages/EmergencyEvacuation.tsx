@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -74,7 +73,6 @@ export default function EmergencyEvacuation() {
   };
 
   return (
-    <MainLayout>
       <div className="space-y-5">
         {/* Emergency Header */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 via-red-500 to-orange-500 p-6 text-white">
@@ -212,6 +210,5 @@ export default function EmergencyEvacuation() {
           </TabsContent>
         </Tabs>
       </div>
-    </MainLayout>
   );
 }
