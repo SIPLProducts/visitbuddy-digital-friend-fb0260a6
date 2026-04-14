@@ -142,7 +142,7 @@ export default function VisitorReport() {
 
   const filteredVisitors = visitors.filter((visitor) => {
     // Host-based filtering for Manager/Operator roles
-    if (isRestrictedRole && hostEmployeeId && visitor.host_id !== hostEmployeeId) {
+    if (isRestrictedRole && hostEmployeeId && visitor.host_id !== hostEmployeeId && (visitor as any).created_by_user_id !== user?.id) {
       return false;
     }
 

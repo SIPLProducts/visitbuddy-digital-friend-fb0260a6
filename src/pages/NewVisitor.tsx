@@ -20,6 +20,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -68,6 +69,7 @@ interface NewVisitorProps {
 
 export default function NewVisitor({ inline = false, onClose }: NewVisitorProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -149,6 +151,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       scheduled_date: data.scheduled_date ? format(data.scheduled_date, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
       govt_id_number: data.govt_id_number || null,
       status: 'pending_approval' as const,
+      created_by_user_id: user?.id || null,
     }]).select('id').single();
 
     if (error) {

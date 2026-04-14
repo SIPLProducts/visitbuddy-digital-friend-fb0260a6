@@ -1170,6 +1170,7 @@ export type Database = {
           checkout_method: string | null
           company: string | null
           created_at: string
+          created_by_user_id: string | null
           department_id: string | null
           email: string | null
           gate_id: string | null
@@ -1202,6 +1203,7 @@ export type Database = {
           checkout_method?: string | null
           company?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           department_id?: string | null
           email?: string | null
           gate_id?: string | null
@@ -1234,6 +1236,7 @@ export type Database = {
           checkout_method?: string | null
           company?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           department_id?: string | null
           email?: string | null
           gate_id?: string | null
