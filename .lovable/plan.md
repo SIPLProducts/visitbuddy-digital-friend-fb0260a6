@@ -1,30 +1,24 @@
 
 
-# Fix Badge Printing
+# Fix "No Role" Display in Header
 
-## Problem Analysis
-After investigation, I found these issues that could cause badge printing to fail:
+## Problem
+The header shows "No Role" because:
+1. When `selectedLocationId` is `"all"` (HO admin), no role matches — but this is already handled by the `isHoAdmin` check, so it's fine for HO admins.
+2. For **regular users**, there's a race condition: `selectedLocationId` starts as `''`, and the location default is set only after locations load. During this time, `currentRole` is `undefined`, showing "No Role". Even after loading, if `selectedLocationId` doesn't match any role's `location_id` (e.g. saved location in localStorage was changed), it stays "No Role".
 
-1. **Missing public read policies on `gates` and `locations` tables** — The PrintBadge page is a public route that queries visitors with joins to employees, departments, gates, and locations. While `visitors`, `employees`, and `departments` have public read policies, `gates` and `locations` do NOT. If the new tab doesn't carry the auth session, these joins return empty data or cause errors.
+## Fix — `src/components/layout/Header.tsx`
 
-2. **Wrong URL pattern in RecentVisitors** — `RecentVisitors.tsx` line 224 uses `/print-badge/${visitor.id}` (path parameter) instead of `/print-badge?id=${visitor.id}` (query parameter). This means clicking "Print Badge" from the dashboard navigates to a wrong URL, causing "Visitor not found".
+**Line 87**: Change `currentRole` logic to be more resilient:
+- If `selectedLocationId` matches a role, use that role.
+- Otherwise, fall back to the **first role** the user has (since they always have at least one role if they can log in).
 
-3. **Silent update failure** — The `badge_printed` update on line 91-94 of PrintBadge.tsx runs without auth for public access, failing silently. This is minor but should be handled.
-
-## Changes
-
-### 1. Database Migration — Add public read policies for `gates` and `locations`
-```sql
-CREATE POLICY "Allow public read for badge printing" 
-ON public.gates FOR SELECT USING (true);
-
-CREATE POLICY "Allow public read for badge printing" 
-ON public.locations FOR SELECT USING (true);
+```tsx
+const currentRole = userRoles.find(r => r.location_id === selectedLocationId)?.role 
+  || userRoles[0]?.role;
 ```
 
-### 2. Fix URL in `src/components/dashboard/RecentVisitors.tsx`
-- Line 224: Change `/print-badge/${visitor.id}` to use `window.open(\`/print-badge?id=${visitor.id}\`, '_blank')` to match the correct query parameter format and open in a new tab.
+This way, even during the initial load or if "all" is somehow selected for a non-HO user, the header shows their actual role instead of "No Role".
 
-### 3. Guard the `badge_printed` update in `src/pages/PrintBadge.tsx`
-- Wrap the `badge_printed` update in a try/catch so it doesn't interfere with rendering if auth is unavailable.
+Also update **line 193** to show the user's actual name from their profile instead of generic "User" text — but that's a separate concern. The core fix is the role fallback.
 
