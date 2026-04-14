@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -250,7 +249,6 @@ export default function Vehicles() {
   };
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -523,6 +521,5 @@ export default function Vehicles() {
           </DialogContent>
         </Dialog>
       </div>
-    </MainLayout>
   );
 }

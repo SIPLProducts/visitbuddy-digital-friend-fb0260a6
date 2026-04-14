@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
@@ -212,7 +211,6 @@ export default function Analytics() {
     }));
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -579,6 +577,5 @@ export default function Analytics() {
           </div>
         </div>
       </div>
-    </MainLayout>
   );
 }

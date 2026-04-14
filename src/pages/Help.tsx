@@ -1,4 +1,3 @@
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -84,7 +83,6 @@ export default function Help() {
   const navigate = useNavigate();
   
   return (
-    <MainLayout>
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -266,6 +264,5 @@ export default function Help() {
           </Card>
         </div>
       </div>
-    </MainLayout>
   );
 }

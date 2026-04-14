@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -287,7 +286,6 @@ export default function Departments() {
   );
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -595,6 +593,5 @@ export default function Departments() {
         result={importResult}
         entityName="Departments"
       />
-    </MainLayout>
   );
 }

@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
 import { QuickActions } from '@/components/dashboard/QuickActions';
@@ -290,7 +289,6 @@ export default function Dashboard() {
   const totalGateCapacity = gates.reduce((sum, g) => sum + (g.capacity || 0), 0);
 
   return (
-    <MainLayout>
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="space-y-5">
           {/* Enterprise Header */}
@@ -520,6 +518,5 @@ export default function Dashboard() {
           </div>
         </div>
       </PullToRefresh>
-    </MainLayout>
   );
 }

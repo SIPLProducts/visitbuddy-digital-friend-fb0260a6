@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -455,7 +454,6 @@ export default function VehicleReport() {
   const hasActiveFilters = searchQuery || statusFilter !== 'all' || locationFilter !== 'all' || vehicleTypeFilter !== 'all';
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1032,6 +1030,5 @@ export default function VehicleReport() {
           )}
         </Card>
       </div>
-    </MainLayout>
   );
 }

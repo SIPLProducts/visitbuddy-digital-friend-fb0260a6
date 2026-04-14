@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -345,7 +344,6 @@ export default function BadgePrinting() {
   const printedCount = visitors.filter(v => v.badge_printed).length;
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -694,6 +692,5 @@ export default function BadgePrinting() {
           )}
         </DialogContent>
       </Dialog>
-    </MainLayout>
   );
 }

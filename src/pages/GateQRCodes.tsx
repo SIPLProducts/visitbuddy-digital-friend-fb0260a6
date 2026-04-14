@@ -4,8 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { supabase } from '@/integrations/supabase/client';
 import { QrCode, Printer, Download, MapPin, Clock, Users, ExternalLink, Copy, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { MainLayout } from '@/components/layout/MainLayout';
-
 interface Gate {
   id: string;
   name: string;
@@ -204,16 +202,13 @@ export default function GateQRCodes() {
 
   if (loading) {
     return (
-      <MainLayout>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-      </MainLayout>
     );
   }
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -355,6 +350,5 @@ export default function GateQRCodes() {
           </div>
         )}
       </div>
-    </MainLayout>
   );
 }

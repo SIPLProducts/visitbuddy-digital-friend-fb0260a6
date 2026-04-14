@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -276,7 +275,6 @@ export default function CheckInOut() {
   );
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -526,6 +524,5 @@ export default function CheckInOut() {
           )}
         </DialogContent>
       </Dialog>
-    </MainLayout>
   );
 }

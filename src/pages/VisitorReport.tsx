@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -435,7 +434,6 @@ export default function VisitorReport() {
   const hasActiveFilters = searchQuery || statusFilter !== 'all' || locationFilter !== 'all' || companyFilter !== 'all' || departmentFilter !== 'all';
 
   return (
-    <MainLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -1125,6 +1123,5 @@ export default function VisitorReport() {
           )}
         </Card>
       </div>
-    </MainLayout>
   );
 }
