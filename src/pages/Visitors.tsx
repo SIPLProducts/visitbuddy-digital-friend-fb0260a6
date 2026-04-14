@@ -44,6 +44,7 @@ import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInDialog } from '@/components/visitors/CheckInDialog';
 import { logAudit } from '@/lib/auditLog';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { useTranslation } from 'react-i18next';
 import NewVisitor from './NewVisitor';
 
