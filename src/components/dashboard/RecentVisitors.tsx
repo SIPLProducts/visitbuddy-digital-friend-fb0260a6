@@ -100,6 +100,8 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
 
   const getSwipeActions = (visitor: Visitor) => {
     if (!isGateSecurity) return {};
+    const today = new Date().toISOString().split('T')[0];
+    const isScheduledToday = !visitor.scheduled_date || visitor.scheduled_date === today;
     if (visitor.status === 'checked_in') {
       return {
         rightAction: {
@@ -110,7 +112,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
         },
       };
     }
-    if (visitor.status === 'scheduled' || visitor.status === 'checked_out') {
+    if (isScheduledToday && (visitor.status === 'scheduled' || visitor.status === 'checked_out')) {
       return {
         rightAction: {
           icon: <LogIn className="h-5 w-5" />,
@@ -213,7 +215,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                             Check Out
                           </DropdownMenuItem>
                         )}
-                        {isGateSecurity && (visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
+                        {isGateSecurity && (() => { const t = new Date().toISOString().split('T')[0]; return !visitor.scheduled_date || visitor.scheduled_date === t; })() && (visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
                           <DropdownMenuItem onClick={() => handleCheckIn(visitor)}>
                             <LogIn className="h-4 w-4 mr-2" />
                             Check In
