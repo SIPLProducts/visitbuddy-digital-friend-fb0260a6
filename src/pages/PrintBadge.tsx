@@ -343,7 +343,12 @@ export default function PrintBadge() {
           font-size: 24px;
           font-weight: bold;
         }
+        .details-signatures-row {
+          display: flex;
+          border-top: 0;
+        }
         .details {
+          flex: 1;
           font-size: 11px;
         }
         .detail-row {
@@ -359,27 +364,33 @@ export default function PrintBadge() {
           flex: 1;
         }
         .signatures {
+          width: 120px;
+          border-left: 2px solid #1f2937;
           display: flex;
-          border-top: 2px solid #1f2937;
+          flex-direction: column;
           text-align: center;
-          font-size: 11px;
+          font-size: 10px;
         }
         .sig-box {
           flex: 1;
-          padding: 8px;
-          border-right: 1px solid #d1d5db;
+          padding: 6px;
+          border-bottom: 1px solid #d1d5db;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
         }
         .sig-box:last-child {
-          border-right: none;
+          border-bottom: none;
         }
         .sig-line {
-          height: 32px;
+          height: 24px;
           border-bottom: 1px dashed #9ca3af;
-          margin-bottom: 4px;
+          margin-bottom: 3px;
         }
         .sig-label {
           font-weight: 600;
           font-style: italic;
+          font-size: 9px;
         }
         .guidelines {
           display: flex;
@@ -473,7 +484,7 @@ export default function PrintBadge() {
           </button>
         </div>
 
-        <div className="badge">
+        <div className="badge" id="printable-badge">
           <div className="header">
             <div className="logo-box">
               <img src={reslLogo} alt="RESL" />
@@ -495,74 +506,76 @@ export default function PrintBadge() {
             </div>
           </div>
 
-          <div className="details">
-            <div className="detail-row">
-              <span className="detail-label">Serial No</span>
-              <span className="detail-value">: {visitor.visitor_id}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Date</span>
-              <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Time</span>
-              <span className="detail-value">: {safeFormat(checkInTime, 'HH:mm')}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Name</span>
-              <span className="detail-value" style={{ fontWeight: 500 }}>: {visitor.name}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Mobile</span>
-              <span className="detail-value">: {visitor.phone || 'N/A'}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Company</span>
-              <span className="detail-value">: {visitor.company || 'N/A'}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Dept. To Meet</span>
-              <span className="detail-value">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
-            </div>
-            {(visitor.department?.floor_number || visitor.department?.building_section) && (
+          <div className="details-signatures-row">
+            <div className="details">
               <div className="detail-row">
-                <span className="detail-label">Location</span>
-                <span className="detail-value">: {[
-                  visitor.department?.floor_number && `Floor ${visitor.department.floor_number}`,
-                  visitor.department?.building_section
-                ].filter(Boolean).join(', ') || 'N/A'}</span>
+                <span className="detail-label">Serial No</span>
+                <span className="detail-value">: {visitor.visitor_id}</span>
               </div>
-            )}
-            <div className="detail-row">
-              <span className="detail-label">Host</span>
-              <span className="detail-value">: {visitor.host?.name || 'N/A'}</span>
+              <div className="detail-row">
+                <span className="detail-label">Date</span>
+                <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Time</span>
+                <span className="detail-value">: {safeFormat(checkInTime, 'HH:mm')}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Name</span>
+                <span className="detail-value" style={{ fontWeight: 500 }}>: {visitor.name}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Mobile</span>
+                <span className="detail-value">: {visitor.phone || 'N/A'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Company</span>
+                <span className="detail-value">: {visitor.company || 'N/A'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Dept. To Meet</span>
+                <span className="detail-value">: {visitor.host?.department?.name || visitor.department?.name || 'N/A'}</span>
+              </div>
+              {(visitor.department?.floor_number || visitor.department?.building_section) && (
+                <div className="detail-row">
+                  <span className="detail-label">Location</span>
+                  <span className="detail-value">: {[
+                    visitor.department?.floor_number && `Floor ${visitor.department.floor_number}`,
+                    visitor.department?.building_section
+                  ].filter(Boolean).join(', ') || 'N/A'}</span>
+                </div>
+              )}
+              <div className="detail-row">
+                <span className="detail-label">Host</span>
+                <span className="detail-value">: {visitor.host?.name || 'N/A'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Purpose</span>
+                <span className="detail-value">: {visitor.purpose || 'N/A'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">IT Asset</span>
+                <span className="detail-value">: {visitor.has_laptop ? 'Laptop' : 'NA'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Validity</span>
+                <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
+              </div>
             </div>
-            <div className="detail-row">
-              <span className="detail-label">Purpose</span>
-              <span className="detail-value">: {visitor.purpose || 'N/A'}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">IT Asset</span>
-              <span className="detail-value">: {visitor.has_laptop ? 'Laptop' : 'NA'}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-label">Validity</span>
-              <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
-            </div>
-          </div>
 
-          <div className="signatures">
-            <div className="sig-box">
-              <div className="sig-line"></div>
-              <p className="sig-label">Security Signature</p>
-            </div>
-            <div className="sig-box">
-              <div className="sig-line"></div>
-              <p className="sig-label">Visitor Signature</p>
-            </div>
-            <div className="sig-box">
-              <div className="sig-line"></div>
-              <p className="sig-label">Officer Signature</p>
+            <div className="signatures">
+              <div className="sig-box">
+                <div className="sig-line"></div>
+                <p className="sig-label">Security</p>
+              </div>
+              <div className="sig-box">
+                <div className="sig-line"></div>
+                <p className="sig-label">Visitor</p>
+              </div>
+              <div className="sig-box">
+                <div className="sig-line"></div>
+                <p className="sig-label">Officer</p>
+              </div>
             </div>
           </div>
 
