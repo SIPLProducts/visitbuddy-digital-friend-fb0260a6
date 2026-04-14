@@ -234,31 +234,26 @@
   }
 }
 
-/* Print Styles for Safety Permit Badge */
+/* Print Styles for Safety Permit Badge — scoped to avoid conflicts */
 @media print {
-  body * {
+  body:has(#printable-badge) * {
     visibility: hidden;
   }
   
-  #printable-badge,
-  #printable-badge * {
-    visibility: visible;
+  body:has(#printable-badge) #printable-badge,
+  body:has(#printable-badge) #printable-badge * {
+    visibility: visible !important;
   }
   
-  #printable-badge {
+  body:has(#printable-badge) #printable-badge {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100mm;
+    width: 140mm;
   }
   
-  .no-print {
+  body:has(#printable-badge) .no-print {
     display: none !important;
-  }
-  
-  @page {
-    size: 100mm 150mm;
-    margin: 5mm;
   }
 }
 
