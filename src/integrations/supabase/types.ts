@@ -1288,6 +1288,7 @@ export type Database = {
         Args: { _location_id: string; _user_id: string }
         Returns: boolean
       }
+      get_admin_location_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_location_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role_at_location: {
         Args: {
