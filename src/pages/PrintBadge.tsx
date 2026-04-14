@@ -262,22 +262,7 @@ export default function PrintBadge() {
             size: A4 landscape; 
             margin: 10mm; 
           }
-          body *, body {
-            visibility: visible !important;
-          }
           .no-print { display: none !important; }
-          #printable-badge {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 140mm !important;
-            max-width: 140mm !important;
-            border: 2px solid #1f2937 !important;
-            page-break-inside: avoid;
-          }
-          #printable-badge * {
-            visibility: visible !important;
-          }
         }
         .badge {
           background: white;
