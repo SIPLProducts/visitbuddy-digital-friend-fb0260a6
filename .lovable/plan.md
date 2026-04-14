@@ -1,23 +1,30 @@
 
 
-# Add Separate "Date of Visit" Column to Visitor List
+# Fix Badge Printing
 
-## Summary
-Currently the "Date of Visit" column in the Visitors table actually displays the `created_at` date (creation date). The fix is to rename that column to "Created Date" and add a new "Date of Visit" column that shows the actual `scheduled_date`.
+## Problem Analysis
+After investigation, I found these issues that could cause badge printing to fail:
+
+1. **Missing public read policies on `gates` and `locations` tables** — The PrintBadge page is a public route that queries visitors with joins to employees, departments, gates, and locations. While `visitors`, `employees`, and `departments` have public read policies, `gates` and `locations` do NOT. If the new tab doesn't carry the auth session, these joins return empty data or cause errors.
+
+2. **Wrong URL pattern in RecentVisitors** — `RecentVisitors.tsx` line 224 uses `/print-badge/${visitor.id}` (path parameter) instead of `/print-badge?id=${visitor.id}` (query parameter). This means clicking "Print Badge" from the dashboard navigates to a wrong URL, causing "Visitor not found".
+
+3. **Silent update failure** — The `badge_printed` update on line 91-94 of PrintBadge.tsx runs without auth for public access, failing silently. This is minor but should be handled.
 
 ## Changes
 
-### `src/pages/Visitors.tsx`
-- Rename the existing column header from `dateOfVisit` to "Created Date" (line 453)
-- Add a new "Date of Visit" column header after "Created Date" that displays `scheduled_date`
-- Update the table body: change the existing cell (line 529-531) to show `created_at` with label "Created Date"
-- Add a new table cell after it showing `scheduled_date` formatted as `dd/MM/yyyy`, or "—" if not set
+### 1. Database Migration — Add public read policies for `gates` and `locations`
+```sql
+CREATE POLICY "Allow public read for badge printing" 
+ON public.gates FOR SELECT USING (true);
 
-### `src/i18n/locales/en.json` (and other locale files)
-- Add a new translation key for "Created Date" if needed, or use inline text
+CREATE POLICY "Allow public read for badge printing" 
+ON public.locations FOR SELECT USING (true);
+```
 
-## Result
-The table will have two date columns:
-1. **Created Date** — when the visitor record was created (`created_at`)
-2. **Date of Visit** — the actual scheduled visit date (`scheduled_date`)
+### 2. Fix URL in `src/components/dashboard/RecentVisitors.tsx`
+- Line 224: Change `/print-badge/${visitor.id}` to use `window.open(\`/print-badge?id=${visitor.id}\`, '_blank')` to match the correct query parameter format and open in a new tab.
+
+### 3. Guard the `badge_printed` update in `src/pages/PrintBadge.tsx`
+- Wrap the `badge_printed` update in a try/catch so it doesn't interfere with rendering if auth is unavailable.
 
