@@ -391,6 +391,19 @@ export default function Visitors() {
           </div>
         </div>
 
+        {/* Inline New Visitor Form */}
+        {showNewVisitorForm && (
+          <div className="border border-border rounded-xl bg-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Pre-Register Visitor</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowNewVisitorForm(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <NewVisitor inline onClose={() => { setShowNewVisitorForm(false); fetchVisitors(); }} />
+          </div>
+        )}
+
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 max-w-md">
