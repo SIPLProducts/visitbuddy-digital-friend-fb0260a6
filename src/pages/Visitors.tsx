@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -51,6 +52,7 @@ import NewVisitor from './NewVisitor';
 export default function Visitors() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { userRoles, isHoAdmin } = useUserRoles();
   const isGateSecurityOnly = useMemo(() => {
     if (isHoAdmin) return false;
@@ -184,6 +186,39 @@ export default function Visitors() {
       fetchVisitors();
     }
   };
+
+  const handleApprove = async (visitor: Visitor) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-visitor', {
+        body: { visitorId: visitor.id, action: 'approve' },
+      });
+      if (error) throw error;
+      toast.success(`${visitor.name} approved successfully`);
+      fetchVisitors();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to approve visitor');
+    }
+  };
+
+  const handleReject = async (visitor: Visitor) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-visitor', {
+        body: { visitorId: visitor.id, action: 'reject' },
+      });
+      if (error) throw error;
+      toast.success(`${visitor.name} rejected`);
+      fetchVisitors();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reject visitor');
+    }
+  };
+
+  const isManagerOnly = useMemo(() => {
+    if (isHoAdmin) return false;
+    return userRoles.length > 0 && userRoles.some(r => r.role === 'manager');
+  }, [userRoles, isHoAdmin]);
+
+  const canApproveReject = isHoAdmin || isManagerOnly || userRoles.some(r => r.role === 'admin');
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -621,22 +656,18 @@ export default function Visitors() {
                         : '—'}
                     </TableCell>
                     <TableCell>
-                      {visitor.status === 'pending_approval' ? (
-                        <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
-                          Awaiting Host Approval
-                        </Badge>
-                      ) : (
-                        <VisitorActions
-                          visitor={visitor}
-                          onViewDetails={handleViewDetails}
-                          onEdit={handleEdit}
-                          onPrintBadge={handlePrintBadge}
-                          onCheckIn={handleCheckIn}
-                          onCheckOut={handleCheckOut}
-                          onCheckInAndPrint={handleCheckInAndPrint}
-                          canCheckInOut={isGateSecurity}
-                        />
-                      )}
+                      <VisitorActions
+                        visitor={visitor}
+                        onViewDetails={handleViewDetails}
+                        onEdit={handleEdit}
+                        onPrintBadge={handlePrintBadge}
+                        onCheckIn={handleCheckIn}
+                        onCheckOut={handleCheckOut}
+                        onCheckInAndPrint={handleCheckInAndPrint}
+                        onApprove={canApproveReject ? handleApprove : undefined}
+                        onReject={canApproveReject ? handleReject : undefined}
+                        canCheckInOut={isGateSecurity}
+                      />
                     </TableCell>
                   </TableRow>
                 ))
