@@ -17,6 +17,7 @@ interface VisitorActionsProps {
   onCheckIn: (visitor: Visitor) => void;
   onCheckOut: (visitor: Visitor) => void;
   onCheckInAndPrint?: (visitor: Visitor) => void;
+  canCheckInOut?: boolean;
 }
 
 export function VisitorActions({
@@ -27,11 +28,12 @@ export function VisitorActions({
   onCheckIn,
   onCheckOut,
   onCheckInAndPrint,
+  canCheckInOut = true,
 }: VisitorActionsProps) {
   return (
     <div className="flex items-center gap-1">
       {/* Quick Check In & Print button for scheduled visitors */}
-      {visitor.status === 'scheduled' && onCheckInAndPrint && (
+      {canCheckInOut && visitor.status === 'scheduled' && onCheckInAndPrint && (
         <Button
           size="sm"
           variant="default"
@@ -66,13 +68,13 @@ export function VisitorActions({
             Print Badge
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {visitor.status === 'checked_in' && (
+          {canCheckInOut && visitor.status === 'checked_in' && (
             <DropdownMenuItem onClick={() => onCheckOut(visitor)}>
               <LogOut className="h-4 w-4 mr-2" />
               Check Out
             </DropdownMenuItem>
           )}
-          {(visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
+          {canCheckInOut && (visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
             <DropdownMenuItem onClick={() => onCheckIn(visitor)}>
               <LogIn className="h-4 w-4 mr-2" />
               Check In

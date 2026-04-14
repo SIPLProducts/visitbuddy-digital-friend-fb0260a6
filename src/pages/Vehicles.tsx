@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,11 +30,17 @@ import { AnprPanel } from '@/components/vehicles/AnprPanel';
 import NewVehicle from '@/pages/NewVehicle';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle, VehicleEntry } from '@/types/vehicle';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { toast } from 'sonner';
 import { format, formatDistanceToNow } from 'date-fns';
 
 export default function Vehicles() {
   const navigate = useNavigate();
+  const { userRoles, isHoAdmin } = useUserRoles();
+  const isGateSecurity = useMemo(() => {
+    if (isHoAdmin) return true;
+    return userRoles.some(r => r.role === 'gate_security');
+  }, [userRoles, isHoAdmin]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -406,13 +412,13 @@ export default function Vehicles() {
                               <History className="h-4 w-4 mr-2" />
                               View History
                             </DropdownMenuItem>
-                            {!vehicle.active_entry && (
+                            {isGateSecurity && !vehicle.active_entry && (
                               <DropdownMenuItem onClick={() => handleCheckIn(vehicle)}>
                                 <LogIn className="h-4 w-4 mr-2" />
                                 Check In
                               </DropdownMenuItem>
                             )}
-                            {vehicle.active_entry && (
+                            {isGateSecurity && vehicle.active_entry && (
                               <DropdownMenuItem onClick={() => handleCheckOut(vehicle)}>
                                 <LogOut className="h-4 w-4 mr-2" />
                                 Check Out
