@@ -120,6 +120,37 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Visitor ${visitorId} approved, sending badge...`);
 
+    // Notify gate security users at the visitor's location
+    const locationId = visitor.gate?.location_id;
+    if (locationId) {
+      const { data: securityUsers, error: secError } = await supabase
+        .from('user_location_roles')
+        .select('user_id')
+        .eq('location_id', locationId)
+        .eq('role', 'gate_security');
+
+      if (secError) {
+        console.error("Error fetching gate security users:", secError);
+      } else if (securityUsers && securityUsers.length > 0) {
+        const notifications = securityUsers.map((u: { user_id: string }) => ({
+          user_id: u.user_id,
+          title: "Visitor Approved",
+          message: `${visitor.name} has been approved by host. Ready for check-in.`,
+          type: "success",
+        }));
+
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .insert(notifications);
+
+        if (notifError) {
+          console.error("Error inserting gate security notifications:", notifError);
+        } else {
+          console.log(`Notified ${securityUsers.length} gate security user(s)`);
+        }
+      }
+    }
+
     let whatsappSent = false;
     let smsSent = false;
     let whatsappSid = null;
