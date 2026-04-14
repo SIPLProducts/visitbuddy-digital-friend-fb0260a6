@@ -221,7 +221,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                             Check In
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuItem onClick={() => navigate(`/print-badge/${visitor.id}`)}>
+                        <DropdownMenuItem onClick={() => window.open(`/print-badge?id=${visitor.id}`, '_blank')}>
                           <Printer className="h-4 w-4 mr-2" />
                           Print Badge
                         </DropdownMenuItem>
