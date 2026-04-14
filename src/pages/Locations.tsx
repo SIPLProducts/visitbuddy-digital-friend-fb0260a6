@@ -605,27 +605,31 @@ export default function Locations() {
               <Download className="h-4 w-4" />
               Template
             </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              <Upload className="h-4 w-4" />
-              {uploading ? 'Importing...' : 'Import CSV'}
-            </Button>
-            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-              <Plus className="h-4 w-4" />
-              Add Location
-            </Button>
+            {isHoAdmin && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="h-4 w-4" />
+                  {uploading ? 'Importing...' : 'Import CSV'}
+                </Button>
+                <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+                  <Plus className="h-4 w-4" />
+                  Add Location
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
