@@ -1,28 +1,40 @@
 
 
-# Fix Print Preview & Fit Badge on Half A4 Sheet
+# Fix Print Preview Showing Empty/Wrong Content
 
 ## Problem
-1. **Print preview shows different content than screen**: The `index.css` has a global `@media print { body * { visibility: hidden } }` rule that conflicts with the inline print styles in `PrintBadge.tsx`. The global rule hides everything first, and while `#printable-badge` is made visible, there may be specificity/ordering issues.
-2. **Badge should fit on half an A4 page horizontally**: The user wants the badge to print on a single page, using only the left half of an A4 sheet in landscape orientation (i.e., approximately 148mm × 210mm, like A5 portrait).
+The `PrintBadge.tsx` inline print CSS has `body *, body { visibility: visible !important; }` which overrides the `index.css` rule that hides everything except `#printable-badge`. This conflict causes the print preview to either show everything (buttons, background) or show nothing depending on CSS load order.
+
+## Solution
+Remove the conflicting inline print styles from `PrintBadge.tsx` and rely solely on the already-correct `index.css` rules. The `index.css` already has proper scoped rules using `body:has(#printable-badge)` that:
+1. Hide all elements
+2. Show only `#printable-badge` and its children
+3. Position it at top-left with 140mm width
 
 ## Changes
 
-### 1. `src/pages/PrintBadge.tsx` — Fix print styles and resize for half-A4
-- Update the inline `@page` rule to `size: A4 landscape` so it prints on A4
-- Set the badge width to ~48% of the page (half of A4 landscape width) so it occupies the left half
-- Add explicit print styles: hide everything except `#printable-badge`, ensure all children are visible
-- Override the global `index.css` print rules with higher-specificity inline styles
-- Scale font sizes and padding slightly to ensure all content fits in a single half-page
+### `src/pages/PrintBadge.tsx` — Fix inline print CSS (lines 260-281)
+Replace the current conflicting `@media print` block:
+```css
+/* REMOVE this — it conflicts with index.css */
+body *, body {
+  visibility: visible !important;
+}
+```
 
-### 2. `src/index.css` — Scope the global print rule to avoid conflicts
-- Wrap the first `@media print` block (for Safety Permit Badge) so it only applies when `#printable-badge` is present, using `body:has(#printable-badge)` — similar to how the proposal document print styles already work
-- This prevents the global `body * { visibility: hidden }` from interfering with other print scenarios
+Replace with a minimal block that only sets `@page` size and defers visibility to `index.css`:
+```css
+@media print {
+  @page { 
+    size: A4 landscape; 
+    margin: 10mm; 
+  }
+  .no-print { display: none !important; }
+}
+```
 
-### 3. `src/components/badge/SafetyPermitBadge.tsx` — Match print sizing
-- Add a print-specific class or inline style so when this component is printed (e.g., from the Visitors page), it also fits the half-A4 format
+The `index.css` already handles hiding everything, showing `#printable-badge`, positioning, and sizing at 140mm.
 
 ## Files Changed
-- `src/pages/PrintBadge.tsx` — Update `@page` size, badge width, and print visibility rules
-- `src/index.css` — Scope global print rules with `:has(#printable-badge)`
+- `src/pages/PrintBadge.tsx` — Remove conflicting inline print visibility rules
 
