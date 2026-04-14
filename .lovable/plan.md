@@ -1,30 +1,27 @@
 
 
-# Restrict Check-In to Matching Scheduled Date
+# Remove Approve/Reject from All Internal Roles — Host-Only Approval
 
 ## Summary
-When a host creates a visitor with a future `scheduled_date`, gate security can see the visitor in the list but cannot check them in until the system date matches the visitor's scheduled date. The "Check In & Print" button and check-in/check-out dropdown items will only appear when `scheduled_date` equals today.
+Approve and Reject actions for `pending_approval` visitors should only be available to the **host** (via the external approval link sent to their WhatsApp/Email). No logged-in role — gate security, admin, manager, or operator — should see approve/reject buttons in the app. The existing `ApproveVisitor` page (public host link) remains unchanged.
 
 ## Changes
 
-### 1. `src/components/visitors/VisitorActions.tsx`
-- Add a date comparison helper: check if `visitor.scheduled_date` matches today's date (using local date string comparison)
-- Gate the "Check In & Print" button, "Check In", and "Check Out" dropdown items behind an additional `isScheduledToday` condition
-- For visitors whose `scheduled_date` is in the future, these actions will not render
-- Check-out for `checked_in` visitors should still work regardless of date (they were already checked in)
+### 1. `src/pages/Visitors.tsx`
+- **Remove** the inline Approve/Reject buttons for `pending_approval` visitors (lines 648-669). Replace with an "Awaiting Host Approval" badge for **all** roles, not just gate security.
+- **Remove** the "Approve Selected" option from bulk actions dropdown (line 360).
+- **Remove** `handleApprove`, `handleReject`, and `handleBulkApprove` functions (no longer needed in this page).
 
-### 2. `src/components/dashboard/RecentVisitors.tsx`
-- Apply the same `isScheduledToday` check in the swipe actions and dropdown menu items
-- Only show check-in swipe/dropdown when the visitor's scheduled date is today
+### 2. `src/components/dashboard/PendingApprovals.tsx`
+- **Remove** the Approve/Reject buttons and swipe actions entirely. This widget should be read-only for all internal users — showing pending visitors as an informational list only.
+- Remove `handleApprove` and `handleReject` functions.
+- Remove `SwipeableCard` usage; render plain cards instead.
+- Keep the widget visible for admins/managers so they can see pending visitors, but with no action buttons — just an "Awaiting Host Approval" badge.
 
-### Logic
-```text
-isScheduledToday = visitor.scheduled_date is null OR visitor.scheduled_date === today's date (YYYY-MM-DD)
+### 3. `src/components/dashboard/RecentVisitors.tsx`
+- Remove any approve/reject swipe actions or dropdown items for `pending_approval` visitors (if present).
 
-Show "Check In & Print": canCheckInOut AND status === 'scheduled' AND isScheduledToday
-Show "Check In" dropdown: canCheckInOut AND (status === 'scheduled' || 'checked_out') AND isScheduledToday
-Show "Check Out" dropdown: canCheckInOut AND status === 'checked_in' (no date restriction — already checked in)
-```
-
-This ensures future-dated visitors are visible but not actionable until their visit date arrives.
+### What stays unchanged
+- `src/pages/ApproveVisitor.tsx` — the public host approval page continues to work as-is. Hosts approve/reject via the link sent to their WhatsApp/Email.
+- `supabase/functions/approve-visitor/index.ts` — the edge function remains, it's called by the host approval page.
 
