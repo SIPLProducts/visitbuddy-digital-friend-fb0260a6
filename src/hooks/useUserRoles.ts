@@ -30,6 +30,7 @@ export function useUserRoles() {
   const { user } = useAuth();
   const [userRoles, setUserRoles] = useState<UserLocationRole[]>([]);
   const [isHoAdmin, setIsHoAdmin] = useState(false);
+  const isLocationAdmin = userRoles.some(r => r.role === 'admin');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
