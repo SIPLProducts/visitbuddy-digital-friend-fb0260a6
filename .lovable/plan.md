@@ -1,29 +1,27 @@
 
 
-# Bulk-Create Auth Accounts for All Employees (Manager Role at HWMP)
+# Add "Users by Location" Sub-Tab in User Management
 
-## Summary
-Create auth accounts for all 38 employees who have email addresses, with password `123456` and the `manager` role at location HWMP.
+## What we're building
+A new tab in User Management that shows all users grouped by location, with expandable location cards displaying each user's name, role, and HO Admin status. This gives a quick location-wise view of who has access where.
 
-## Plan
+## Implementation
 
-### 1. Create edge function `bulk-create-employee-users`
-- Fetches all employees with emails from the database
-- For each employee:
-  - Creates an auth user via `supabase.auth.admin.createUser()` with password `123456` and `email_confirm: true`
-  - Creates a profile record with the employee's name
-  - Inserts a `user_location_roles` record with `role = 'manager'` and `location_id = '013e5f3f-0fee-45a8-a1a8-c625ef9e53bb'` (HWMP)
-- Skips employees whose email already exists as an auth user
-- Returns a JSON summary of created vs skipped accounts
+### File: `src/pages/UserManagement.tsx`
 
-### 2. Deploy and invoke the function once
-- Deploy the edge function
-- Call it to process all 38 employees
-- Verify the results
+1. Add a 4th tab called **"Users by Location"** (with MapPin icon) to the existing TabsList, placed after "Assign Users"
 
-### 3. No UI changes needed
-User Management already displays users from `user_location_roles`.
+2. The tab content will:
+   - Group `scopedUserRoles` by `location_id`
+   - Render one Card per location with the location name as the header and user count
+   - Inside each card, show a table with columns: User Name, Role (badge), HO Admin
+   - Include a search filter that works across all locations
+   - Show a summary count (e.g., "3 users at this location")
 
-## Files
-- `supabase/functions/bulk-create-employee-users/index.ts` (new)
+3. No new files or database changes needed — all data is already fetched in `fetchData()`
+
+## Technical details
+- Reuse existing `scopedUserRoles`, `locations`, `roleColors`, `roleLabels` data
+- Group by `location_id` using a reduce, then render each group as a Card with a Table inside
+- The search filter already exists (`searchQuery`) and will be reused
 
