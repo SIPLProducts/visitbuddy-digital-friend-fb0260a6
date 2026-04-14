@@ -41,6 +41,9 @@ import {
   Legend,
 } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { useHostEmployee } from '@/hooks/useHostEmployee';
 import { Location } from '@/types/database';
 import { format, subDays } from 'date-fns';
 import { DateRange } from 'react-day-picker';
