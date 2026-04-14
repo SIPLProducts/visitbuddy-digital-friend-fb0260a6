@@ -1,43 +1,57 @@
 
-## What I found
 
-- The test-email function is running, but the email provider is rejecting the request with a `403` sandbox restriction — this is why the UI shows a generic edge-function error.
-- The current function sends from `VisiGuard VMS <onboarding@resend.dev>`, which only allows test delivery to the owner address `bala@sharviinfotech.com` until a sending domain is verified.
-- The recipient in your screenshot is `chandra910091@gmail.com`, so that request is expected to fail right now.
-- `src/pages/Settings.tsx` only surfaces the generic `non-2xx` error, so the real reason is hidden.
-- The saved SMTP fields are not the current cause of failure: `supabase/functions/test-email/index.ts` now uses the email provider API, and only reads `email_config` for display text.
-- This project already has a custom domain available (`visiguard.sharvisoftwareservices.com`), but it is not yet configured as an email-sending domain.
+# Replace Resend with Nodemailer SMTP for Email Sending
+
+## Problem
+The current `test-email` edge function uses the Resend API, which has sandbox restrictions. The user has a working nodemailer-based implementation from another project that sends via the user's own SMTP config (e.g. Gmail with App Password).
 
 ## Plan
 
-### 1. Configure the sending domain
-- Set up the project’s existing custom domain for email sending.
-- After that, use a sender address on that verified domain instead of `onboarding@resend.dev`.
+### 1. Rename existing `email_config` table to `smtp_config` schema
+Create a migration to:
+- Add `is_active` and `plant` columns to the existing `email_config` table (to match the user's schema)
+- OR create a new `smtp_config` table and migrate data — but since `email_config` already has the same core fields, we'll **keep `email_config`** and just add `is_active BOOLEAN DEFAULT true` to avoid breaking existing code
 
-### 2. Fix the test-email function behavior
-- Update `supabase/functions/test-email/index.ts` to:
-  - use the verified sender address when available
-  - detect the sandbox restriction explicitly
-  - return a clear, user-friendly response for that case instead of a raw `500`
-  - optionally fall back to `bala@sharviinfotech.com` for temporary test delivery, matching the badge-email pattern
+Also create two new tables:
+- `email_templates` — stores reusable templates with `{{placeholder}}` support
+- `email_logs` — audit trail for all sent emails
 
-### 3. Improve the Settings UI
-- Update `src/pages/Settings.tsx` so the toast shows the real backend message instead of only “Edge Function returned a non-2xx status code”.
-- Add helper text in the email test dialog/card explaining:
-  - before domain verification, test emails only work to Bala’s address
-  - after domain setup, any recipient can be used
-- Clarify that delivery depends on the verified sender domain, not just the saved SMTP form fields.
+### 2. Rewrite `test-email` edge function → `test-smtp`
+Create `supabase/functions/test-smtp/index.ts` using `npm:nodemailer@6.9.10`:
+- Accepts `{ smtp_config_id, to_email }`
+- Fetches SMTP credentials from `email_config` table
+- Creates nodemailer transporter with `secure: port === 465`, `tls: { rejectUnauthorized: false }`
+- Sends test email and returns success/error as JSON (always HTTP 200 to avoid generic errors)
 
-### 4. Verify end to end
-- Test with `bala@sharviinfotech.com` to confirm the function succeeds immediately.
-- Test with another email before domain verification to confirm the app shows a clear explanation instead of the generic edge-function error.
-- Test again after domain setup to confirm real delivery to external recipients.
+### 3. Create `send-email` edge function
+Create `supabase/functions/send-email/index.ts`:
+- Accepts `{ template_key, variables }`
+- Fetches template from `email_templates`, replaces `{{placeholders}}`
+- Fetches active SMTP config, sends via nodemailer
+- Logs result to `email_logs`
+
+### 4. Update Settings UI (`src/pages/Settings.tsx`)
+- Change `handleTestEmail` to invoke `test-smtp` with `{ smtp_config_id: emailConfig.id, to_email: testEmail }`
+- Remove the Resend sandbox warning alert
+- Remove references to the old `test-email` function
+
+### 5. Delete old `test-email` edge function
+Remove `supabase/functions/test-email/index.ts` after the new function is deployed.
+
+### 6. Update other email-sending functions
+Update `send-email-badge`, `send-whatsapp-badge`, etc. to use the new `send-email` function or read from `email_config` with nodemailer instead of Resend, so all email sending goes through the user's configured SMTP.
 
 ## Technical details
 
-- Relevant files:
-  - `supabase/functions/test-email/index.ts`
-  - `src/pages/Settings.tsx`
-  - pattern reference: `supabase/functions/send-email-badge/index.ts`
-- I do not plan to switch back to direct Gmail SMTP sending in the edge function, because that was the earlier runtime compatibility issue.
-- The permanent fix is verified-domain sending plus better error handling, not another SMTP retry.
+- **Why nodemailer over denomailer**: `denomailer` uses `Deno.startTls` which is blocked in Supabase Edge Runtime. `npm:nodemailer@6.9.10` works via Deno's npm compatibility.
+- **Why `tls: { rejectUnauthorized: false }`**: Supports self-signed certs common in enterprise environments.
+- **Why HTTP 200 on errors**: Prevents the Supabase JS client from throwing generic "non-2xx" exceptions; the real error is in JSON body.
+- **Gmail setup**: Host `smtp.gmail.com`, port 587, username = full email, password = 16-char App Password.
+
+## Files affected
+- `supabase/functions/test-smtp/index.ts` (new)
+- `supabase/functions/send-email/index.ts` (new)
+- `supabase/functions/test-email/index.ts` (delete)
+- `src/pages/Settings.tsx` (update test email call)
+- Database migration: add `email_templates`, `email_logs` tables; add `is_active` to `email_config`
+
