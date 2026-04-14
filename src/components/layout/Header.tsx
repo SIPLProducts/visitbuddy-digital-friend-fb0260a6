@@ -84,7 +84,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const userInitials = user?.email?.substring(0, 2).toUpperCase() || 'AU';
   const currentLocation = locations.find(l => l.id === selectedLocationId);
-  const currentRole = userRoles.find(r => r.location_id === selectedLocationId)?.role;
+  const currentRole = userRoles.find(r => r.location_id === selectedLocationId)?.role || userRoles[0]?.role;
 
   const roleLabels: Record<string, string> = {
     admin: 'Admin',
