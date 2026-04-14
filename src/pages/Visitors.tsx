@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,12 +44,18 @@ import { VisitorActions } from '@/components/visitors/VisitorActions';
 import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInDialog } from '@/components/visitors/CheckInDialog';
 import { logAudit } from '@/lib/auditLog';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { useTranslation } from 'react-i18next';
 import NewVisitor from './NewVisitor';
 
 export default function Visitors() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { userRoles, isHoAdmin } = useUserRoles();
+  const isGateSecurityOnly = useMemo(() => {
+    if (isHoAdmin) return false;
+    return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
+  }, [userRoles, isHoAdmin]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -668,24 +674,28 @@ export default function Visitors() {
                     </TableCell>
                     <TableCell>
                       {visitor.status === 'pending_approval' ? (
-                        <div className="flex items-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
-                            onClick={() => handleApprove(visitor)}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-7 text-xs border-red-300 text-red-700 hover:bg-red-50"
-                            onClick={() => handleReject(visitor)}
-                          >
-                            Reject
-                          </Button>
-                        </div>
+                        isGateSecurityOnly ? (
+                          <Badge variant="secondary" className="text-xs">Awaiting Approval</Badge>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+                              onClick={() => handleApprove(visitor)}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-7 text-xs border-red-300 text-red-700 hover:bg-red-50"
+                              onClick={() => handleReject(visitor)}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        )
                       ) : (
                         <VisitorActions
                           visitor={visitor}
