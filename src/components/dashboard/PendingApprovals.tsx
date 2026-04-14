@@ -63,10 +63,19 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
   const handleApprove = async (visitor: Visitor) => {
     setLoadingAction(visitor.id + '_approve');
     try {
-      const { error } = await supabase.functions.invoke('approve-visitor', {
+      const { data, error } = await supabase.functions.invoke('approve-visitor', {
         body: { visitorId: visitor.id, action: 'approve' },
       });
       if (error) throw error;
+      if (data?.error) {
+        if (data.currentStatus === 'scheduled') {
+          toast.info(`${visitor.name} is already approved`);
+        } else {
+          toast.error(data.error);
+        }
+        onRefresh();
+        return;
+      }
       toast.success(`${visitor.name} approved`);
       onRefresh();
     } catch (err: any) {
@@ -79,10 +88,15 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
   const handleReject = async (visitor: Visitor) => {
     setLoadingAction(visitor.id + '_reject');
     try {
-      const { error } = await supabase.functions.invoke('approve-visitor', {
+      const { data, error } = await supabase.functions.invoke('approve-visitor', {
         body: { visitorId: visitor.id, action: 'reject' },
       });
       if (error) throw error;
+      if (data?.error) {
+        toast.info(`${visitor.name} is no longer pending approval`);
+        onRefresh();
+        return;
+      }
       toast.success(`${visitor.name} rejected`);
       onRefresh();
     } catch (err: any) {
