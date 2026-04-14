@@ -9,7 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock, Globe } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock, Globe, Mail, Trash2, Send, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { logAudit } from '@/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +38,27 @@ interface TenantSettings {
   security_contact_number: string | null;
 }
 
+interface EmailConfig {
+  id?: string;
+  smtp_host: string;
+  smtp_port: number;
+  smtp_username: string;
+  smtp_password: string;
+  sender_name: string;
+  sender_email: string;
+  use_tls: boolean;
+}
+
+const defaultEmailConfig: EmailConfig = {
+  smtp_host: '',
+  smtp_port: 587,
+  smtp_username: '',
+  smtp_password: '',
+  sender_name: '',
+  sender_email: '',
+  use_tls: true,
+};
+
 export default function Settings() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -44,11 +66,32 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // Email config state
+  const [emailConfig, setEmailConfig] = useState<EmailConfig>(defaultEmailConfig);
+  const [emailConfigLoading, setEmailConfigLoading] = useState(true);
+  const [emailConfigExists, setEmailConfigExists] = useState(false);
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [testDialogOpen, setTestDialogOpen] = useState(false);
+  const [testEmail, setTestEmail] = useState('');
+  const [sendingTest, setSendingTest] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   useEffect(() => {
     supabase.from('tenant_settings').select('*').limit(1).single()
       .then(({ data }) => {
         if (data) setSettings({ ...data, checkout_warning_hour: (data as any).checkout_warning_hour ?? 18, security_contact_number: (data as any).security_contact_number ?? null } as any);
         setLoading(false);
+      });
+
+    // Load email config
+    supabase.from('email_config' as any).select('*').limit(1).single()
+      .then(({ data, error }: any) => {
+        if (data && !error) {
+          setEmailConfig(data);
+          setEmailConfigExists(true);
+        }
+        setEmailConfigLoading(false);
       });
   }, []);
 
@@ -66,8 +109,74 @@ export default function Settings() {
     }
   };
 
+  const handleSaveEmailConfig = async () => {
+    if (!emailConfig.smtp_host || !emailConfig.smtp_username || !emailConfig.sender_email) {
+      toast.error('Please fill in SMTP Host, Username, and Sender Email');
+      return;
+    }
+    setSavingEmail(true);
+    try {
+      if (emailConfigExists && emailConfig.id) {
+        const { id, ...updates } = emailConfig;
+        const { error } = await (supabase.from('email_config' as any) as any).update(updates).eq('id', id);
+        if (error) throw error;
+      } else {
+        const { id, ...insertData } = emailConfig;
+        const { data, error } = await (supabase.from('email_config' as any) as any).insert(insertData).select().single();
+        if (error) throw error;
+        setEmailConfig(data);
+        setEmailConfigExists(true);
+      }
+      toast.success('Email configuration saved successfully');
+      await logAudit({ action: 'email_config_saved', entityType: 'settings', entityName: 'Email Configuration' });
+    } catch (error: any) {
+      toast.error(`Failed to save: ${error.message}`);
+    }
+    setSavingEmail(false);
+  };
+
+  const handleTestEmail = async () => {
+    if (!testEmail || !testEmail.includes('@')) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    setSendingTest(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('test-email', {
+        body: { receiver_email: testEmail },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(data?.message || 'Test email sent successfully!');
+      setTestDialogOpen(false);
+      setTestEmail('');
+    } catch (error: any) {
+      toast.error(`Test failed: ${error.message}`);
+    }
+    setSendingTest(false);
+  };
+
+  const handleDeleteEmailConfig = async () => {
+    if (!emailConfig.id) return;
+    try {
+      const { error } = await (supabase.from('email_config' as any) as any).delete().eq('id', emailConfig.id);
+      if (error) throw error;
+      setEmailConfig(defaultEmailConfig);
+      setEmailConfigExists(false);
+      setDeleteDialogOpen(false);
+      toast.success('Email configuration deleted');
+      await logAudit({ action: 'email_config_deleted', entityType: 'settings', entityName: 'Email Configuration' });
+    } catch (error: any) {
+      toast.error(`Failed to delete: ${error.message}`);
+    }
+  };
+
   const update = (key: keyof TenantSettings, value: any) => {
     setSettings(prev => prev ? { ...prev, [key]: value } : null);
+  };
+
+  const updateEmail = (key: keyof EmailConfig, value: any) => {
+    setEmailConfig(prev => ({ ...prev, [key]: value }));
   };
 
   if (loading || !settings) {
@@ -93,6 +202,7 @@ export default function Settings() {
             <TabsTrigger value="branding" className="gap-1.5"><Palette className="h-4 w-4" /> {t('settings.branding')}</TabsTrigger>
             <TabsTrigger value="policies" className="gap-1.5"><FileText className="h-4 w-4" /> {t('settings.policies')}</TabsTrigger>
             <TabsTrigger value="security" className="gap-1.5"><Shield className="h-4 w-4" /> {t('settings.security')}</TabsTrigger>
+            <TabsTrigger value="email" className="gap-1.5"><Mail className="h-4 w-4" /> Email</TabsTrigger>
             <TabsTrigger value="data" className="gap-1.5"><Database className="h-4 w-4" /> {t('settings.data')}</TabsTrigger>
             <TabsTrigger value="notifications" className="gap-1.5"><Bell className="h-4 w-4" /> {t('settings.notifications')}</TabsTrigger>
             <TabsTrigger value="help" className="gap-1.5"><HelpCircle className="h-4 w-4" /> {t('settings.help')}</TabsTrigger>
@@ -141,20 +251,12 @@ export default function Settings() {
                   </div>
                 </div>
                 <Separator />
-                {/* Language Selector */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium flex items-center gap-2"><Globe className="h-4 w-4 text-primary" /> {t('settings.language')}</p>
-                    <p className="text-sm text-muted-foreground">{t('settings.languageDescription')}</p>
-                  </div>
-                  <Select value={i18n.language} onValueChange={(val) => i18n.changeLanguage(val)}>
-                    <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover max-h-80">
-                      {languages.map((lang) => (
-                        <SelectItem key={lang.code} value={lang.code}>
-                          {lang.nativeName} ({lang.name})
-                        </SelectItem>
-                      ))}
+                <div className="space-y-2">
+                  <Label>{t('settings.language')}</Label>
+                  <Select value={i18n.language} onValueChange={lng => i18n.changeLanguage(lng)}>
+                    <SelectTrigger className="w-full md:w-64"><SelectValue /></SelectTrigger>
+                    <SelectContent className="bg-popover">
+                      {languages.map(l => <SelectItem key={l.code} value={l.code}>{l.flag} {l.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -166,37 +268,46 @@ export default function Settings() {
           <TabsContent value="branding">
             <Card>
               <CardHeader>
-                <CardTitle>White-Label Branding</CardTitle>
-                <CardDescription>Customize how VisiGuard appears for your organization</CardDescription>
+                <CardTitle>{t('settings.branding')}</CardTitle>
+                <CardDescription>Customize the look and feel of the application</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Primary Color</Label>
+                    <Label>{t('settings.primaryColor')}</Label>
                     <div className="flex gap-2">
-                      <input type="color" value={settings.primary_color} onChange={e => update('primary_color', e.target.value)} className="h-10 w-12 rounded border cursor-pointer" />
+                      <Input type="color" value={settings.primary_color} onChange={e => update('primary_color', e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
                       <Input value={settings.primary_color} onChange={e => update('primary_color', e.target.value)} className="flex-1" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Secondary Color</Label>
+                    <Label>{t('settings.secondaryColor')}</Label>
                     <div className="flex gap-2">
-                      <input type="color" value={settings.secondary_color} onChange={e => update('secondary_color', e.target.value)} className="h-10 w-12 rounded border cursor-pointer" />
+                      <Input type="color" value={settings.secondary_color} onChange={e => update('secondary_color', e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
                       <Input value={settings.secondary_color} onChange={e => update('secondary_color', e.target.value)} className="flex-1" />
                     </div>
                   </div>
                 </div>
                 <Separator />
-                <h3 className="text-sm font-semibold">Badge Customization</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Badge Logo URL</Label><Input value={settings.badge_logo_url || ''} onChange={e => update('badge_logo_url', e.target.value)} placeholder="https://..." /></div>
-                  <div className="space-y-2"><Label>Badge Footer Text</Label><Input value={settings.badge_footer_text} onChange={e => update('badge_footer_text', e.target.value)} /></div>
+                  <div className="space-y-2">
+                    <Label>{t('settings.badgeLogo')}</Label>
+                    <Input value={settings.badge_logo_url || ''} onChange={e => update('badge_logo_url', e.target.value)} placeholder="https://..." />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('settings.badgeFooter')}</Label>
+                    <Input value={settings.badge_footer_text} onChange={e => update('badge_footer_text', e.target.value)} />
+                  </div>
                 </div>
-                <Separator />
-                <h3 className="text-sm font-semibold">Email Customization</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Email Header Text</Label><Input value={settings.email_header_text} onChange={e => update('email_header_text', e.target.value)} /></div>
-                  <div className="space-y-2"><Label>Email Footer Text</Label><Input value={settings.email_footer_text} onChange={e => update('email_footer_text', e.target.value)} /></div>
+                  <div className="space-y-2">
+                    <Label>{t('settings.emailHeader')}</Label>
+                    <Input value={settings.email_header_text} onChange={e => update('email_header_text', e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('settings.emailFooter')}</Label>
+                    <Input value={settings.email_footer_text} onChange={e => update('email_footer_text', e.target.value)} />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -206,26 +317,27 @@ export default function Settings() {
           <TabsContent value="policies">
             <Card>
               <CardHeader>
-                <CardTitle>Visitor Policies & NDA</CardTitle>
-                <CardDescription>Configure agreements visitors must accept during check-in</CardDescription>
+                <CardTitle>{t('settings.ndaSettings')}</CardTitle>
+                <CardDescription>Configure visitor agreements and policies</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Enable NDA / Policy Agreement</p><p className="text-sm text-muted-foreground">Require visitors to sign a policy agreement during check-in</p></div>
+                <div className="flex items-center justify-between p-4 rounded-lg border">
+                  <div><p className="font-medium">{t('settings.enableNda')}</p><p className="text-sm text-muted-foreground">Require visitors to sign NDA</p></div>
                   <Switch checked={settings.enable_nda} onCheckedChange={v => update('enable_nda', v)} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Agreement Text</Label>
-                  <Textarea value={settings.nda_text} onChange={e => update('nda_text', e.target.value)} rows={6} />
-                  <p className="text-xs text-muted-foreground">This text will be shown to visitors during check-in</p>
-                </div>
+                {settings.enable_nda && (
+                  <div className="space-y-2">
+                    <Label>{t('settings.ndaText')}</Label>
+                    <Textarea rows={6} value={settings.nda_text} onChange={e => update('nda_text', e.target.value)} />
+                  </div>
+                )}
                 <Separator />
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Enable Photo Capture</p><p className="text-sm text-muted-foreground">Require visitor photo during check-in</p></div>
+                <div className="flex items-center justify-between p-4 rounded-lg border">
+                  <div><p className="font-medium">{t('settings.photoCapture')}</p><p className="text-sm text-muted-foreground">Capture visitor photos during check-in</p></div>
                   <Switch checked={settings.enable_photo_capture} onCheckedChange={v => update('enable_photo_capture', v)} />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Enable Watchlist Check</p><p className="text-sm text-muted-foreground">Automatically check visitors against the security watchlist</p></div>
+                <div className="flex items-center justify-between p-4 rounded-lg border">
+                  <div><p className="font-medium">{t('settings.watchlistCheck')}</p><p className="text-sm text-muted-foreground">Check visitors against watchlist</p></div>
                   <Switch checked={settings.enable_watchlist_check} onCheckedChange={v => update('enable_watchlist_check', v)} />
                 </div>
               </CardContent>
@@ -236,60 +348,174 @@ export default function Settings() {
           <TabsContent value="security">
             <Card>
               <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>Session management, auto-checkout, and warning thresholds</CardDescription>
+                <CardTitle>{t('settings.sessionSettings')}</CardTitle>
+                <CardDescription>Configure security and session parameters</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Session Timeout</p><p className="text-sm text-muted-foreground">Auto-logout after inactivity</p></div>
-                  <Select value={String(settings.session_timeout_minutes)} onValueChange={v => update('session_timeout_minutes', parseInt(v))}>
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover">
-                      <SelectItem value="15">15 minutes</SelectItem>
-                      <SelectItem value="30">30 minutes</SelectItem>
-                      <SelectItem value="60">1 hour</SelectItem>
-                      <SelectItem value="120">2 hours</SelectItem>
-                      <SelectItem value="0">Never</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>{t('settings.sessionTimeout')}</Label>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <Input type="number" value={settings.session_timeout_minutes} onChange={e => update('session_timeout_minutes', parseInt(e.target.value) || 30)} min={5} max={480} />
+                      <span className="text-sm text-muted-foreground">min</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('settings.autoCheckout')}</Label>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <Input type="number" value={settings.auto_checkout_hours} onChange={e => update('auto_checkout_hours', parseInt(e.target.value) || 12)} min={1} max={72} />
+                      <span className="text-sm text-muted-foreground">hrs</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Auto Check-Out</p><p className="text-sm text-muted-foreground">Automatically check out visitors after specified hours</p></div>
-                  <Select value={String(settings.auto_checkout_hours)} onValueChange={v => update('auto_checkout_hours', parseInt(v))}>
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover">
-                      <SelectItem value="8">8 hours</SelectItem>
-                      <SelectItem value="10">10 hours</SelectItem>
-                      <SelectItem value="12">12 hours</SelectItem>
-                      <SelectItem value="24">24 hours</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Checkout Warning Hour (24h)</Label>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <Input type="number" value={settings.checkout_warning_hour} onChange={e => update('checkout_warning_hour', parseInt(e.target.value) || 18)} min={0} max={23} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Security Contact Number</Label>
+                    <Input value={settings.security_contact_number || ''} onChange={e => update('security_contact_number', e.target.value)} placeholder="+91 XXXXX XXXXX" />
+                  </div>
                 </div>
-                <Separator />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Email Configuration Tab */}
+          <TabsContent value="email">
+            <Card>
+              <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium flex items-center gap-2"><Clock className="h-4 w-4 text-amber-400" /> Checkout Warning Time</p>
-                    <p className="text-sm text-muted-foreground">Show dashboard warning & send notifications for visitors still checked in after this time</p>
+                    <CardTitle className="flex items-center gap-2"><Mail className="h-5 w-5" /> Email Configuration</CardTitle>
+                    <CardDescription>Configure SMTP settings for sending emails from the application</CardDescription>
                   </div>
-                  <Select value={String(settings.checkout_warning_hour)} onValueChange={v => update('checkout_warning_hour', parseInt(v))}>
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover">
-                      <SelectItem value="16">4:00 PM</SelectItem>
-                      <SelectItem value="17">5:00 PM</SelectItem>
-                      <SelectItem value="18">6:00 PM</SelectItem>
-                      <SelectItem value="19">7:00 PM</SelectItem>
-                      <SelectItem value="20">8:00 PM</SelectItem>
-                      <SelectItem value="21">9:00 PM</SelectItem>
-                      <SelectItem value="22">10:00 PM</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {emailConfigExists && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-600 font-medium">Configured</span>
+                    </div>
+                  )}
                 </div>
-                <Separator />
-                <div className="space-y-2">
-                  <Label>Security Contact Number</Label>
-                  <Input value={settings.security_contact_number || ''} onChange={e => update('security_contact_number', e.target.value)} placeholder="+91 98765 43210" />
-                  <p className="text-xs text-muted-foreground">This number is shared with visitors in auto-checkout notifications so they can contact security if still on premises</p>
-                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {emailConfigLoading ? (
+                  <p className="text-muted-foreground">Loading email configuration...</p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>SMTP Host <span className="text-destructive">*</span></Label>
+                        <Input
+                          value={emailConfig.smtp_host}
+                          onChange={e => updateEmail('smtp_host', e.target.value)}
+                          placeholder="smtp.gmail.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>SMTP Port <span className="text-destructive">*</span></Label>
+                        <Input
+                          type="number"
+                          value={emailConfig.smtp_port}
+                          onChange={e => updateEmail('smtp_port', parseInt(e.target.value) || 587)}
+                          placeholder="587"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>SMTP Username <span className="text-destructive">*</span></Label>
+                        <Input
+                          value={emailConfig.smtp_username}
+                          onChange={e => updateEmail('smtp_username', e.target.value)}
+                          placeholder="your-email@gmail.com"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>SMTP Password <span className="text-destructive">*</span></Label>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            value={emailConfig.smtp_password}
+                            onChange={e => updateEmail('smtp_password', e.target.value)}
+                            placeholder="••••••••"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Sender Name</Label>
+                        <Input
+                          value={emailConfig.sender_name}
+                          onChange={e => updateEmail('sender_name', e.target.value)}
+                          placeholder="VisiGuard VMS"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Sender Email <span className="text-destructive">*</span></Label>
+                        <Input
+                          type="email"
+                          value={emailConfig.sender_email}
+                          onChange={e => updateEmail('sender_email', e.target.value)}
+                          placeholder="noreply@yourcompany.com"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 rounded-lg border">
+                      <div>
+                        <p className="font-medium">Use TLS</p>
+                        <p className="text-sm text-muted-foreground">Enable TLS encryption for SMTP connection</p>
+                      </div>
+                      <Switch checked={emailConfig.use_tls} onCheckedChange={v => updateEmail('use_tls', v)} />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex flex-wrap gap-3">
+                      <Button onClick={handleSaveEmailConfig} disabled={savingEmail} className="gap-1.5">
+                        {savingEmail ? <Check className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        {savingEmail ? 'Saving...' : emailConfigExists ? 'Update Configuration' : 'Save Configuration'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setTestDialogOpen(true)}
+                        disabled={!emailConfigExists}
+                        className="gap-1.5"
+                      >
+                        <Send className="h-4 w-4" /> Send Test Email
+                      </Button>
+                      {emailConfigExists && (
+                        <Button
+                          variant="destructive"
+                          onClick={() => setDeleteDialogOpen(true)}
+                          className="gap-1.5"
+                        >
+                          <Trash2 className="h-4 w-4" /> Delete Configuration
+                        </Button>
+                      )}
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -298,32 +524,17 @@ export default function Settings() {
           <TabsContent value="data">
             <Card>
               <CardHeader>
-                <CardTitle>Data Retention & Compliance</CardTitle>
-                <CardDescription>Configure data lifecycle and privacy settings</CardDescription>
+                <CardTitle>{t('settings.dataRetention')}</CardTitle>
+                <CardDescription>Manage data lifecycle and retention policies</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Data Retention Period</p><p className="text-sm text-muted-foreground">Automatically archive visitor records after this period</p></div>
-                  <Select value={String(settings.data_retention_days)} onValueChange={v => update('data_retention_days', parseInt(v))}>
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                    <SelectContent className="bg-popover">
-                      <SelectItem value="30">30 days</SelectItem>
-                      <SelectItem value="60">60 days</SelectItem>
-                      <SelectItem value="90">90 days</SelectItem>
-                      <SelectItem value="180">180 days</SelectItem>
-                      <SelectItem value="365">1 year</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Separator />
-                <div className="p-4 rounded-lg border bg-muted/30">
-                  <h4 className="font-medium text-sm">GDPR & Privacy Compliance</h4>
-                  <ul className="text-xs text-muted-foreground mt-2 space-y-1">
-                    <li>• Visitor data is automatically archived after the retention period</li>
-                    <li>• NDA signatures are stored securely and linked to visitor records</li>
-                    <li>• Audit trail maintains full compliance history</li>
-                    <li>• Data export available via Visitor Report for subject access requests</li>
-                  </ul>
+                <div className="space-y-2">
+                  <Label>{t('settings.retentionPeriod')}</Label>
+                  <div className="flex items-center gap-2">
+                    <Input type="number" value={settings.data_retention_days} onChange={e => update('data_retention_days', parseInt(e.target.value) || 90)} min={30} max={365} />
+                    <span className="text-sm text-muted-foreground">days</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Visitor records older than this will be auto-purged</p>
                 </div>
               </CardContent>
             </Card>
@@ -334,19 +545,11 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>Configure how you receive notifications</CardDescription>
+                <CardDescription>Choose how you'd like to be notified</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <div><p className="font-medium">New Visitor Check-ins</p><p className="text-sm text-muted-foreground">Get notified when a new visitor checks in</p></div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Appointment Reminders</p><p className="text-sm text-muted-foreground">Receive reminders for upcoming appointments</p></div>
-                  <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div><p className="font-medium">Overstay Alerts</p><p className="text-sm text-muted-foreground">Get notified when visitors exceed expected duration</p></div>
+                  <div><p className="font-medium">Push Notifications</p><p className="text-sm text-muted-foreground">Receive browser push notifications</p></div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between">
@@ -387,6 +590,51 @@ export default function Settings() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Test Email Dialog */}
+        <Dialog open={testDialogOpen} onOpenChange={setTestDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2"><Send className="h-5 w-5" /> Send Test Email</DialogTitle>
+              <DialogDescription>Enter the recipient email address to send a test email and verify your SMTP configuration.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Receiver Email</Label>
+                <Input
+                  type="email"
+                  value={testEmail}
+                  onChange={e => setTestEmail(e.target.value)}
+                  placeholder="test@example.com"
+                  onKeyDown={e => e.key === 'Enter' && handleTestEmail()}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setTestDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleTestEmail} disabled={sendingTest} className="gap-1.5">
+                {sendingTest ? <Check className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {sendingTest ? 'Sending...' : 'Send Test'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-destructive"><Trash2 className="h-5 w-5" /> Delete Email Configuration</DialogTitle>
+              <DialogDescription>Are you sure you want to delete the email configuration? This will disable all email sending functionality in the application.</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+              <Button variant="destructive" onClick={handleDeleteEmailConfig} className="gap-1.5">
+                <Trash2 className="h-4 w-4" /> Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
   );
 }
