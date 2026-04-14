@@ -1,30 +1,54 @@
 
 
-# Restrict Check-In/Check-Out to Gate Security Role Only
+# Auto-Capture Photo During Check-In and Print Badge
 
 ## Summary
-Only users with the `gate_security` role should see and use Check-In / Check-Out actions. All other roles (admin, manager, operator) will no longer see these options.
+When gate security checks in a visitor, the system will automatically open the camera to capture the visitor's photo, save it, then print the badge — all in one seamless flow.
+
+## Current Flow
+1. Gate security clicks "Check In" or "Check In & Print"
+2. Confirmation dialog opens → confirm → visitor is checked in
+3. If "Check In & Print", badge opens in new tab
+
+## New Flow
+1. Gate security clicks "Check In & Print" (or "Check In")
+2. **Camera dialog opens automatically** with live camera feed
+3. Security captures the visitor's photo
+4. Photo is uploaded to the `visitor-photos` storage bucket
+5. Visitor record is updated with `photo_url`, status set to `checked_in`, and `check_in_time`
+6. Badge automatically opens in a new tab for printing
+7. Toast confirmation shown
 
 ## Changes
 
 ### 1. `src/pages/Visitors.tsx`
-- Add an `isGateSecurity` flag (true if user has `gate_security` role OR is HO admin)
-- Pass this flag to `VisitorActions` as a new prop `canCheckInOut`
-- Only call check-in/check-out handlers when the user has gate security role
+- Modify `handleCheckIn` and `handleCheckInAndPrint` to open a new **photo capture dialog** instead of the simple CheckInDialog
+- Add state for photo capture dialog (`showPhotoCaptureDialog`)
+- After photo is captured:
+  - Upload photo blob to `visitor-photos` bucket with path `{visitor_id}/checkin.jpg`
+  - Get the public URL
+  - Update visitor record: `status = 'checked_in'`, `check_in_time`, `photo_url`
+  - Auto-open print badge page
+- Keep watchlist check before allowing photo capture
 
-### 2. `src/components/visitors/VisitorActions.tsx`
-- Add optional `canCheckInOut` prop (defaults to `true` for backward compat)
-- Hide "Check In & Print" button, "Check In", and "Check Out" dropdown items when `canCheckInOut` is `false`
+### 2. Create `src/components/visitors/CheckInCaptureDialog.tsx`
+- New dialog component that combines:
+  - Watchlist check (from existing CheckInDialog logic)
+  - If watchlist is clear (or warning-only), show the `CameraCapture` component automatically
+  - After photo capture, show a brief preview with "Confirm Check-In" button
+  - On confirm: upload photo → update visitor → open badge → close dialog
+- Uses existing `CameraCapture` component for camera/upload functionality
+- Shows loading state during upload and check-in
 
-### 3. `src/components/dashboard/RecentVisitors.tsx`
-- Import `useUserRoles` hook
-- Add `isGateSecurity` check
-- Hide check-in/check-out swipe actions and dropdown menu items for non-gate-security users
-- Keep "View Details" and "Print Badge" visible for all roles
+### 3. `src/components/visitors/CheckInDialog.tsx`
+- No changes needed — kept for backward compatibility with other pages (CheckInOut, etc.)
 
-### 4. `src/pages/Vehicles.tsx` (vehicle check-in/out)
-- Same pattern: import `useUserRoles`, add gate security check
-- Hide vehicle check-in/check-out dropdown items for non-gate-security roles
+### 4. `src/components/dashboard/RecentVisitors.tsx`
+- Update the check-in handler to also use the photo capture flow (same pattern as Visitors.tsx)
 
-Note: HO Admin will retain access to all actions as an override.
+## Technical Notes
+- Reuses existing `CameraCapture` component (camera + upload tabs)
+- Uses existing `visitor-photos` storage bucket (already public)
+- Photo URL stored in visitor's `photo_url` field
+- Badge print page already reads `photo_url`, so captured photo will appear on the badge automatically
 
