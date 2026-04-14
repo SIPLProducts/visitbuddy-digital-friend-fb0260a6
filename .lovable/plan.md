@@ -1,24 +1,54 @@
 
 
-# Fix "No Role" Display in Header
+# Auto-Select Location for Single-Location Users
 
 ## Problem
-The header shows "No Role" because:
-1. When `selectedLocationId` is `"all"` (HO admin), no role matches — but this is already handled by the `isHoAdmin` check, so it's fine for HO admins.
-2. For **regular users**, there's a race condition: `selectedLocationId` starts as `''`, and the location default is set only after locations load. During this time, `currentRole` is `undefined`, showing "No Role". Even after loading, if `selectedLocationId` doesn't match any role's `location_id` (e.g. saved location in localStorage was changed), it stays "No Role".
+Currently, the header fetches **all** locations from the database regardless of the user's role assignments. Users with only one assigned location still see the full location dropdown and must select manually.
 
 ## Fix — `src/components/layout/Header.tsx`
 
-**Line 87**: Change `currentRole` logic to be more resilient:
-- If `selectedLocationId` matches a role, use that role.
-- Otherwise, fall back to the **first role** the user has (since they always have at least one role if they can log in).
+### 1. Filter locations by user's assigned locations
+For non-HO-Admin users, instead of fetching all locations, filter to only show locations the user has roles for:
 
 ```tsx
-const currentRole = userRoles.find(r => r.location_id === selectedLocationId)?.role 
-  || userRoles[0]?.role;
+const fetchLocations = async () => {
+  try {
+    if (isHoAdmin) {
+      // HO Admin sees all locations
+      const { data } = await supabase.from('locations').select('id, name, city').order('name');
+      setLocations(data || []);
+    } else {
+      // Regular users only see their assigned locations
+      const assignedLocationIds = userRoles.map(r => r.location_id);
+      if (assignedLocationIds.length === 0) return;
+      const { data } = await supabase
+        .from('locations')
+        .select('id, name, city')
+        .in('id', assignedLocationIds)
+        .order('name');
+      setLocations(data || []);
+    }
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+  }
+};
 ```
 
-This way, even during the initial load or if "all" is somehow selected for a non-HO user, the header shows their actual role instead of "No Role".
+### 2. Auto-select and hide dropdown for single-location users
+- If the user has exactly **one** location, auto-set it and skip the dropdown selector entirely (just show the location name as static text).
+- If 2+ locations, show the dropdown as usual.
 
-Also update **line 193** to show the user's actual name from their profile instead of generic "User" text — but that's a separate concern. The core fix is the role fallback.
+```tsx
+{locations.length === 1 ? (
+  <div className="flex items-center gap-2 text-sm">
+    <Building2 className="h-4 w-4 text-muted-foreground" />
+    <span className="font-medium">{locations[0].name}</span>
+  </div>
+) : (
+  <Select ...>...</Select>
+)}
+```
+
+### Files Changed
+- `src/components/layout/Header.tsx`
 
