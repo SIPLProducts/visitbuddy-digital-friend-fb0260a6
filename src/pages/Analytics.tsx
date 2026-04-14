@@ -123,6 +123,7 @@ export default function Analytics() {
       .select(`
         id,
         created_at,
+        host_id,
         gate:gates(location_id)
       `);
 
@@ -135,7 +136,12 @@ export default function Analytics() {
       visitorsQuery = visitorsQuery.lte('created_at', endOfDay.toISOString());
     }
 
-    const { data: visitorsData } = await visitorsQuery;
+    let { data: visitorsData } = await visitorsQuery;
+
+    // Host-based filtering for Manager/Operator roles
+    if (isRestrictedRole && hostEmployeeId && visitorsData) {
+      visitorsData = visitorsData.filter((v: any) => v.host_id === hostEmployeeId);
+    }
 
     // Fetch vehicles grouped by location with date filter
     let vehiclesQuery = supabase
