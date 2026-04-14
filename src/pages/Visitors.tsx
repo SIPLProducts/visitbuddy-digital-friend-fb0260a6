@@ -197,43 +197,6 @@ export default function Visitors() {
     }
   };
 
-  const handleApprove = async (visitor: Visitor) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('approve-visitor', {
-        body: { visitorId: visitor.id, action: 'approve' }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast.success(`${visitor.name} approved! Badge sent via WhatsApp & SMS.`);
-        fetchVisitors();
-      } else {
-        throw new Error(data.error || 'Failed to approve');
-      }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to approve visitor');
-    }
-  };
-
-  const handleReject = async (visitor: Visitor) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('approve-visitor', {
-        body: { visitorId: visitor.id, action: 'reject' }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast.success(`${visitor.name} rejected.`);
-        fetchVisitors();
-      } else {
-        throw new Error(data.error || 'Failed to reject');
-      }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to reject visitor');
-    }
-  };
 
   const formatTime = (dateString: string | null) => {
     if (!dateString) return '—';
@@ -312,19 +275,6 @@ export default function Visitors() {
     fetchVisitors();
   };
 
-  const handleBulkApprove = async () => {
-    const pending = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'pending_approval');
-    if (pending.length === 0) { toast.error('No pending visitors selected'); return; }
-    setBulkLoading(true);
-    for (const v of pending) {
-      await supabase.functions.invoke('approve-visitor', { body: { visitorId: v.id, action: 'approve' } });
-    }
-    setBulkLoading(false);
-    await logAudit({ action: 'bulk_approval', entityType: 'visitor', entityName: `${pending.length} visitors`, details: { count: pending.length } });
-    toast.success(`${pending.length} visitors approved`);
-    setSelectedIds(new Set());
-    fetchVisitors();
-  };
 
   const handleBulkPrint = () => {
     const ids = Array.from(selectedIds);
@@ -357,7 +307,7 @@ export default function Visitors() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-popover">
                   <DropdownMenuItem onClick={handleBulkCheckout} className="gap-2"><LogOut className="h-4 w-4" /> Check Out Selected</DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleBulkApprove} className="gap-2"><CheckSquare className="h-4 w-4" /> Approve Selected</DropdownMenuItem>
+                  
                   <DropdownMenuItem onClick={handleBulkPrint} className="gap-2"><Printer className="h-4 w-4" /> Print Badges</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -646,28 +596,9 @@ export default function Visitors() {
                     </TableCell>
                     <TableCell>
                       {visitor.status === 'pending_approval' ? (
-                        isGateSecurityOnly ? (
-                          <Badge variant="secondary" className="text-xs">Awaiting Approval</Badge>
-                        ) : (
-                          <div className="flex items-center gap-1">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50"
-                              onClick={() => handleApprove(visitor)}
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 text-xs border-red-300 text-red-700 hover:bg-red-50"
-                              onClick={() => handleReject(visitor)}
-                            >
-                              Reject
-                            </Button>
-                          </div>
-                        )
+                        <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
+                          Awaiting Host Approval
+                        </Badge>
                       ) : (
                         <VisitorActions
                           visitor={visitor}
