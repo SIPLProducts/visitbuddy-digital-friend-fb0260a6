@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +45,7 @@ import { PullToRefresh } from '@/components/shared/PullToRefresh';
 import { CheckInDialog } from '@/components/visitors/CheckInDialog';
 import { logAudit } from '@/lib/auditLog';
 import { useTranslation } from 'react-i18next';
+import NewVisitor from './NewVisitor';
 
 export default function Visitors() {
   const navigate = useNavigate();
@@ -72,6 +73,7 @@ export default function Visitors() {
   const [checkInVisitor, setCheckInVisitor] = useState<Visitor | null>(null);
   const [checkInLoading, setCheckInLoading] = useState(false);
   const [checkInAndPrint, setCheckInAndPrint] = useState(false);
+  const [showNewVisitorForm, setShowNewVisitorForm] = useState(false);
 
   useEffect(() => {
     fetchVisitors();
@@ -382,14 +384,25 @@ export default function Visitors() {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Link to="/visitors/new">
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                {t('visitors.newVisitor')}
-              </Button>
-            </Link>
+            <Button className="gap-2" onClick={() => setShowNewVisitorForm(true)}>
+              <Plus className="h-4 w-4" />
+              {t('visitors.newVisitor')}
+            </Button>
           </div>
         </div>
+
+        {/* Inline New Visitor Form */}
+        {showNewVisitorForm && (
+          <div className="border border-border rounded-xl bg-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Pre-Register Visitor</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowNewVisitorForm(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <NewVisitor inline onClose={() => { setShowNewVisitorForm(false); fetchVisitors(); }} />
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4">
