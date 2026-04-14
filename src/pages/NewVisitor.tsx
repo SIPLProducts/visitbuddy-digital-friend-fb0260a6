@@ -55,7 +55,12 @@ interface AccompanyingPerson {
   mobile_serial: string;
 }
 
-export default function NewVisitor() {
+interface NewVisitorProps {
+  inline?: boolean;
+  onClose?: () => void;
+}
+
+export default function NewVisitor({ inline = false, onClose }: NewVisitorProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
@@ -200,25 +205,31 @@ export default function NewVisitor() {
     }
 
     setLoading(false);
-    navigate('/visitors');
+    if (inline && onClose) {
+      onClose();
+    } else {
+      navigate('/visitors');
+    }
   };
 
   return (
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Pre-Register Visitor
-            </h1>
-            <p className="text-muted-foreground">
-              Add a new visitor to the system
-            </p>
+        {!inline && (
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">
+                Pre-Register Visitor
+              </h1>
+              <p className="text-muted-foreground">
+                Add a new visitor to the system
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Personal Information */}
