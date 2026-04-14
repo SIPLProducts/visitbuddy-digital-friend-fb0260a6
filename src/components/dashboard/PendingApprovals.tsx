@@ -1,31 +1,24 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import { 
-  UserCheck, 
-  XCircle, 
-  CheckCircle2, 
   Building2, 
   Clock, 
-  Loader2,
-  AlertCircle 
+  AlertCircle,
+  Hourglass
 } from 'lucide-react';
 import { Visitor } from '@/types/database';
 import { Link } from 'react-router-dom';
-import { SwipeableCard } from '@/components/shared/SwipeableCard';
 
 interface PendingApprovalsProps {
   visitors: Visitor[];
   onRefresh: () => void;
 }
 
-export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps) {
-  const [processingId, setProcessingId] = useState<string | null>(null);
+export function PendingApprovals({ visitors }: PendingApprovalsProps) {
   const { userRoles, isHoAdmin } = useUserRoles();
   
   const isGateSecurityOnly = useMemo(() => {
@@ -57,50 +50,6 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
     return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
   };
 
-  const handleApprove = async (visitor: Visitor) => {
-    setProcessingId(visitor.id);
-    try {
-      const { data, error } = await supabase.functions.invoke('approve-visitor', {
-        body: { visitorId: visitor.id, action: 'approve' }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast.success(`${visitor.name} approved! Badge sent.`);
-        onRefresh();
-      } else {
-        throw new Error(data.error || 'Failed to approve');
-      }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to approve visitor');
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  const handleReject = async (visitor: Visitor) => {
-    setProcessingId(visitor.id);
-    try {
-      const { data, error } = await supabase.functions.invoke('approve-visitor', {
-        body: { visitorId: visitor.id, action: 'reject' }
-      });
-
-      if (error) throw error;
-
-      if (data.success) {
-        toast.success(`${visitor.name} rejected.`);
-        onRefresh();
-      } else {
-        throw new Error(data.error || 'Failed to reject');
-      }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to reject visitor');
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
   if (pendingVisitors.length === 0 || isGateSecurityOnly) {
     return null;
   }
@@ -115,7 +64,7 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
             </div>
             <div>
               <CardTitle className="text-base font-semibold">Pending Approvals</CardTitle>
-              <p className="text-xs text-muted-foreground">{pendingVisitors.length} visitor(s) awaiting approval</p>
+              <p className="text-xs text-muted-foreground">{pendingVisitors.length} visitor(s) awaiting host approval</p>
             </div>
           </div>
           <Link to="/visitors?status=pending_approval">
@@ -127,88 +76,41 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
       </CardHeader>
       <CardContent className="space-y-3">
         {pendingVisitors.slice(0, 5).map((visitor) => (
-          <SwipeableCard
-            key={visitor.id}
-            leftAction={{
-              icon: <CheckCircle2 className="h-5 w-5" />,
-              label: 'Approve',
-              onClick: () => handleApprove(visitor),
-              className: 'bg-emerald-500',
-            }}
-            rightAction={{
-              icon: <XCircle className="h-5 w-5" />,
-              label: 'Reject',
-              onClick: () => handleReject(visitor),
-              className: 'bg-rose-500',
-            }}
-            disabled={processingId === visitor.id}
-          >
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-background border">
-              <Avatar className="h-10 w-10">
-                {visitor.photo_url && <AvatarImage src={visitor.photo_url} />}
-                <AvatarFallback className="bg-amber-100 text-amber-700 text-sm font-medium">
-                  {getInitials(visitor.name)}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm truncate">{visitor.name}</p>
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-amber-100 text-amber-700 border-amber-200">
-                    Pending
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  {visitor.company && (
-                    <span className="flex items-center gap-1 truncate">
-                      <Building2 className="h-3 w-3" />
-                      {visitor.company}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {formatTime(visitor.created_at)}
+          <div key={visitor.id} className="flex items-center gap-3 p-3 rounded-lg bg-background border">
+            <Avatar className="h-10 w-10">
+              {visitor.photo_url && <AvatarImage src={visitor.photo_url} />}
+              <AvatarFallback className="bg-amber-100 text-amber-700 text-sm font-medium">
+                {getInitials(visitor.name)}
+              </AvatarFallback>
+            </Avatar>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-sm truncate">{visitor.name}</p>
+                <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-amber-100 text-amber-700 border-amber-200 gap-1">
+                  <Hourglass className="h-2.5 w-2.5" />
+                  Awaiting Host
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                {visitor.company && (
+                  <span className="flex items-center gap-1 truncate">
+                    <Building2 className="h-3 w-3" />
+                    {visitor.company}
                   </span>
-                </div>
-                {visitor.host?.name && (
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Host: <span className="font-medium">{visitor.host.name}</span>
-                  </p>
                 )}
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {formatTime(visitor.created_at)}
+                </span>
               </div>
-
-              <div className="flex items-center gap-1.5">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={() => handleReject(visitor)}
-                  disabled={processingId === visitor.id}
-                >
-                  {processingId === visitor.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <XCircle className="h-4 w-4" />
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  className="h-8 bg-emerald-600 hover:bg-emerald-700 text-white gap-1"
-                  onClick={() => handleApprove(visitor)}
-                  disabled={processingId === visitor.id}
-                >
-                  {processingId === visitor.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Approve
-                    </>
-                  )}
-                </Button>
-              </div>
+              {visitor.host?.name && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Host: <span className="font-medium">{visitor.host.name}</span>
+                </p>
+              )}
             </div>
-          </SwipeableCard>
+          </div>
         ))}
         
         {pendingVisitors.length > 5 && (
