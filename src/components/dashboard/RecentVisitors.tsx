@@ -76,21 +76,9 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
       .slice(0, 2);
   };
 
-  const handleCheckIn = async (visitor: Visitor) => {
-    const { error } = await supabase
-      .from('visitors')
-      .update({
-        status: 'checked_in',
-        check_in_time: new Date().toISOString(),
-      })
-      .eq('id', visitor.id);
-
-    if (error) {
-      toast.error('Failed to check in visitor');
-    } else {
-      toast.success(`${visitor.name} checked in`);
-      onRefresh?.();
-    }
+  const handleCheckIn = (visitor: Visitor) => {
+    setCaptureVisitor(visitor);
+    setCaptureDialogOpen(true);
   };
 
   const handleCheckOut = async (visitor: Visitor) => {
@@ -244,6 +232,13 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
           })
         )}
       </div>
+      <CheckInCaptureDialog
+        open={captureDialogOpen}
+        onOpenChange={setCaptureDialogOpen}
+        visitor={captureVisitor}
+        onComplete={() => onRefresh?.()}
+        autoPrint={true}
+      />
     </div>
   );
 }
