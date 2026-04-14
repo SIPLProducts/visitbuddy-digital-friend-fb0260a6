@@ -1,19 +1,21 @@
 
 
-# Hide Pending Approvals Widget & Approve/Reject for Gate Security
+# Notify Gate Security Users on Visitor Approval
 
 ## Summary
-For Gate Security users, hide the entire Pending Approvals dashboard widget (since they cannot act on it) and ensure no Approve/Reject actions are visible anywhere.
+After a visitor is approved (status changes from `pending_approval` to `scheduled`), insert a notification for all `gate_security` users at the visitor's location so they know to proceed with check-in.
 
 ## Changes
 
-### 1. `src/components/dashboard/PendingApprovals.tsx`
-- Import `useUserRoles` hook
-- Add `isGateSecurityOnly` check (same pattern as Visitors.tsx)
-- If user is gate_security only, return `null` — hide the entire widget since they have no actions to take on pending visitors
+### `supabase/functions/approve-visitor/index.ts`
+After the successful status update to `scheduled` (around line 111), add logic to:
+1. Determine the visitor's `location_id` from the gate relation (`visitor.gate?.location_id` is already fetched in the query)
+2. Query `user_location_roles` for all users with `role = 'gate_security'` at that location
+3. Insert a notification row for each gate security user into the `notifications` table with:
+   - `title`: "Visitor Approved"
+   - `message`: "{visitor.name} has been approved by host. Ready for check-in."
+   - `type`: "success"
+   - `user_id`: each gate security user's `user_id`
 
-### 2. `src/pages/Visitors.tsx` (already done)
-- No further changes needed — Approve/Reject buttons are already hidden for gate_security role from the previous change
-
-This is a small change: gate security users simply won't see the Pending Approvals card on the dashboard at all.
+This uses the service role client already available in the function, so no RLS issues. Gate security users will receive the notification in real-time via the existing realtime subscription on the `notifications` table.
 
