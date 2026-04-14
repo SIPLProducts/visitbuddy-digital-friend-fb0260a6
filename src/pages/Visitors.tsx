@@ -293,7 +293,7 @@ export default function Visitors() {
       gateFilter === 'all' || visitor.gate_id === gateFilter;
 
     const visitorDate = new Date(visitor.created_at);
-    const matchesFromDate = !fromDate || visitorDate >= new Date(fromDate.setHours(0, 0, 0, 0));
+    const matchesFromDate = !fromDate || visitorDate >= new Date(new Date(fromDate).setHours(0, 0, 0, 0));
     const matchesToDate = !toDate || visitorDate <= new Date(new Date(toDate).setHours(23, 59, 59, 999));
 
     return matchesSearch && matchesStatus && matchesDepartment && matchesLocation && matchesGate && matchesFromDate && matchesToDate;

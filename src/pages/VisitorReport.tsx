@@ -162,22 +162,71 @@ export default function VisitorReport() {
     setLoading(false);
   };
 
-  // Chart data calculations
+  const filteredVisitors = visitors.filter((visitor) => {
+    const matchesSearch =
+      visitor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      visitor.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      visitor.host?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      visitor.visitor_id.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === 'all' || visitor.status === statusFilter;
+
+    const matchesLocation =
+      locationFilter === 'all' || visitor.gate?.location?.id === locationFilter;
+
+    const matchesCompany =
+      companyFilter === 'all' || visitor.company === companyFilter;
+
+    const matchesDepartment =
+      departmentFilter === 'all' || visitor.department?.id === departmentFilter;
+
+    return matchesSearch && matchesStatus && matchesLocation && matchesCompany && matchesDepartment;
+  });
+
+  // Reactive stats based on filtered visitors
+  const filteredStats = useMemo(() => {
+    const completedVisits = filteredVisitors.filter(
+      (v) => v.check_in_time && v.check_out_time
+    );
+    let avgMinutes = 0;
+    if (completedVisits.length > 0) {
+      const totalMinutes = completedVisits.reduce((sum, v) => {
+        const mins = differenceInMinutes(
+          new Date(v.check_out_time!),
+          new Date(v.check_in_time!)
+        );
+        return sum + mins;
+      }, 0);
+      avgMinutes = Math.round(totalMinutes / completedVisits.length);
+    }
+    const hours = Math.floor(avgMinutes / 60);
+    const mins = avgMinutes % 60;
+
+    return {
+      total: filteredVisitors.length,
+      checkedIn: filteredVisitors.filter((v) => v.status === 'checked_in').length,
+      checkedOut: filteredVisitors.filter((v) => v.status === 'checked_out').length,
+      withLaptop: filteredVisitors.filter((v) => v.has_laptop).length,
+      avgDuration: `${hours}h ${mins}m`,
+    };
+  }, [filteredVisitors]);
+
+  // Chart data calculations based on filtered visitors
   const chartData = useMemo(() => {
-    if (!dateRange?.from || !dateRange?.to || visitors.length === 0) {
+    if (!dateRange?.from || !dateRange?.to || filteredVisitors.length === 0) {
       return { dailyTrend: [], companyStats: [], locationStats: [], statusDistribution: [], topVisitors: [] };
     }
 
-    // Daily trend data
     const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
     const dailyTrend = days.map(day => {
       const dayStart = startOfDay(day);
-      const checkIns = visitors.filter(v => {
+      const checkIns = filteredVisitors.filter(v => {
         if (!v.check_in_time) return false;
         const checkIn = startOfDay(new Date(v.check_in_time));
         return checkIn.getTime() === dayStart.getTime();
       });
-      const checkOuts = visitors.filter(v => {
+      const checkOuts = filteredVisitors.filter(v => {
         if (!v.check_out_time) return false;
         const checkOut = startOfDay(new Date(v.check_out_time));
         return checkOut.getTime() === dayStart.getTime();
@@ -189,9 +238,8 @@ export default function VisitorReport() {
       };
     });
 
-    // Company distribution (top 8)
     const companyMap = new Map<string, number>();
-    visitors.forEach(v => {
+    filteredVisitors.forEach(v => {
       const company = v.company || 'Individual';
       companyMap.set(company, (companyMap.get(company) || 0) + 1);
     });
@@ -204,9 +252,8 @@ export default function VisitorReport() {
         value,
       }));
 
-    // Location stats
     const locationMap = new Map<string, { checkIns: number; checkOuts: number }>();
-    visitors.forEach(v => {
+    filteredVisitors.forEach(v => {
       const locName = v.gate?.location?.name || 'Unknown';
       const existing = locationMap.get(locName) || { checkIns: 0, checkOuts: 0 };
       if (v.status === 'checked_in') existing.checkIns++;
@@ -219,17 +266,15 @@ export default function VisitorReport() {
       checkOuts: data.checkOuts,
     }));
 
-    // Status distribution
     const statusDistribution = [
-      { name: 'Currently Inside', value: stats.checkedIn, color: '#10b981' },
-      { name: 'Checked Out', value: stats.checkedOut, color: '#64748b' },
-      { name: 'Scheduled', value: visitors.filter(v => v.status === 'scheduled').length, color: '#3b82f6' },
-      { name: 'Pending Approval', value: visitors.filter(v => v.status === 'pending_approval').length, color: '#f59e0b' },
+      { name: 'Currently Inside', value: filteredStats.checkedIn, color: '#10b981' },
+      { name: 'Checked Out', value: filteredStats.checkedOut, color: '#64748b' },
+      { name: 'Scheduled', value: filteredVisitors.filter(v => v.status === 'scheduled').length, color: '#3b82f6' },
+      { name: 'Pending Approval', value: filteredVisitors.filter(v => v.status === 'pending_approval').length, color: '#f59e0b' },
     ].filter(s => s.value > 0);
 
-    // Top 10 visitors by visit count (grouped by name + company)
     const visitorFrequency = new Map<string, { name: string; company: string; visits: number; lastVisit: string }>();
-    visitors.forEach(v => {
+    filteredVisitors.forEach(v => {
       const key = `${v.name.toLowerCase()}-${(v.company || '').toLowerCase()}`;
       const existing = visitorFrequency.get(key);
       if (existing) {
@@ -251,7 +296,7 @@ export default function VisitorReport() {
       .slice(0, 10);
 
     return { dailyTrend, companyStats, locationStats, statusDistribution, topVisitors };
-  }, [visitors, dateRange, stats]);
+  }, [filteredVisitors, dateRange, filteredStats]);
 
   // Get unique companies for filter
   const companies = useMemo(() => {
