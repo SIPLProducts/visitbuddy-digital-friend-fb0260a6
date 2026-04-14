@@ -84,9 +84,31 @@ export default function Visitors() {
   const [captureAutoPrint, setCaptureAutoPrint] = useState(false);
   const [showNewVisitorForm, setShowNewVisitorForm] = useState(false);
 
+  // Default filters for gate security users
+  useEffect(() => {
+    if (isGateSecurityOnly) {
+      setStatusFilter('scheduled');
+      const today = new Date();
+      setFromDate(today);
+      setToDate(today);
+    }
+  }, [isGateSecurityOnly]);
+
   useEffect(() => {
     fetchVisitors();
     fetchFilterOptions();
+
+    // Realtime subscription for auto-refresh when visitors are updated
+    const channel = supabase
+      .channel('visitors-page-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
+        fetchVisitors();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchVisitors = async () => {
