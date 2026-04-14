@@ -768,7 +768,7 @@ export default function Locations() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Location</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{selectedLocation?.name}"? This will also remove all associated gates and departments. This action cannot be undone.
+              Are you sure you want to delete "{selectedLocation?.name}"? This will permanently remove all associated data including gates, departments, employees, visitors, vehicles, and ANPR events. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
