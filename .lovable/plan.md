@@ -1,40 +1,26 @@
 
 
-# Fix Print Preview Showing Empty/Wrong Content
+# Fix Two Badges Printing Side-by-Side on A4 Landscape
 
 ## Problem
-The `PrintBadge.tsx` inline print CSS has `body *, body { visibility: visible !important; }` which overrides the `index.css` rule that hides everything except `#printable-badge`. This conflict causes the print preview to either show everything (buttons, background) or show nothing depending on CSS load order.
+The print preview doesn't show the two badges correctly. The `index.css` print rules set `#printable-badge` to `position: absolute` and `width: 100%`, but the individual `.badge` children don't have print-specific width constraints. Combined with the inline styles in `PrintBadge.tsx`, the badges may overflow or not appear properly.
 
 ## Solution
-Remove the conflicting inline print styles from `PrintBadge.tsx` and rely solely on the already-correct `index.css` rules. The `index.css` already has proper scoped rules using `body:has(#printable-badge)` that:
-1. Hide all elements
-2. Show only `#printable-badge` and its children
-3. Position it at top-left with 140mm width
+Ensure both `index.css` and `PrintBadge.tsx` print styles are aligned — the container uses flexbox with centered layout, and each badge is sized to ~125mm so both fit on A4 landscape (297mm wide) with a 12mm gap between them.
 
 ## Changes
 
-### `src/pages/PrintBadge.tsx` — Fix inline print CSS (lines 260-281)
-Replace the current conflicting `@media print` block:
-```css
-/* REMOVE this — it conflicts with index.css */
-body *, body {
-  visibility: visible !important;
-}
-```
+### 1. `src/index.css` — Update print rules for `#printable-badge`
+- Add `.badge` child sizing: `width: 125mm !important`
+- Keep `position: absolute; left: 0; top: 0` for proper print positioning
+- Ensure `align-items: flex-start` so badges align to top
 
-Replace with a minimal block that only sets `@page` size and defers visibility to `index.css`:
-```css
-@media print {
-  @page { 
-    size: A4 landscape; 
-    margin: 10mm; 
-  }
-  .no-print { display: none !important; }
-}
-```
-
-The `index.css` already handles hiding everything, showing `#printable-badge`, positioning, and sizing at 140mm.
+### 2. `src/pages/PrintBadge.tsx` — Ensure print CSS doesn't conflict
+- Verify the inline `@media print` block's `.badge` width matches `index.css`
+- Add `!important` to `.print-container` flex rules to override any defaults
+- Ensure both badges render identically with proper gap
 
 ## Files Changed
-- `src/pages/PrintBadge.tsx` — Remove conflicting inline print visibility rules
+- `src/index.css` — Add `.badge` width rule inside the `#printable-badge` print block
+- `src/pages/PrintBadge.tsx` — Sync inline print styles with global rules
 
