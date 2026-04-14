@@ -1,14 +1,17 @@
 
 
-# Default "Date of Visit" to Current Date in New Visitor Form
+# Remove Policy Agreement Popup from Check-In
 
-## Problem
-The `scheduled_date` field is not included in the form's `defaultValues`, so although the Zod schema has a default, the date picker may show "Pick a date" instead of today's date on initial render.
+## Summary
+The user doesn't want the Policy Agreement / NDA popup during check-in. The check-in should proceed directly without showing any dialog.
 
-## Change
+## Changes
 
-### `src/pages/NewVisitor.tsx`
-- Add `scheduled_date: new Date()` to the `defaultValues` object (around line 94, before the closing brace)
+### `src/components/visitors/CheckInDialog.tsx`
+- Remove the NDA/signature section entirely — no policy agreement, no signature pad, no checkbox
+- Keep only the watchlist check (security feature) and a simple confirmation dialog
+- The dialog should just show "Confirm check-in for {visitorName}" with Cancel and Confirm buttons
+- Watchlist alerts still display if a match is found
 
-This is a one-line addition. The Zod schema default and insert payload already handle `new Date()` as a fallback, but this ensures the UI displays today's date immediately when the form opens.
+This simplifies the check-in to: open dialog → confirm (with watchlist warning if applicable) → done.
 
