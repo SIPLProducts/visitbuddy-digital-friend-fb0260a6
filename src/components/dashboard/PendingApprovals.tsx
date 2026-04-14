@@ -101,7 +101,7 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
     }
   };
 
-  if (pendingVisitors.length === 0) {
+  if (pendingVisitors.length === 0 || isGateSecurityOnly) {
     return null;
   }
 
