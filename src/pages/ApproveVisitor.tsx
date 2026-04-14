@@ -34,10 +34,6 @@ export default function ApproveVisitor() {
   useEffect(() => {
     if (visitorId) {
       fetchVisitor();
-      // Auto-process if action is in URL
-      if (action === 'approve' || action === 'reject') {
-        handleAction(action);
-      }
     } else {
       setStatus('error');
     }

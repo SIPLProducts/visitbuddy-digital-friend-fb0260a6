@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -53,8 +53,10 @@ export default function Visitors() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { userRoles, isHoAdmin } = useUserRoles();
+  const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const [searchParams] = useSearchParams();
   const isGateSecurityOnly = useMemo(() => {
+    if (rolesLoading) return false; // Default to showing all actions until roles load
     if (isHoAdmin) return false;
     return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
   }, [userRoles, isHoAdmin]);
@@ -85,6 +87,14 @@ export default function Visitors() {
   const [captureVisitor, setCaptureVisitor] = useState<Visitor | null>(null);
   const [captureAutoPrint, setCaptureAutoPrint] = useState(false);
   const [showNewVisitorForm, setShowNewVisitorForm] = useState(false);
+
+  // Read URL status param (e.g. from PendingApprovals dashboard link)
+  useEffect(() => {
+    const statusParam = searchParams.get('status');
+    if (statusParam) {
+      setStatusFilter(statusParam);
+    }
+  }, [searchParams]);
 
   // Default filters for gate security users
   useEffect(() => {
