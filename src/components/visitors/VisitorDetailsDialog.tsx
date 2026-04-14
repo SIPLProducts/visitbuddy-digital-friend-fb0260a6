@@ -120,6 +120,15 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
             <h4 className="font-medium text-sm text-muted-foreground">Visit Information</h4>
             <div className="grid grid-cols-2 gap-4">
               <div>
+                <p className="text-xs text-muted-foreground">Date of Visit</p>
+                <p className="text-sm font-medium flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {visitor.scheduled_date
+                    ? new Date(visitor.scheduled_date + 'T00:00:00').toLocaleDateString('en-US', { dateStyle: 'medium' })
+                    : '—'}
+                </p>
+              </div>
+              <div>
                 <p className="text-xs text-muted-foreground">Host</p>
                 <p className="text-sm font-medium flex items-center gap-1">
                   <User className="h-3 w-3" />
