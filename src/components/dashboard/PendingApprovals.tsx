@@ -55,13 +55,8 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
   }, [isManagerOnly, user?.email]);
   
   const pendingVisitors = useMemo(() => {
-    const pending = visitors.filter(v => v.status === 'pending_approval');
-    // For managers, only show visitors assigned to them as host
-    if (isManagerOnly && hostEmployeeId) {
-      return pending.filter(v => v.host_id === hostEmployeeId);
-    }
-    return pending;
-  }, [visitors, isManagerOnly, hostEmployeeId]);
+    return visitors.filter(v => v.status === 'pending_approval');
+  }, [visitors]);
 
   const getInitials = (name: string) => {
     return name

@@ -218,7 +218,7 @@ export default function Visitors() {
     return userRoles.length > 0 && userRoles.some(r => r.role === 'manager');
   }, [userRoles, isHoAdmin]);
 
-  const canApproveReject = isHoAdmin || isManagerOnly || userRoles.some(r => r.role === 'admin');
+  const canApproveReject = !isGateSecurityOnly;
 
   const getStatusColor = (status: string) => {
     switch (status) {
