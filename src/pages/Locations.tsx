@@ -148,7 +148,10 @@ export default function Locations() {
 
     setLoading(false);
     if (error) {
-      toast.error('Failed to add location');
+      const msg = error.message?.includes('row-level security')
+        ? 'Permission denied. Only HO Admins can add locations.'
+        : `Failed to add location: ${error.message}`;
+      toast.error(msg);
     } else {
       toast.success('Location added successfully');
       setIsAddDialogOpen(false);
@@ -194,19 +197,50 @@ export default function Locations() {
     if (!selectedLocation) return;
 
     setLoading(true);
-    const { error } = await supabase
-      .from('locations')
-      .delete()
-      .eq('id', selectedLocation.id);
+    try {
+      const locationId = selectedLocation.id;
 
-    setLoading(false);
-    if (error) {
-      toast.error('Failed to delete location. Make sure no gates or departments are linked.');
-    } else {
-      toast.success('Location deleted successfully');
-      setIsDeleteDialogOpen(false);
-      setSelectedLocation(null);
-      fetchLocations();
+      // Get gate IDs at this location
+      const { data: gates } = await supabase.from('gates').select('id').eq('location_id', locationId);
+      const gateIds = (gates || []).map(g => g.id);
+
+      // Get visitor IDs via gates at this location
+      if (gateIds.length > 0) {
+        const { data: visitors } = await supabase.from('visitors').select('id').in('gate_id', gateIds);
+        const visitorIds = (visitors || []).map(v => v.id);
+
+        if (visitorIds.length > 0) {
+          await supabase.from('accompanying_visitors').delete().in('visitor_id', visitorIds);
+          await supabase.from('visitor_agreements').delete().in('visitor_id', visitorIds);
+        }
+        await supabase.from('visitors').delete().in('gate_id', gateIds);
+      }
+
+      // Delete location-linked records
+      await supabase.from('vehicle_entries').delete().eq('location_id', locationId);
+      await supabase.from('anpr_events').delete().eq('location_id', locationId);
+      await supabase.from('vehicles').delete().eq('location_id', locationId);
+      await supabase.from('employees').delete().eq('location_id', locationId);
+      await supabase.from('departments').delete().eq('location_id', locationId);
+      await supabase.from('gates').delete().eq('location_id', locationId);
+      await supabase.from('role_screen_permissions').delete().eq('location_id', locationId);
+      await supabase.from('visitor_watchlist').delete().eq('location_id', locationId);
+
+      // Finally delete the location
+      const { error } = await supabase.from('locations').delete().eq('id', locationId);
+
+      if (error) {
+        toast.error(`Failed to delete location: ${error.message}`);
+      } else {
+        toast.success('Location and all associated data deleted successfully');
+        setIsDeleteDialogOpen(false);
+        setSelectedLocation(null);
+        fetchLocations();
+      }
+    } catch (err: any) {
+      toast.error(`Failed to delete location: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -701,7 +735,9 @@ export default function Locations() {
             <DialogTitle>Add Location</DialogTitle>
             <DialogDescription>Create a new office location or facility</DialogDescription>
           </DialogHeader>
-          {locationFormContent}
+          <ScrollArea className="max-h-[60vh]">
+            {locationFormContent}
+          </ScrollArea>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleAdd} disabled={loading}>{loading ? 'Adding...' : 'Add Location'}</Button>
@@ -716,7 +752,9 @@ export default function Locations() {
             <DialogTitle>Edit Location</DialogTitle>
             <DialogDescription>Update location details</DialogDescription>
           </DialogHeader>
-          {locationFormContent}
+          <ScrollArea className="max-h-[60vh]">
+            {locationFormContent}
+          </ScrollArea>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleEdit} disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
