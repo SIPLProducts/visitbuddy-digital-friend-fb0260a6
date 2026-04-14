@@ -56,6 +56,10 @@ export default function Visitors() {
     if (isHoAdmin) return false;
     return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
   }, [userRoles, isHoAdmin]);
+  const isGateSecurity = useMemo(() => {
+    if (isHoAdmin) return true;
+    return userRoles.some(r => r.role === 'gate_security');
+  }, [userRoles, isHoAdmin]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -705,6 +709,7 @@ export default function Visitors() {
                           onCheckIn={handleCheckIn}
                           onCheckOut={handleCheckOut}
                           onCheckInAndPrint={handleCheckInAndPrint}
+                          canCheckInOut={isGateSecurity}
                         />
                       )}
                     </TableCell>

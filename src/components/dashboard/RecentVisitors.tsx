@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { SwipeableCard } from '@/components/shared/SwipeableCard';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +24,11 @@ interface RecentVisitorsProps {
 
 export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
   const navigate = useNavigate();
+  const { userRoles, isHoAdmin } = useUserRoles();
+  const isGateSecurity = useMemo(() => {
+    if (isHoAdmin) return true;
+    return userRoles.some(r => r.role === 'gate_security');
+  }, [userRoles, isHoAdmin]);
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
@@ -101,6 +108,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
   };
 
   const getSwipeActions = (visitor: Visitor) => {
+    if (!isGateSecurity) return {};
     if (visitor.status === 'checked_in') {
       return {
         rightAction: {
@@ -208,13 +216,13 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        {visitor.status === 'checked_in' && (
+                        {isGateSecurity && visitor.status === 'checked_in' && (
                           <DropdownMenuItem onClick={() => handleCheckOut(visitor)}>
                             <LogOut className="h-4 w-4 mr-2" />
                             Check Out
                           </DropdownMenuItem>
                         )}
-                        {(visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
+                        {isGateSecurity && (visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
                           <DropdownMenuItem onClick={() => handleCheckIn(visitor)}>
                             <LogIn className="h-4 w-4 mr-2" />
                             Check In
