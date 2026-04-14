@@ -29,7 +29,6 @@ serve(async (req: Request) => {
       );
     }
 
-    // Read email_config for display purposes
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
@@ -46,65 +45,30 @@ serve(async (req: Request) => {
 
     console.log(`Sending test email to ${receiver_email} via Resend API`);
 
-    const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-
-    let response: Response;
-
-    if (lovableApiKey) {
-      // Use connector gateway
-      response = await fetch(`${GATEWAY_URL}/emails`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${lovableApiKey}`,
-          "X-Connection-Api-Key": resendApiKey,
-        },
-        body: JSON.stringify({
-          from: "VisiGuard VMS <onboarding@resend.dev>",
-          to: [receiver_email],
-          subject: "Test Email - VisiGuard Email Configuration",
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-                <h2 style="color: white; margin: 0;">✅ Email Configuration Working!</h2>
-              </div>
-              <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-                <p>This is a test email from <strong>VisiGuard VMS</strong> to verify your email configuration.</p>
-                <p style="color: #6b7280; font-size: 14px;">${smtpInfo}</p>
-                <p style="color: #9ca3af; font-size: 12px; margin-top: 20px;">Sent at ${new Date().toISOString()}</p>
-              </div>
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify({
+        from: "VisiGuard VMS <onboarding@resend.dev>",
+        to: [receiver_email],
+        subject: "Test Email - VisiGuard Email Configuration",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
+              <h2 style="color: white; margin: 0;">✅ Email Configuration Working!</h2>
             </div>
-          `,
-        }),
-      });
-    } else {
-      // Direct Resend API call
-      response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${resendApiKey}`,
-        },
-        body: JSON.stringify({
-          from: "VisiGuard VMS <onboarding@resend.dev>",
-          to: [receiver_email],
-          subject: "Test Email - VisiGuard Email Configuration",
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
-                <h2 style="color: white; margin: 0;">✅ Email Configuration Working!</h2>
-              </div>
-              <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-                <p>This is a test email from <strong>VisiGuard VMS</strong> to verify your email configuration.</p>
-                <p style="color: #6b7280; font-size: 14px;">${smtpInfo}</p>
-                <p style="color: #9ca3af; font-size: 12px; margin-top: 20px;">Sent at ${new Date().toISOString()}</p>
-              </div>
+            <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+              <p>This is a test email from <strong>VisiGuard VMS</strong> to verify your email configuration.</p>
+              <p style="color: #6b7280; font-size: 14px;">${smtpInfo}</p>
+              <p style="color: #9ca3af; font-size: 12px; margin-top: 20px;">Sent at ${new Date().toISOString()}</p>
             </div>
-          `,
-        }),
-      });
-    }
+          </div>
+        `,
+      }),
+    });
 
     const resendData = await response.json();
 
