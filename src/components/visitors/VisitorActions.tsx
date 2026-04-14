@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreVertical, Eye, Edit, Printer, LogIn, LogOut, UserCheck } from 'lucide-react';
+import { MoreVertical, Eye, Edit, Printer, LogIn, LogOut, UserCheck, CheckCircle, XCircle } from 'lucide-react';
 import { Visitor } from '@/types/database';
 
 interface VisitorActionsProps {
@@ -17,6 +17,8 @@ interface VisitorActionsProps {
   onCheckIn: (visitor: Visitor) => void;
   onCheckOut: (visitor: Visitor) => void;
   onCheckInAndPrint?: (visitor: Visitor) => void;
+  onApprove?: (visitor: Visitor) => void;
+  onReject?: (visitor: Visitor) => void;
   canCheckInOut?: boolean;
 }
 
@@ -28,6 +30,8 @@ export function VisitorActions({
   onCheckIn,
   onCheckOut,
   onCheckInAndPrint,
+  onApprove,
+  onReject,
   canCheckInOut = true,
 }: VisitorActionsProps) {
   const today = new Date().toISOString().split('T')[0];
@@ -46,6 +50,30 @@ export function VisitorActions({
           <UserCheck className="h-3.5 w-3.5" />
           <Printer className="h-3.5 w-3.5" />
           Check In & Print
+        </Button>
+      )}
+
+      {/* Quick Approve/Reject buttons for pending visitors */}
+      {visitor.status === 'pending_approval' && onApprove && (
+        <Button
+          size="sm"
+          variant="default"
+          className="gap-1.5 h-8 text-xs bg-emerald-600 hover:bg-emerald-700"
+          onClick={() => onApprove(visitor)}
+        >
+          <CheckCircle className="h-3.5 w-3.5" />
+          Approve
+        </Button>
+      )}
+      {visitor.status === 'pending_approval' && onReject && (
+        <Button
+          size="sm"
+          variant="destructive"
+          className="gap-1.5 h-8 text-xs"
+          onClick={() => onReject(visitor)}
+        >
+          <XCircle className="h-3.5 w-3.5" />
+          Reject
         </Button>
       )}
       
@@ -71,6 +99,18 @@ export function VisitorActions({
             Print Badge
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+          {visitor.status === 'pending_approval' && onApprove && (
+            <DropdownMenuItem onClick={() => onApprove(visitor)}>
+              <CheckCircle className="h-4 w-4 mr-2 text-emerald-600" />
+              Approve
+            </DropdownMenuItem>
+          )}
+          {visitor.status === 'pending_approval' && onReject && (
+            <DropdownMenuItem onClick={() => onReject(visitor)}>
+              <XCircle className="h-4 w-4 mr-2 text-destructive" />
+              Reject
+            </DropdownMenuItem>
+          )}
           {canCheckInOut && visitor.status === 'checked_in' && (
             <DropdownMenuItem onClick={() => onCheckOut(visitor)}>
               <LogOut className="h-4 w-4 mr-2" />

@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -8,25 +9,59 @@ import {
   Building2, 
   Clock, 
   AlertCircle,
-  Hourglass
+  Hourglass,
+  CheckCircle,
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import { Visitor } from '@/types/database';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface PendingApprovalsProps {
   visitors: Visitor[];
   onRefresh: () => void;
 }
 
-export function PendingApprovals({ visitors }: PendingApprovalsProps) {
+export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps) {
+  const { user } = useAuth();
   const { userRoles, isHoAdmin } = useUserRoles();
+  const [loadingAction, setLoadingAction] = useState<string | null>(null);
+  const [hostEmployeeId, setHostEmployeeId] = useState<string | null>(null);
   
   const isGateSecurityOnly = useMemo(() => {
     if (isHoAdmin) return false;
     return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
   }, [userRoles, isHoAdmin]);
+
+  const isManagerOnly = useMemo(() => {
+    if (isHoAdmin) return false;
+    return userRoles.length > 0 && userRoles.some(r => r.role === 'manager') && !userRoles.some(r => r.role === 'admin');
+  }, [userRoles, isHoAdmin]);
+
+  // Look up employee ID for manager users
+  useEffect(() => {
+    if (isManagerOnly && user?.email) {
+      supabase
+        .from('employees')
+        .select('id')
+        .eq('email', user.email)
+        .maybeSingle()
+        .then(({ data }) => {
+          setHostEmployeeId(data?.id || null);
+        });
+    }
+  }, [isManagerOnly, user?.email]);
   
-  const pendingVisitors = visitors.filter(v => v.status === 'pending_approval');
+  const pendingVisitors = useMemo(() => {
+    const pending = visitors.filter(v => v.status === 'pending_approval');
+    // For managers, only show visitors assigned to them as host
+    if (isManagerOnly && hostEmployeeId) {
+      return pending.filter(v => v.host_id === hostEmployeeId);
+    }
+    return pending;
+  }, [visitors, isManagerOnly, hostEmployeeId]);
 
   const getInitials = (name: string) => {
     return name
@@ -48,6 +83,38 @@ export function PendingApprovals({ visitors }: PendingApprovalsProps) {
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
     return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  };
+
+  const handleApprove = async (visitor: Visitor) => {
+    setLoadingAction(visitor.id + '_approve');
+    try {
+      const { error } = await supabase.functions.invoke('approve-visitor', {
+        body: { visitorId: visitor.id, action: 'approve' },
+      });
+      if (error) throw error;
+      toast.success(`${visitor.name} approved`);
+      onRefresh();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to approve');
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const handleReject = async (visitor: Visitor) => {
+    setLoadingAction(visitor.id + '_reject');
+    try {
+      const { error } = await supabase.functions.invoke('approve-visitor', {
+        body: { visitorId: visitor.id, action: 'reject' },
+      });
+      if (error) throw error;
+      toast.success(`${visitor.name} rejected`);
+      onRefresh();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reject');
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   if (pendingVisitors.length === 0 || isGateSecurityOnly) {
@@ -109,6 +176,37 @@ export function PendingApprovals({ visitors }: PendingApprovalsProps) {
                   Host: <span className="font-medium">{visitor.host.name}</span>
                 </p>
               )}
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                size="sm"
+                variant="default"
+                className="h-7 text-xs gap-1 bg-emerald-600 hover:bg-emerald-700"
+                disabled={loadingAction === visitor.id + '_approve'}
+                onClick={() => handleApprove(visitor)}
+              >
+                {loadingAction === visitor.id + '_approve' ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <CheckCircle className="h-3 w-3" />
+                )}
+                Approve
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="h-7 text-xs gap-1"
+                disabled={loadingAction === visitor.id + '_reject'}
+                onClick={() => handleReject(visitor)}
+              >
+                {loadingAction === visitor.id + '_reject' ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <XCircle className="h-3 w-3" />
+                )}
+                Reject
+              </Button>
             </div>
           </div>
         ))}
