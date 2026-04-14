@@ -26,6 +26,12 @@ interface PendingApprovalsProps {
 
 export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps) {
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const { userRoles, isHoAdmin } = useUserRoles();
+  
+  const isGateSecurityOnly = useMemo(() => {
+    if (isHoAdmin) return false;
+    return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
+  }, [userRoles, isHoAdmin]);
   
   const pendingVisitors = visitors.filter(v => v.status === 'pending_approval');
 
