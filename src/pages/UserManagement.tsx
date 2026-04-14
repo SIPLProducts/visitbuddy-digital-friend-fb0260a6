@@ -606,7 +606,7 @@ export default function UserManagement() {
   };
 
   // --- Derived Data ---
-  const filteredUserRoles = userRoles.filter((role) => {
+  const filteredUserRoles = (typeof scopedUserRoles !== 'undefined' ? scopedUserRoles : userRoles).filter((role) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
