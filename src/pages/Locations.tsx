@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { useUserRoles } from '@/hooks/useUserRoles';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,6 +53,7 @@ import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail, validatePhone, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
 
 export default function Locations() {
+  const { isHoAdmin } = useUserRoles();
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -603,27 +605,31 @@ export default function Locations() {
               <Download className="h-4 w-4" />
               Template
             </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              <Upload className="h-4 w-4" />
-              {uploading ? 'Importing...' : 'Import CSV'}
-            </Button>
-            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-              <Plus className="h-4 w-4" />
-              Add Location
-            </Button>
+            {isHoAdmin && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="h-4 w-4" />
+                  {uploading ? 'Importing...' : 'Import CSV'}
+                </Button>
+                <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+                  <Plus className="h-4 w-4" />
+                  Add Location
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -633,9 +639,11 @@ export default function Locations() {
             <div className="col-span-full text-center py-12">
               <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
               <p className="text-muted-foreground">No locations configured</p>
-              <Button variant="outline" className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
-                Add Your First Location
-              </Button>
+              {isHoAdmin && (
+                <Button variant="outline" className="mt-4" onClick={() => setIsAddDialogOpen(true)}>
+                  Add Your First Location
+                </Button>
+              )}
             </div>
           ) : (
             locations.map((location) => (
@@ -712,15 +720,17 @@ export default function Locations() {
                     )}
                   </div>
 
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1 gap-2" onClick={() => openEditDialog(location)}>
-                      <Edit className="h-4 w-4" />
-                      Edit
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => openDeleteDialog(location)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  {isHoAdmin && (
+                    <div className="flex gap-2">
+                      <Button variant="outline" className="flex-1 gap-2" onClick={() => openEditDialog(location)}>
+                        <Edit className="h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => openDeleteDialog(location)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))
