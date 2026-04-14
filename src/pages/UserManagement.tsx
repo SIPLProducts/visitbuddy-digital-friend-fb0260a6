@@ -1028,14 +1028,14 @@ export default function UserManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredUserRoles.length === 0 ? (
+                    {filteredUserRoles.filter(r => isHoAdmin || adminLocationIds.includes(r.location_id)).length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                           {searchQuery ? 'No users found matching your search' : 'No user roles assigned yet.'}
                         </TableCell>
                       </TableRow>
                     ) : (
-                      filteredUserRoles.map((role) => (
+                      filteredUserRoles.filter(r => isHoAdmin || adminLocationIds.includes(r.location_id)).map((role) => (
                         <TableRow key={role.id}>
                           <TableCell>
                             <div className="flex items-center gap-2">
