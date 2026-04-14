@@ -787,6 +787,13 @@ export default function Locations() {
             <AlertDialogTitle>Delete Location</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete "{selectedLocation?.name}"? This will permanently remove all associated data including gates, departments, employees, visitors, vehicles, and ANPR events. This action cannot be undone.
+              {rolesAtLocation.length > 0 && (
+                <span className="block mt-2 font-semibold text-destructive">
+                  ⚠️ {rolesAtLocation.length} user role(s) are assigned to this location
+                  {rolesAtLocation.some(r => r.is_ho_admin) && ' (including HO Admin)'}
+                  . These roles will be removed!
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
