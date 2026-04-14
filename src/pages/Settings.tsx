@@ -10,12 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock, Globe, Mail, Trash2, Send, Eye, EyeOff } from 'lucide-react';
+import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock, Globe, Mail, Trash2, Send, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { logAudit } from '@/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { languages } from '@/i18n';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 interface TenantSettings {
   id: string;
@@ -62,6 +63,7 @@ const defaultEmailConfig: EmailConfig = {
 export default function Settings() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { isHoAdmin, loading: rolesLoading } = useUserRoles();
   const [settings, setSettings] = useState<TenantSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -491,15 +493,22 @@ export default function Settings() {
 
                     <Separator />
 
+                    {!rolesLoading && !isHoAdmin && (
+                      <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+                        <AlertTriangle className="h-4 w-4 shrink-0" />
+                        Only HO Admins can manage email configuration.
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap gap-3">
-                      <Button onClick={handleSaveEmailConfig} disabled={savingEmail} className="gap-1.5">
+                      <Button onClick={handleSaveEmailConfig} disabled={savingEmail || !isHoAdmin} className="gap-1.5">
                         {savingEmail ? <Check className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         {savingEmail ? 'Saving...' : emailConfigExists ? 'Update Configuration' : 'Save Configuration'}
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => setTestDialogOpen(true)}
-                        disabled={!emailConfigExists}
+                        disabled={!emailConfigExists || !isHoAdmin}
                         className="gap-1.5"
                       >
                         <Send className="h-4 w-4" /> Send Test Email
@@ -508,6 +517,7 @@ export default function Settings() {
                         <Button
                           variant="destructive"
                           onClick={() => setDeleteDialogOpen(true)}
+                          disabled={!isHoAdmin}
                           className="gap-1.5"
                         >
                           <Trash2 className="h-4 w-4" /> Delete Configuration
