@@ -1,22 +1,19 @@
 
 
-# Hide Check-In & Approve Actions for Gate Security on Pending Visitors
+# Hide Pending Approvals Widget & Approve/Reject for Gate Security
 
 ## Summary
-For users with the `gate_security` role, hide the "Approve/Reject" buttons and "Check In & Print" actions for visitors that are still in `pending_approval` status. Gate Security should only see View Details for pending visitors. Check-in actions should only appear once the host has approved (status = `scheduled`).
+For Gate Security users, hide the entire Pending Approvals dashboard widget (since they cannot act on it) and ensure no Approve/Reject actions are visible anywhere.
 
 ## Changes
 
-### 1. `src/pages/Visitors.tsx`
-- Import `useUserRoles` hook to detect the current user's role
-- In the actions column (around line 670), add a role check: if the user is `gate_security`, do NOT show the Approve/Reject buttons for `pending_approval` visitors — show only a "Pending Approval" label or View Details instead
-- The existing `VisitorActions` component already correctly shows "Check In & Print" only for `scheduled` status, so no change needed there
+### 1. `src/components/dashboard/PendingApprovals.tsx`
+- Import `useUserRoles` hook
+- Add `isGateSecurityOnly` check (same pattern as Visitors.tsx)
+- If user is gate_security only, return `null` — hide the entire widget since they have no actions to take on pending visitors
 
-### 2. `src/components/visitors/VisitorActions.tsx`
-- No changes needed — the component already gates "Check In & Print" behind `visitor.status === 'scheduled'`, which only happens after host approval
+### 2. `src/pages/Visitors.tsx` (already done)
+- No further changes needed — Approve/Reject buttons are already hidden for gate_security role from the previous change
 
-## Technical Detail
-- `useUserRoles()` provides `userRoles` array with role info; check if any role is `gate_security` and none are `admin`/`manager`/`operator`
-- For gate_security users viewing `pending_approval` visitors: show a disabled "Awaiting Approval" badge instead of Approve/Reject buttons
-- All other roles (admin, manager, operator) continue to see Approve/Reject as before
+This is a small change: gate security users simply won't see the Pending Approvals card on the dashboard at all.
 
