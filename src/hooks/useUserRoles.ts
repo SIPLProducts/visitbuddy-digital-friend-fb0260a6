@@ -90,6 +90,7 @@ export function useUserRoles() {
   return {
     userRoles,
     isHoAdmin,
+    isLocationAdmin,
     loading,
     hasRoleAtLocation,
     canAccessLocation,
