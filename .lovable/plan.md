@@ -1,27 +1,33 @@
 
 
-# Add "Users by Location" Sub-Tab in User Management
+# Add "Date of Visit" Field to Visitor Form
 
-## What we're building
-A new tab in User Management that shows all users grouped by location, with expandable location cards displaying each user's name, role, and HO Admin status. This gives a quick location-wise view of who has access where.
+## Summary
+Add a date picker for scheduling the visit date when pre-registering a visitor. Currently, visitors are created with no visit date — only `check_in_time` is set at actual check-in.
 
-## Implementation
+## Changes
 
-### File: `src/pages/UserManagement.tsx`
+### 1. Database migration — add `scheduled_date` column to `visitors` table
+- Add `scheduled_date DATE NULL DEFAULT CURRENT_DATE` to the `visitors` table
+- This stores the expected date of visit
 
-1. Add a 4th tab called **"Users by Location"** (with MapPin icon) to the existing TabsList, placed after "Assign Users"
+### 2. Update `src/pages/NewVisitor.tsx`
+- Add `scheduled_date` to the Zod schema (as an optional date, defaulting to today)
+- Add a date picker field (using the Shadcn Calendar + Popover pattern) in the Personal Information card, after the company/purpose fields
+- Include `scheduled_date` in the insert payload sent to the database
+- Import `CalendarIcon`, `Calendar`, `Popover`, `format` from date-fns
 
-2. The tab content will:
-   - Group `scopedUserRoles` by `location_id`
-   - Render one Card per location with the location name as the header and user count
-   - Inside each card, show a table with columns: User Name, Role (badge), HO Admin
-   - Include a search filter that works across all locations
-   - Show a summary count (e.g., "3 users at this location")
+### 3. Update `src/components/visitors/VisitorEditDialog.tsx`
+- Add `scheduled_date` to the form state
+- Add a date picker field in the edit form
+- Include `scheduled_date` in the update payload
 
-3. No new files or database changes needed — all data is already fetched in `fetchData()`
+### 4. Update `src/types/database.ts`
+- Add `scheduled_date: string | null` to the `Visitor` interface
 
-## Technical details
-- Reuse existing `scopedUserRoles`, `locations`, `roleColors`, `roleLabels` data
-- Group by `location_id` using a reduce, then render each group as a Card with a Table inside
-- The search filter already exists (`searchQuery`) and will be reused
+## Files modified
+- **Migration** — new column `scheduled_date` on `visitors`
+- `src/types/database.ts` — add field to Visitor type
+- `src/pages/NewVisitor.tsx` — add date picker
+- `src/components/visitors/VisitorEditDialog.tsx` — add date picker
 
