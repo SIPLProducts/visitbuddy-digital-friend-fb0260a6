@@ -198,6 +198,15 @@ export default function Visitors() {
         body: { visitorId: visitor.id, action: 'approve' },
       });
       if (error) throw error;
+      if (data?.error) {
+        if (data.currentStatus === 'scheduled') {
+          toast.info(`${visitor.name} is already approved`);
+        } else {
+          toast.error(data.error);
+        }
+        fetchVisitors();
+        return;
+      }
       toast.success(`${visitor.name} approved successfully`);
       fetchVisitors();
     } catch (err: any) {
@@ -216,6 +225,11 @@ export default function Visitors() {
         body: { visitorId: visitor.id, action: 'reject' },
       });
       if (error) throw error;
+      if (data?.error) {
+        toast.info(`${visitor.name} is no longer pending approval`);
+        fetchVisitors();
+        return;
+      }
       toast.success(`${visitor.name} rejected`);
       fetchVisitors();
     } catch (err: any) {
