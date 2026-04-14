@@ -250,6 +250,32 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Date of Visit</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !form.watch('scheduled_date') && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.watch('scheduled_date') ? format(form.watch('scheduled_date')!, 'PPP') : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={form.watch('scheduled_date')}
+                      onSelect={(date) => form.setValue('scheduled_date', date || new Date())}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name *</Label>
@@ -604,32 +630,6 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                   placeholder="Meeting, Interview, Delivery, etc."
                   {...form.register('purpose')}
                 />
-              </div>
-              <div className="space-y-2">
-                <Label>Date of Visit</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !form.watch('scheduled_date') && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {form.watch('scheduled_date') ? format(form.watch('scheduled_date')!, 'PPP') : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={form.watch('scheduled_date')}
-                      onSelect={(date) => form.setValue('scheduled_date', date || new Date())}
-                      initialFocus
-                      className={cn("p-3 pointer-events-auto")}
-                    />
-                  </PopoverContent>
-                </Popover>
               </div>
             </CardContent>
           </Card>
