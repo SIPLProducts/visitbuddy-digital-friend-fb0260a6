@@ -140,7 +140,7 @@ export default function Analytics() {
 
     // Host-based filtering for Manager/Operator roles
     if (isRestrictedRole && hostEmployeeId && visitorsData) {
-      visitorsData = visitorsData.filter((v: any) => v.host_id === hostEmployeeId);
+      visitorsData = visitorsData.filter((v: any) => v.host_id === hostEmployeeId || v.created_by_user_id === user?.id);
     }
 
     // Fetch vehicles grouped by location with date filter
