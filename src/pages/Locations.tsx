@@ -72,6 +72,7 @@ export default function Locations() {
   const [isImportResultOpen, setIsImportResultOpen] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [rolesAtLocation, setRolesAtLocation] = useState<{ user_id: string; role: string; is_ho_admin: boolean; email?: string }[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
