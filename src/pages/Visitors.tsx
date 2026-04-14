@@ -51,6 +51,11 @@ import NewVisitor from './NewVisitor';
 export default function Visitors() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { userRoles, isHoAdmin } = useUserRoles();
+  const isGateSecurityOnly = useMemo(() => {
+    if (isHoAdmin) return false;
+    return userRoles.length > 0 && userRoles.every(r => r.role === 'gate_security');
+  }, [userRoles, isHoAdmin]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
