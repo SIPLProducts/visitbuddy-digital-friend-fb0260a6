@@ -1,54 +1,30 @@
 
 
-# Auto-Capture Photo During Check-In and Print Badge
+# Restrict Check-In to Matching Scheduled Date
 
 ## Summary
-When gate security checks in a visitor, the system will automatically open the camera to capture the visitor's photo, save it, then print the badge — all in one seamless flow.
-
-## Current Flow
-1. Gate security clicks "Check In" or "Check In & Print"
-2. Confirmation dialog opens → confirm → visitor is checked in
-3. If "Check In & Print", badge opens in new tab
-
-## New Flow
-1. Gate security clicks "Check In & Print" (or "Check In")
-2. **Camera dialog opens automatically** with live camera feed
-3. Security captures the visitor's photo
-4. Photo is uploaded to the `visitor-photos` storage bucket
-5. Visitor record is updated with `photo_url`, status set to `checked_in`, and `check_in_time`
-6. Badge automatically opens in a new tab for printing
-7. Toast confirmation shown
+When a host creates a visitor with a future `scheduled_date`, gate security can see the visitor in the list but cannot check them in until the system date matches the visitor's scheduled date. The "Check In & Print" button and check-in/check-out dropdown items will only appear when `scheduled_date` equals today.
 
 ## Changes
 
-### 1. `src/pages/Visitors.tsx`
-- Modify `handleCheckIn` and `handleCheckInAndPrint` to open a new **photo capture dialog** instead of the simple CheckInDialog
-- Add state for photo capture dialog (`showPhotoCaptureDialog`)
-- After photo is captured:
-  - Upload photo blob to `visitor-photos` bucket with path `{visitor_id}/checkin.jpg`
-  - Get the public URL
-  - Update visitor record: `status = 'checked_in'`, `check_in_time`, `photo_url`
-  - Auto-open print badge page
-- Keep watchlist check before allowing photo capture
+### 1. `src/components/visitors/VisitorActions.tsx`
+- Add a date comparison helper: check if `visitor.scheduled_date` matches today's date (using local date string comparison)
+- Gate the "Check In & Print" button, "Check In", and "Check Out" dropdown items behind an additional `isScheduledToday` condition
+- For visitors whose `scheduled_date` is in the future, these actions will not render
+- Check-out for `checked_in` visitors should still work regardless of date (they were already checked in)
 
-### 2. Create `src/components/visitors/CheckInCaptureDialog.tsx`
-- New dialog component that combines:
-  - Watchlist check (from existing CheckInDialog logic)
-  - If watchlist is clear (or warning-only), show the `CameraCapture` component automatically
-  - After photo capture, show a brief preview with "Confirm Check-In" button
-  - On confirm: upload photo → update visitor → open badge → close dialog
-- Uses existing `CameraCapture` component for camera/upload functionality
-- Shows loading state during upload and check-in
+### 2. `src/components/dashboard/RecentVisitors.tsx`
+- Apply the same `isScheduledToday` check in the swipe actions and dropdown menu items
+- Only show check-in swipe/dropdown when the visitor's scheduled date is today
 
-### 3. `src/components/visitors/CheckInDialog.tsx`
-- No changes needed — kept for backward compatibility with other pages (CheckInOut, etc.)
+### Logic
+```text
+isScheduledToday = visitor.scheduled_date is null OR visitor.scheduled_date === today's date (YYYY-MM-DD)
 
-### 4. `src/components/dashboard/RecentVisitors.tsx`
-- Update the check-in handler to also use the photo capture flow (same pattern as Visitors.tsx)
+Show "Check In & Print": canCheckInOut AND status === 'scheduled' AND isScheduledToday
+Show "Check In" dropdown: canCheckInOut AND (status === 'scheduled' || 'checked_out') AND isScheduledToday
+Show "Check Out" dropdown: canCheckInOut AND status === 'checked_in' (no date restriction — already checked in)
+```
 
-## Technical Notes
-- Reuses existing `CameraCapture` component (camera + upload tabs)
-- Uses existing `visitor-photos` storage bucket (already public)
-- Photo URL stored in visitor's `photo_url` field
-- Badge print page already reads `photo_url`, so captured photo will appear on the badge automatically
+This ensures future-dated visitors are visible but not actionable until their visit date arrives.
 
