@@ -19,39 +19,62 @@ interface DailyData {
   vehicles: number;
 }
 
-export function VisitorTrendChart() {
+interface VisitorTrendChartProps {
+  locationFilter?: string;
+  departmentFilter?: string;
+}
+
+export function VisitorTrendChart({ locationFilter = 'all', departmentFilter = 'all' }: VisitorTrendChartProps) {
   const [data, setData] = useState<DailyData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTrendData();
-  }, []);
+  }, [locationFilter, departmentFilter]);
 
   const fetchTrendData = async () => {
+    setLoading(true);
     const days = 7;
-    const result: DailyData[] = [];
+    const startDate = format(subDays(new Date(), days - 1), 'yyyy-MM-dd');
+    const endDate = format(new Date(), 'yyyy-MM-dd');
 
+    // Fetch all visitors and vehicles for the 7-day range in one query each
+    let visitorQuery = supabase
+      .from('visitors')
+      .select('created_at, department_id, gate:gates(location_id)')
+      .gte('created_at', `${startDate}T00:00:00`)
+      .lte('created_at', `${endDate}T23:59:59`);
+
+    let vehicleQuery = supabase
+      .from('vehicles')
+      .select('created_at, department_id, gate:gates(location_id)')
+      .gte('created_at', `${startDate}T00:00:00`)
+      .lte('created_at', `${endDate}T23:59:59`);
+
+    const [visitorRes, vehicleRes] = await Promise.all([visitorQuery, vehicleQuery]);
+
+    let visitorData = (visitorRes.data || []) as any[];
+    let vehicleData = (vehicleRes.data || []) as any[];
+
+    // Apply filters client-side
+    if (locationFilter !== 'all') {
+      visitorData = visitorData.filter(v => v.gate?.location_id === locationFilter);
+      vehicleData = vehicleData.filter(v => v.gate?.location_id === locationFilter);
+    }
+    if (departmentFilter !== 'all') {
+      visitorData = visitorData.filter(v => v.department_id === departmentFilter);
+      vehicleData = vehicleData.filter(v => v.department_id === departmentFilter);
+    }
+
+    const result: DailyData[] = [];
     for (let i = days - 1; i >= 0; i--) {
       const date = subDays(new Date(), i);
       const dateStr = format(date, 'yyyy-MM-dd');
 
-      const [visitorRes, vehicleRes] = await Promise.all([
-        supabase
-          .from('visitors')
-          .select('id', { count: 'exact', head: true })
-          .gte('created_at', `${dateStr}T00:00:00`)
-          .lte('created_at', `${dateStr}T23:59:59`),
-        supabase
-          .from('vehicles')
-          .select('id', { count: 'exact', head: true })
-          .gte('created_at', `${dateStr}T00:00:00`)
-          .lte('created_at', `${dateStr}T23:59:59`),
-      ]);
-
       result.push({
         date: format(date, 'EEE'),
-        visitors: visitorRes.count || 0,
-        vehicles: vehicleRes.count || 0,
+        visitors: visitorData.filter(v => v.created_at?.startsWith(dateStr)).length,
+        vehicles: vehicleData.filter(v => v.created_at?.startsWith(dateStr)).length,
       });
     }
 
