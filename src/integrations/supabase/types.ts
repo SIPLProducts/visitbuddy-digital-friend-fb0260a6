@@ -283,6 +283,45 @@ export type Database = {
           },
         ]
       }
+      email_config: {
+        Row: {
+          created_at: string
+          id: string
+          sender_email: string
+          sender_name: string
+          smtp_host: string
+          smtp_password: string
+          smtp_port: number
+          smtp_username: string
+          updated_at: string
+          use_tls: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sender_email: string
+          sender_name?: string
+          smtp_host: string
+          smtp_password: string
+          smtp_port?: number
+          smtp_username: string
+          updated_at?: string
+          use_tls?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sender_email?: string
+          sender_name?: string
+          smtp_host?: string
+          smtp_password?: string
+          smtp_port?: number
+          smtp_username?: string
+          updated_at?: string
+          use_tls?: boolean
+        }
+        Relationships: []
+      }
       employees: {
         Row: {
           created_at: string

@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.anpr-scan]
 verify_jwt = false
+
+[functions.test-email]
+verify_jwt = false
