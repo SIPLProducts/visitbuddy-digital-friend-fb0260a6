@@ -60,6 +60,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { logAudit } from '@/lib/auditLog';
 import { toast } from 'sonner';
 import { useUserRoles, AppRole } from '@/hooks/useUserRoles';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail } from '@/components/shared/CsvImportResult';
@@ -254,12 +255,17 @@ export default function UserManagement() {
 
   const handleDeleteRole = async (roleId: string) => {
     try {
+      const roleToDelete = userRoles.find(r => r.id === roleId);
       const { error } = await supabase
         .from('user_location_roles')
         .delete()
         .eq('id', roleId);
       if (error) throw error;
       toast.success('User role removed');
+      if (roleToDelete) {
+        const profile = profiles.find(p => p.user_id === roleToDelete.user_id);
+        logAudit({ action: 'user_role_changed', entityType: 'user', entityId: roleToDelete.user_id, entityName: profile?.full_name || roleToDelete.user_id, details: { change: 'deleted', role: roleToDelete.role, location_id: roleToDelete.location_id, is_ho_admin: roleToDelete.is_ho_admin }, locationId: roleToDelete.location_id });
+      }
       fetchData();
     } catch (error) {
       console.error('Error deleting role:', error);
@@ -433,6 +439,8 @@ export default function UserManagement() {
         });
 
       if (error) throw error;
+      const profile = profiles.find(p => p.user_id === assignUserId);
+      logAudit({ action: 'user_role_changed', entityType: 'user', entityId: assignUserId, entityName: profile?.full_name || assignUserId, details: { change: 'assigned', role: assignRole, location_id: assignLocationId, is_ho_admin: assignIsHoAdmin }, locationId: assignLocationId });
       toast.success('User assigned to role successfully!');
       setIsAssignUserDialogOpen(false);
       setAssignUserId('');
@@ -464,6 +472,8 @@ export default function UserManagement() {
         .update({ role: editRole, is_ho_admin: editIsHoAdmin, location_id: editLocationId })
         .eq('id', editingRole.id);
       if (error) throw error;
+      const profile = profiles.find(p => p.user_id === editingRole.user_id);
+      logAudit({ action: 'user_role_changed', entityType: 'user', entityId: editingRole.user_id, entityName: profile?.full_name || editingRole.user_id, details: { change: 'updated', oldRole: editingRole.role, newRole: editRole, is_ho_admin: editIsHoAdmin, location_id: editLocationId }, locationId: editLocationId });
       toast.success('Role updated successfully!');
       setIsEditRoleDialogOpen(false);
       setEditingRole(null);
