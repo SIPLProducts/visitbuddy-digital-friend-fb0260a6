@@ -44,7 +44,12 @@ interface VehicleTypeOption {
   name: string;
 }
 
-export default function NewVehicle() {
+interface NewVehicleProps {
+  inline?: boolean;
+  onClose?: () => void;
+}
+
+export default function NewVehicle({ inline = false, onClose }: NewVehicleProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
@@ -159,25 +164,31 @@ export default function NewVehicle() {
     }
 
     setLoading(false);
-    navigate('/vehicles');
+    if (inline && onClose) {
+      onClose();
+    } else {
+      navigate('/vehicles');
+    }
   };
 
   return (
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Register Vehicle
-            </h1>
-            <p className="text-muted-foreground">
-              Add a new commercial vehicle to the system
-            </p>
+        {!inline && (
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">
+                Register Vehicle
+              </h1>
+              <p className="text-muted-foreground">
+                Add a new commercial vehicle to the system
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Vehicle Information */}

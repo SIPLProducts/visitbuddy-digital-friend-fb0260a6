@@ -27,6 +27,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Truck, Plus, Search, MoreVertical, LogIn, LogOut, Trash2, QrCode, FileText, History, Clock } from 'lucide-react';
 import { AnprPanel } from '@/components/vehicles/AnprPanel';
+import NewVehicle from '@/pages/NewVehicle';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle, VehicleEntry } from '@/types/vehicle';
 import { toast } from 'sonner';
@@ -41,6 +42,7 @@ export default function Vehicles() {
   const [vehicleEntries, setVehicleEntries] = useState<VehicleEntry[]>([]);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [showNewVehicleForm, setShowNewVehicleForm] = useState(false);
 
   useEffect(() => {
     fetchVehicles();
@@ -270,12 +272,19 @@ export default function Vehicles() {
               <QrCode className="h-4 w-4 mr-2" />
               Gate Entry
             </Button>
-            <Button onClick={() => navigate('/vehicles/new')}>
+            <Button onClick={() => setShowNewVehicleForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Vehicle
             </Button>
           </div>
         </div>
+
+        {/* Inline New Vehicle Form */}
+        {showNewVehicleForm && (
+          <div className="border border-border rounded-xl bg-card p-6">
+            <NewVehicle inline onClose={() => { setShowNewVehicleForm(false); fetchVehicles(); }} />
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
