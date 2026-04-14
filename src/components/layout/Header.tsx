@@ -63,13 +63,27 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const fetchLocations = async () => {
     try {
-      const { data, error } = await supabase
-        .from('locations')
-        .select('id, name, city')
-        .order('name');
-
-      if (error) throw error;
-      setLocations(data || []);
+      if (isHoAdmin) {
+        const { data, error } = await supabase
+          .from('locations')
+          .select('id, name, city')
+          .order('name');
+        if (error) throw error;
+        setLocations(data || []);
+      } else {
+        const assignedLocationIds = userRoles.map(r => r.location_id);
+        if (assignedLocationIds.length === 0) {
+          setLocations([]);
+          return;
+        }
+        const { data, error } = await supabase
+          .from('locations')
+          .select('id, name, city')
+          .in('id', assignedLocationIds)
+          .order('name');
+        if (error) throw error;
+        setLocations(data || []);
+      }
     } catch (error) {
       console.error('Error fetching locations:', error);
     }
@@ -112,29 +126,36 @@ export function Header({ onMenuClick }: HeaderProps) {
         {/* Location Selector */}
         {!rolesLoading && locations.length > 0 && (
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Select value={selectedLocationId} onValueChange={handleLocationChange}>
-              <SelectTrigger className="w-[120px] md:w-[200px] bg-background h-10">
-                <div className="flex items-center gap-2 truncate">
-                  <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <SelectValue placeholder="Location" className="truncate" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                {isHoAdmin && (
-                  <SelectItem value="all">
-                    <div className="flex items-center gap-2">
-                      <Crown className="h-4 w-4 text-[#f59e0b]" />
-                      All Locations
-                    </div>
-                  </SelectItem>
-                )}
-                {locations.map((location) => (
-                  <SelectItem key={location.id} value={location.id}>
-                    {location.name} {location.city && `(${location.city})`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {locations.length === 1 && !isHoAdmin ? (
+              <div className="flex items-center gap-2 text-sm px-3 h-10">
+                <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="font-medium truncate">{locations[0].name}</span>
+              </div>
+            ) : (
+              <Select value={selectedLocationId} onValueChange={handleLocationChange}>
+                <SelectTrigger className="w-[120px] md:w-[200px] bg-background h-10">
+                  <div className="flex items-center gap-2 truncate">
+                    <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <SelectValue placeholder="Location" className="truncate" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {isHoAdmin && (
+                    <SelectItem value="all">
+                      <div className="flex items-center gap-2">
+                        <Crown className="h-4 w-4 text-[#f59e0b]" />
+                        All Locations
+                      </div>
+                    </SelectItem>
+                  )}
+                  {locations.map((location) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.name} {location.city && `(${location.city})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         )}
 
