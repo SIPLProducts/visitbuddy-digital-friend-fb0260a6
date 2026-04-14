@@ -260,7 +260,14 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
               <div className="flex gap-2">
                 <Select
                   value={formData.host_id || undefined}
-                  onValueChange={(value) => setFormData({ ...formData, host_id: value })}
+                  onValueChange={(value) => {
+                    const selectedEmployee = employees.find(e => e.id === value);
+                    setFormData({
+                      ...formData,
+                      host_id: value,
+                      department_id: selectedEmployee?.department?.id || formData.department_id,
+                    });
+                  }}
                 >
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Select host" />

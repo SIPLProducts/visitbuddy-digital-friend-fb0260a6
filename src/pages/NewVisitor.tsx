@@ -573,7 +573,13 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Host</Label>
-                  <Select onValueChange={(value) => form.setValue('host_id', value)}>
+                  <Select onValueChange={(value) => {
+                    form.setValue('host_id', value);
+                    const selectedEmployee = employees.find(e => e.id === value);
+                    if (selectedEmployee?.department?.id) {
+                      form.setValue('department_id', selectedEmployee.department.id);
+                    }
+                  }}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select host" />
                     </SelectTrigger>
@@ -588,7 +594,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                 </div>
                 <div className="space-y-2">
                   <Label>Department</Label>
-                  <Select onValueChange={(value) => form.setValue('department_id', value)}>
+                  <Select value={form.watch('department_id')} onValueChange={(value) => form.setValue('department_id', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
