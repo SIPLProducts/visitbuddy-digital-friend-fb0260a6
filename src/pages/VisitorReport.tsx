@@ -68,13 +68,7 @@ export default function VisitorReport() {
     from: subDays(new Date(), 30),
     to: new Date(),
   });
-  const [stats, setStats] = useState({
-    total: 0,
-    checkedIn: 0,
-    checkedOut: 0,
-    withLaptop: 0,
-    avgDuration: '0h 0m',
-  });
+  // stats are now computed reactively via filteredStats memo
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -130,34 +124,6 @@ export default function VisitorReport() {
     if (data) {
       const typedData = data as unknown as Visitor[];
       setVisitors(typedData);
-      
-      // Calculate average duration
-      const completedVisits = typedData.filter(
-        (v) => v.check_in_time && v.check_out_time
-      );
-      
-      let avgMinutes = 0;
-      if (completedVisits.length > 0) {
-        const totalMinutes = completedVisits.reduce((sum, v) => {
-          const mins = differenceInMinutes(
-            new Date(v.check_out_time!),
-            new Date(v.check_in_time!)
-          );
-          return sum + mins;
-        }, 0);
-        avgMinutes = Math.round(totalMinutes / completedVisits.length);
-      }
-      
-      const hours = Math.floor(avgMinutes / 60);
-      const mins = avgMinutes % 60;
-      
-      setStats({
-        total: typedData.length,
-        checkedIn: typedData.filter((v) => v.status === 'checked_in').length,
-        checkedOut: typedData.filter((v) => v.status === 'checked_out').length,
-        withLaptop: typedData.filter((v) => v.has_laptop).length,
-        avgDuration: `${hours}h ${mins}m`,
-      });
     }
     setLoading(false);
   };
@@ -433,27 +399,7 @@ export default function VisitorReport() {
     }
   };
 
-  const filteredVisitors = visitors.filter((visitor) => {
-    const matchesSearch =
-      visitor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      visitor.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      visitor.host?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      visitor.visitor_id.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === 'all' || visitor.status === statusFilter;
-
-    const matchesLocation =
-      locationFilter === 'all' || visitor.gate?.location?.id === locationFilter;
-
-    const matchesCompany =
-      companyFilter === 'all' || visitor.company === companyFilter;
-
-    const matchesDepartment =
-      departmentFilter === 'all' || visitor.department?.id === departmentFilter;
-
-    return matchesSearch && matchesStatus && matchesLocation && matchesCompany && matchesDepartment;
-  });
+  // filteredVisitors is defined above near line 165
 
   const getStatusColor = (status: string) => {
     switch (status) {
