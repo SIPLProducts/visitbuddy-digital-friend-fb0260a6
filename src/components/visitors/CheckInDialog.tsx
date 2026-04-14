@@ -8,7 +8,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +41,6 @@ export function CheckInDialog({
   onConfirm,
   loading = false,
 }: CheckInDialogProps) {
-  const [govtIdNumber, setGovtIdNumber] = useState('');
   const [error, setError] = useState('');
   const [ndaAgreed, setNdaAgreed] = useState(false);
   const [signatureData, setSignatureData] = useState<string | null>(null);
@@ -51,11 +49,9 @@ export function CheckInDialog({
   const [enableNda, setEnableNda] = useState(true);
   const [enableWatchlist, setEnableWatchlist] = useState(true);
   const [ndaText, setNdaText] = useState('');
-  const [step, setStep] = useState<'id' | 'nda'>('id');
 
   useEffect(() => {
     if (open) {
-      // Load tenant settings
       supabase.from('tenant_settings').select('enable_nda, enable_watchlist_check, nda_text').limit(1).single()
         .then(({ data }) => {
           if (data) {
@@ -64,7 +60,6 @@ export function CheckInDialog({
             setNdaText((data as any).nda_text || 'I agree to comply with all facility security policies and procedures.');
           }
         });
-      // Check watchlist
       if (visitorName) checkWatchlist();
     }
   }, [open, visitorName]);
@@ -88,51 +83,31 @@ export function CheckInDialog({
     setCheckingWatchlist(false);
   };
 
-  const handleIdSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = govtIdNumber.trim();
-    if (!trimmed) {
-      setError('Government ID number is required for check-in');
-      return;
-    }
-    if (trimmed.length < 3) {
-      setError('Please enter a valid ID number');
-      return;
-    }
-    setError('');
-    
-    if (enableNda) {
-      setStep('nda');
-    } else {
-      onConfirm(trimmed);
-    }
-  };
-
-  const handleNdaSubmit = async () => {
-    if (!ndaAgreed) {
+  const handleConfirm = async () => {
+    if (enableNda && !ndaAgreed) {
       setError('You must agree to the facility policies');
       return;
     }
-    // Save agreement
-    await supabase.from('visitor_agreements').insert({
-      visitor_id: null, // Will be linked after
-      agreement_type: 'nda',
-      agreement_text: ndaText,
-      signature_data: signatureData,
-    } as any);
-    
-    await logAudit({ action: 'visitor_check_in', entityType: 'visitor', entityName: visitorName, details: { nda_signed: true } });
-    onConfirm(govtIdNumber.trim());
+
+    if (enableNda) {
+      await supabase.from('visitor_agreements').insert({
+        visitor_id: null,
+        agreement_type: 'nda',
+        agreement_text: ndaText,
+        signature_data: signatureData,
+      } as any);
+      await logAudit({ action: 'visitor_check_in', entityType: 'visitor', entityName: visitorName, details: { nda_signed: true } });
+    }
+
+    onConfirm('');
   };
 
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
-      setGovtIdNumber('');
       setError('');
       setNdaAgreed(false);
       setSignatureData(null);
       setWatchlistMatch(null);
-      setStep('id');
     }
     onOpenChange(isOpen);
   };
@@ -142,16 +117,16 @@ export function CheckInDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {step === 'id' ? (
-              <><ShieldCheck className="h-5 w-5 text-primary" /> Visitor Check-In</>
-            ) : (
+            {enableNda ? (
               <><FileSignature className="h-5 w-5 text-primary" /> Policy Agreement</>
+            ) : (
+              <><ShieldCheck className="h-5 w-5 text-primary" /> Visitor Check-In</>
             )}
           </DialogTitle>
           <DialogDescription>
-            {step === 'id' 
-              ? <>Enter ID for <strong>{visitorName}</strong> to proceed.</>
-              : <>Please review and sign the facility policy agreement.</>
+            {enableNda 
+              ? <>Please review and sign the facility policy agreement for <strong>{visitorName}</strong>.</>
+              : <>Confirm check-in for <strong>{visitorName}</strong>.</>
             }
           </DialogDescription>
         </DialogHeader>
@@ -181,28 +156,7 @@ export function CheckInDialog({
           </div>
         )}
 
-        {step === 'id' ? (
-          <form onSubmit={handleIdSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="govt_id">Government ID Number *</Label>
-              <Input
-                id="govt_id"
-                placeholder="e.g. Aadhaar, PAN, Driving License number"
-                value={govtIdNumber}
-                onChange={(e) => { setGovtIdNumber(e.target.value); if (error) setError(''); }}
-                className="mt-1.5"
-                autoFocus
-              />
-              {error && <p className="text-sm text-destructive mt-1">{error}</p>}
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
-              <Button type="submit" disabled={loading || (watchlistMatch?.severity === 'blocked')}>
-                {enableNda ? 'Next: Sign Agreement' : loading ? 'Checking In...' : 'Confirm Check-In'}
-              </Button>
-            </DialogFooter>
-          </form>
-        ) : (
+        {enableNda ? (
           <div className="space-y-4">
             <div className="p-3 bg-muted/50 rounded-lg border text-sm max-h-32 overflow-y-auto">
               {ndaText}
@@ -223,12 +177,19 @@ export function CheckInDialog({
             {error && <p className="text-sm text-destructive">{error}</p>}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setStep('id')}>Back</Button>
-              <Button onClick={handleNdaSubmit} disabled={loading || !ndaAgreed}>
+              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+              <Button onClick={handleConfirm} disabled={loading || !ndaAgreed || (watchlistMatch?.severity === 'blocked')}>
                 {loading ? 'Checking In...' : 'Sign & Check In'}
               </Button>
             </DialogFooter>
           </div>
+        ) : (
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>Cancel</Button>
+            <Button onClick={handleConfirm} disabled={loading || (watchlistMatch?.severity === 'blocked')}>
+              {loading ? 'Checking In...' : 'Confirm Check-In'}
+            </Button>
+          </DialogFooter>
         )}
       </DialogContent>
     </Dialog>

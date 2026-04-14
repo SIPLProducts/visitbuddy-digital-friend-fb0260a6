@@ -67,6 +67,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
     mobile_serial: '',
     accompanying_count: 0,
     scheduled_date: new Date(),
+    govt_id_number: '',
   });
 
   useEffect(() => {
@@ -96,6 +97,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         mobile_serial: visitor.mobile_serial || '',
         accompanying_count: visitor.accompanying_count || 0,
         scheduled_date: visitor.scheduled_date ? parseISO(visitor.scheduled_date) : new Date(),
+        govt_id_number: (visitor as any).govt_id_number || '',
       });
     }
   }, [visitor, open]);
@@ -142,6 +144,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
         mobile_serial: formData.has_mobile ? formData.mobile_serial : null,
         accompanying_count: formData.accompanying_count,
         scheduled_date: formData.scheduled_date ? format(formData.scheduled_date, 'yyyy-MM-dd') : null,
+        govt_id_number: formData.govt_id_number || null,
       })
       .eq('id', visitor.id);
 
@@ -202,6 +205,16 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
+              />
+            </div>
+            
+            <div className="col-span-2">
+              <Label htmlFor="govt_id_number">Aadhaar Number</Label>
+              <Input
+                id="govt_id_number"
+                placeholder="1234 5678 9012"
+                value={formData.govt_id_number}
+                onChange={(e) => setFormData({ ...formData, govt_id_number: e.target.value })}
               />
             </div>
             
