@@ -23,7 +23,7 @@ export default function ComplianceReport() {
     setLoading(true);
     const since = subDays(new Date(), parseInt(period)).toISOString();
     const [vRes, aRes] = await Promise.all([
-      supabase.from('visitors').select('id, name, status, check_in_time, check_out_time, govt_id_number, created_at, gate:gates(name)').gte('created_at', since).order('created_at', { ascending: false }),
+      supabase.from('visitors').select('id, name, status, check_in_time, check_out_time, govt_id_number, created_at, purpose, scheduled_date, gate:gates(name)').gte('created_at', since).order('created_at', { ascending: false }),
       supabase.from('visitor_agreements').select('*').gte('created_at', since),
     ]);
     setVisitors((vRes.data as any) || []);
