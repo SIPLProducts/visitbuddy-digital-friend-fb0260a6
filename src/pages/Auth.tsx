@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Shield, CheckCircle2, Loader2, Crown, Building2, Users, UserCheck, ShieldCheck, User } from 'lucide-react';
+import { Eye, EyeOff, Shield, Loader2 } from 'lucide-react';
 import authHero from '@/assets/auth-hero.jpg';
 import authCheckin from '@/assets/auth-checkin.jpg';
 import authAccess from '@/assets/auth-access.jpg';
@@ -38,69 +38,7 @@ const featureImages = [
   { src: authBadge, title: 'Badge Management', description: 'Instant badge printing' },
 ];
 
-// Demo users for client demonstration
-const demoUsers = [
-  { 
-    email: 'bala@sharviinfotech.com', 
-    password: '123456', 
-    name: 'Bala', 
-    role: 'HO Admin',
-    location: 'All Locations',
-    color: 'bg-amber-500',
-    icon: Crown,
-    description: 'Full access across all locations',
-  },
-  { 
-    email: 'admin.delhi@demo.com', 
-    password: '123456', 
-    name: 'Amit Kumar', 
-    role: 'Admin',
-    location: 'Regional Office - Delhi',
-    color: 'bg-destructive',
-    icon: Shield,
-    description: 'Location admin for Delhi office',
-  },
-  { 
-    email: 'manager@demo.com', 
-    password: '123456', 
-    name: 'Priya Sharma', 
-    role: 'Manager',
-    location: 'Tech Campus - Bangalore',
-    color: 'bg-info',
-    icon: Users,
-    description: 'Manages visitors at Bangalore campus',
-  },
-  { 
-    email: 'operator@demo.com', 
-    password: '123456', 
-    name: 'Rahul Verma', 
-    role: 'Operator',
-    location: 'Mfg Plant - Pune',
-    color: 'bg-success',
-    icon: UserCheck,
-    description: 'Gate operator at Pune plant',
-  },
-  { 
-    email: 'security@demo.com', 
-    password: '123456', 
-    name: 'Suresh Patil', 
-    role: 'Gate Security',
-    location: 'Mfg Plant - Pune',
-    color: 'bg-warning',
-    icon: ShieldCheck,
-    description: 'Check-in/out & vehicle gate',
-  },
-  { 
-    email: 'visitor@demo.com', 
-    password: '123456', 
-    name: 'Ananya Reddy', 
-    role: 'Visitor',
-    location: 'Tech Campus - BLR',
-    color: 'bg-secondary',
-    icon: User,
-    description: 'View-only visitor access',
-  },
-];
+
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -157,10 +95,8 @@ export default function Auth() {
     }
   };
 
-  const handleDemoLogin = (email: string, password: string) => {
-    loginForm.setValue('email', email);
-    loginForm.setValue('password', password);
-  };
+
+
 
   return (
     <div className="min-h-screen flex">
@@ -243,33 +179,8 @@ export default function Auth() {
             </p>
           </div>
 
-          {/* Demo Users Section */}
-          {isLogin && (
-            <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-accent/50 to-accent/30 border border-border">
-              <p className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
-                <Crown className="h-4 w-4 text-amber-500" />
-                Demo Accounts <span className="text-xs text-muted-foreground font-normal">(click to auto-fill)</span>
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {demoUsers.map((demo) => (
-                  <button
-                    key={demo.email}
-                    type="button"
-                    onClick={() => handleDemoLogin(demo.email, demo.password)}
-                    className="flex items-center gap-2.5 p-2.5 rounded-lg bg-card border border-border hover:border-primary transition-all hover:shadow-md text-left"
-                  >
-                    <div className={`w-8 h-8 rounded-full ${demo.color} flex items-center justify-center shrink-0`}>
-                      <demo.icon className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-semibold text-foreground truncate">{demo.name}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">{demo.role} • {demo.location}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+
+
 
           {/* Auth Form */}
           <div className="bg-card rounded-2xl border shadow-sm p-6 sm:p-8">
