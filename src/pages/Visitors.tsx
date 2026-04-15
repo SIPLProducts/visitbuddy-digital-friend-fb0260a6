@@ -554,6 +554,7 @@ export default function Visitors() {
                 <TableHead>{t('visitors.id')}</TableHead>
                 <TableHead>{t('visitors.company')}</TableHead>
                 <TableHead>{t('visitors.hostDepartment')}</TableHead>
+                <TableHead>Purpose</TableHead>
                 <TableHead>Created Date</TableHead>
                 <TableHead>{t('visitors.dateOfVisit')}</TableHead>
                 <TableHead>{t('visitors.vehicle')}</TableHead>
@@ -567,13 +568,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={13} className="text-center py-8">
+                   <TableCell colSpan={14} className="text-center py-8">
                     {t('visitors.loading')}
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={13} className="text-center py-8">
+                  <TableCell colSpan={14} className="text-center py-8">
                     {t('visitors.noVisitors')}
                   </TableCell>
                 </TableRow>
@@ -630,6 +631,9 @@ export default function Visitors() {
                           {visitor.host?.department?.name || visitor.department?.name || '—'}
                         </p>
                       </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {visitor.purpose || '—'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                       {format(new Date(visitor.created_at), 'dd/MM/yyyy')}

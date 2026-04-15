@@ -66,6 +66,8 @@ export default function ComplianceReport() {
     csv += 'SUMMARY\nTotal Visitors,' + stats.total + '\nWith ID,' + stats.withId + '\nNDA Signed,' + stats.withNda + '\nOverstayed,' + stats.overstayed + '\nID Compliance,' + stats.idComplianceRate + '%\n\n';
     csv += 'VIOLATIONS\nType,Severity,Visitor,Detail,Date\n';
     violations.forEach(v => { csv += `"${v.type}","${v.severity}","${v.visitor}","${v.detail}","${format(new Date(v.date), 'dd/MM/yyyy')}"\n`; });
+    csv += '\nVISITOR DETAILS\nName,Purpose,Date of Visit,Created Date,Status,ID Verified\n';
+    visitors.forEach(v => { csv += `"${v.name}","${v.purpose || ''}","${v.scheduled_date ? format(new Date(v.scheduled_date + 'T00:00:00'), 'dd/MM/yyyy') : ''}","${format(new Date(v.created_at), 'dd/MM/yyyy')}","${v.status}","${v.govt_id_number ? 'Yes' : 'No'}"\n`; });
     const blob = new Blob([csv], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

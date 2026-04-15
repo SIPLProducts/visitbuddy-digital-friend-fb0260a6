@@ -289,7 +289,7 @@ export default function VisitorReport() {
   }, [visitors]);
 
   const exportToCsv = () => {
-    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Location', 'Status', 'Checkout By', 'Check In', 'Check Out'];
+    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Created Date', 'Date of Visit', 'Location', 'Status', 'Checkout By', 'Check In', 'Check Out'];
     const rows = filteredVisitors.map((v) => [
       v.name,
       v.visitor_id,
@@ -298,6 +298,8 @@ export default function VisitorReport() {
       v.company || '',
       v.purpose || '',
       v.host?.name || '',
+      format(new Date(v.created_at), 'yyyy-MM-dd'),
+      v.scheduled_date ? format(new Date(v.scheduled_date + 'T00:00:00'), 'yyyy-MM-dd') : '',
       v.gate?.location?.name || '',
       v.status,
       (v as any).checkout_method || '',
@@ -1017,7 +1019,10 @@ export default function VisitorReport() {
               <TableRow>
                 <TableHead>Visitor</TableHead>
                 <TableHead>Company</TableHead>
+                <TableHead>Purpose</TableHead>
                 <TableHead>Host</TableHead>
+                <TableHead>Created Date</TableHead>
+                <TableHead>Date of Visit</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Checkout By</TableHead>
@@ -1029,7 +1034,7 @@ export default function VisitorReport() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8">
+                  <TableCell colSpan={12} className="text-center py-8">
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                       Loading...
@@ -1038,7 +1043,7 @@ export default function VisitorReport() {
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={12} className="text-center py-8 text-muted-foreground">
                     No visitors found matching your criteria
                   </TableCell>
                 </TableRow>
@@ -1056,6 +1061,9 @@ export default function VisitorReport() {
                     <TableCell>
                       <span className="font-medium">{visitor.company || '—'}</span>
                     </TableCell>
+                    <TableCell className="text-sm">
+                      {visitor.purpose || '—'}
+                    </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium">{visitor.host?.name || '—'}</p>
@@ -1063,6 +1071,12 @@ export default function VisitorReport() {
                           {visitor.department?.name}
                         </p>
                       </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {format(new Date(visitor.created_at), 'dd/MM/yyyy')}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {visitor.scheduled_date ? format(new Date(visitor.scheduled_date + 'T00:00:00'), 'dd/MM/yyyy') : '—'}
                     </TableCell>
                     <TableCell>
                       <div>
