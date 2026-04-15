@@ -78,7 +78,8 @@ function generateHostApprovalEmail(
   currentDate: string,
   currentTime: string,
   approveLink: string,
-  rejectLink: string
+  rejectLink: string,
+  accompanyingVisitors: any[] = []
 ): string {
   return `<!DOCTYPE html>
 <html>
@@ -106,6 +107,31 @@ function generateHostApprovalEmail(
           <tr><td style="padding:4px 8px;font-weight:bold;">Time:</td><td style="padding:4px 8px;">${currentTime}</td></tr>
         </table>
       </div>
+
+      ${accompanyingVisitors.length > 0 ? `
+      <div style="background:#f0fdf4;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #16a34a;">
+        <h3 style="margin:0 0 12px;color:#166534;font-size:15px;">👥 Accompanying Persons (${accompanyingVisitors.length})</h3>
+        <table style="width:100%;font-size:13px;color:#374151;border-collapse:collapse;">
+          <tr style="background:#dcfce7;">
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">#</th>
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">Name</th>
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">Phone</th>
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">Devices</th>
+          </tr>
+          ${accompanyingVisitors.map((av: any, i: number) => {
+            const devices: string[] = [];
+            if (av.has_laptop) devices.push(`💻 ${av.laptop_brand || 'Laptop'}${av.laptop_serial ? ` (${av.laptop_serial})` : ''}`);
+            if (av.has_mobile) devices.push(`📱 ${av.mobile_brand || 'Mobile'}${av.mobile_serial ? ` (${av.mobile_serial})` : ''}`);
+            return `<tr>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${i + 1}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${av.name}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${av.phone || '-'}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${devices.length > 0 ? devices.join(', ') : 'None'}</td>
+            </tr>`;
+          }).join('')}
+        </table>
+      </div>
+      ` : ''}
 
       <div style="text-align:center;margin:24px 0;">
         <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">✅ Approve Visit</a>
@@ -263,6 +289,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Host ${hostData.name} (${hostData.email}, ${hostData.phone}) should be notified about visitor ${visitor.name}`);
 
+    // Fetch accompanying visitors
+    const { data: accompanyingVisitors } = await supabase
+      .from("accompanying_visitors")
+      .select("name, phone, has_laptop, laptop_brand, laptop_serial, has_mobile, mobile_brand, mobile_serial")
+      .eq("visitor_id", visitor.id);
+    
+    const companions = accompanyingVisitors || [];
+    console.log(`Found ${companions.length} accompanying visitors`);
+
     const currentDate = new Date().toLocaleDateString("en-IN", {
       weekday: "long",
       year: "numeric",
@@ -313,6 +348,9 @@ ${visitor.phone ? `📱 *Mobile:* ${visitor.phone}` : ""}
 ${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
 ${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
 ${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
+${companions.length > 0 ? `
+👥 *Accompanying Persons (${companions.length}):*
+${companions.map((c: any, i: number) => `  ${i + 1}. ${c.name}${c.phone ? ` (${c.phone})` : ''}`).join('\n')}` : ""}
 
 📅 *Date:* ${currentDate}
 ⏰ *Time:* ${currentTime}
@@ -443,7 +481,7 @@ _VisiGuard Visitor Management System_
       const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, approveLink, rejectLink
+        currentDate, currentTime, approveLink, rejectLink, companions
       );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
@@ -454,7 +492,7 @@ _VisiGuard Visitor Management System_
       // For direct check-in, still notify host via email
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, "", ""
+        currentDate, currentTime, "", "", companions
       ).replace(/Visitor Approval Required/g, "Visitor Arrival Notification")
        .replace(/<div style="text-align:center;margin:24px 0;">[\s\S]*?<\/div>/,
         '<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>');
