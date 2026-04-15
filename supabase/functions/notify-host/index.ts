@@ -108,6 +108,31 @@ function generateHostApprovalEmail(
         </table>
       </div>
 
+      ${accompanyingVisitors.length > 0 ? `
+      <div style="background:#f0fdf4;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #16a34a;">
+        <h3 style="margin:0 0 12px;color:#166534;font-size:15px;">👥 Accompanying Persons (${accompanyingVisitors.length})</h3>
+        <table style="width:100%;font-size:13px;color:#374151;border-collapse:collapse;">
+          <tr style="background:#dcfce7;">
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">#</th>
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">Name</th>
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">Phone</th>
+            <th style="padding:6px 8px;text-align:left;border-bottom:1px solid #bbf7d0;">Devices</th>
+          </tr>
+          ${accompanyingVisitors.map((av: any, i: number) => {
+            const devices: string[] = [];
+            if (av.has_laptop) devices.push(`💻 ${av.laptop_brand || 'Laptop'}${av.laptop_serial ? ` (${av.laptop_serial})` : ''}`);
+            if (av.has_mobile) devices.push(`📱 ${av.mobile_brand || 'Mobile'}${av.mobile_serial ? ` (${av.mobile_serial})` : ''}`);
+            return `<tr>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${i + 1}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${av.name}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${av.phone || '-'}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #e5e7eb;">${devices.length > 0 ? devices.join(', ') : 'None'}</td>
+            </tr>`;
+          }).join('')}
+        </table>
+      </div>
+      ` : ''}
+
       <div style="text-align:center;margin:24px 0;">
         <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">✅ Approve Visit</a>
         <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">❌ Reject Visit</a>
