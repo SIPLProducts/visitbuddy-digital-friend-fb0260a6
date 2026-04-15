@@ -348,6 +348,9 @@ ${visitor.phone ? `📱 *Mobile:* ${visitor.phone}` : ""}
 ${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
 ${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
 ${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
+${companions.length > 0 ? `
+👥 *Accompanying Persons (${companions.length}):*
+${companions.map((c: any, i: number) => `  ${i + 1}. ${c.name}${c.phone ? ` (${c.phone})` : ''}`).join('\n')}` : ""}
 
 📅 *Date:* ${currentDate}
 ⏰ *Time:* ${currentTime}
