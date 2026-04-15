@@ -1,21 +1,28 @@
 
 
-# Add Back "Officer" Signature Box to Both Badge Components
+# Badge Layout: "Visitor Pass" Title Left of Photo
 
 ## Summary
-Re-add the "Officer" signature box (with a signature line) to both `SafetyPermitBadge.tsx` and `PrintBadge.tsx`. Only "Officer" — not "Security" or "Visitor".
+Change the photo section in both badge files so that "VISITOR PASS" title text appears on the left side and the visitor photo on the right, in a horizontal row.
 
 ## Changes
 
-### 1. `src/components/badge/SafetyPermitBadge.tsx`
-- After the details `</div>` (line 189), before the closing `</div>` of the flex container (line 191), add a right-side column with a single "Officer" signature box:
-  - 100px wide, border-left, containing a signature line and "Officer" label
+### 1. `src/components/badge/SafetyPermitBadge.tsx` (lines 120-130)
+Replace the centered photo section with a flex row:
+- Left side: "VISITOR PASS" text (bold, uppercase, centered vertically)
+- Right side: Visitor photo/avatar (same size)
+- Same border-bottom and background styling
 
-### 2. `src/pages/PrintBadge.tsx`
-- After the details `</div>` (line 541), before the closing `</div>` of `details-signatures-row` (line 543), add a matching "Officer" signature box using inline CSS classes
-- Add corresponding CSS styles for the officer signature box
+### 2. `src/pages/PrintBadge.tsx` (lines 496-504)
+Replace the `.photo-section` with a flex row layout:
+- Left side: "VISITOR PASS" title
+- Right side: Photo box
+- Add CSS for the new `.title-photo-row` class
+
+### 3. Restore safety guidelines (keep QR commented out)
+Uncomment the safety points text while keeping only the QR code portion commented out in both files.
 
 ## Files Changed
-- `src/components/badge/SafetyPermitBadge.tsx` — Add Officer signature column
-- `src/pages/PrintBadge.tsx` — Add Officer signature column + CSS
+- `src/components/badge/SafetyPermitBadge.tsx`
+- `src/pages/PrintBadge.tsx`
 
