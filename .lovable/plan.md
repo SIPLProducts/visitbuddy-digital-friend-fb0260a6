@@ -1,46 +1,29 @@
 
 
-# Visitor UX Improvements: Photo Reuse, Loaders, Labels & Default Filter
+# Auto-Delete Visitor Records After Retention Period
 
 ## Summary
-Five changes: (1) reuse self-service uploaded photo at check-in instead of forcing camera, (2) add loading spinners to Approve/Reject/CheckIn/CheckOut buttons, (3) rename all "Aadhaar"/"Govt ID" labels to "Government Photo ID", (4) default status filter to "all" for all roles, (5) show existing photo with "Use This Photo" / "Retake" options.
+Create a scheduled edge function that deletes visitor records older than the configured `data_retention_days` (already exists in tenant_settings, default 90 days). Update the default to 30 days. Schedule a daily cron job to invoke it.
 
 ## Changes
 
-### 1. `src/components/visitors/CheckInCaptureDialog.tsx` — Show existing photo, skip camera
-- After watchlist check, if `visitor.photo_url` exists, display the photo with two buttons: **"Use This Photo"** (proceeds to check-in without re-upload) and **"Retake Photo"** (opens camera)
-- "Use This Photo" calls handleCapture-like logic but skips upload — just updates status to `checked_in`
-- Only show `CameraCapture` when no photo exists OR user clicks "Retake"
-- Update dialog description text accordingly
+### 1. New Edge Function: `supabase/functions/auto-delete-visitors/index.ts`
+- Read `data_retention_days` from `tenant_settings` (integer, days)
+- Select visitor IDs where `created_at < now() - interval '${days} days'`
+- Delete related `accompanying_visitors` and `visitor_agreements` for those IDs first
+- Delete the visitor records
+- Uses `SUPABASE_SERVICE_ROLE_KEY` to bypass RLS
+- Return count of deleted records
 
-### 2. `src/pages/Visitors.tsx` — Add loaders to Approve/Reject actions
-- Add `actionLoadingId` state to track which visitor ID is being processed
-- Wrap `handleApprove` and `handleReject` with `setActionLoadingId(visitor.id)` / clear on completion
-- Pass `actionLoadingId` to `VisitorActions` component
-- Change gate security default: remove line 110 `setStatusFilter('scheduled')` or change to `'all'`
+### 2. Update default retention to 30 days
+- Migration: `UPDATE tenant_settings SET data_retention_days = 30 WHERE data_retention_days = 90`
 
-### 3. `src/components/visitors/VisitorActions.tsx` — Show spinners on buttons
-- Add `actionLoadingId?: string` prop
-- When `actionLoadingId === visitor.id`, show `Loader2` spinner and disable Approve/Reject/CheckIn buttons
-
-### 4. Label rename — "Government Photo ID" in 5 files
-| File | Line | Old | New |
-|------|------|-----|-----|
-| `src/pages/NewVisitor.tsx` | 345 | `Aadhaar Number` | `Government Photo ID` |
-| `src/components/visitors/VisitorEditDialog.tsx` | 212 | `Aadhaar Number` | `Government Photo ID` |
-| `src/components/visitors/VisitorDetailsDialog.tsx` | 183 | `Govt ID Number` | `Government Photo ID` |
-| `src/pages/Watchlist.tsx` | 156 | `Govt ID Number` | `Government Photo ID` |
-| `src/pages/Watchlist.tsx` | 197 | `Govt ID` | `Govt Photo ID` |
-
-### 5. `src/pages/Visitors.tsx` — Default status to "all"
-- Line 110: Change `setStatusFilter('scheduled')` to `setStatusFilter('all')` for gate security users
+### 3. Schedule daily cron job
+- Enable `pg_cron` and `pg_net` extensions
+- Insert cron job running daily at 02:00 UTC calling the edge function via `net.http_post`
 
 ## Files Changed
-- `src/components/visitors/CheckInCaptureDialog.tsx` — Photo reuse logic with Use/Retake buttons
-- `src/pages/Visitors.tsx` — Action loading state, default filter fix
-- `src/components/visitors/VisitorActions.tsx` — Loading spinner props
-- `src/pages/NewVisitor.tsx` — Label rename
-- `src/components/visitors/VisitorEditDialog.tsx` — Label rename
-- `src/components/visitors/VisitorDetailsDialog.tsx` — Label rename
-- `src/pages/Watchlist.tsx` — Label rename
+- `supabase/functions/auto-delete-visitors/index.ts` — New cleanup edge function
+- Database migration — Update default retention to 30 days
+- Cron job via insert tool — Daily scheduled invocation
 
