@@ -1,24 +1,28 @@
 
 
-# Visitor Details Dialog Improvements & Gate Security Edit Access
+# Fix Scroll in Visitor Details Dialog
 
-## Changes
+## Problem
+The `ScrollArea` component is already present but the scroll isn't working properly because the Radix ScrollArea viewport needs proper height constraints to activate scrolling within a flex container.
 
-### 1. `src/components/visitors/VisitorDetailsDialog.tsx` — Reorder fields, add scroll, show all details
+## Fix
 
-- Add `max-h-[70vh] overflow-y-auto` to the content wrapper for scrollability
-- Move **Govt ID Number** inside the Visit Information section, directly after Purpose
-- Add **Mobile Details** section (when `has_mobile` is true) showing brand and serial — currently missing
-- Add **Checkout Method** display (when present)
-- Add **Checkout By** info if available
-- Ensure all collected fields are visible: photo (if URL exists), created date, date of visit, host, department, gate, purpose, govt ID, vehicle info, timing, laptop details, mobile details, accompanying count
+### `src/components/visitors/VisitorDetailsDialog.tsx`
 
-### 2. `src/pages/Visitors.tsx` — Allow Gate Security to edit visitors
+Change the `ScrollArea` wrapper to use `overflow-y-auto` directly instead of relying on Radix's internal overflow handling, and ensure the height constraint is applied correctly:
 
-- Change line 721 from `canEdit={!isGateSecurityOnly}` to `canEdit={!isRestrictedRole}` (or simply `canEdit={isGateSecurity || isHoAdmin || userRoles.some(r => r.role === 'admin')}`)
-- This allows Gate Security users to access the Edit option while still blocking Manager/Operator roles per existing restriction logic
+```tsx
+// Replace:
+<ScrollArea className="flex-1 max-h-[70vh] pr-4">
+
+// With:
+<div className="flex-1 overflow-y-auto max-h-[70vh] pr-2">
+```
+
+And close with `</div>` instead of `</ScrollArea>`. This ensures native browser scrollbar works reliably inside the flex dialog container.
+
+Alternatively, keep `ScrollArea` but add `h-[70vh]` (fixed height instead of max-height) to force the scroll container to activate.
 
 ## Files Changed
-- `src/components/visitors/VisitorDetailsDialog.tsx` — Reorder Govt ID after Purpose, add scrollbar, add mobile details section
-- `src/pages/Visitors.tsx` — Enable Edit for Gate Security role
+- `src/components/visitors/VisitorDetailsDialog.tsx` — Fix scrollable container for visitor details
 
