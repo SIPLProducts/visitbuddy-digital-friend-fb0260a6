@@ -164,7 +164,11 @@ const handler = async (req: Request): Promise<Response> => {
         Powered by VisiGuard VMS
       </p>
     </div>
-    
+    <div style="background:#1e293b;padding:16px;text-align:center;">
+      <p style="margin:0;color:#f1f5f9;font-size:12px;">🚀 Built with excellence by <strong>Sharvi Info Tech Pvt. Ltd.</strong></p>
+      <p style="margin:6px 0;"><a href="https://www.sharviinfotech.com/" style="color:#38bdf8;font-size:11px;text-decoration:none;">🌐 www.sharviinfotech.com</a></p>
+      <p style="margin:0;color:#94a3b8;font-size:11px;font-style:italic;">Transforming ideas into powerful digital solutions.</p>
+    </div>
   </div>
 </body>
 </html>
