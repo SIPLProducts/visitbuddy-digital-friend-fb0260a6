@@ -1,29 +1,26 @@
 
 
-# Auto-Delete Visitor Records After Retention Period
+# Badge Printing Cleanup
 
 ## Summary
-Create a scheduled edge function that deletes visitor records older than the configured `data_retention_days` (already exists in tenant_settings, default 90 days). Update the default to 30 days. Schedule a daily cron job to invoke it.
+Three changes to the SafetyPermitBadge component: remove the "SAFETY PERMIT / VISITOR" label section, remove the Security/Visitor/Officer signature boxes on the right side, and comment out the check-out QR section.
 
 ## Changes
 
-### 1. New Edge Function: `supabase/functions/auto-delete-visitors/index.ts`
-- Read `data_retention_days` from `tenant_settings` (integer, days)
-- Select visitor IDs where `created_at < now() - interval '${days} days'`
-- Delete related `accompanying_visitors` and `visitor_agreements` for those IDs first
-- Delete the visitor records
-- Uses `SUPABASE_SERVICE_ROLE_KEY` to bypass RLS
-- Return count of deleted records
+### `src/components/badge/SafetyPermitBadge.tsx`
 
-### 2. Update default retention to 30 days
-- Migration: `UPDATE tenant_settings SET data_retention_days = 30 WHERE data_retention_days = 90`
+1. **Remove "SAFETY PERMIT / VISITOR" title block** (lines 120-136)
+   - Delete the entire `<div className="flex border-b-2 border-gray-800">` block containing the "SAFETY PERMIT" heading and "VISITOR" subtitle
+   - Move the photo/avatar into the details section or keep it in the header area
 
-### 3. Schedule daily cron job
-- Enable `pg_cron` and `pg_net` extensions
-- Insert cron job running daily at 02:00 UTC calling the edge function via `net.http_post`
+2. **Remove Signatures column** (lines 197-211)
+   - Delete the right-side `<div className="w-[100px] border-l-2 ...">` containing Security, Visitor, and Officer signature boxes
+   - The details section will now span full width
+
+3. **Comment out Check-out QR section** (lines 232-254)
+   - Comment out the `<div className="flex border-t-2 border-gray-800 bg-gray-100">` block containing the safety guidelines text and the check-out QR code
+   - Keep the code for future re-enablement
 
 ## Files Changed
-- `supabase/functions/auto-delete-visitors/index.ts` — New cleanup edge function
-- Database migration — Update default retention to 30 days
-- Cron job via insert tool — Daily scheduled invocation
+- `src/components/badge/SafetyPermitBadge.tsx`
 
