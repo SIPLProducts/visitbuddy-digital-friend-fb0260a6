@@ -188,6 +188,11 @@ export function SafetyPermitBadge({
           </div>
         </div>
 
+        {/* Officer Signature Box */}
+        <div className="w-[100px] border-l-2 border-gray-800 flex flex-col items-center justify-end p-2">
+          <div className="w-full border-b border-gray-500 mb-1 mt-auto" style={{ minHeight: '40px' }}></div>
+          <span className="text-[9px] font-semibold text-gray-600">Officer</span>
+        </div>
       </div>
 
       {/* Location with Navigation QR */}

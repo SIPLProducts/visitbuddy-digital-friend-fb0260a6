@@ -371,6 +371,26 @@ export default function PrintBadge() {
         .detail-value {
           flex: 1;
         }
+        .officer-sig {
+          width: 100px;
+          border-left: 2px solid #1f2937;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-end;
+          padding: 8px;
+        }
+        .officer-sig .sig-line {
+          width: 100%;
+          border-bottom: 1px solid #6b7280;
+          margin-bottom: 4px;
+          min-height: 40px;
+        }
+        .officer-sig .sig-label {
+          font-size: 9px;
+          font-weight: 600;
+          color: #4b5563;
+        }
         .guidelines {
           display: flex;
           border-top: 2px solid #1f2937;
@@ -540,6 +560,10 @@ export default function PrintBadge() {
                   </div>
                 </div>
 
+                <div className="officer-sig">
+                  <div className="sig-line"></div>
+                  <span className="sig-label">Officer</span>
+                </div>
               </div>
 
               {(geoAddress || navigationUrl) && (
