@@ -83,7 +83,7 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
           <DialogTitle>Visitor Details</DialogTitle>
         </DialogHeader>
         
-        <ScrollArea className="flex-1 max-h-[70vh] pr-4">
+        <div className="flex-1 overflow-y-auto max-h-[70vh] pr-2">
           <div className="space-y-6">
             {/* Header with Avatar */}
             <div className="flex items-center gap-4">
