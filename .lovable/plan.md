@@ -1,26 +1,26 @@
 
 
-# Badge Printing Cleanup
+# Fix PrintBadge.tsx: Remove Labels, Signatures, Comment Out Checkout QR
 
 ## Summary
-Three changes to the SafetyPermitBadge component: remove the "SAFETY PERMIT / VISITOR" label section, remove the Security/Visitor/Officer signature boxes on the right side, and comment out the check-out QR section.
+The `PrintBadge.tsx` page has its own inline HTML badge (not using the `SafetyPermitBadge` component). It still contains the "SAFETY PERMIT / VISITOR" title, the Security/Visitor/Officer signature boxes, and the checkout QR section. These need to match the changes already made to `SafetyPermitBadge.tsx`.
 
 ## Changes
 
-### `src/components/badge/SafetyPermitBadge.tsx`
+### `src/pages/PrintBadge.tsx`
 
-1. **Remove "SAFETY PERMIT / VISITOR" title block** (lines 120-136)
-   - Delete the entire `<div className="flex border-b-2 border-gray-800">` block containing the "SAFETY PERMIT" heading and "VISITOR" subtitle
-   - Move the photo/avatar into the details section or keep it in the header area
+1. **Remove "SAFETY PERMIT / VISITOR" title block** (lines 517-529)
+   - Delete the `title-row` div containing "SAFETY PERMIT" heading and "VISITOR" subtitle
+   - Keep the photo box but move it into a standalone centered section (similar to SafetyPermitBadge)
 
-2. **Remove Signatures column** (lines 197-211)
-   - Delete the right-side `<div className="w-[100px] border-l-2 ...">` containing Security, Visitor, and Officer signature boxes
-   - The details section will now span full width
+2. **Remove Signatures column** (lines 588-601)
+   - Delete the `<div className="signatures">` block with Security, Visitor, Officer sig boxes
+   - Remove related CSS styles (`.signatures`, `.sig-box`, `.sig-line`, `.sig-label`)
 
-3. **Comment out Check-out QR section** (lines 232-254)
-   - Comment out the `<div className="flex border-t-2 border-gray-800 bg-gray-100">` block containing the safety guidelines text and the check-out QR code
-   - Keep the code for future re-enablement
+3. **Comment out Checkout QR + Safety Guidelines section** (lines 617-638)
+   - Comment out the entire `<div className="guidelines">` block containing safety text and checkout QR code
+   - Keep code for future re-enablement
 
 ## Files Changed
-- `src/components/badge/SafetyPermitBadge.tsx`
+- `src/pages/PrintBadge.tsx` — Remove title, signatures, comment out checkout section
 
