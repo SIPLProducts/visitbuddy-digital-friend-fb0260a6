@@ -117,22 +117,16 @@ export function SafetyPermitBadge({
         </div>
       </div>
 
-      {/* Safety Permit Title with Photo */}
-      <div className="flex border-b-2 border-gray-800">
-        <div className="flex-1 bg-gray-800 text-white p-2">
-          <h2 className="text-lg font-bold">SAFETY PERMIT</h2>
-          <p className="text-sm font-semibold">VISITOR</p>
-        </div>
-        <div className="w-24 p-1 flex items-center justify-center bg-gray-100">
-          <Avatar className="h-20 w-20 rounded-none">
-            {visitor.photo_url ? (
-              <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />
-            ) : null}
-            <AvatarFallback className="bg-gray-300 text-gray-700 text-xl font-bold rounded-none">
-              {getInitials(visitor.name)}
-            </AvatarFallback>
-          </Avatar>
-        </div>
+      {/* Photo Section */}
+      <div className="flex items-center justify-center py-2 border-b-2 border-gray-800 bg-gray-100">
+        <Avatar className="h-20 w-20 rounded-none">
+          {visitor.photo_url ? (
+            <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />
+          ) : null}
+          <AvatarFallback className="bg-gray-300 text-gray-700 text-xl font-bold rounded-none">
+            {getInitials(visitor.name)}
+          </AvatarFallback>
+        </Avatar>
       </div>
 
       {/* Details + Signatures Side by Side */}
@@ -194,21 +188,6 @@ export function SafetyPermitBadge({
           </div>
         </div>
 
-        {/* Signatures (Right) */}
-        <div className="w-[100px] border-l-2 border-gray-800 flex flex-col text-center text-[9px]">
-          <div className="flex-1 p-1.5 border-b border-gray-300 flex flex-col justify-end">
-            <div className="h-6 border-b border-dashed border-gray-400 mb-1"></div>
-            <p className="font-semibold italic">Security</p>
-          </div>
-          <div className="flex-1 p-1.5 border-b border-gray-300 flex flex-col justify-end">
-            <div className="h-6 border-b border-dashed border-gray-400 mb-1"></div>
-            <p className="font-semibold italic">Visitor</p>
-          </div>
-          <div className="flex-1 p-1.5 flex flex-col justify-end">
-            <div className="h-6 border-b border-dashed border-gray-400 mb-1"></div>
-            <p className="font-semibold italic">Officer</p>
-          </div>
-        </div>
       </div>
 
       {/* Location with Navigation QR */}
@@ -229,7 +208,7 @@ export function SafetyPermitBadge({
         </div>
       )}
 
-      {/* Safety Guidelines with QR */}
+      {/* Safety Guidelines with QR - Commented out for now
       <div className="flex border-t-2 border-gray-800 bg-gray-100">
         <div className="flex-1 p-2 text-[10px] leading-tight">
           <p className="mb-0.5">1. Your safety is your responsibility.</p>
@@ -252,6 +231,7 @@ export function SafetyPermitBadge({
           <span className="text-[8px] font-semibold text-gray-600">Check-out</span>
         </div>
       </div>
+      */}
 
       {/* Powered By Footer */}
       <div className="bg-gray-200 py-1.5 text-center border-t border-gray-300">
