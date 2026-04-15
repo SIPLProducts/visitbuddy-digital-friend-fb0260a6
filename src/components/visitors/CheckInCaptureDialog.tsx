@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, AlertTriangle, Ban, Loader2 } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, Ban, Loader2, Camera, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { Visitor } from '@/types/database';
@@ -39,12 +39,14 @@ export function CheckInCaptureDialog({
   const [checkingWatchlist, setCheckingWatchlist] = useState(false);
   const [watchlistChecked, setWatchlistChecked] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
 
   useEffect(() => {
     if (open && visitor) {
       setWatchlistMatch(null);
       setWatchlistChecked(false);
       setProcessing(false);
+      setShowCamera(false);
       checkWatchlist();
     }
   }, [open, visitor?.id]);
@@ -68,6 +70,37 @@ export function CheckInCaptureDialog({
     }
     setCheckingWatchlist(false);
     setWatchlistChecked(true);
+  };
+
+  // Use existing photo — just update status without re-uploading
+  const handleUseExistingPhoto = async () => {
+    if (!visitor) return;
+    setProcessing(true);
+    try {
+      const { error: updateError } = await supabase
+        .from('visitors')
+        .update({
+          status: 'checked_in' as const,
+          check_in_time: new Date().toISOString(),
+        })
+        .eq('id', visitor.id);
+
+      if (updateError) throw updateError;
+
+      toast.success(`${visitor.name} checked in successfully`);
+      onOpenChange(false);
+
+      if (autoPrint) {
+        window.open(`/print-badge?id=${visitor.id}`, '_blank');
+      }
+
+      onComplete();
+    } catch (err: any) {
+      console.error('Check-in error:', err);
+      toast.error('Failed to check in visitor: ' + (err.message || 'Unknown error'));
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const handleCapture = useCallback(async (photoBlob: Blob) => {
@@ -118,6 +151,7 @@ export function CheckInCaptureDialog({
   }, [visitor, autoPrint, onComplete, onOpenChange]);
 
   const isBlocked = watchlistMatch?.severity === 'blocked';
+  const hasExistingPhoto = !!visitor?.photo_url;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -127,7 +161,9 @@ export function CheckInCaptureDialog({
             <ShieldCheck className="h-5 w-5 text-primary" /> Check-In: {visitor?.name}
           </DialogTitle>
           <DialogDescription>
-            Capture visitor photo to complete check-in and print badge.
+            {hasExistingPhoto
+              ? 'Review the uploaded photo to complete check-in and print badge.'
+              : 'Capture visitor photo to complete check-in and print badge.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -170,11 +206,40 @@ export function CheckInCaptureDialog({
           </div>
         )}
 
-        {/* Camera - show only after watchlist check passes and not blocked */}
-        {watchlistChecked && !isBlocked && !processing && (
+        {/* Show existing photo with Use/Retake options */}
+        {watchlistChecked && !isBlocked && !processing && hasExistingPhoto && !showCamera && (
+          <div className="space-y-4">
+            <div className="flex justify-center">
+              <img
+                src={visitor!.photo_url!}
+                alt={`${visitor!.name} photo`}
+                className="w-48 h-48 object-cover rounded-lg border-2 border-border shadow-sm"
+              />
+            </div>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={handleUseExistingPhoto} className="gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Use This Photo
+              </Button>
+              <Button variant="outline" onClick={() => setShowCamera(true)} className="gap-2">
+                <Camera className="h-4 w-4" />
+                Retake Photo
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Camera - show when no photo OR user chose retake */}
+        {watchlistChecked && !isBlocked && !processing && (!hasExistingPhoto || showCamera) && (
           <CameraCapture
             onCapture={handleCapture}
-            onCancel={() => onOpenChange(false)}
+            onCancel={() => {
+              if (showCamera && hasExistingPhoto) {
+                setShowCamera(false);
+              } else {
+                onOpenChange(false);
+              }
+            }}
             autoStart={true}
           />
         )}

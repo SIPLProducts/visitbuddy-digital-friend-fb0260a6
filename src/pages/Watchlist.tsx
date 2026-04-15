@@ -153,7 +153,7 @@ export default function Watchlist() {
                   <div><Label>Phone</Label><Input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label>Govt ID Number</Label><Input value={form.govt_id_number} onChange={e => setForm(f => ({ ...f, govt_id_number: e.target.value }))} /></div>
+                  <div><Label>Government Photo ID</Label><Input value={form.govt_id_number} onChange={e => setForm(f => ({ ...f, govt_id_number: e.target.value }))} /></div>
                   <div><Label>Company</Label><Input value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} /></div>
                 </div>
                 <div>
@@ -194,7 +194,7 @@ export default function Watchlist() {
                     <TableHead>Severity</TableHead>
                     <TableHead>Reason</TableHead>
                     <TableHead>Contact</TableHead>
-                    <TableHead>Govt ID</TableHead>
+                    <TableHead>Govt Photo ID</TableHead>
                     <TableHead>Added</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>

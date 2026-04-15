@@ -95,6 +95,7 @@ export default function Visitors() {
   const [captureVisitor, setCaptureVisitor] = useState<Visitor | null>(null);
   const [captureAutoPrint, setCaptureAutoPrint] = useState(false);
   const [showNewVisitorForm, setShowNewVisitorForm] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   // Read URL status param (e.g. from PendingApprovals dashboard link)
   useEffect(() => {
@@ -107,7 +108,7 @@ export default function Visitors() {
   // Default filters for gate security users
   useEffect(() => {
     if (isGateSecurityOnly) {
-      setStatusFilter('scheduled');
+      setStatusFilter('all');
       const today = new Date();
       setFromDate(today);
       setToDate(today);
@@ -211,6 +212,7 @@ export default function Visitors() {
       fetchVisitors();
       return;
     }
+    setActionLoadingId(visitor.id);
     try {
       const { data, error } = await supabase.functions.invoke('approve-visitor', {
         body: { visitorId: visitor.id, action: 'approve' },
@@ -229,6 +231,8 @@ export default function Visitors() {
       fetchVisitors();
     } catch (err: any) {
       toast.error(err.message || 'Failed to approve visitor');
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -238,6 +242,7 @@ export default function Visitors() {
       fetchVisitors();
       return;
     }
+    setActionLoadingId(visitor.id);
     try {
       const { data, error } = await supabase.functions.invoke('approve-visitor', {
         body: { visitorId: visitor.id, action: 'reject' },
@@ -252,6 +257,8 @@ export default function Visitors() {
       fetchVisitors();
     } catch (err: any) {
       toast.error(err.message || 'Failed to reject visitor');
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -719,6 +726,7 @@ export default function Visitors() {
                         onReject={canApproveReject ? handleReject : undefined}
                         canCheckInOut={isGateSecurity}
                         canEdit={true}
+                        actionLoadingId={actionLoadingId}
                       />
                     </TableCell>
                   </TableRow>
