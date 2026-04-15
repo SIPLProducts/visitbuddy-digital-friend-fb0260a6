@@ -1,26 +1,21 @@
 
 
-# Fix PrintBadge.tsx: Remove Labels, Signatures, Comment Out Checkout QR
+# Add Back "Officer" Signature Box to Both Badge Components
 
 ## Summary
-The `PrintBadge.tsx` page has its own inline HTML badge (not using the `SafetyPermitBadge` component). It still contains the "SAFETY PERMIT / VISITOR" title, the Security/Visitor/Officer signature boxes, and the checkout QR section. These need to match the changes already made to `SafetyPermitBadge.tsx`.
+Re-add the "Officer" signature box (with a signature line) to both `SafetyPermitBadge.tsx` and `PrintBadge.tsx`. Only "Officer" — not "Security" or "Visitor".
 
 ## Changes
 
-### `src/pages/PrintBadge.tsx`
+### 1. `src/components/badge/SafetyPermitBadge.tsx`
+- After the details `</div>` (line 189), before the closing `</div>` of the flex container (line 191), add a right-side column with a single "Officer" signature box:
+  - 100px wide, border-left, containing a signature line and "Officer" label
 
-1. **Remove "SAFETY PERMIT / VISITOR" title block** (lines 517-529)
-   - Delete the `title-row` div containing "SAFETY PERMIT" heading and "VISITOR" subtitle
-   - Keep the photo box but move it into a standalone centered section (similar to SafetyPermitBadge)
-
-2. **Remove Signatures column** (lines 588-601)
-   - Delete the `<div className="signatures">` block with Security, Visitor, Officer sig boxes
-   - Remove related CSS styles (`.signatures`, `.sig-box`, `.sig-line`, `.sig-label`)
-
-3. **Comment out Checkout QR + Safety Guidelines section** (lines 617-638)
-   - Comment out the entire `<div className="guidelines">` block containing safety text and checkout QR code
-   - Keep code for future re-enablement
+### 2. `src/pages/PrintBadge.tsx`
+- After the details `</div>` (line 541), before the closing `</div>` of `details-signatures-row` (line 543), add a matching "Officer" signature box using inline CSS classes
+- Add corresponding CSS styles for the officer signature box
 
 ## Files Changed
-- `src/pages/PrintBadge.tsx` — Remove title, signatures, comment out checkout section
+- `src/components/badge/SafetyPermitBadge.tsx` — Add Officer signature column
+- `src/pages/PrintBadge.tsx` — Add Officer signature column + CSS
 
