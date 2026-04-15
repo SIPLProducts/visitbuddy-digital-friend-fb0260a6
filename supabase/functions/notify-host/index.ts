@@ -289,6 +289,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Host ${hostData.name} (${hostData.email}, ${hostData.phone}) should be notified about visitor ${visitor.name}`);
 
+    // Fetch accompanying visitors
+    const { data: accompanyingVisitors } = await supabase
+      .from("accompanying_visitors")
+      .select("name, phone, has_laptop, laptop_brand, laptop_serial, has_mobile, mobile_brand, mobile_serial")
+      .eq("visitor_id", visitor.id);
+    
+    const companions = accompanyingVisitors || [];
+    console.log(`Found ${companions.length} accompanying visitors`);
+
     const currentDate = new Date().toLocaleDateString("en-IN", {
       weekday: "long",
       year: "numeric",
