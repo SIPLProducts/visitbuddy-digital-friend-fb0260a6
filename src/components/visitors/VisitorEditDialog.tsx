@@ -209,10 +209,10 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
             </div>
             
             <div className="col-span-2">
-              <Label htmlFor="govt_id_number">Aadhaar Number</Label>
+              <Label htmlFor="govt_id_number">Government Photo ID</Label>
               <Input
                 id="govt_id_number"
-                placeholder="1234 5678 9012"
+                placeholder="Enter ID number"
                 value={formData.govt_id_number}
                 onChange={(e) => setFormData({ ...formData, govt_id_number: e.target.value })}
               />

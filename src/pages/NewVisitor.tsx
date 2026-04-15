@@ -342,10 +342,10 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="govt_id_number">Aadhaar Number</Label>
+                <Label htmlFor="govt_id_number">Government Photo ID</Label>
                 <Input
                   id="govt_id_number"
-                  placeholder="1234 5678 9012"
+                  placeholder="Enter ID number"
                   {...form.register('govt_id_number')}
                 />
               </div>

@@ -180,7 +180,7 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
                 )}
                 {(visitor as any).govt_id_number && (
                   <div>
-                    <p className="text-xs text-muted-foreground">Govt ID Number</p>
+                    <p className="text-xs text-muted-foreground">Government Photo ID</p>
                     <p className="text-sm font-medium flex items-center gap-1">
                       <ShieldCheck className="h-3 w-3" />
                       {(visitor as any).govt_id_number}
