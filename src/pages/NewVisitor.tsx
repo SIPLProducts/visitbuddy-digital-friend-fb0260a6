@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { startOfToday } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,8 +30,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 const visitorSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email').optional().or(z.literal('')),
-  phone: z.string().optional(),
+  email: z.string().min(1, 'Email is required').email('Please enter a valid email'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   company: z.string().optional(),
   purpose: z.string().optional(),
   host_id: z.string().optional(),
@@ -45,7 +46,10 @@ const visitorSchema = z.object({
   mobile_brand: z.string().optional(),
   mobile_serial: z.string().optional(),
   accompanying_count: z.number().min(0).max(50).default(0),
-  scheduled_date: z.date().optional().default(() => new Date()),
+  scheduled_date: z.date({ required_error: 'Date of visit is required' }).refine(
+    (date) => date >= startOfToday(),
+    { message: 'Date of visit cannot be in the past' }
+  ),
   govt_id_number: z.string().optional(),
 });
 
@@ -242,7 +246,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Date of Visit</Label>
+                <Label>Date of Visit *</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -260,12 +264,18 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                     <Calendar
                       mode="single"
                       selected={form.watch('scheduled_date')}
-                      onSelect={(date) => form.setValue('scheduled_date', date || new Date())}
+                      onSelect={(date) => form.setValue('scheduled_date', date || new Date(), { shouldValidate: true })}
+                      disabled={(date) => date < startOfToday()}
                       initialFocus
                       className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
+                {form.formState.errors.scheduled_date && (
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.scheduled_date.message}
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -282,7 +292,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -293,11 +303,16 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                       {...form.register('email')}
                     />
                   </div>
+                  {form.formState.errors.email && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">Phone *</Label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -307,6 +322,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                       {...form.register('phone')}
                     />
                   </div>
+                  {form.formState.errors.phone && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.phone.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="company">Company</Label>

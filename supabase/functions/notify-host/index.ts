@@ -268,11 +268,13 @@ const handler = async (req: Request): Promise<Response> => {
       year: "numeric",
       month: "long",
       day: "numeric",
+      timeZone: "Asia/Kolkata",
     });
 
     const currentTime = new Date().toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "Asia/Kolkata",
     });
 
     // ---- WhatsApp notifications (existing logic) ----

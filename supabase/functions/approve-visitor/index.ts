@@ -259,6 +259,7 @@ const handler = async (req: Request): Promise<Response> => {
       year: "numeric",
       month: "long",
       day: "numeric",
+      timeZone: "Asia/Kolkata",
     });
 
     let whatsappSent = false;

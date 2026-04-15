@@ -70,11 +70,13 @@ const handler = async (req: Request): Promise<Response> => {
       day: "2-digit",
       month: "short",
       year: "numeric",
+      timeZone: "Asia/Kolkata",
     });
 
     const currentTime = new Date().toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "Asia/Kolkata",
     });
 
     // Build a concise SMS message
