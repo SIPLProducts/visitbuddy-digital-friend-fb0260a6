@@ -132,8 +132,17 @@ export default function SelfService() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.phone) {
-      toast.error('Please fill in required fields');
+    if (!formData.name || !formData.phone || !formData.email) {
+      toast.error('Please fill in all required fields (Name, Phone, Email)');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    if (formData.phone.replace(/[\s\-\+]/g, '').length < 10) {
+      toast.error('Phone number must be at least 10 digits');
       return;
     }
 
@@ -310,7 +319,7 @@ export default function SelfService() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email (Optional)</Label>
+                <Label htmlFor="email">Email *</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -339,7 +348,7 @@ export default function SelfService() {
 
               <Button
                 onClick={nextStep}
-                disabled={!formData.name || !formData.phone}
+                disabled={!formData.name || !formData.phone || !formData.email}
                 className="w-full h-12 mt-4"
               >
                 Continue <ArrowRight className="ml-2 h-4 w-4" />

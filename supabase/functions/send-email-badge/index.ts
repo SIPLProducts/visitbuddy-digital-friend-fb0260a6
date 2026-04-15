@@ -65,22 +65,26 @@ const handler = async (req: Request): Promise<Response> => {
           year: "numeric",
           month: "long",
           day: "numeric",
+          timeZone: "Asia/Kolkata",
         })
       : new Date().toLocaleDateString("en-IN", {
           weekday: "long",
           year: "numeric",
           month: "long",
           day: "numeric",
+          timeZone: "Asia/Kolkata",
         });
 
     const formattedTime = checkInTime
       ? new Date(checkInTime).toLocaleTimeString("en-IN", {
           hour: "2-digit",
           minute: "2-digit",
+          timeZone: "Asia/Kolkata",
         })
       : new Date().toLocaleTimeString("en-IN", {
           hour: "2-digit",
           minute: "2-digit",
+          timeZone: "Asia/Kolkata",
         });
 
     const htmlContent = `
