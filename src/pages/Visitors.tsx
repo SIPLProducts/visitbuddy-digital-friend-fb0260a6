@@ -718,7 +718,7 @@ export default function Visitors() {
                         onApprove={canApproveReject ? handleApprove : undefined}
                         onReject={canApproveReject ? handleReject : undefined}
                         canCheckInOut={isGateSecurity}
-                        canEdit={!isGateSecurityOnly}
+                        canEdit={true}
                       />
                     </TableCell>
                   </TableRow>
