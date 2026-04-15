@@ -481,7 +481,7 @@ _VisiGuard Visitor Management System_
       const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, approveLink, rejectLink
+        currentDate, currentTime, approveLink, rejectLink, companions
       );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
