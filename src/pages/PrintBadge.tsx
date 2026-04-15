@@ -540,6 +540,10 @@ export default function PrintBadge() {
                   </div>
                 </div>
 
+                <div className="officer-sig">
+                  <div className="sig-line"></div>
+                  <span className="sig-label">Officer</span>
+                </div>
               </div>
 
               {(geoAddress || navigationUrl) && (
