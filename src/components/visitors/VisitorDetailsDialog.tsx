@@ -226,12 +226,12 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
                     {formatDateTime(visitor.check_out_time)}
                   </p>
                 </div>
-                {visitor.checkout_method && (
+                {(visitor as any).checkout_method && (
                   <div>
                     <p className="text-xs text-muted-foreground">Checkout Method</p>
                     <p className="text-sm font-medium flex items-center gap-1">
                       <LogOut className="h-3 w-3" />
-                      {getCheckoutMethodLabel(visitor.checkout_method)}
+                      {getCheckoutMethodLabel((visitor as any).checkout_method)}
                     </p>
                   </div>
                 )}
