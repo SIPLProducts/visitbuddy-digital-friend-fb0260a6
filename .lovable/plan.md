@@ -1,49 +1,22 @@
 
 
-# Visitor Form Validation + IST Timezone Fix
+# Include Accompanying Visitors in Host Approval Email
 
 ## Problem
-1. **Date of Visit** is not enforced as mandatory and allows past dates
-2. **Mobile number** and **Email** are not mandatory fields
-3. **All email timestamps** in Edge Functions use server UTC time instead of IST (India Standard Time), showing times like "3:15 AM" instead of the correct Indian time
+When a visitor is submitted for approval, the email sent to the host does not include details of accompanying persons, even though this data exists in the `accompanying_visitors` table.
 
 ## Changes
 
-### 1. `src/pages/NewVisitor.tsx` — Form Validation
-- Change `email` from optional to **required** with valid email validation
-- Change `phone` from optional to **required** with minimum length
-- Change `scheduled_date` to **required** (non-optional) and add a `.refine()` that rejects past dates (date must be ≥ today)
-- Disable past dates in the Calendar picker using `disabled={(date) => date < startOfToday()}`
+### `supabase/functions/notify-host/index.ts`
 
-### 2. `src/pages/SelfService.tsx` — Form Validation
-- Make email and phone mandatory in the self-service form validation
-- Add past-date validation if date picker exists there
+1. **Fetch accompanying visitors** — After fetching the main visitor details, query `accompanying_visitors` where `visitor_id = visitor.id` to get names, phones, and device info for all companions.
 
-### 3. IST Timezone Fix — All Edge Functions
-Add `timeZone: "Asia/Kolkata"` to every `toLocaleDateString` and `toLocaleTimeString` call across all Edge Functions. Deno's `toLocaleString` supports IANA timezones, so this forces IST output regardless of server location.
+2. **Update `generateHostApprovalEmail`** — Add a new parameter for accompanying visitors. If any exist, render an additional section in the email after the main visitor details table:
+   - Section header: "Accompanying Persons (X)"
+   - Table listing each person's name, phone, and device details (laptop/mobile)
 
-**Files affected:**
-- `supabase/functions/notify-host/index.ts`
-- `supabase/functions/approve-visitor/index.ts`
-- `supabase/functions/send-email-badge/index.ts`
-- `supabase/functions/send-whatsapp-badge/index.ts`
-- `supabase/functions/send-sms-badge/index.ts`
-- `supabase/functions/send-vehicle-whatsapp/index.ts`
-
-**Pattern — before:**
-```js
-new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
-```
-
-**Pattern — after:**
-```js
-new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" })
-```
-
-Same for `toLocaleDateString` — add `timeZone: "Asia/Kolkata"`.
+3. **Update WhatsApp message** — Append accompanying visitor names and phones to the host WhatsApp notification body when `isPendingApproval` is true.
 
 ## Files Changed
-- `src/pages/NewVisitor.tsx` — mandatory email, phone, date validation (no past dates)
-- `src/pages/SelfService.tsx` — mandatory email, phone validation
-- 6 Edge Functions — add `timeZone: "Asia/Kolkata"` to all date/time formatting
+- `supabase/functions/notify-host/index.ts`
 
