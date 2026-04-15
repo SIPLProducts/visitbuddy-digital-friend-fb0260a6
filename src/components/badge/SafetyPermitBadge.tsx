@@ -117,16 +117,21 @@ export function SafetyPermitBadge({
         </div>
       </div>
 
-      {/* Photo Section */}
-      <div className="flex items-center justify-center py-2 border-b-2 border-gray-800 bg-gray-100">
-        <Avatar className="h-20 w-20 rounded-none">
-          {visitor.photo_url ? (
-            <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />
-          ) : null}
-          <AvatarFallback className="bg-gray-300 text-gray-700 text-xl font-bold rounded-none">
-            {getInitials(visitor.name)}
-          </AvatarFallback>
-        </Avatar>
+      {/* Title + Photo Row */}
+      <div className="flex items-center border-b-2 border-gray-800 bg-gray-100">
+        <div className="flex-1 text-center font-bold text-lg tracking-wider uppercase py-2">
+          VISITOR PASS
+        </div>
+        <div className="border-l-2 border-gray-800 p-2">
+          <Avatar className="h-20 w-20 rounded-none">
+            {visitor.photo_url ? (
+              <AvatarImage src={visitor.photo_url} alt={visitor.name} className="object-cover" />
+            ) : null}
+            <AvatarFallback className="bg-gray-300 text-gray-700 text-xl font-bold rounded-none">
+              {getInitials(visitor.name)}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
 
       {/* Details + Signatures Side by Side */}
@@ -213,7 +218,7 @@ export function SafetyPermitBadge({
         </div>
       )}
 
-      {/* Safety Guidelines with QR - Commented out for now
+      {/* Safety Guidelines */}
       <div className="flex border-t-2 border-gray-800 bg-gray-100">
         <div className="flex-1 p-2 text-[10px] leading-tight">
           <p className="mb-0.5">1. Your safety is your responsibility.</p>
@@ -227,6 +232,7 @@ export function SafetyPermitBadge({
             <p className="mt-0.5 font-semibold text-sky-700">🚨 Assembly Point: {assemblyPoint}</p>
           )}
         </div>
+        {/* QR code commented out for now
         <div className="w-24 p-1 flex flex-col items-center justify-center border-l border-gray-300">
           <img 
             src={qrCodeUrl} 
@@ -235,8 +241,8 @@ export function SafetyPermitBadge({
           />
           <span className="text-[8px] font-semibold text-gray-600">Check-out</span>
         </div>
+        */}
       </div>
-      */}
 
       {/* Powered By Footer */}
       <div className="bg-gray-200 py-1.5 text-center border-t border-gray-300">
