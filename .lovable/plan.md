@@ -1,22 +1,40 @@
 
 
-# Include Accompanying Visitors in Host Approval Email
+# Add Sharvi Infotech Branded Footer to All Emails
 
-## Problem
-When a visitor is submitted for approval, the email sent to the host does not include details of accompanying persons, even though this data exists in the `accompanying_visitors` table.
+## Overview
+Add the Sharvi Infotech branding footer below the "automated email / do not reply" line in all email-generating Edge Functions.
 
-## Changes
+## Footer Content
+After the existing "do not reply" / "Powered by" text, add:
+```
+🚀 Built with excellence by Sharvi Info Tech Pvt. Ltd.
+🌐 https://www.sharviinfotech.com/
+Transforming ideas into powerful digital solutions.
+```
 
-### `supabase/functions/notify-host/index.ts`
+## Files to Update
 
-1. **Fetch accompanying visitors** — After fetching the main visitor details, query `accompanying_visitors` where `visitor_id = visitor.id` to get names, phones, and device info for all companions.
+### 1. `supabase/functions/send-email/index.ts`
+- Add branded footer after the "This is an automated email" paragraph in the `generateHtmlEmail` function
 
-2. **Update `generateHostApprovalEmail`** — Add a new parameter for accompanying visitors. If any exist, render an additional section in the email after the main visitor details table:
-   - Section header: "Accompanying Persons (X)"
-   - Table listing each person's name, phone, and device details (laptop/mobile)
+### 2. `supabase/functions/notify-host/index.ts`
+- Add branded footer in all 3 email HTML templates (`generateHostApprovalEmail`, `generateVisitorConfirmationEmail`, and the approval notification email)
 
-3. **Update WhatsApp message** — Append accompanying visitor names and phones to the host WhatsApp notification body when `isPendingApproval` is true.
+### 3. `supabase/functions/approve-visitor/index.ts`
+- Add branded footer in the visitor approval email HTML template
 
-## Files Changed
-- `supabase/functions/notify-host/index.ts`
+### 4. `supabase/functions/send-email-badge/index.ts`
+- Add branded footer after the existing "Powered by VisiGuard VMS" line
+
+## Footer HTML (consistent across all)
+```html
+<div style="background:#1e293b;padding:16px;text-align:center;">
+  <p style="margin:0;color:#f1f5f9;font-size:12px;">🚀 Built with excellence by <strong>Sharvi Info Tech Pvt. Ltd.</strong></p>
+  <p style="margin:6px 0;"><a href="https://www.sharviinfotech.com/" style="color:#38bdf8;font-size:11px;text-decoration:none;">🌐 www.sharviinfotech.com</a></p>
+  <p style="margin:0;color:#94a3b8;font-size:11px;font-style:italic;">Transforming ideas into powerful digital solutions.</p>
+</div>
+```
+
+Placed as the very last section inside the email container, after the "do not reply" / "Powered by" footer.
 
