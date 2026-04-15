@@ -319,25 +319,13 @@ export default function PrintBadge() {
           font-style: italic;
           font-size: 14px;
         }
-        .title-row {
+        .photo-section {
           display: flex;
-          border-bottom: 2px solid #1f2937;
-        }
-        .title-content {
-          flex: 1;
-          background: #1f2937;
-          color: white;
+          align-items: center;
+          justify-content: center;
           padding: 8px;
-        }
-        .title-content h2 {
-          font-size: 18px;
-          font-weight: bold;
-          margin: 0;
-        }
-        .title-content p {
-          font-size: 14px;
-          font-weight: 600;
-          margin: 0;
+          background: #f3f4f6;
+          border-bottom: 2px solid #1f2937;
         }
         .photo-box {
           width: 96px;
@@ -382,35 +370,6 @@ export default function PrintBadge() {
         }
         .detail-value {
           flex: 1;
-        }
-        .signatures {
-          width: 120px;
-          border-left: 2px solid #1f2937;
-          display: flex;
-          flex-direction: column;
-          text-align: center;
-          font-size: 10px;
-        }
-        .sig-box {
-          flex: 1;
-          padding: 6px;
-          border-bottom: 1px solid #d1d5db;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-end;
-        }
-        .sig-box:last-child {
-          border-bottom: none;
-        }
-        .sig-line {
-          height: 24px;
-          border-bottom: 1px dashed #9ca3af;
-          margin-bottom: 3px;
-        }
-        .sig-label {
-          font-weight: 600;
-          font-style: italic;
-          font-size: 9px;
         }
         .guidelines {
           display: flex;
@@ -514,11 +473,7 @@ export default function PrintBadge() {
                 <div className="company-text">Resustainability</div>
               </div>
 
-              <div className="title-row">
-                <div className="title-content">
-                  <h2>SAFETY PERMIT</h2>
-                  <p>VISITOR</p>
-                </div>
+              <div className="photo-section">
                 <div className="photo-box">
                   {visitor.photo_url ? (
                     <img src={visitor.photo_url} alt={visitor.name} />
@@ -585,20 +540,6 @@ export default function PrintBadge() {
                   </div>
                 </div>
 
-                <div className="signatures">
-                  <div className="sig-box">
-                    <div className="sig-line"></div>
-                    <p className="sig-label">Security</p>
-                  </div>
-                  <div className="sig-box">
-                    <div className="sig-line"></div>
-                    <p className="sig-label">Visitor</p>
-                  </div>
-                  <div className="sig-box">
-                    <div className="sig-line"></div>
-                    <p className="sig-label">Officer</p>
-                  </div>
-                </div>
               </div>
 
               {(geoAddress || navigationUrl) && (
@@ -614,6 +555,7 @@ export default function PrintBadge() {
                 </div>
               )}
 
+              {/* Checkout QR + Safety Guidelines - commented out for now
               <div className="guidelines">
                 <div className="guidelines-text">
                   <p>1. Your safety is your responsibility.</p>
@@ -636,6 +578,7 @@ export default function PrintBadge() {
                   <span className="qr-label">Check-out</span>
                 </div>
               </div>
+              */}
             </div>
           ))}
         </div>
