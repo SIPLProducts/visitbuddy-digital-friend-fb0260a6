@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer@6.9.10";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,11 +8,166 @@ const corsHeaders = {
 };
 
 interface NotifyHostRequest {
-  visitorId: string; // This is the UUID (id column)
+  visitorId: string;
+}
+
+async function sendSmtpEmail(
+  supabase: any,
+  to: string,
+  subject: string,
+  html: string
+): Promise<boolean> {
+  try {
+    const { data: smtp } = await supabase
+      .from("email_config")
+      .select("*")
+      .eq("is_active", true)
+      .limit(1)
+      .single();
+
+    if (!smtp) {
+      console.warn("No active SMTP config found, skipping email");
+      return false;
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: smtp.smtp_host,
+      port: smtp.smtp_port,
+      secure: smtp.smtp_port === 465,
+      auth: { user: smtp.smtp_username, pass: smtp.smtp_password },
+      tls: { rejectUnauthorized: false },
+    });
+
+    await transporter.sendMail({
+      from: smtp.sender_name
+        ? `"${smtp.sender_name}" <${smtp.sender_email}>`
+        : smtp.sender_email,
+      to,
+      subject,
+      html,
+    });
+
+    await supabase.from("email_logs").insert({
+      subject,
+      body: html,
+      recipients: [to],
+      status: "sent",
+      template: "notify-host",
+    });
+
+    console.log(`Email sent to ${to}: ${subject}`);
+    return true;
+  } catch (err: any) {
+    console.error(`Failed to send email to ${to}:`, err.message);
+    await supabase.from("email_logs").insert({
+      subject,
+      body: html,
+      recipients: [to],
+      status: "failed",
+      template: "notify-host",
+    });
+    return false;
+  }
+}
+
+function generateHostApprovalEmail(
+  visitor: any,
+  hostName: string,
+  gateName: string,
+  departmentName: string,
+  currentDate: string,
+  currentTime: string,
+  approveLink: string,
+  rejectLink: string
+): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5;">
+  <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="background:linear-gradient(135deg,#0891b2,#0e7490);padding:20px;text-align:center;">
+      <h1 style="margin:0;color:white;font-size:20px;">VisiGuard VMS</h1>
+      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">Visitor Approval Required</p>
+    </div>
+    <div style="padding:24px;">
+      <h2 style="margin:0 0 16px;color:#1f2937;font-size:18px;">Dear ${hostName},</h2>
+      <p style="color:#374151;font-size:14px;line-height:1.6;">A visitor is waiting for your approval. Please review the details below and take action.</p>
+      
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #0891b2;">
+        <table style="width:100%;font-size:14px;color:#374151;">
+          <tr><td style="padding:4px 8px;font-weight:bold;">Visitor:</td><td style="padding:4px 8px;">${visitor.name}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;">ID:</td><td style="padding:4px 8px;">${visitor.visitor_id}</td></tr>
+          ${visitor.company ? `<tr><td style="padding:4px 8px;font-weight:bold;">Company:</td><td style="padding:4px 8px;">${visitor.company}</td></tr>` : ""}
+          ${visitor.purpose ? `<tr><td style="padding:4px 8px;font-weight:bold;">Purpose:</td><td style="padding:4px 8px;">${visitor.purpose}</td></tr>` : ""}
+          ${visitor.phone ? `<tr><td style="padding:4px 8px;font-weight:bold;">Phone:</td><td style="padding:4px 8px;">${visitor.phone}</td></tr>` : ""}
+          ${departmentName ? `<tr><td style="padding:4px 8px;font-weight:bold;">Department:</td><td style="padding:4px 8px;">${departmentName}</td></tr>` : ""}
+          ${gateName ? `<tr><td style="padding:4px 8px;font-weight:bold;">Entry Gate:</td><td style="padding:4px 8px;">${gateName}</td></tr>` : ""}
+          <tr><td style="padding:4px 8px;font-weight:bold;">Date:</td><td style="padding:4px 8px;">${currentDate}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;">Time:</td><td style="padding:4px 8px;">${currentTime}</td></tr>
+        </table>
+      </div>
+
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">✅ Approve Visit</a>
+        <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">❌ Reject Visit</a>
+      </div>
+    </div>
+    <div style="background:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
+      <p style="margin:0;color:#9ca3af;font-size:11px;">This is an automated email from VisiGuard VMS. Please do not reply.</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function generateVisitorConfirmationEmail(
+  visitorName: string,
+  visitorId: string,
+  hostName: string,
+  departmentName: string,
+  gateName: string,
+  currentDate: string,
+  currentTime: string
+): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5;">
+  <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <div style="background:linear-gradient(135deg,#0891b2,#0e7490);padding:20px;text-align:center;">
+      <h1 style="margin:0;color:white;font-size:20px;">VisiGuard VMS</h1>
+      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">Visit Request Submitted</p>
+    </div>
+    <div style="padding:24px;">
+      <h2 style="margin:0 0 16px;color:#1f2937;font-size:18px;">Dear ${visitorName},</h2>
+      <p style="color:#374151;font-size:14px;line-height:1.6;">Your visit request has been submitted and is now pending approval from your host.</p>
+      
+      <div style="background:#fefce8;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #eab308;">
+        <p style="margin:0;color:#854d0e;font-size:14px;font-weight:bold;">⏳ Status: Awaiting Host Approval</p>
+      </div>
+
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:16px 0;">
+        <table style="width:100%;font-size:14px;color:#374151;">
+          <tr><td style="padding:4px 8px;font-weight:bold;">Visitor ID:</td><td style="padding:4px 8px;">${visitorId}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;">Host:</td><td style="padding:4px 8px;">${hostName}</td></tr>
+          ${departmentName ? `<tr><td style="padding:4px 8px;font-weight:bold;">Department:</td><td style="padding:4px 8px;">${departmentName}</td></tr>` : ""}
+          ${gateName ? `<tr><td style="padding:4px 8px;font-weight:bold;">Entry Gate:</td><td style="padding:4px 8px;">${gateName}</td></tr>` : ""}
+          <tr><td style="padding:4px 8px;font-weight:bold;">Date:</td><td style="padding:4px 8px;">${currentDate}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;">Time:</td><td style="padding:4px 8px;">${currentTime}</td></tr>
+        </table>
+      </div>
+
+      <p style="color:#374151;font-size:14px;line-height:1.6;">You will receive another email once your visit has been approved. Please wait for confirmation before proceeding to the facility.</p>
+    </div>
+    <div style="background:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
+      <p style="margin:0;color:#9ca3af;font-size:11px;">This is an automated email from VisiGuard VMS. Please do not reply.</p>
+    </div>
+  </div>
+</body>
+</html>`;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -24,14 +180,6 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const publicUrl = Deno.env.get("PUBLIC_URL") || "https://visitbuddy-digital-friend.lovable.app";
 
-    if (!accountSid || !authToken || !twilioWhatsAppNumber) {
-      console.error("Missing Twilio credentials");
-      return new Response(
-        JSON.stringify({ error: "WhatsApp service not configured" }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
     if (!supabaseUrl || !supabaseServiceKey) {
       console.error("Missing Supabase credentials");
       return new Response(
@@ -40,9 +188,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Clean the WhatsApp number
-    twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
-
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { visitorId }: NotifyHostRequest = await req.json();
 
     if (!visitorId) {
@@ -54,16 +200,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Fetching visitor details for ID: ${visitorId}`);
 
-    // Create Supabase client with service role
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Fetch visitor details
+    // Fetch visitor details - added email field
     const { data: visitor, error: visitorError } = await supabase
       .from("visitors")
-      .select("id, visitor_id, name, phone, company, purpose, photo_url, host_id, department_id, gate_id, status")
+      .select("id, visitor_id, name, phone, email, company, purpose, photo_url, host_id, department_id, gate_id, status")
       .eq("id", visitorId)
       .single();
-    
+
     const isPendingApproval = visitor?.status === 'pending_approval';
 
     if (visitorError || !visitor) {
@@ -76,7 +219,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Visitor data:", JSON.stringify(visitor));
 
-    // Check if host_id exists
     if (!visitor.host_id) {
       console.log("No host assigned to this visitor");
       return new Response(
@@ -85,7 +227,6 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Get host details from employees table including phone
     const { data: hostData, error: hostError } = await supabase
       .from("employees")
       .select("id, name, email, phone")
@@ -100,7 +241,6 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Fetch gate name if gate_id exists
     let gateName = "";
     if (visitor.gate_id) {
       const { data: gateData } = await supabase
@@ -111,7 +251,6 @@ const handler = async (req: Request): Promise<Response> => {
       gateName = gateData?.name || "";
     }
 
-    // Fetch department name if department_id exists
     let departmentName = "";
     if (visitor.department_id) {
       const { data: deptData } = await supabase
@@ -136,22 +275,24 @@ const handler = async (req: Request): Promise<Response> => {
       minute: "2-digit",
     });
 
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+    // ---- WhatsApp notifications (existing logic) ----
+    const twilioUrl = accountSid ? `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json` : null;
     let hostNotificationSent = false;
     let hostMessageSid = "";
+    let visitorNotificationSent = false;
 
-    // Send WhatsApp notification to host if they have a phone number
-    if (hostData.phone) {
+    if (accountSid && authToken && twilioWhatsAppNumber && hostData.phone) {
+      twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
+
       let formattedHostPhone = hostData.phone.replace(/\s/g, "").replace(/-/g, "");
       if (!formattedHostPhone.startsWith("+")) {
         formattedHostPhone = "+91" + formattedHostPhone.replace(/^0/, "");
       }
 
-      // Generate approval links if pending approval
-      const approveLink = isPendingApproval 
+      const approveLink = isPendingApproval
         ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=approve`
         : null;
-      const rejectLink = isPendingApproval 
+      const rejectLink = isPendingApproval
         ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`
         : null;
 
@@ -208,14 +349,12 @@ _VisiGuard Visitor Management System_
       hostFormData.append("To", `whatsapp:${formattedHostPhone}`);
       hostFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       hostFormData.append("Body", hostMessage);
-      
-      // Include visitor photo if available
       if (visitor.photo_url) {
         hostFormData.append("MediaUrl", visitor.photo_url);
       }
 
       try {
-        const twilioResponse = await fetch(twilioUrl, {
+        const twilioResponse = await fetch(twilioUrl!, {
           method: "POST",
           headers: {
             "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
@@ -223,9 +362,7 @@ _VisiGuard Visitor Management System_
           },
           body: hostFormData,
         });
-
         const twilioResult = await twilioResponse.json();
-
         if (twilioResponse.ok) {
           console.log("Host notification sent successfully:", twilioResult.sid);
           hostNotificationSent = true;
@@ -237,12 +374,11 @@ _VisiGuard Visitor Management System_
         console.error("WhatsApp send error to host:", whatsappError);
       }
     } else {
-      console.log("Host has no phone number configured, skipping WhatsApp notification");
+      console.log("Twilio not configured or host has no phone, skipping WhatsApp to host");
     }
 
-    // Send confirmation to visitor if they have a phone number
-    let visitorNotificationSent = false;
-    if (visitor.phone) {
+    // WhatsApp confirmation to visitor
+    if (accountSid && authToken && twilioWhatsAppNumber && visitor.phone) {
       let formattedVisitorPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
       if (!formattedVisitorPhone.startsWith("+")) {
         formattedVisitorPhone = "+91" + formattedVisitorPhone.replace(/^0/, "");
@@ -275,7 +411,7 @@ _VisiGuard Visitor Management System_
       visitorFormData.append("Body", visitorMessage);
 
       try {
-        const twilioResponse = await fetch(twilioUrl, {
+        const twilioResponse = await fetch(twilioUrl!, {
           method: "POST",
           headers: {
             "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
@@ -283,9 +419,7 @@ _VisiGuard Visitor Management System_
           },
           body: visitorFormData,
         });
-
         const twilioResult = await twilioResponse.json();
-
         if (twilioResponse.ok) {
           console.log("Visitor confirmation sent:", twilioResult.sid);
           visitorNotificationSent = true;
@@ -297,22 +431,66 @@ _VisiGuard Visitor Management System_
       }
     }
 
+    // ---- Email notifications ----
+    let hostEmailSent = false;
+    let visitorEmailSent = false;
+
+    // Email to host (if host has email and visitor is pending approval)
+    if (hostData.email && isPendingApproval) {
+      const approveLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=approve`;
+      const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
+      const hostEmailHtml = generateHostApprovalEmail(
+        visitor, hostData.name, gateName, departmentName,
+        currentDate, currentTime, approveLink, rejectLink
+      );
+      hostEmailSent = await sendSmtpEmail(
+        supabase, hostData.email,
+        `Visitor Approval Required — ${visitor.name}`,
+        hostEmailHtml
+      );
+    } else if (hostData.email && !isPendingApproval) {
+      // For direct check-in, still notify host via email
+      const hostEmailHtml = generateHostApprovalEmail(
+        visitor, hostData.name, gateName, departmentName,
+        currentDate, currentTime, "", ""
+      ).replace(/Visitor Approval Required/g, "Visitor Arrival Notification")
+       .replace(/<div style="text-align:center;margin:24px 0;">[\s\S]*?<\/div>/,
+        '<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>');
+      hostEmailSent = await sendSmtpEmail(
+        supabase, hostData.email,
+        `Visitor Arrival — ${visitor.name}`,
+        hostEmailHtml
+      );
+    }
+
+    // Email to visitor (if visitor has email)
+    if (visitor.email && isPendingApproval) {
+      const visitorEmailHtml = generateVisitorConfirmationEmail(
+        visitor.name, visitor.visitor_id, hostData.name,
+        departmentName, gateName, currentDate, currentTime
+      );
+      visitorEmailSent = await sendSmtpEmail(
+        supabase, visitor.email,
+        "Visit Request Submitted — Awaiting Approval",
+        visitorEmailHtml
+      );
+    }
+
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         message: "Notifications processed",
         hostNotified: hostNotificationSent,
         hostMessageSid: hostMessageSid || null,
         visitorNotified: visitorNotificationSent,
-        visitor: {
-          id: visitor.visitor_id,
-          name: visitor.name
-        },
+        hostEmailSent,
+        visitorEmailSent,
+        visitor: { id: visitor.visitor_id, name: visitor.name },
         host: {
           name: hostData.name,
           email: hostData.email,
-          phone: hostData.phone ? "***" + hostData.phone.slice(-4) : null
-        }
+          phone: hostData.phone ? "***" + hostData.phone.slice(-4) : null,
+        },
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
