@@ -344,13 +344,13 @@ export default function PrintBadge() {
           border-left: 2px solid #1f2937;
         }
         .photo-box img {
-          width: 80px;
-          height: 80px;
+          width: 64px;
+          height: 64px;
           object-fit: cover;
         }
         .photo-placeholder {
-          width: 80px;
-          height: 80px;
+          width: 64px;
+          height: 64px;
           background: #d1d5db;
           display: flex;
           align-items: center;
@@ -365,11 +365,11 @@ export default function PrintBadge() {
         }
         .details {
           flex: 1;
-          font-size: 11px;
+          font-size: 10px;
         }
         .detail-row {
           display: flex;
-          padding: 6px;
+          padding: 4px;
           border-bottom: 1px solid #d1d5db;
         }
         .detail-label {
@@ -392,7 +392,7 @@ export default function PrintBadge() {
           width: 100%;
           border-bottom: 1px solid #6b7280;
           margin-bottom: 4px;
-          min-height: 40px;
+          min-height: 24px;
         }
         .officer-sig .sig-label {
           font-size: 9px;
@@ -406,7 +406,7 @@ export default function PrintBadge() {
         }
         .guidelines-text {
           flex: 1;
-          padding: 8px;
+          padding: 4px 8px;
           font-size: 10px;
           line-height: 1.3;
         }
@@ -433,10 +433,10 @@ export default function PrintBadge() {
           font-weight: 600;
         }
         .consent-text {
-          font-size: 7.5px;
+          font-size: 7px;
           color: #6b7280;
           border-top: 1px solid #d1d5db;
-          padding: 6px 8px;
+          padding: 4px 6px;
           line-height: 1.25;
           background: #fff;
           page-break-inside: avoid;
@@ -451,7 +451,7 @@ export default function PrintBadge() {
         .location-row {
           display: flex;
           border-top: 1px solid #d1d5db;
-          padding: 6px 8px;
+          padding: 4px 6px;
           background: #e0f2fe;
           align-items: center;
           gap: 8px;
