@@ -244,6 +244,13 @@ export function SafetyPermitBadge({
         */}
       </div>
 
+      {/* Data Consent Text */}
+      <div className="border-t border-gray-300 px-2 py-1.5 text-[7.5px] leading-tight text-gray-500 bg-white" style={{ pageBreakInside: 'avoid' }}>
+        <p className="mb-0.5">I consent to the processing of my personal data for visiting purposes and confirm that the data shared is accurate and belongs to me. I understand that I can withdraw my consent at any time through written notice, and that such withdrawal may limit or affect the services offered.</p>
+        <p className="mb-0.5">Resustainability seeks your consent to collect and process your personal data for visitor management, legal and compliance obligations, and lawful, specified needs. Data will be retained as per applicable regulations. Adequate safeguards are in place to prevent misuse or unauthorized access, and data will be deleted after 30 days.</p>
+        <p className="font-semibold">Data will not be shared to any 3rd parties.</p>
+      </div>
+
       {/* Powered By Footer */}
       <div className="bg-gray-200 py-1.5 text-center border-t border-gray-300">
         <p className="text-[9px] text-gray-600">
