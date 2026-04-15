@@ -519,7 +519,7 @@ _VisiGuard Visitor Management System_
     if (visitor.email && isPendingApproval) {
       const visitorEmailHtml = generateVisitorConfirmationEmail(
         visitor.name, visitor.visitor_id, hostData.name,
-        departmentName, gateName, currentDate, currentTime
+        departmentName, gateName, currentDate, currentTime, visitor.purpose
       );
       visitorEmailSent = await sendSmtpEmail(
         supabase, visitor.email,
