@@ -432,6 +432,22 @@ export default function PrintBadge() {
           margin-top: 2px;
           font-weight: 600;
         }
+        .consent-text {
+          font-size: 7.5px;
+          color: #6b7280;
+          border-top: 1px solid #d1d5db;
+          padding: 6px 8px;
+          line-height: 1.25;
+          background: #fff;
+          page-break-inside: avoid;
+        }
+        .consent-text p {
+          margin: 0 0 3px;
+        }
+        .consent-text p:last-child {
+          margin-bottom: 0;
+          font-weight: 600;
+        }
         .location-row {
           display: flex;
           border-top: 1px solid #d1d5db;
@@ -612,6 +628,13 @@ export default function PrintBadge() {
                   <span className="qr-label">Check-out</span>
                 </div>
                 */}
+              </div>
+
+              {/* Data Consent Text */}
+              <div className="consent-text">
+                <p>I consent to the processing of my personal data for visiting purposes and confirm that the data shared is accurate and belongs to me. I understand that I can withdraw my consent at any time through written notice, and that such withdrawal may limit or affect the services offered.</p>
+                <p>Resustainability seeks your consent to collect and process your personal data for visitor management, legal and compliance obligations, and lawful, specified needs. Data will be retained as per applicable regulations. Adequate safeguards are in place to prevent misuse or unauthorized access, and data will be deleted after 30 days.</p>
+                <p>Data will not be shared to any 3rd parties.</p>
               </div>
             </div>
           ))}
