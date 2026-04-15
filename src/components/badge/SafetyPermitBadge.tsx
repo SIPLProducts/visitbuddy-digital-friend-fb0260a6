@@ -221,8 +221,10 @@ export function SafetyPermitBadge({
       {/* Safety Guidelines */}
       <div className="flex border-t-2 border-gray-800 bg-gray-100">
         <div className="flex-1 p-2 text-[10px] leading-tight">
-          <p className="mb-0.5">1. Your safety is your responsibility. &nbsp; 2. Always follow the safety procedures.</p>
-          <p>3. Always keep company work place clean. &nbsp; 4. When in doubt, contact our official for instruction, guidance & training.</p>
+          <p>1. Your safety is your responsibility.</p>
+          <p>2. Always follow the safety procedures.</p>
+          <p>3. Always keep company work place clean.</p>
+          <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
           {emergencyContact && (
             <p className="mt-1 font-semibold text-red-600">🆘 Emergency: {emergencyContact}</p>
           )}
