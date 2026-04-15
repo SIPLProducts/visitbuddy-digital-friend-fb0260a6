@@ -275,6 +275,12 @@ export default function PrintBadge() {
             width: 130mm !important;
             margin: 0 !important;
             page-break-inside: avoid;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .logo-box {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
         }
         .print-container {
