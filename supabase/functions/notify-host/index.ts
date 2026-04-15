@@ -78,7 +78,8 @@ function generateHostApprovalEmail(
   currentDate: string,
   currentTime: string,
   approveLink: string,
-  rejectLink: string
+  rejectLink: string,
+  accompanyingVisitors: any[] = []
 ): string {
   return `<!DOCTYPE html>
 <html>
