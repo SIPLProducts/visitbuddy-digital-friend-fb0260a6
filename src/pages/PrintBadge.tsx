@@ -518,8 +518,11 @@ export default function PrintBadge() {
           {[0].map((copy) => (
             <div className="badge" key={copy}>
               <div className="header">
-                <div className="logo-box">
-                  <img src={reslLogo} alt="RESL" />
+                <div className="logo-box" style={{ position: 'relative', overflow: 'hidden' }}>
+                  <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                    <rect width="100%" height="100%" fill="#000000" />
+                  </svg>
+                  <img src={reslLogo} alt="RESL" style={{ position: 'relative', zIndex: 1 }} />
                 </div>
                 <div className="company-text">Resustainability</div>
               </div>
