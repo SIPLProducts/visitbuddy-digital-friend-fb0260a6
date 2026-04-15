@@ -492,7 +492,7 @@ _VisiGuard Visitor Management System_
       // For direct check-in, still notify host via email
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, "", ""
+        currentDate, currentTime, "", "", companions
       ).replace(/Visitor Approval Required/g, "Visitor Arrival Notification")
        .replace(/<div style="text-align:center;margin:24px 0;">[\s\S]*?<\/div>/,
         '<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>');
