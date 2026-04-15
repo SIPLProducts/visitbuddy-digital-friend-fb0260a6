@@ -284,7 +284,7 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
