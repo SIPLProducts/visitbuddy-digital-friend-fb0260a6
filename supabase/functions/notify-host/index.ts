@@ -158,7 +158,8 @@ function generateVisitorConfirmationEmail(
   departmentName: string,
   gateName: string,
   currentDate: string,
-  currentTime: string
+  currentTime: string,
+  purpose?: string
 ): string {
   return `<!DOCTYPE html>
 <html>
