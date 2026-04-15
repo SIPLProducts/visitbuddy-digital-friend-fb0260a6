@@ -271,6 +271,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                     />
                   </PopoverContent>
                 </Popover>
+                {form.formState.errors.scheduled_date && (
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.scheduled_date.message}
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
