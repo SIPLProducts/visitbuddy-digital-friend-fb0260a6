@@ -607,8 +607,10 @@ export default function PrintBadge() {
               {/* Safety Guidelines */}
               <div className="guidelines">
                 <div className="guidelines-text">
-                  <p>1. Your safety is your responsibility. &nbsp; 2. Always follow the safety procedures.</p>
-                  <p>3. Always keep company work place clean. &nbsp; 4. When in doubt, contact our official for instruction, guidance & training.</p>
+                  <p>1. Your safety is your responsibility.</p>
+                  <p>2. Always follow the safety procedures.</p>
+                  <p>3. Always keep company work place clean.</p>
+                  <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
                   {emergencyContact && (
                     <p style={{ marginTop: '4px', fontWeight: 600, color: '#dc2626' }}>
                       🆘 Emergency: {emergencyContact}
