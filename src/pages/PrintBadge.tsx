@@ -323,7 +323,7 @@ export default function PrintBadge() {
           padding: 4px 0;
           color: #dc2626;
           font-weight: 600;
-          font-style: italic;
+          font-style: normal;
           font-size: 14px;
         }
         .title-photo-row {
@@ -524,7 +524,7 @@ export default function PrintBadge() {
                   </svg>
                   <img src={reslLogo} alt="RESL" style={{ position: 'relative', zIndex: 1 }} />
                 </div>
-                <div className="company-text">Resustainability</div>
+                <div className="company-text">Re Sustainability</div>
               </div>
 
               <div className="title-photo-row">
@@ -638,7 +638,7 @@ export default function PrintBadge() {
               {/* Data Consent Text */}
               <div className="consent-text">
                 <p>I consent to the processing of my personal data for visiting purposes and confirm that the data shared is accurate and belongs to me. I understand that I can withdraw my consent at any time through written notice, and that such withdrawal may limit or affect the services offered.</p>
-                <p>Resustainability seeks your consent to collect and process your personal data for visitor management, legal and compliance obligations, and lawful, specified needs. Data will be retained as per applicable regulations. Adequate safeguards are in place to prevent misuse or unauthorized access, and data will be deleted after 30 days.</p>
+                <p>Re Sustainability seeks your consent to collect and process your personal data for visitor management, legal and compliance obligations, and lawful, specified needs. Data will be retained as per applicable regulations. Adequate safeguards are in place to prevent misuse or unauthorized access, and data will be deleted after 30 days.</p>
                 <p>Data will not be shared to any 3rd parties.</p>
               </div>
             </div>
