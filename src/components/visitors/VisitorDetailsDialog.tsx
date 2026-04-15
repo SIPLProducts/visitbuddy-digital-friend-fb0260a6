@@ -93,6 +93,12 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
             </div>
           </div>
 
+          {/* Created Date */}
+          <div className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Created:</span>{' '}
+            {new Date(visitor.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+          </div>
+
           {/* Contact Info */}
           <div className="grid grid-cols-2 gap-4">
             {visitor.email && (
