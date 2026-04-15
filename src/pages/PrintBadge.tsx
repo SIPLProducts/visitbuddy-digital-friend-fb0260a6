@@ -319,13 +319,20 @@ export default function PrintBadge() {
           font-style: italic;
           font-size: 14px;
         }
-        .photo-section {
+        .title-photo-row {
           display: flex;
           align-items: center;
-          justify-content: center;
-          padding: 8px;
           background: #f3f4f6;
           border-bottom: 2px solid #1f2937;
+        }
+        .visitor-pass-title {
+          flex: 1;
+          text-align: center;
+          font-weight: 700;
+          font-size: 16px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          padding: 8px;
         }
         .photo-box {
           width: 96px;
@@ -334,6 +341,7 @@ export default function PrintBadge() {
           align-items: center;
           justify-content: center;
           background: #f3f4f6;
+          border-left: 2px solid #1f2937;
         }
         .photo-box img {
           width: 80px;
@@ -493,7 +501,8 @@ export default function PrintBadge() {
                 <div className="company-text">Resustainability</div>
               </div>
 
-              <div className="photo-section">
+              <div className="title-photo-row">
+                <div className="visitor-pass-title">VISITOR PASS</div>
                 <div className="photo-box">
                   {visitor.photo_url ? (
                     <img src={visitor.photo_url} alt={visitor.name} />
@@ -579,7 +588,7 @@ export default function PrintBadge() {
                 </div>
               )}
 
-              {/* Checkout QR + Safety Guidelines - commented out for now
+              {/* Safety Guidelines */}
               <div className="guidelines">
                 <div className="guidelines-text">
                   <p>1. Your safety is your responsibility.</p>
@@ -597,12 +606,13 @@ export default function PrintBadge() {
                     </p>
                   )}
                 </div>
+                {/* QR code commented out for now
                 <div className="qr-box">
                   <img src={qrCodeUrl} alt="QR Code" />
                   <span className="qr-label">Check-out</span>
                 </div>
+                */}
               </div>
-              */}
             </div>
           ))}
         </div>
