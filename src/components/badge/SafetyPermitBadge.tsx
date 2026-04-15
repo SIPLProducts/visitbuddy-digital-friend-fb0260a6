@@ -206,7 +206,7 @@ export function SafetyPermitBadge({
           <span className="text-sm">📍</span>
           <div className="flex-1 text-[10px]">
             <p className="font-semibold text-sky-700">{geoAddress || location?.name || 'Location'}</p>
-            <p className="text-gray-500">Scan QR to navigate</p>
+            <p className="text-gray-500">Scan QR to navigate → Safe to Assembly Point</p>
           </div>
           {navigationQrUrl && (
             <img 
@@ -221,15 +221,10 @@ export function SafetyPermitBadge({
       {/* Safety Guidelines */}
       <div className="flex border-t-2 border-gray-800 bg-gray-100">
         <div className="flex-1 p-2 text-[10px] leading-tight">
-          <p className="mb-0.5">1. Your safety is your responsibility.</p>
-          <p className="mb-0.5">2. Always follow the safety procedures.</p>
-          <p className="mb-0.5">3. Always keep company work place clean.</p>
-          <p>4. When in doubt, contact our official for instruction, guidance & training.</p>
+          <p className="mb-0.5">1. Your safety is your responsibility. &nbsp; 2. Always follow the safety procedures.</p>
+          <p>3. Always keep company work place clean. &nbsp; 4. When in doubt, contact our official for instruction, guidance & training.</p>
           {emergencyContact && (
             <p className="mt-1 font-semibold text-red-600">🆘 Emergency: {emergencyContact}</p>
-          )}
-          {assemblyPoint && (
-            <p className="mt-0.5 font-semibold text-sky-700">🚨 Assembly Point: {assemblyPoint}</p>
           )}
         </div>
         {/* QR code commented out for now
