@@ -181,6 +181,7 @@ function generateVisitorConfirmationEmail(
       <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:16px 0;">
         <table style="width:100%;font-size:14px;color:#374151;">
           <tr><td style="padding:4px 8px;font-weight:bold;">Visitor ID:</td><td style="padding:4px 8px;">${visitorId}</td></tr>
+          ${purpose ? `<tr><td style="padding:4px 8px;font-weight:bold;">Purpose:</td><td style="padding:4px 8px;">${purpose}</td></tr>` : ""}
           <tr><td style="padding:4px 8px;font-weight:bold;">Host:</td><td style="padding:4px 8px;">${hostName}</td></tr>
           ${departmentName ? `<tr><td style="padding:4px 8px;font-weight:bold;">Department:</td><td style="padding:4px 8px;">${departmentName}</td></tr>` : ""}
           ${gateName ? `<tr><td style="padding:4px 8px;font-weight:bold;">Entry Gate:</td><td style="padding:4px 8px;">${gateName}</td></tr>` : ""}
