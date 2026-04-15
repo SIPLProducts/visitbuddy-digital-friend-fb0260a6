@@ -587,7 +587,7 @@ export default function PrintBadge() {
 
                 <div className="officer-sig">
                   <div className="sig-line"></div>
-                  <span className="sig-label">Officer</span>
+                  <span className="sig-label">Host</span>
                 </div>
               </div>
 
