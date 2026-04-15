@@ -304,6 +304,7 @@ export default function PrintBadge() {
           display: flex;
           align-items: center;
           justify-content: center;
+          background-color: #000000;
         }
         .logo-box img {
           width: 48px;
