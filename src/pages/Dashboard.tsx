@@ -139,8 +139,8 @@ export default function Dashboard() {
       .from('visitors')
       .select(`
         *,
-        host:employees(*, department:departments(*)),
-        department:departments(*),
+        host:employees(*, location_id, department:departments(*)),
+        department:departments(*, location_id),
         gate:gates(*, location:locations(*))
       `)
       .in('status', ['checked_in', 'checked_out', 'scheduled', 'pending_approval'])
@@ -247,7 +247,15 @@ export default function Dashboard() {
       : visitors;
 
     if (locationFilter !== 'all') {
-      result = result.filter(v => v.gate?.location?.id === locationFilter);
+      result = result.filter(v => {
+        const ids = [
+          v.gate?.location?.id,
+          (v as any).gate?.location_id,
+          (v as any).department?.location_id,
+          (v as any).host?.location_id,
+        ].filter(Boolean);
+        return ids.includes(locationFilter);
+      });
     }
 
     if (departmentFilter !== 'all') {
@@ -290,7 +298,15 @@ export default function Dashboard() {
       ? visitors.filter(v => v.host_id === hostEmployeeId || (v as any).created_by_user_id === user?.id)
       : visitors;
     if (locationFilter !== 'all') {
-      result = result.filter(v => v.gate?.location?.id === locationFilter);
+      result = result.filter(v => {
+        const ids = [
+          v.gate?.location?.id,
+          (v as any).gate?.location_id,
+          (v as any).department?.location_id,
+          (v as any).host?.location_id,
+        ].filter(Boolean);
+        return ids.includes(locationFilter);
+      });
     }
     if (departmentFilter !== 'all') {
       result = result.filter(v => v.department?.id === departmentFilter);
