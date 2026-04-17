@@ -719,7 +719,7 @@ export default function Visitors() {
                         onCheckInAndPrint={handleCheckInAndPrint}
                         onApprove={canApproveReject ? handleApprove : undefined}
                         onReject={canApproveReject ? handleReject : undefined}
-                        canCheckInOut={isGateSecurity}
+                        canCheckInOut={isGateSecurity || (!!hostEmployeeId && visitor.host_id === hostEmployeeId)}
                         canEdit={true}
                         actionLoadingId={actionLoadingId}
                       />
