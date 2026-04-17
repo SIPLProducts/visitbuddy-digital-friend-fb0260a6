@@ -436,18 +436,7 @@ export default function Dashboard() {
                   </div>
                 </PopoverContent>
               </Popover>
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-40 h-8 text-xs">
-                  <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
-                  <SelectValue placeholder="All Locations" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border border-border z-50">
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Location is controlled globally via the Header selector */}
               <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                 <SelectTrigger className="w-40 h-8 text-xs">
                   <Building2 className="h-3 w-3 mr-1 text-muted-foreground" />
