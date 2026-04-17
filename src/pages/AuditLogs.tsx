@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Shield, Search, Filter, Clock, User, Activity, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, subDays, subHours } from 'date-fns';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 interface AuditLog {
   id: string;
@@ -42,6 +43,7 @@ function formatAction(action: string) {
 }
 
 export default function AuditLogs() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -52,7 +54,7 @@ export default function AuditLogs() {
 
   useEffect(() => {
     fetchLogs();
-  }, [entityFilter, timeFilter, page]);
+  }, [entityFilter, timeFilter, page, selectedLocationId, isAllLocations]);
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -64,6 +66,9 @@ export default function AuditLogs() {
 
     if (entityFilter !== 'all') {
       query = query.eq('entity_type', entityFilter);
+    }
+    if (!isAllLocations && selectedLocationId) {
+      query = query.eq('location_id', selectedLocationId);
     }
 
     const now = new Date();

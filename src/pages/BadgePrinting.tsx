@@ -27,6 +27,7 @@ import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { SafetyPermitBadge } from '@/components/badge/SafetyPermitBadge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 interface VisitorWithLocation extends Omit<Visitor, 'gate' | 'host'> {
   host?: (Employee & { phone?: string | null }) | null;
@@ -39,6 +40,7 @@ interface VisitorWithLocation extends Omit<Visitor, 'gate' | 'host'> {
 }
 
 export default function BadgePrinting() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [searchParams] = useSearchParams();
   const badgeRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -331,12 +333,14 @@ export default function BadgePrinting() {
     }
   };
 
-  const filteredVisitors = visitors.filter(
-    (v) =>
+  const filteredVisitors = visitors.filter((v) => {
+    const matchesSearch =
       v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       v.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.visitor_id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      v.visitor_id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesLocation = isAllLocations || v.gate?.location_id === selectedLocationId;
+    return matchesSearch && matchesLocation;
+  });
 
   // Stats
   const checkedInCount = visitors.filter(v => v.status === 'checked_in').length;

@@ -15,6 +15,7 @@ import { ShieldAlert, Plus, Search, Edit2, Trash2, AlertTriangle, Ban, Eye } fro
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { logAudit } from '@/lib/auditLog';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 interface WatchlistEntry {
   id: string;
@@ -28,6 +29,7 @@ interface WatchlistEntry {
   photo_url: string | null;
   is_active: boolean;
   created_at: string;
+  location_id: string | null;
 }
 
 const severityConfig: Record<string, { label: string; color: string; icon: typeof AlertTriangle }> = {
@@ -37,6 +39,7 @@ const severityConfig: Record<string, { label: string; color: string; icon: typeo
 };
 
 export default function Watchlist() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [entries, setEntries] = useState<WatchlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -107,6 +110,7 @@ export default function Watchlist() {
   };
 
   const filtered = entries.filter(e => {
+    if (!isAllLocations && e.location_id && e.location_id !== selectedLocationId) return false;
     if (!search) return true;
     const s = search.toLowerCase();
     return e.name.toLowerCase().includes(s) || (e.company || '').toLowerCase().includes(s) || (e.phone || '').includes(s);
