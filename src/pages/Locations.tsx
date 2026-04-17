@@ -52,6 +52,61 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail, validatePhone, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
 
+/**
+ * Parses a coordinate string. Accepts:
+ *  - decimal degrees: "17.378722", "-78.582076"
+ *  - DMS:  17°22'43.399"N | 17'22'43.399"N | 17 22 43.399 N
+ * Returns decimal number, or null if unparseable.
+ */
+function parseCoordinate(input: string): number | null {
+  if (input == null) return null;
+  const raw = String(input).trim();
+  if (!raw) return null;
+
+  // Plain decimal (optionally signed)
+  if (/^[-+]?\d+(\.\d+)?$/.test(raw)) {
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  // DMS: capture deg, min, sec (optional decimal), and optional hemisphere
+  const dms = raw.match(
+    /^\s*(-?\d+(?:\.\d+)?)\s*[°'\s]\s*(\d+(?:\.\d+)?)\s*['\s]\s*(\d+(?:\.\d+)?)\s*["”]?\s*([NSEWnsew])?\s*$/
+  );
+  if (dms) {
+    const deg = parseFloat(dms[1]);
+    const min = parseFloat(dms[2]);
+    const sec = parseFloat(dms[3]);
+    const hem = (dms[4] || '').toUpperCase();
+    if (![deg, min, sec].every(Number.isFinite)) return null;
+    let dec = Math.abs(deg) + min / 60 + sec / 3600;
+    if (deg < 0 || hem === 'S' || hem === 'W') dec = -dec;
+    return dec;
+  }
+
+  return null;
+}
+
+function parseAndValidateCoordinate(
+  input: string,
+  kind: 'latitude' | 'longitude'
+): { value: number | null; error: string | null } {
+  if (!input || !input.trim()) return { value: null, error: null };
+  const parsed = parseCoordinate(input);
+  if (parsed === null) {
+    return {
+      value: null,
+      error: `Invalid ${kind}. Use decimal (e.g. 17.378722) or DMS (e.g. 17°22'43.399"N)`,
+    };
+  }
+  const limit = kind === 'latitude' ? 90 : 180;
+  if (Math.abs(parsed) > limit) {
+    return { value: null, error: `${kind === 'latitude' ? 'Latitude' : 'Longitude'} must be between -${limit} and ${limit}` };
+  }
+  // Round to 8 decimal places to match DB precision
+  return { value: Math.round(parsed * 1e8) / 1e8, error: null };
+}
+
 export default function Locations() {
   const { isHoAdmin } = useUserRoles();
   const [locations, setLocations] = useState<Location[]>([]);
@@ -133,6 +188,11 @@ export default function Locations() {
       return;
     }
 
+    const lat = parseAndValidateCoordinate(formData.latitude, 'latitude');
+    if (lat.error) { toast.error(lat.error); return; }
+    const lng = parseAndValidateCoordinate(formData.longitude, 'longitude');
+    if (lng.error) { toast.error(lng.error); return; }
+
     setLoading(true);
     const { error } = await supabase.from('locations').insert({
       name: formData.name,
@@ -144,8 +204,8 @@ export default function Locations() {
       emergency_contact: formData.emergency_contact || null,
       assembly_point: formData.assembly_point || null,
       status: formData.status,
-      latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-      longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+      latitude: lat.value,
+      longitude: lng.value,
       geo_address: formData.geo_address || null,
     });
 
@@ -166,6 +226,11 @@ export default function Locations() {
   const handleEdit = async () => {
     if (!selectedLocation || !formData.name) return;
 
+    const lat = parseAndValidateCoordinate(formData.latitude, 'latitude');
+    if (lat.error) { toast.error(lat.error); return; }
+    const lng = parseAndValidateCoordinate(formData.longitude, 'longitude');
+    if (lng.error) { toast.error(lng.error); return; }
+
     setLoading(true);
     const { error } = await supabase
       .from('locations')
@@ -179,8 +244,8 @@ export default function Locations() {
         emergency_contact: formData.emergency_contact || null,
         assembly_point: formData.assembly_point || null,
         status: formData.status,
-        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-        longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+        latitude: lat.value,
+        longitude: lng.value,
         geo_address: formData.geo_address || null,
       })
       .eq('id', selectedLocation.id);
@@ -314,21 +379,21 @@ export default function Locations() {
           errors.push({ row: rowNum, field: 'Status', message: statusError, value: values[8] });
         }
         
-        // Validate latitude if provided
-        const latError = validateNumber(values[9], 'Latitude');
-        if (latError) {
-          errors.push({ row: rowNum, field: 'Latitude', message: latError, value: values[9] });
+        // Validate latitude if provided (accepts decimal or DMS)
+        const latParsed = parseAndValidateCoordinate(values[9] || '', 'latitude');
+        if (latParsed.error) {
+          errors.push({ row: rowNum, field: 'Latitude', message: latParsed.error, value: values[9] });
         }
-        
-        // Validate longitude if provided
-        const lngError = validateNumber(values[10], 'Longitude');
-        if (lngError) {
-          errors.push({ row: rowNum, field: 'Longitude', message: lngError, value: values[10] });
+
+        // Validate longitude if provided (accepts decimal or DMS)
+        const lngParsed = parseAndValidateCoordinate(values[10] || '', 'longitude');
+        if (lngParsed.error) {
+          errors.push({ row: rowNum, field: 'Longitude', message: lngParsed.error, value: values[10] });
         }
-        
+
         // Skip row if it has critical errors
         if (nameError) continue;
-        
+
         locationsToInsert.push({
           name: values[0],
           address: values[1] || null,
@@ -339,8 +404,8 @@ export default function Locations() {
           emergency_contact: values[6] || null,
           assembly_point: values[7] || null,
           status: (values[8]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
-          latitude: latError ? null : (values[9] ? parseFloat(values[9]) : null),
-          longitude: lngError ? null : (values[10] ? parseFloat(values[10]) : null),
+          latitude: latParsed.error ? null : latParsed.value,
+          longitude: lngParsed.error ? null : lngParsed.value,
           geo_address: values[11] || null,
         });
       }
@@ -498,20 +563,21 @@ export default function Locations() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input
-            type="number"
-            step="any"
-            placeholder="Latitude (e.g., 12.9716)"
+            type="text"
+            placeholder={`Latitude (e.g., 17.378722 or 17°22'43.4"N)`}
             value={formData.latitude}
             onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
           />
           <Input
-            type="number"
-            step="any"
-            placeholder="Longitude (e.g., 77.5946)"
+            type="text"
+            placeholder={`Longitude (e.g., 78.582076 or 78°34'53.5"E)`}
             value={formData.longitude}
             onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
           />
         </div>
+        <p className="text-xs text-muted-foreground">
+          Accepts decimal degrees or DMS format (e.g. 17°22'43.399"N, 78°34'53.476"E).
+        </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
