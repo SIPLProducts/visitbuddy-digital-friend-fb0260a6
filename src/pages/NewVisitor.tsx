@@ -22,6 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -74,6 +75,7 @@ interface NewVisitorProps {
 export default function NewVisitor({ inline = false, onClose }: NewVisitorProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [loading, setLoading] = useState(false);
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -108,14 +110,25 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
 
   useEffect(() => {
     fetchFormData();
-  }, []);
+    // Reset location-scoped selections when location changes
+    form.setValue('host_id', '');
+    form.setValue('department_id', '');
+    form.setValue('gate_id', '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLocationId, isAllLocations]);
 
   const fetchFormData = async () => {
-    const [deptRes, empRes, gateRes] = await Promise.all([
-      supabase.from('departments').select('*').order('name'),
-      supabase.from('employees').select('*, department:departments(*)').eq('is_host', true).order('name'),
-      supabase.from('gates').select('*').eq('status', 'active').order('name'),
-    ]);
+    let deptQuery: any = supabase.from('departments').select('*').order('name');
+    let empQuery: any = supabase.from('employees').select('*, department:departments(*)').eq('is_host', true).order('name');
+    let gateQuery: any = supabase.from('gates').select('*').eq('status', 'active').order('name');
+
+    if (!isAllLocations && selectedLocationId) {
+      deptQuery = deptQuery.eq('location_id', selectedLocationId);
+      empQuery = empQuery.eq('location_id', selectedLocationId);
+      gateQuery = gateQuery.eq('location_id', selectedLocationId);
+    }
+
+    const [deptRes, empRes, gateRes] = await Promise.all([deptQuery, empQuery, gateQuery]);
 
     if (deptRes.data) setDepartments(deptRes.data as Department[]);
     if (empRes.data) setEmployees(empRes.data as unknown as Employee[]);
