@@ -119,7 +119,7 @@ export default function Dashboard() {
       supabase.removeChannel(vehicleChannel);
       supabase.removeChannel(appointmentChannel);
     };
-  }, [user]);
+  }, [user, locationFilter]);
 
   const fetchLocations = async () => {
     const { data } = await supabase.from('locations').select('*').order('name');
