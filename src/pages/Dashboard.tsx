@@ -201,23 +201,32 @@ export default function Dashboard() {
       setGates(gatesData as Gate[]);
     }
 
-    const { count: appointmentsCount } = await supabase
+    const apptDateQ = supabase
       .from('appointments')
-      .select('*', { count: 'exact', head: true })
+      .select('id, department:departments(location_id)', { count: 'exact' })
       .eq('scheduled_date', today);
+    const { data: apptRows } = await apptDateQ;
+    const filteredAppts = locationFilter === 'all'
+      ? (apptRows || [])
+      : (apptRows || []).filter((a: any) => a.department?.location_id === locationFilter);
+    const appointmentsCount = filteredAppts.length;
 
-    // Get vehicles inside count (all time checked_in, not just today)
-    const { count: vehicleCount } = await supabase
+    // Get vehicles inside count (all time checked_in)
+    let vehicleInsideQ = supabase
       .from('vehicles')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'checked_in');
+    if (locationFilter !== 'all') vehicleInsideQ = vehicleInsideQ.eq('location_id', locationFilter);
+    const { count: vehicleCount } = await vehicleInsideQ;
 
     // Get today's vehicles
-    const { count: todaysVehicleCount } = await supabase
+    let todayVehQ = supabase
       .from('vehicles')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', `${today}T00:00:00`)
       .lte('created_at', `${today}T23:59:59`);
+    if (locationFilter !== 'all') todayVehQ = todayVehQ.eq('location_id', locationFilter);
+    const { count: todaysVehicleCount } = await todayVehQ;
 
     setVehiclesInside(vehicleCount || 0);
     setStats(prev => ({
