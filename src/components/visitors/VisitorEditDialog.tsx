@@ -49,6 +49,7 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
   const [loading, setLoading] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   
   const [formData, setFormData] = useState({
     name: '',
