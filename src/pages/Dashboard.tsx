@@ -3,6 +3,7 @@ import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, Calenda
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useHostEmployee } from '@/hooks/useHostEmployee';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -56,7 +57,8 @@ export default function Dashboard() {
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeSmartFilter, setActiveSmartFilter] = useState<string>('today');
-  const [locationFilter, setLocationFilter] = useState('all');
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
+  const locationFilter = isAllLocations ? 'all' : selectedLocationId;
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
