@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Users, Truck, TrendingUp, TrendingDown, Clock, UserCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { cn } from '@/lib/utils';
 
 interface CombinedStatsData {
@@ -17,6 +18,7 @@ interface CombinedStatsData {
 }
 
 export function CombinedStats() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [stats, setStats] = useState<CombinedStatsData>({
     visitors: { today: 0, activeCheckIns: 0, trend: 0 },
     vehicles: { today: 0, currentlyInside: 0, trend: 0 },
@@ -25,62 +27,77 @@ export function CombinedStats() {
 
   useEffect(() => {
     fetchCombinedStats();
-  }, []);
+  }, [selectedLocationId, isAllLocations]);
 
   const fetchCombinedStats = async () => {
     const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
     try {
-      // Fetch today's visitors
-      const { data: todayVisitors } = await supabase
+      // Visitors join gates(location_id) so we can filter client-side
+      let todayVisitorsQ = supabase
         .from('visitors')
-        .select('id, status')
+        .select('id, status, gate:gates(location_id)')
         .gte('created_at', `${today}T00:00:00`)
         .lte('created_at', `${today}T23:59:59`);
 
-      // Fetch yesterday's visitors for trend
-      const { data: yesterdayVisitors } = await supabase
+      let yesterdayVisitorsQ = supabase
         .from('visitors')
-        .select('id')
+        .select('id, gate:gates(location_id)')
         .gte('created_at', `${yesterday}T00:00:00`)
         .lte('created_at', `${yesterday}T23:59:59`);
 
-      // Fetch today's vehicles (commercial)
-      const { data: todayVehicles } = await supabase
+      let todayVehiclesQ = supabase
         .from('vehicles')
-        .select('id, status')
+        .select('id, status, location_id')
         .gte('created_at', `${today}T00:00:00`)
         .lte('created_at', `${today}T23:59:59`);
 
-      // Fetch yesterday's vehicles for trend
-      const { data: yesterdayVehicles } = await supabase
+      let yesterdayVehiclesQ = supabase
         .from('vehicles')
-        .select('id')
+        .select('id, location_id')
         .gte('created_at', `${yesterday}T00:00:00`)
         .lte('created_at', `${yesterday}T23:59:59`);
 
-      const todayVisitorCount = todayVisitors?.length || 0;
-      const yesterdayVisitorCount = yesterdayVisitors?.length || 0;
-      const visitorTrend = yesterdayVisitorCount > 0 
-        ? Math.round(((todayVisitorCount - yesterdayVisitorCount) / yesterdayVisitorCount) * 100) 
+      if (!isAllLocations && selectedLocationId) {
+        todayVehiclesQ = todayVehiclesQ.eq('location_id', selectedLocationId);
+        yesterdayVehiclesQ = yesterdayVehiclesQ.eq('location_id', selectedLocationId);
+      }
+
+      const [todayVisitorsRes, yesterdayVisitorsRes, todayVehiclesRes, yesterdayVehiclesRes] =
+        await Promise.all([todayVisitorsQ, yesterdayVisitorsQ, todayVehiclesQ, yesterdayVehiclesQ]);
+
+      let todayVisitors = (todayVisitorsRes.data || []) as any[];
+      let yesterdayVisitors = (yesterdayVisitorsRes.data || []) as any[];
+      const todayVehicles = (todayVehiclesRes.data || []) as any[];
+      const yesterdayVehicles = (yesterdayVehiclesRes.data || []) as any[];
+
+      if (!isAllLocations && selectedLocationId) {
+        todayVisitors = todayVisitors.filter(v => v.gate?.location_id === selectedLocationId);
+        yesterdayVisitors = yesterdayVisitors.filter(v => v.gate?.location_id === selectedLocationId);
+      }
+
+      const todayVisitorCount = todayVisitors.length;
+      const yesterdayVisitorCount = yesterdayVisitors.length;
+      const visitorTrend = yesterdayVisitorCount > 0
+        ? Math.round(((todayVisitorCount - yesterdayVisitorCount) / yesterdayVisitorCount) * 100)
         : 0;
 
-      const todayVehicleCount = todayVehicles?.length || 0;
-      const yesterdayVehicleCount = yesterdayVehicles?.length || 0;
-      const vehicleTrend = yesterdayVehicleCount > 0 
-        ? Math.round(((todayVehicleCount - yesterdayVehicleCount) / yesterdayVehicleCount) * 100) 
+      const todayVehicleCount = todayVehicles.length;
+      const yesterdayVehicleCount = yesterdayVehicles.length;
+      const vehicleTrend = yesterdayVehicleCount > 0
+        ? Math.round(((todayVehicleCount - yesterdayVehicleCount) / yesterdayVehicleCount) * 100)
         : 0;
 
       setStats({
         visitors: {
           today: todayVisitorCount,
-          activeCheckIns: todayVisitors?.filter(v => v.status === 'checked_in').length || 0,
+          activeCheckIns: todayVisitors.filter((v: any) => v.status === 'checked_in').length,
           trend: visitorTrend,
         },
         vehicles: {
           today: todayVehicleCount,
-          currentlyInside: todayVehicles?.filter(v => v.status === 'checked_in').length || 0,
+          currentlyInside: todayVehicles.filter((v: any) => v.status === 'checked_in').length,
           trend: vehicleTrend,
         },
       });
