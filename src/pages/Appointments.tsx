@@ -84,7 +84,7 @@ export default function Appointments() {
 
   useEffect(() => {
     fetchAppointments();
-  }, [selectedDate]);
+  }, [selectedDate, selectedLocationId, isAllLocations]);
 
   const fetchData = async () => {
     const [deptRes, empRes] = await Promise.all([
