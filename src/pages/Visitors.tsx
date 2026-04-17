@@ -529,8 +529,8 @@ export default function Visitors() {
           </Popover>
 
           {/* Clear filters */}
-          {(fromDate || toDate || departmentFilter !== 'all' || locationFilter !== 'all' || gateFilter !== 'all') && (
-            <Button variant="ghost" size="icon" onClick={() => { setFromDate(undefined); setToDate(undefined); setDepartmentFilter('all'); setLocationFilter('all'); setGateFilter('all'); }} title="Clear all filters">
+          {(fromDate || toDate || departmentFilter !== 'all' || gateFilter !== 'all') && (
+            <Button variant="ghost" size="icon" onClick={() => { setFromDate(undefined); setToDate(undefined); setDepartmentFilter('all'); setGateFilter('all'); }} title="Clear all filters">
               <X className="h-4 w-4" />
             </Button>
           )}
