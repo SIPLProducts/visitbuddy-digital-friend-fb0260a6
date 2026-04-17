@@ -44,6 +44,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useHostEmployee } from '@/hooks/useHostEmployee';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { Location } from '@/types/database';
 import { format, subDays } from 'date-fns';
 import { DateRange } from 'react-day-picker';
@@ -81,6 +82,7 @@ export default function Analytics() {
     if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
     return true;
   }, [userRoles, isHoAdmin, rolesLoading]);
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationStats, setLocationStats] = useState<LocationStats[]>([]);
   const [trendData, setTrendData] = useState<TrendData[]>([]);
@@ -102,7 +104,7 @@ export default function Analytics() {
     if (dateRange?.from) {
       fetchAnalyticsData();
     }
-  }, [dateRange]);
+  }, [dateRange, selectedLocationId, isAllLocations]);
 
   const fetchAnalyticsData = async () => {
     setLoading(true);
@@ -143,10 +145,19 @@ export default function Analytics() {
       visitorsData = visitorsData.filter((v: any) => v.host_id === hostEmployeeId || v.created_by_user_id === user?.id);
     }
 
+    // Apply selected-location filter to visitors (via gate.location_id)
+    if (!isAllLocations && selectedLocationId && visitorsData) {
+      visitorsData = visitorsData.filter((v: any) => v.gate?.location_id === selectedLocationId);
+    }
+
     // Fetch vehicles grouped by location with date filter
     let vehiclesQuery = supabase
       .from('vehicles')
       .select('id, location_id, created_at');
+
+    if (!isAllLocations && selectedLocationId) {
+      vehiclesQuery = vehiclesQuery.eq('location_id', selectedLocationId);
+    }
 
     if (dateRange?.from) {
       vehiclesQuery = vehiclesQuery.gte('created_at', dateRange.from.toISOString());

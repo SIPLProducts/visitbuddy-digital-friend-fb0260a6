@@ -30,6 +30,7 @@ import {
   Filter, Building2, Zap
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { Vehicle } from '@/types/vehicle';
 import { Location } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -55,6 +56,7 @@ import {
 const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 export default function VehicleReport() {
+  const { selectedLocationId: globalLocationId, isAllLocations } = useSelectedLocation();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,7 @@ export default function VehicleReport() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
+  const effectiveLocationFilter = isAllLocations ? locationFilter : globalLocationId;
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
@@ -399,7 +402,7 @@ export default function VehicleReport() {
       statusFilter === 'all' || vehicle.status === statusFilter;
 
     const matchesLocation =
-      locationFilter === 'all' || vehicle.location?.id === locationFilter;
+      effectiveLocationFilter === 'all' || vehicle.location?.id === effectiveLocationFilter;
 
     const matchesVehicleType =
       vehicleTypeFilter === 'all' || vehicle.vehicle_type === vehicleTypeFilter;

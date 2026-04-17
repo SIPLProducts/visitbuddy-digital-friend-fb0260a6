@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useHostEmployee } from '@/hooks/useHostEmployee';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -66,13 +67,17 @@ export default function VisitorReport() {
     if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
     return true;
   }, [userRoles, isHoAdmin, rolesLoading]);
+  const { selectedLocationId: globalLocationId, isAllLocations } = useSelectedLocation();
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [locationFilter, setLocationFilter] = useState('all');
+  const [locationFilter, setLocationFilterRaw] = useState('all');
+  // Override local location filter with global header selection when not "All"
+  const effectiveLocationFilter = isAllLocations ? locationFilter : globalLocationId;
+  const setLocationFilter = setLocationFilterRaw;
   const [companyFilter, setCompanyFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -157,7 +162,7 @@ export default function VisitorReport() {
       (statusFilter === 'with_laptop' ? visitor.has_laptop === true : visitor.status === statusFilter);
 
     const matchesLocation =
-      locationFilter === 'all' || visitor.gate?.location?.id === locationFilter;
+      effectiveLocationFilter === 'all' || visitor.gate?.location?.id === effectiveLocationFilter;
 
     const matchesCompany =
       companyFilter === 'all' || visitor.company === companyFilter;

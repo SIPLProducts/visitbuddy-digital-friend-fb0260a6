@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,21 +13,26 @@ import { FileText, Download, AlertTriangle, Clock, ShieldCheck, Users, Calendar,
 import { format, subDays } from 'date-fns';
 
 export default function ComplianceReport() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [visitors, setVisitors] = useState<any[]>([]);
   const [agreements, setAgreements] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('30');
 
-  useEffect(() => { fetchData(); }, [period]);
+  useEffect(() => { fetchData(); }, [period, selectedLocationId, isAllLocations]);
 
   const fetchData = async () => {
     setLoading(true);
     const since = subDays(new Date(), parseInt(period)).toISOString();
     const [vRes, aRes] = await Promise.all([
-      supabase.from('visitors').select('id, name, status, check_in_time, check_out_time, govt_id_number, created_at, purpose, scheduled_date, gate:gates(name)').gte('created_at', since).order('created_at', { ascending: false }),
+      supabase.from('visitors').select('id, name, status, check_in_time, check_out_time, govt_id_number, created_at, purpose, scheduled_date, gate:gates(name, location_id)').gte('created_at', since).order('created_at', { ascending: false }),
       supabase.from('visitor_agreements').select('*').gte('created_at', since),
     ]);
-    setVisitors((vRes.data as any) || []);
+    let visitorsData = (vRes.data as any) || [];
+    if (!isAllLocations && selectedLocationId) {
+      visitorsData = visitorsData.filter((v: any) => v.gate?.location_id === selectedLocationId);
+    }
+    setVisitors(visitorsData);
     setAgreements((aRes.data as any) || []);
     setLoading(false);
   };
