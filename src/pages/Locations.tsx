@@ -226,6 +226,11 @@ export default function Locations() {
   const handleEdit = async () => {
     if (!selectedLocation || !formData.name) return;
 
+    const lat = parseAndValidateCoordinate(formData.latitude, 'latitude');
+    if (lat.error) { toast.error(lat.error); return; }
+    const lng = parseAndValidateCoordinate(formData.longitude, 'longitude');
+    if (lng.error) { toast.error(lng.error); return; }
+
     setLoading(true);
     const { error } = await supabase
       .from('locations')
@@ -239,8 +244,8 @@ export default function Locations() {
         emergency_contact: formData.emergency_contact || null,
         assembly_point: formData.assembly_point || null,
         status: formData.status,
-        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-        longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+        latitude: lat.value,
+        longitude: lng.value,
         geo_address: formData.geo_address || null,
       })
       .eq('id', selectedLocation.id);
