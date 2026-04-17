@@ -47,6 +47,7 @@ import { CheckInCaptureDialog } from '@/components/visitors/CheckInCaptureDialog
 import { logAudit } from '@/lib/auditLog';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useHostEmployee } from '@/hooks/useHostEmployee';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { useTranslation } from 'react-i18next';
 import NewVisitor from './NewVisitor';
 
@@ -81,7 +82,8 @@ export default function Visitors() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
   const [departmentFilter, setDepartmentFilter] = useState('all');
-  const [locationFilter, setLocationFilter] = useState('all');
+  const { selectedLocationId: globalLocationId, isAllLocations } = useSelectedLocation();
+  const locationFilter = isAllLocations ? 'all' : globalLocationId;
   const [gateFilter, setGateFilter] = useState('all');
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
@@ -484,19 +486,7 @@ export default function Visitors() {
             </SelectContent>
           </Select>
 
-          {/* Location Filter */}
-          <Select value={locationFilter} onValueChange={setLocationFilter}>
-            <SelectTrigger className="w-44">
-              <MapPin className="h-4 w-4 mr-1.5 text-muted-foreground" />
-              <SelectValue placeholder={t('dashboard.allLocations')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('dashboard.allLocations')}</SelectItem>
-              {locations.map(l => (
-                <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Location is controlled globally via the Header selector */}
 
           {/* Gate Filter */}
           <Select value={gateFilter} onValueChange={setGateFilter}>
