@@ -41,13 +41,13 @@ export function VisitorTrendChart({ locationFilter = 'all', departmentFilter = '
     // Fetch all visitors and vehicles for the 7-day range in one query each
     let visitorQuery = supabase
       .from('visitors')
-      .select('created_at, department_id, gate:gates(location_id)')
+      .select('created_at, department_id, gate:gates(location_id), department:departments(location_id), host:employees(location_id)')
       .gte('created_at', `${startDate}T00:00:00`)
       .lte('created_at', `${endDate}T23:59:59`);
 
     let vehicleQuery = supabase
       .from('vehicles')
-      .select('created_at, department_id, gate:gates(location_id)')
+      .select('created_at, department_id, location_id, gate:gates(location_id)')
       .gte('created_at', `${startDate}T00:00:00`)
       .lte('created_at', `${endDate}T23:59:59`);
 
@@ -56,10 +56,16 @@ export function VisitorTrendChart({ locationFilter = 'all', departmentFilter = '
     let visitorData = (visitorRes.data || []) as any[];
     let vehicleData = (vehicleRes.data || []) as any[];
 
-    // Apply filters client-side
+    // Apply filters client-side using fallback location resolution
     if (locationFilter !== 'all') {
-      visitorData = visitorData.filter(v => v.gate?.location_id === locationFilter);
-      vehicleData = vehicleData.filter(v => v.gate?.location_id === locationFilter);
+      visitorData = visitorData.filter(v => {
+        const ids = [v.gate?.location_id, v.department?.location_id, v.host?.location_id].filter(Boolean);
+        return ids.includes(locationFilter);
+      });
+      vehicleData = vehicleData.filter(v => {
+        const ids = [v.location_id, v.gate?.location_id].filter(Boolean);
+        return ids.includes(locationFilter);
+      });
     }
     if (departmentFilter !== 'all') {
       visitorData = visitorData.filter(v => v.department_id === departmentFilter);

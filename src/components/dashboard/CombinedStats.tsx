@@ -34,16 +34,16 @@ export function CombinedStats() {
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
     try {
-      // Visitors join gates(location_id) so we can filter client-side
+      // Visitors join gates/dept/host so we can filter by any location source client-side
       let todayVisitorsQ = supabase
         .from('visitors')
-        .select('id, status, gate:gates(location_id)')
+        .select('id, status, gate:gates(location_id), department:departments(location_id), host:employees(location_id)')
         .gte('created_at', `${today}T00:00:00`)
         .lte('created_at', `${today}T23:59:59`);
 
       let yesterdayVisitorsQ = supabase
         .from('visitors')
-        .select('id, gate:gates(location_id)')
+        .select('id, gate:gates(location_id), department:departments(location_id), host:employees(location_id)')
         .gte('created_at', `${yesterday}T00:00:00`)
         .lte('created_at', `${yesterday}T23:59:59`);
 
@@ -73,8 +73,12 @@ export function CombinedStats() {
       const yesterdayVehicles = (yesterdayVehiclesRes.data || []) as any[];
 
       if (!isAllLocations && selectedLocationId) {
-        todayVisitors = todayVisitors.filter(v => v.gate?.location_id === selectedLocationId);
-        yesterdayVisitors = yesterdayVisitors.filter(v => v.gate?.location_id === selectedLocationId);
+        const matches = (v: any) => {
+          const ids = [v.gate?.location_id, v.department?.location_id, v.host?.location_id].filter(Boolean);
+          return ids.includes(selectedLocationId);
+        };
+        todayVisitors = todayVisitors.filter(matches);
+        yesterdayVisitors = yesterdayVisitors.filter(matches);
       }
 
       const todayVisitorCount = todayVisitors.length;
