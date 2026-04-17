@@ -77,7 +77,8 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
       fetchEmployees();
       fetchDepartments();
     }
-  }, [open]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, selectedLocationId, isAllLocations]);
 
   useEffect(() => {
     if (visitor && open) {
@@ -105,19 +106,27 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
   }, [visitor, open]);
 
   const fetchEmployees = async () => {
-    const { data } = await supabase
+    let query: any = supabase
       .from('employees')
-      .select('id, name, department:departments(id, name)')
+      .select('id, name, location_id, department:departments(id, name)')
       .eq('is_host', true)
       .order('name');
+    if (!isAllLocations && selectedLocationId) {
+      query = query.eq('location_id', selectedLocationId);
+    }
+    const { data } = await query;
     if (data) setEmployees(data as Employee[]);
   };
 
   const fetchDepartments = async () => {
-    const { data } = await supabase
+    let query: any = supabase
       .from('departments')
-      .select('id, name')
+      .select('id, name, location_id')
       .order('name');
+    if (!isAllLocations && selectedLocationId) {
+      query = query.eq('location_id', selectedLocationId);
+    }
+    const { data } = await query;
     if (data) setDepartments(data);
   };
 
