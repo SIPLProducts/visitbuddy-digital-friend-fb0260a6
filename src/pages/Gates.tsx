@@ -48,8 +48,10 @@ import { Gate, Location } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 export default function Gates() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);

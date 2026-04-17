@@ -36,8 +36,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Department, Employee, Location } from '@/types/database';
 import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired } from '@/components/shared/CsvImportResult';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 export default function Departments() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -281,9 +283,11 @@ export default function Departments() {
     return employees.filter((e) => e.department_id === deptId);
   };
 
-  const filteredDepartments = departments.filter((dept) =>
-    dept.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDepartments = departments.filter((dept) => {
+    const matchesSearch = dept.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesLocation = isAllLocations || dept.location_id === selectedLocationId;
+    return matchesSearch && matchesLocation;
+  });
 
   return (
     <>
