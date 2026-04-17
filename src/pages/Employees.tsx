@@ -44,8 +44,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Employee, Department, Location } from '@/types/database';
 import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail } from '@/components/shared/CsvImportResult';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 export default function Employees() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -347,11 +349,14 @@ export default function Employees() {
     return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const filteredEmployees = employees.filter((emp) =>
-    emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.employee_id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredEmployees = employees.filter((emp) => {
+    const matchesSearch =
+      emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      emp.employee_id.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesLocation = isAllLocations || emp.location_id === selectedLocationId;
+    return matchesSearch && matchesLocation;
+  });
 
   const employeeFormContent = (
     <div className="space-y-4 py-4">

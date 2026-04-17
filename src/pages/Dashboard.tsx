@@ -3,6 +3,7 @@ import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, Calenda
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useHostEmployee } from '@/hooks/useHostEmployee';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentVisitors } from '@/components/dashboard/RecentVisitors';
@@ -56,7 +57,8 @@ export default function Dashboard() {
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [activeSmartFilter, setActiveSmartFilter] = useState<string>('today');
-  const [locationFilter, setLocationFilter] = useState('all');
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
+  const locationFilter = isAllLocations ? 'all' : selectedLocationId;
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [departments, setDepartments] = useState<Department[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
@@ -199,23 +201,32 @@ export default function Dashboard() {
       setGates(gatesData as Gate[]);
     }
 
-    const { count: appointmentsCount } = await supabase
+    const apptDateQ = supabase
       .from('appointments')
-      .select('*', { count: 'exact', head: true })
+      .select('id, department:departments(location_id)', { count: 'exact' })
       .eq('scheduled_date', today);
+    const { data: apptRows } = await apptDateQ;
+    const filteredAppts = locationFilter === 'all'
+      ? (apptRows || [])
+      : (apptRows || []).filter((a: any) => a.department?.location_id === locationFilter);
+    const appointmentsCount = filteredAppts.length;
 
-    // Get vehicles inside count (all time checked_in, not just today)
-    const { count: vehicleCount } = await supabase
+    // Get vehicles inside count (all time checked_in)
+    let vehicleInsideQ = supabase
       .from('vehicles')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'checked_in');
+    if (locationFilter !== 'all') vehicleInsideQ = vehicleInsideQ.eq('location_id', locationFilter);
+    const { count: vehicleCount } = await vehicleInsideQ;
 
     // Get today's vehicles
-    const { count: todaysVehicleCount } = await supabase
+    let todayVehQ = supabase
       .from('vehicles')
       .select('*', { count: 'exact', head: true })
       .gte('created_at', `${today}T00:00:00`)
       .lte('created_at', `${today}T23:59:59`);
+    if (locationFilter !== 'all') todayVehQ = todayVehQ.eq('location_id', locationFilter);
+    const { count: todaysVehicleCount } = await todayVehQ;
 
     setVehiclesInside(vehicleCount || 0);
     setStats(prev => ({
@@ -331,7 +342,12 @@ export default function Dashboard() {
     { id: 'checked_out', label: 'Left', icon: Users, count: locationDeptFiltered.filter(v => v.status === 'checked_out').length },
   ];
 
-  const totalGateCapacity = gates.reduce((sum, g) => sum + (g.capacity || 0), 0);
+  const filteredGates = useMemo(() => {
+    if (locationFilter === 'all') return gates;
+    return gates.filter(g => (g as any).location_id === locationFilter);
+  }, [gates, locationFilter]);
+
+  const totalGateCapacity = filteredGates.reduce((sum, g) => sum + (g.capacity || 0), 0);
 
   return (
       <PullToRefresh onRefresh={handleRefresh}>
@@ -434,18 +450,7 @@ export default function Dashboard() {
                   </div>
                 </PopoverContent>
               </Popover>
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-40 h-8 text-xs">
-                  <MapPin className="h-3 w-3 mr-1 text-muted-foreground" />
-                  <SelectValue placeholder="All Locations" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border border-border z-50">
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Location is controlled globally via the Header selector */}
               <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                 <SelectTrigger className="w-40 h-8 text-xs">
                   <Building2 className="h-3 w-3 mr-1 text-muted-foreground" />
@@ -558,7 +563,7 @@ export default function Dashboard() {
           {/* Bottom Row: Quick Actions + Gate Status + Activity Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <QuickActions />
-            <GateStatus gates={gates} />
+            <GateStatus gates={filteredGates} />
             <CombinedStats />
           </div>
         </div>

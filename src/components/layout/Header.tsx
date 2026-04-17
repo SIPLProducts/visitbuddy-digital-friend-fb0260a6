@@ -52,14 +52,30 @@ export function Header({ onMenuClick }: HeaderProps) {
   }, [userRoles, isHoAdmin]);
 
   useEffect(() => {
-    // Set default location from localStorage or first available
+    // Set default location from localStorage or first available.
+    // Non-HO users can NEVER have 'all' — force them to a specific location.
     const savedLocation = localStorage.getItem('selectedLocationId');
-    if (savedLocation && locations.find(l => l.id === savedLocation)) {
-      setSelectedLocationId(savedLocation);
-    } else if (locations.length > 0) {
-      setSelectedLocationId(locations[0].id);
+
+    if (isHoAdmin) {
+      if (savedLocation === 'all') {
+        setSelectedLocationId('all');
+      } else if (savedLocation && locations.find(l => l.id === savedLocation)) {
+        setSelectedLocationId(savedLocation);
+      } else if (locations.length > 0) {
+        setSelectedLocationId('all');
+        localStorage.setItem('selectedLocationId', 'all');
+      }
+    } else {
+      if (savedLocation && savedLocation !== 'all' && locations.find(l => l.id === savedLocation)) {
+        setSelectedLocationId(savedLocation);
+      } else if (locations.length > 0) {
+        const first = locations[0].id;
+        setSelectedLocationId(first);
+        localStorage.setItem('selectedLocationId', first);
+        window.dispatchEvent(new CustomEvent('locationChanged', { detail: { locationId: first } }));
+      }
     }
-  }, [locations]);
+  }, [locations, isHoAdmin]);
 
   const fetchLocations = async () => {
     try {

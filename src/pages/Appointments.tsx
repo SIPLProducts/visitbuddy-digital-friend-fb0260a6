@@ -122,13 +122,17 @@ export default function Appointments() {
       .select(`
         *,
         host:employees(*, department:departments(*)),
-        department:departments(*)
+        department:departments(*, location_id)
       `)
       .eq('scheduled_date', dateStr)
       .order('scheduled_time');
 
     if (data) {
-      setAppointments(data as unknown as Appointment[]);
+      const filtered = (data as unknown as any[]).filter((a) => {
+        if (isAllLocations) return true;
+        return !a.department?.location_id || a.department?.location_id === selectedLocationId;
+      });
+      setAppointments(filtered as unknown as Appointment[]);
     }
     setLoading(false);
   };
