@@ -418,7 +418,7 @@ export default function SelfService() {
                     </SelectTrigger>
                     <SelectContent>
                       {gates.map((g) => (
-                        <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                        <SelectItem key={g.id} value={g.id}>{g.name}{g.building ? ` — ${g.building}` : ''}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
