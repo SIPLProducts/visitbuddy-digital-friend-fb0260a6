@@ -31,12 +31,14 @@ import NewVehicle from '@/pages/NewVehicle';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle, VehicleEntry } from '@/types/vehicle';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { toast } from 'sonner';
 import { format, formatDistanceToNow } from 'date-fns';
 
 export default function Vehicles() {
   const navigate = useNavigate();
   const { userRoles, isHoAdmin } = useUserRoles();
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const isGateSecurity = useMemo(() => {
     if (isHoAdmin) return true;
     return userRoles.some(r => r.role === 'gate_security');
@@ -243,17 +245,19 @@ export default function Vehicles() {
     return `${minutes}m`;
   };
 
-  const filteredVehicles = vehicles.filter(
-    (v) =>
+  const filteredVehicles = vehicles.filter((v) => {
+    const matchesSearch =
       v.vehicle_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       v.driver_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.company?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      v.company?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesLocation = isAllLocations || (v as any).location_id === selectedLocationId;
+    return matchesSearch && matchesLocation;
+  });
 
   const stats = {
-    total: vehicles.length,
-    inside: vehicles.filter((v) => v.active_entry).length,
-    totalEntries: vehicles.reduce((sum, v) => sum + (v.entry_count || 0), 0),
+    total: filteredVehicles.length,
+    inside: filteredVehicles.filter((v) => v.active_entry).length,
+    totalEntries: filteredVehicles.reduce((sum, v) => sum + (v.entry_count || 0), 0),
   };
 
   return (
