@@ -29,6 +29,7 @@ interface Employee {
 interface Gate {
   id: string;
   name: string;
+  building?: string | null;
 }
 
 export default function SelfService() {
