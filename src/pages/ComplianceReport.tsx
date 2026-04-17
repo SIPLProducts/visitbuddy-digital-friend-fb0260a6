@@ -25,12 +25,15 @@ export default function ComplianceReport() {
     setLoading(true);
     const since = subDays(new Date(), parseInt(period)).toISOString();
     const [vRes, aRes] = await Promise.all([
-      supabase.from('visitors').select('id, name, status, check_in_time, check_out_time, govt_id_number, created_at, purpose, scheduled_date, gate:gates(name, location_id)').gte('created_at', since).order('created_at', { ascending: false }),
+      supabase.from('visitors').select('id, name, status, check_in_time, check_out_time, govt_id_number, created_at, purpose, scheduled_date, gate:gates(name, location_id), department:departments(location_id), host:employees!visitors_host_id_fkey(location_id)').gte('created_at', since).order('created_at', { ascending: false }),
       supabase.from('visitor_agreements').select('*').gte('created_at', since),
     ]);
     let visitorsData = (vRes.data as any) || [];
     if (!isAllLocations && selectedLocationId) {
-      visitorsData = visitorsData.filter((v: any) => v.gate?.location_id === selectedLocationId);
+      visitorsData = visitorsData.filter((v: any) => {
+        const ids = [v.gate?.location_id, v.department?.location_id, v.host?.location_id].filter(Boolean);
+        return ids.includes(selectedLocationId);
+      });
     }
     setVisitors(visitorsData);
     setAgreements((aRes.data as any) || []);
