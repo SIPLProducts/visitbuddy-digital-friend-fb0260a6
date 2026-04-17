@@ -654,7 +654,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                     <SelectContent>
                       {gates.map((gate) => (
                         <SelectItem key={gate.id} value={gate.id}>
-                          {gate.name}
+                          {gate.name}{gate.building ? ` — ${gate.building}` : ''}
                         </SelectItem>
                       ))}
                     </SelectContent>

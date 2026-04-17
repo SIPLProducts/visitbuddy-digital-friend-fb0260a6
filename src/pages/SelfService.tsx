@@ -29,6 +29,7 @@ interface Employee {
 interface Gate {
   id: string;
   name: string;
+  building?: string | null;
 }
 
 export default function SelfService() {
@@ -96,8 +97,8 @@ export default function SelfService() {
   };
 
   const fetchGates = async () => {
-    const { data } = await supabase.from('gates').select('id, name').eq('status', 'active').order('name');
-    if (data) setGates(data);
+    const { data } = await supabase.from('gates').select('id, name, building').eq('status', 'active').order('name');
+    if (data) setGates(data as Gate[]);
   };
 
   const uploadPhoto = async (blob: Blob): Promise<string | null> => {
@@ -418,7 +419,7 @@ export default function SelfService() {
                     </SelectTrigger>
                     <SelectContent>
                       {gates.map((g) => (
-                        <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                        <SelectItem key={g.id} value={g.id}>{g.name}{g.building ? ` — ${g.building}` : ''}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

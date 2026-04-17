@@ -87,7 +87,7 @@ export default function Visitors() {
   const [gateFilter, setGateFilter] = useState('all');
   const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
-  const [gates, setGates] = useState<{ id: string; name: string }[]>([]);
+  const [gates, setGates] = useState<{ id: string; name: string; building: string | null }[]>([]);
   
   // Dialog states
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
@@ -156,7 +156,7 @@ export default function Visitors() {
     const [deptRes, locRes, gateRes] = await Promise.all([
       supabase.from('departments').select('id, name').order('name'),
       supabase.from('locations').select('id, name').order('name'),
-      supabase.from('gates').select('id, name').order('name'),
+      supabase.from('gates').select('id, name, building').order('name'),
     ]);
     if (deptRes.data) setDepartments(deptRes.data);
     if (locRes.data) setLocations(locRes.data);
@@ -497,7 +497,7 @@ export default function Visitors() {
             <SelectContent>
               <SelectItem value="all">{t('gates.title')}</SelectItem>
               {gates.map(g => (
-                <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>
+                <SelectItem key={g.id} value={g.id}>{g.name}{g.building ? ` — ${g.building}` : ''}</SelectItem>
               ))}
             </SelectContent>
           </Select>
