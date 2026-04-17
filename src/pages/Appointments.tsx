@@ -44,8 +44,10 @@ import { Appointment, Department, Employee } from '@/types/database';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 export default function Appointments() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
@@ -82,7 +84,7 @@ export default function Appointments() {
 
   useEffect(() => {
     fetchAppointments();
-  }, [selectedDate]);
+  }, [selectedDate, selectedLocationId, isAllLocations]);
 
   const fetchData = async () => {
     const [deptRes, empRes] = await Promise.all([
