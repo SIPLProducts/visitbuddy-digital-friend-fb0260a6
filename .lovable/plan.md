@@ -1,39 +1,52 @@
 
-The user wants dashboard counts/stats to also respect the selected location filter. Let me check what dashboard subcomponents still fetch unfiltered data.
+User wants the New Visitor / Edit Visitor form dropdowns (Host/Employee, Gate, Department) to be filtered by the visitor's selected Location, similar to what was done for the Employees form.
 
-From earlier work: `CombinedStats.tsx` was already updated. Still need to check the other dashboard widgets that fetch their own data.
+Let me check the relevant files quickly.
+<lov-tool-use id="toolu_vrtx_01Xeoktdm6E2g8zMFWeFSodd" name="code--search_files" integration-id="code" data="{\"query\": \"location_id\", \"include_patterns\": \"src/pages/NewVisitor.tsx,src/pages/Visitors.tsx,src/components/visitors/VisitorEditDialog.tsx\"}">
+</lov-tool-use>
 
-# Apply location filter to all Dashboard count widgets
+<lov-tool-use id="toolu_vrtx_016k1wNNJNNur4jqVTyYLJeH" name="code--search_files" integration-id="code" data="{\"query\": \"location_id|gate_id|department_id|host_id\", \"include_patterns\": \"src/pages/NewVisitor.tsx\"}">
+</lov-tool-use>
+
+<lov-tool-use id="toolu_vrtx_01HzHaCnG8bBs9vBkBSxMn28" name="code--list_dir" integration-id="code" data="{\"dir_path\": \"src/pages\"}">
+</lov-tool-use>
+
+<lov-tool-use id="toolu_vrtx_01QY1Kf5D9svNv2eYQbTp8xj" name="code--search_files" integration-id="code" data="{\"include_patterns\": \"src/pages/NewVisitor.tsx\", \"query\": \"fetchEmployees|fetchDepartments|fetchGates|from\\\\('employees|from\\\\('gates|from\\\\('departments|setEmployees|setGates|setDepartments\"}">
+</lov-tool-use>
+I have enough context. The NewVisitor (and likely VisitorEditDialog) form fetches all employees/gates/departments without scoping to the selected location. Same as the Employees fix done earlier.
+
+<lov-plan>
+
+# Scope Hosts, Gates & Departments to selected Location in Visitor forms
 
 ## Problem
-Dashboard stat cards and widgets fetch their own data without respecting the global location selection. Counts (visitors today, vehicles inside, gates, pending approvals, etc.) show totals across all locations even when a specific location is selected in the header.
+In the New Visitor form (`src/pages/NewVisitor.tsx`) and the Edit Visitor dialog (`src/components/visitors/VisitorEditDialog.tsx`), the Host, Department, and Gate dropdowns currently load every record across all locations. They should only show items belonging to the location currently selected in the global header.
 
 ## Changes
 
-### Subcomponents to update (each will use `useSelectedLocation` and filter queries)
-- `src/components/dashboard/OccupancyMeter.tsx` — filter checked-in visitor count by `gate.location_id`
-- `src/components/dashboard/GateStatus.tsx` — filter gates by `location_id`
-- `src/components/dashboard/PendingApprovals.tsx` — filter pending visitors by `gate.location_id`
-- `src/components/dashboard/RecentVisitors.tsx` — filter recent visitors by `gate.location_id`
-- `src/components/dashboard/SecurityOverview.tsx` — filter security events by location
-- `src/components/dashboard/DepartmentDistribution.tsx` — filter visitors by `gate.location_id`
-- `src/components/dashboard/VisitorTrendChart.tsx` — filter trend data by `gate.location_id`
-- `src/components/dashboard/WeeklyOverview.tsx` — filter weekly counts by `gate.location_id`
+### 1. `src/pages/NewVisitor.tsx`
+- Use `useSelectedLocation()` to read `selectedLocationId` and `isAllLocations`.
+- In `fetchFormData`, scope each query to the active location when a specific one is selected:
+  - `departments`: `.eq('location_id', selectedLocationId)`
+  - `employees`: `.eq('location_id', selectedLocationId)` (host list)
+  - `gates`: `.eq('location_id', selectedLocationId)` (entry gates)
+- Re-run `fetchFormData` whenever `selectedLocationId` changes (add to `useEffect` deps).
+- When the location changes, reset `host_id`, `department_id`, and `gate_id` so a stale selection from another location can't be saved.
+- HO Admin "All Locations" → no extra `.eq` filter (current behaviour preserved).
 
-### Pattern applied to each
-```typescript
-const { selectedLocationId, isAllLocations } = useSelectedLocation();
+### 2. `src/components/visitors/VisitorEditDialog.tsx`
+- Same treatment: import the hook, scope `fetchEmployees` and `fetchDepartments` (and add a gate fetch if/when relevant) by `selectedLocationId`.
+- When opening the dialog for a visitor whose location differs from the active one, still show that visitor's saved values; just constrain the *available* options in the dropdowns to the active location.
 
-useEffect(() => {
-  fetchData();
-}, [selectedLocationId, isAllLocations]);
+### 3. Cross-field consistency (already partly working)
+- Selecting a Host auto-fills the Department — this stays the same; since hosts are now location-scoped, the auto-filled department will also belong to the active location.
 
-// In fetch: filter by location_id directly OR by gate.location_id (client-side
-// filter after join) for visitor-related queries.
-```
-
-### Also verify
-- `src/pages/Dashboard.tsx` main stat cards (today's visitors, inside count, etc.) already pass through filter — re-confirm.
+## Files changed
+- `src/pages/NewVisitor.tsx`
+- `src/components/visitors/VisitorEditDialog.tsx`
 
 ## Expected result
-Every count, chart, list, and meter on the Dashboard reflects only the selected location's data. HO Admin "All Locations" still shows aggregated totals.
+- A non-HO user (or HO Admin with a specific location selected) opening "New Visitor" sees only Hosts, Departments, and Gates that belong to that location.
+- Switching the location in the global header instantly refreshes the dropdown options.
+- HO Admin with "All Locations" continues to see every host/department/gate (unchanged).
+
