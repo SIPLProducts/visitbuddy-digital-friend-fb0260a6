@@ -333,7 +333,12 @@ export default function Dashboard() {
     { id: 'checked_out', label: 'Left', icon: Users, count: locationDeptFiltered.filter(v => v.status === 'checked_out').length },
   ];
 
-  const totalGateCapacity = gates.reduce((sum, g) => sum + (g.capacity || 0), 0);
+  const filteredGates = useMemo(() => {
+    if (locationFilter === 'all') return gates;
+    return gates.filter(g => (g as any).location_id === locationFilter);
+  }, [gates, locationFilter]);
+
+  const totalGateCapacity = filteredGates.reduce((sum, g) => sum + (g.capacity || 0), 0);
 
   return (
       <PullToRefresh onRefresh={handleRefresh}>
@@ -549,7 +554,7 @@ export default function Dashboard() {
           {/* Bottom Row: Quick Actions + Gate Status + Activity Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <QuickActions />
-            <GateStatus gates={gates} />
+            <GateStatus gates={filteredGates} />
             <CombinedStats />
           </div>
         </div>
