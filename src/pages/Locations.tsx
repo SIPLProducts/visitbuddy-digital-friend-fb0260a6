@@ -563,20 +563,21 @@ export default function Locations() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Input
-            type="number"
-            step="any"
-            placeholder="Latitude (e.g., 12.9716)"
+            type="text"
+            placeholder={`Latitude (e.g., 17.378722 or 17°22'43.4"N)`}
             value={formData.latitude}
             onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
           />
           <Input
-            type="number"
-            step="any"
-            placeholder="Longitude (e.g., 77.5946)"
+            type="text"
+            placeholder={`Longitude (e.g., 78.582076 or 78°34'53.5"E)`}
             value={formData.longitude}
             onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
           />
         </div>
+        <p className="text-xs text-muted-foreground">
+          Accepts decimal degrees or DMS format (e.g. 17°22'43.399"N, 78°34'53.476"E).
+        </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
