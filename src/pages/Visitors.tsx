@@ -342,8 +342,13 @@ export default function Visitors() {
     const matchesDepartment =
       departmentFilter === 'all' || visitor.department_id === departmentFilter;
 
+    const visitorLocationIds = [
+      visitor.gate?.location_id,
+      (visitor as any).department?.location_id,
+      (visitor as any).host?.location_id,
+    ].filter(Boolean);
     const matchesLocation =
-      locationFilter === 'all' || visitor.gate?.location_id === locationFilter;
+      locationFilter === 'all' || visitorLocationIds.includes(locationFilter);
 
     const matchesGate =
       gateFilter === 'all' || visitor.gate_id === gateFilter;

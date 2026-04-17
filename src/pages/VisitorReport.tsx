@@ -161,8 +161,13 @@ export default function VisitorReport() {
       statusFilter === 'all' || 
       (statusFilter === 'with_laptop' ? visitor.has_laptop === true : visitor.status === statusFilter);
 
+    const visitorLocationIds = [
+      visitor.gate?.location?.id ?? visitor.gate?.location_id,
+      visitor.department?.location_id,
+      visitor.host?.location_id,
+    ].filter(Boolean);
     const matchesLocation =
-      effectiveLocationFilter === 'all' || visitor.gate?.location?.id === effectiveLocationFilter;
+      effectiveLocationFilter === 'all' || visitorLocationIds.includes(effectiveLocationFilter);
 
     const matchesCompany =
       companyFilter === 'all' || visitor.company === companyFilter;
