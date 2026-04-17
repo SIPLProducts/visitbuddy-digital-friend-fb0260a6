@@ -52,6 +52,61 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail, validatePhone, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
 
+/**
+ * Parses a coordinate string. Accepts:
+ *  - decimal degrees: "17.378722", "-78.582076"
+ *  - DMS:  17°22'43.399"N | 17'22'43.399"N | 17 22 43.399 N
+ * Returns decimal number, or null if unparseable.
+ */
+function parseCoordinate(input: string): number | null {
+  if (input == null) return null;
+  const raw = String(input).trim();
+  if (!raw) return null;
+
+  // Plain decimal (optionally signed)
+  if (/^[-+]?\d+(\.\d+)?$/.test(raw)) {
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  // DMS: capture deg, min, sec (optional decimal), and optional hemisphere
+  const dms = raw.match(
+    /^\s*(-?\d+(?:\.\d+)?)\s*[°'\s]\s*(\d+(?:\.\d+)?)\s*['\s]\s*(\d+(?:\.\d+)?)\s*["”]?\s*([NSEWnsew])?\s*$/
+  );
+  if (dms) {
+    const deg = parseFloat(dms[1]);
+    const min = parseFloat(dms[2]);
+    const sec = parseFloat(dms[3]);
+    const hem = (dms[4] || '').toUpperCase();
+    if (![deg, min, sec].every(Number.isFinite)) return null;
+    let dec = Math.abs(deg) + min / 60 + sec / 3600;
+    if (deg < 0 || hem === 'S' || hem === 'W') dec = -dec;
+    return dec;
+  }
+
+  return null;
+}
+
+function parseAndValidateCoordinate(
+  input: string,
+  kind: 'latitude' | 'longitude'
+): { value: number | null; error: string | null } {
+  if (!input || !input.trim()) return { value: null, error: null };
+  const parsed = parseCoordinate(input);
+  if (parsed === null) {
+    return {
+      value: null,
+      error: `Invalid ${kind}. Use decimal (e.g. 17.378722) or DMS (e.g. 17°22'43.399"N)`,
+    };
+  }
+  const limit = kind === 'latitude' ? 90 : 180;
+  if (Math.abs(parsed) > limit) {
+    return { value: null, error: `${kind === 'latitude' ? 'Latitude' : 'Longitude'} must be between -${limit} and ${limit}` };
+  }
+  // Round to 8 decimal places to match DB precision
+  return { value: Math.round(parsed * 1e8) / 1e8, error: null };
+}
+
 export default function Locations() {
   const { isHoAdmin } = useUserRoles();
   const [locations, setLocations] = useState<Location[]>([]);
