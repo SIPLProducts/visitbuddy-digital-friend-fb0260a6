@@ -96,8 +96,8 @@ export default function SelfService() {
   };
 
   const fetchGates = async () => {
-    const { data } = await supabase.from('gates').select('id, name').eq('status', 'active').order('name');
-    if (data) setGates(data);
+    const { data } = await supabase.from('gates').select('id, name, building').eq('status', 'active').order('name');
+    if (data) setGates(data as Gate[]);
   };
 
   const uploadPhoto = async (blob: Blob): Promise<string | null> => {
