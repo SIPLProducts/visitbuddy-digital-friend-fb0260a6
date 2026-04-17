@@ -1,56 +1,59 @@
 
-User reports: switching to "C&D" location shows "no records found" on Visitors page, and reports (Visitor Report, Vehicle Report) don't respect the selected location filter.
 
-Likely cause: Visitors page filters by `gate.location_id`, but visitors created without a gate (or via self-service) may have `gate_id = null` OR the page's location filter logic doesn't account for the global `selectedLocationId`. Reports pages likely fetch all data without applying location scope.
+# Fix Visitors location filter to include records without a gate
 
-Let me outline the fix without exploring further (the pattern is clear from prior work in this conversation).
+## Confirmed root cause (verified in DB)
+- Location **C&D HYD** has 1 visitor ("Suresh") but their `gate_id IS NULL`.
+- Their `department_id` and `host_id` both belong to C&D HYD.
+- Current filter in `Visitors.tsx` line 346: `visitor.gate?.location_id === locationFilter` — only checks gate, so the visitor is excluded.
+- Same issue affects `VisitorReport.tsx` and `ComplianceReport.tsx`.
 
-# Apply selected-location filter to Visitors page and all Reports
+## Fix strategy
+Resolve a visitor's effective location from **any** of these (in order):
+1. `visitor.gate.location_id` (most reliable — actual entry gate)
+2. `visitor.department.location_id` (fallback — host's department)
+3. `visitor.host.location_id` (fallback — host employee)
 
-## Problem
-- Visitors page shows "no records found" for C&D location even though visitors exist.
-- Visitor Report, Vehicle Report, and other reports show data across all locations regardless of the global location selector.
-- Visitors created without a `gate_id` (e.g. self-service or older records) may be invisible when filtering strictly by `gate.location_id`.
+If any of those equals the selected location, the visitor matches. This way every visitor that "belongs" to C&D HYD shows up, even without a gate assigned (e.g. self-service / pre-registered).
 
-## Root cause
-1. Reports pages (`VisitorReport.tsx`, `VehicleReport.tsx`, `ComplianceReport.tsx`, `Analytics.tsx`) fetch data without using `useSelectedLocation`.
-2. Visitors page's location filter relies solely on `gate.location_id`. Records with `gate_id = null` or with a gate whose location doesn't match are excluded — and the page may not be reacting to the global header location at all.
-
-## Fix
+## Changes
 
 ### 1. `src/pages/Visitors.tsx`
-- Use `useSelectedLocation()` to read `selectedLocationId` / `isAllLocations`.
-- After fetching visitors (with `gate:gates(location_id, name, building)`), filter client-side:
-  - When a specific location is selected → keep only visitors where `gate?.location_id === selectedLocationId`.
-- Re-fetch / re-filter when `selectedLocationId` changes (add to `useEffect` deps).
-- Verify the existing in-page Location filter dropdown stays in sync with the header selection (or hide it when the header already constrains location).
+- Update the visitors fetch query to also pull location info from department and host:
+  ```ts
+  .select(`
+    *,
+    gate:gates(id, name, building, location_id),
+    department:departments(id, name, location_id),
+    host:employees!visitors_host_id_fkey(id, name, location_id)
+  `)
+  ```
+- Replace the `matchesLocation` check with:
+  ```ts
+  const visitorLocationIds = [
+    visitor.gate?.location_id,
+    visitor.department?.location_id,
+    visitor.host?.location_id,
+  ].filter(Boolean);
+  const matchesLocation =
+    locationFilter === 'all' || visitorLocationIds.includes(locationFilter);
+  ```
 
 ### 2. `src/pages/VisitorReport.tsx`
-- Use `useSelectedLocation()`.
-- Include `gate:gates(location_id, name, building)` in the visitors query.
-- Filter results by `gate?.location_id === selectedLocationId` when not `isAllLocations`.
-- Add `selectedLocationId` to the fetch `useEffect` deps so charts/tables refresh on header change.
+- Same query expansion (add `department` and `host` joins with `location_id`).
+- Same multi-source `matchesLocation` logic.
 
-### 3. `src/pages/VehicleReport.tsx`
-- Use `useSelectedLocation()`.
-- Vehicles already have `location_id` directly → apply `.eq('location_id', selectedLocationId)` to both `vehicles` and `vehicle_entries` queries when not `isAllLocations`.
-- Add `selectedLocationId` to fetch deps.
-
-### 4. `src/pages/ComplianceReport.tsx`
-- Use `useSelectedLocation()`.
-- Same pattern: include gate join, filter visitors by `gate.location_id`; deps refresh.
-
-### 5. `src/pages/Analytics.tsx`
-- Same pattern — apply location filter to all queries used by charts/cards.
+### 3. `src/pages/ComplianceReport.tsx`
+- Same query expansion + same filter logic.
 
 ## Behaviour after fix
-- HO Admin "All Locations" → unchanged, sees everything.
-- Specific location selected (HO Admin or any other user) → Visitors list, Visitor Report, Vehicle Report, Compliance Report, Analytics all show only that location's data.
-- C&D visitors will appear on the Visitors page when C&D is selected (assuming their `gate_id` belongs to C&D — if some have `gate_id = null`, they'll be excluded; we can later decide whether to surface those to HO Admin only).
+- Switching header to **C&D HYD** → "Suresh" (and any future gate-less visitor whose host/department belongs to C&D) now appears.
+- Locations that already work (HWMP, etc.) remain unaffected — the gate match is still the primary signal.
+- HO Admin "All Locations" → unchanged.
+- Filter dropdowns (status, department, gate, search) continue to apply on top of the location match.
 
 ## Files changed
 - `src/pages/Visitors.tsx`
 - `src/pages/VisitorReport.tsx`
-- `src/pages/VehicleReport.tsx`
 - `src/pages/ComplianceReport.tsx`
-- `src/pages/Analytics.tsx`
+
