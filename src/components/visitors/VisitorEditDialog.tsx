@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Visitor } from '@/types/database';
 import { supabase } from '@/integrations/supabase/client';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { toast } from 'sonner';
 import { X, CalendarIcon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
