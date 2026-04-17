@@ -409,14 +409,20 @@ export default function Employees() {
         </div>
         <div className="space-y-2">
           <Label>Department</Label>
-          <Select value={formData.department_id} onValueChange={(v) => setFormData({ ...formData, department_id: v })}>
+          <Select
+            value={formData.department_id}
+            onValueChange={(v) => setFormData({ ...formData, department_id: v })}
+            disabled={!formData.location_id}
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Select department" />
+              <SelectValue placeholder={formData.location_id ? "Select department" : "Select location first"} />
             </SelectTrigger>
             <SelectContent>
-              {departments.map((dept) => (
-                <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
-              ))}
+              {departments
+                .filter((dept) => !formData.location_id || dept.location_id === formData.location_id)
+                .map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
@@ -424,7 +430,10 @@ export default function Employees() {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Location</Label>
-          <Select value={formData.location_id} onValueChange={(v) => setFormData({ ...formData, location_id: v })}>
+          <Select
+            value={formData.location_id}
+            onValueChange={(v) => setFormData({ ...formData, location_id: v, department_id: '' })}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select location" />
             </SelectTrigger>
