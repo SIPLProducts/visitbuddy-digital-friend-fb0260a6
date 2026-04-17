@@ -576,7 +576,7 @@ export default function Gates() {
               </Button>
             </div>
           ) : (
-            gates.map((gate) => {
+            gates.filter(g => isAllLocations || (g as any).location_id === selectedLocationId).map((gate) => {
               const capacityPercent = getCapacityPercentage(gate.current_visitors, gate.capacity);
 
               return (
