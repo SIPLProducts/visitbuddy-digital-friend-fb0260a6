@@ -379,21 +379,21 @@ export default function Locations() {
           errors.push({ row: rowNum, field: 'Status', message: statusError, value: values[8] });
         }
         
-        // Validate latitude if provided
-        const latError = validateNumber(values[9], 'Latitude');
-        if (latError) {
-          errors.push({ row: rowNum, field: 'Latitude', message: latError, value: values[9] });
+        // Validate latitude if provided (accepts decimal or DMS)
+        const latParsed = parseAndValidateCoordinate(values[9] || '', 'latitude');
+        if (latParsed.error) {
+          errors.push({ row: rowNum, field: 'Latitude', message: latParsed.error, value: values[9] });
         }
-        
-        // Validate longitude if provided
-        const lngError = validateNumber(values[10], 'Longitude');
-        if (lngError) {
-          errors.push({ row: rowNum, field: 'Longitude', message: lngError, value: values[10] });
+
+        // Validate longitude if provided (accepts decimal or DMS)
+        const lngParsed = parseAndValidateCoordinate(values[10] || '', 'longitude');
+        if (lngParsed.error) {
+          errors.push({ row: rowNum, field: 'Longitude', message: lngParsed.error, value: values[10] });
         }
-        
+
         // Skip row if it has critical errors
         if (nameError) continue;
-        
+
         locationsToInsert.push({
           name: values[0],
           address: values[1] || null,
@@ -404,8 +404,8 @@ export default function Locations() {
           emergency_contact: values[6] || null,
           assembly_point: values[7] || null,
           status: (values[8]?.toLowerCase() === 'inactive' ? 'inactive' : 'active') as 'active' | 'inactive',
-          latitude: latError ? null : (values[9] ? parseFloat(values[9]) : null),
-          longitude: lngError ? null : (values[10] ? parseFloat(values[10]) : null),
+          latitude: latParsed.error ? null : latParsed.value,
+          longitude: lngParsed.error ? null : lngParsed.value,
           geo_address: values[11] || null,
         });
       }
