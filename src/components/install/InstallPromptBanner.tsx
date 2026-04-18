@@ -9,43 +9,19 @@ import {
 } from '@/components/ui/sheet';
 import { Download, Share, Plus, Smartphone, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
+import {
+  getDeferredPrompt,
+  subscribeToInstallPrompt,
+  triggerNativeInstall,
+  isStandaloneInstalled,
+  isMobileOrTablet,
+  isIOSDevice,
+  type BeforeInstallPromptEvent,
+} from '@/lib/pwa';
 
 const DISMISS_KEY = 'install_prompt_dismissed_until';
 const PERMANENT_DISMISS_KEY = 'install_prompt_never';
 const SNOOZE_DAYS = 7;
-
-// Capture beforeinstallprompt as early as possible (module scope)
-let capturedPrompt: BeforeInstallPromptEvent | null = null;
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeinstallprompt', (e: Event) => {
-    e.preventDefault();
-    capturedPrompt = e as BeforeInstallPromptEvent;
-  });
-}
-
-function isMobileOrTablet(): boolean {
-  if (typeof window === 'undefined') return false;
-  const ua = navigator.userAgent;
-  const mobileUA = /Android|iPhone|iPad|iPod|Mobile|Tablet/i.test(ua);
-  // iPad in desktop mode
-  const iPadDesktop = navigator.maxTouchPoints > 1 && /Mac/.test(ua);
-  const smallViewport = window.innerWidth <= 1024;
-  return mobileUA || iPadDesktop || smallViewport;
-}
-
-function isStandaloneInstalled(): boolean {
-  if (typeof window === 'undefined') return false;
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    // iOS Safari
-    (window.navigator as any).standalone === true
-  );
-}
 
 function isDismissed(): boolean {
   if (localStorage.getItem(PERMANENT_DISMISS_KEY) === '1') return true;
