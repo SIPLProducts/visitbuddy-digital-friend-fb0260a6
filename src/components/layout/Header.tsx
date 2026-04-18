@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Plus, Building2, ChevronDown, Crown, Menu, Globe, Download } from 'lucide-react';
 import { NotificationDropdown } from '@/components/layout/NotificationDropdown';
+import { InstallButton } from '@/components/install/InstallButton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -255,11 +256,15 @@ export function Header({ onMenuClick }: HeaderProps) {
             <DropdownMenuItem asChild>
               <Link to="/help" className="w-full">{t('header.helpSupport')}</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="md:hidden">
-              <Link to="/install" className="w-full flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Install App
-              </Link>
+            <DropdownMenuItem asChild className="md:hidden p-0">
+              <div className="w-full px-2 py-1.5">
+                <InstallButton
+                  variant="ghost"
+                  size="sm"
+                  label="Install App"
+                  className="w-full justify-start h-8 px-2"
+                />
+              </div>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut} className="text-destructive">
