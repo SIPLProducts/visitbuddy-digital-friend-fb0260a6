@@ -107,17 +107,23 @@ export function SafetyPermitBadge({
     <div className="bg-white border-2 border-gray-800 rounded-lg overflow-hidden w-[350px] mx-auto text-black print:border-black">
       {/* Header with RESL Logo - White Background */}
       <div
-        className="bg-white py-3 border-b-2 border-gray-800 print:bg-white"
+        className="bg-white pt-3 pb-2 print:bg-white"
         style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
       >
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex items-center justify-center">
           <img 
             src={companyLogo} 
             alt={companyName} 
             className="h-12 w-auto" 
           />
-          <p className="text-gray-800 font-bold text-sm mt-1 tracking-wide">{companyName}</p>
         </div>
+      </div>
+      {/* Company Name Band - Dark with White Text */}
+      <div
+        className="bg-gray-800 py-1.5 border-b-2 border-gray-800 print:bg-gray-800"
+        style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}
+      >
+        <p className="text-white font-bold text-sm text-center tracking-wide">{companyName}</p>
       </div>
 
       {/* Title + Photo Row */}
