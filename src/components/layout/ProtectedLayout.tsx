@@ -2,6 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { MainLayout } from './MainLayout';
 import { PageTransition } from './PageTransition';
+import { InstallPromptBanner } from '@/components/install/InstallPromptBanner';
 
 export function ProtectedLayout() {
   const { user, loading } = useAuth();
@@ -24,6 +25,7 @@ export function ProtectedLayout() {
       <PageTransition locationKey={location.pathname}>
         <Outlet />
       </PageTransition>
+      <InstallPromptBanner />
     </MainLayout>
   );
 }
