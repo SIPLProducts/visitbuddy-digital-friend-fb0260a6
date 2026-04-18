@@ -57,14 +57,14 @@ export default function Vehicles() {
 
     // Real-time subscriptions for live updates
     const vehicleChannel = supabase
-      .channel('vehicles-page-vehicles')
+      .channel(`vehicles-page-vehicles-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
         fetchVehicles();
       })
       .subscribe();
 
     const entryChannel = supabase
-      .channel('vehicles-page-entries')
+      .channel(`vehicles-page-entries-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicle_entries' }, () => {
         fetchVehicles();
       })

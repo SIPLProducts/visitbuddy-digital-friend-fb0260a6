@@ -51,7 +51,7 @@ export function AnprPanel({ onVehicleAction }: { onVehicleAction?: () => void })
     fetchRecentEvents();
 
     const channel = supabase
-      .channel('anpr-panel-events')
+      .channel(`anpr-panel-events-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'anpr_events' }, () => {
         fetchRecentEvents();
       })
