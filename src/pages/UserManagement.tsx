@@ -136,6 +136,9 @@ export default function UserManagement() {
   const [rolePermissions, setRolePermissions] = useState<RoleScreenPermission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const { selectedLocationId: headerLocationId, isAllLocations: headerIsAll } = useSelectedLocation();
+  const [filterLocationId, setFilterLocationId] = useState<string>('all');
+  const [filterSeeded, setFilterSeeded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showImportResult, setShowImportResult] = useState(false);
