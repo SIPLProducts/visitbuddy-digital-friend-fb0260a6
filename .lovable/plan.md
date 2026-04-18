@@ -1,34 +1,33 @@
 
 
-## Root cause (confirmed from console)
+## Root cause
 
-`Html5Qrcode.start()` validates the camera config and throws:
-> `'facingMode' should be string or object with exact as key.`
+Console confirms `Html5Qrcode.start()` succeeds (`Camera started: environment (back)`). But session replay shows the injected `<video>` immediately fires `paused` then `ended`, then the UI reverts to "Scanner paused". On tablet, the camera stream is acquired but the `<video>` element never plays.
 
-Current code in `src/components/checkin/QrScanner.tsx`:
-- Primary: `{ facingMode: { ideal: 'environment' } }` ❌ (`ideal` not allowed by html5-qrcode)
-- Fallback: `{ facingMode: 'user' }` ✅ shape is fine, but it never runs because the catch only retries on specific error names — and even when it does, it fails on desktop laptops where the only camera is "environment-less" anyway.
+Cause: the scanner container's React state is changing **while** html5-qrcode is attaching the `<video>` and calling `play()`:
+- `className` flips `w-48 h-48` → `w-72 h-72` (layout reflow)
+- `#qr-reader` style flips `visibility:hidden`/`position:absolute` → `visibility:visible`/`position:relative`
+- The "Starting camera…" overlay sits on top with `z-10` and `backdrop-blur-sm`, intercepting the video paint
 
-So both attempts throw before `getUserMedia` is ever called.
+Mobile/tablet browsers (especially iPad Safari and Android Chrome WebView) treat a `<video>` whose ancestor visibility/layout is changing during `play()` as ineligible for autoplay → silent pause → "ended".
 
-## Fix (single file: `src/components/checkin/QrScanner.tsx`)
+## Fix (one file: `src/components/checkin/QrScanner.tsx`)
 
-1. **Use the shape html5-qrcode actually accepts.** Try in this order:
-   - `{ facingMode: "environment" }` (plain string — back camera on phones)
-   - `{ facingMode: "user" }` (front camera fallback)
-   - Enumerate cameras via `Html5Qrcode.getCameras()` and start with the first device's `deviceId` (works on desktops where `facingMode` isn't meaningful)
+1. **Stop toggling `visibility` and `position` on `#qr-reader`.** Render it always-visible at full size. Use a separate sibling placeholder (camera icon) that's only mounted when not scanning — never overlay or hide the actual video container.
 
-2. **Loop the fallbacks unconditionally** instead of branching on error name. If attempt 1 throws, try 2; if 2 throws, try 3. Only surface an error after all three fail.
+2. **Stop toggling the wrapper's size class.** Keep the wrapper at a single fixed size (`w-72 h-72` or responsive `w-full max-w-xs aspect-square`) so no layout reflow happens when scanning starts.
 
-3. **Improve error logging** — current `console.error` prints `undefined` for name/message because the thrown value from html5-qrcode is sometimes a plain string. Coerce with `String(err)` so the actual reason is visible.
+3. **Remove the full-cover "Starting camera…" overlay.** Replace it with a small spinner badge in a corner (`absolute top-2 right-2`) that doesn't sit on top of the video. The overlay's `backdrop-blur` + `inset-0` is what's blocking the video paint on tablets.
 
-4. **Better user-facing messages** — distinguish "permission denied" / "no camera found" / "in use" by inspecting the final error string (since `err.name` isn't reliable here).
+4. **Force-play the video after `start()` resolves.** Query `#qr-reader video`, set `playsInline`, `muted`, `autoplay` attributes explicitly, and call `.play().catch()`. iOS/iPadOS requires `playsinline` + `muted` for autoplay — html5-qrcode sets these but they get stripped if the element is re-parented.
+
+5. **Add a MutationObserver-free safeguard:** after `start()` succeeds, wait one frame (`requestAnimationFrame`), then check `videoEl.paused`. If paused, call `videoEl.play()` once more. Log the outcome.
 
 ### File touched
 - `src/components/checkin/QrScanner.tsx` (only)
 
 ### Result
-- Mobile: back camera starts immediately via `"environment"`.
-- Desktop laptop (no rear camera): falls through to `"user"` or first enumerated `deviceId` → built-in webcam works.
-- Real failures (denied, no hardware) show a precise reason instead of a generic "Could not start camera".
+- Tablet: video element stays mounted in stable container, plays inline immediately, no pause/ended cycle.
+- Desktop: unchanged behavior — still works.
+- Mobile phone: unchanged (already worked).
 
