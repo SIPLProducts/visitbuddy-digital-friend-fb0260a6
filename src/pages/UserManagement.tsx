@@ -838,6 +838,65 @@ export default function UserManagement() {
           </div>
         </div>
 
+        {/* Change Password Dialog (admin sets new password) */}
+        <Dialog open={isChangePasswordDialogOpen} onOpenChange={setIsChangePasswordDialogOpen}>
+          <DialogContent className="sm:max-w-[450px]">
+            <DialogHeader>
+              <DialogTitle>Change Password</DialogTitle>
+              <DialogDescription>
+                Set a new password for{' '}
+                <span className="font-medium text-foreground">{changePasswordUserName || 'this user'}</span>.
+                The user will need to use this new password on their next sign in.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="changePasswordValue">New Password *</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="changePasswordValue"
+                    type={showChangePassword ? 'text' : 'password'}
+                    placeholder="Minimum 6 characters"
+                    value={changePasswordValue}
+                    onChange={(e) => setChangePasswordValue(e.target.value)}
+                    className="pl-10 pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowChangePassword((s) => !s)}
+                    tabIndex={-1}
+                  >
+                    {showChangePassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsChangePasswordDialogOpen(false)} disabled={changingPassword}>
+                Cancel
+              </Button>
+              <Button onClick={handleChangePassword} disabled={changingPassword}>
+                {changingPassword ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  'Update Password'
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
