@@ -786,7 +786,6 @@ export type Database = {
           auto_checkout_hours: number | null
           badge_footer_text: string | null
           badge_logo_url: string | null
-          checkout_warning_hour: number | null
           company_name: string
           created_at: string
           data_retention_days: number | null
@@ -800,7 +799,6 @@ export type Database = {
           nda_text: string | null
           primary_color: string | null
           secondary_color: string | null
-          security_contact_number: string | null
           session_timeout_minutes: number | null
           updated_at: string
         }
@@ -808,7 +806,6 @@ export type Database = {
           auto_checkout_hours?: number | null
           badge_footer_text?: string | null
           badge_logo_url?: string | null
-          checkout_warning_hour?: number | null
           company_name?: string
           created_at?: string
           data_retention_days?: number | null
@@ -822,7 +819,6 @@ export type Database = {
           nda_text?: string | null
           primary_color?: string | null
           secondary_color?: string | null
-          security_contact_number?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
         }
@@ -830,7 +826,6 @@ export type Database = {
           auto_checkout_hours?: number | null
           badge_footer_text?: string | null
           badge_logo_url?: string | null
-          checkout_warning_hour?: number | null
           company_name?: string
           created_at?: string
           data_retention_days?: number | null
@@ -844,7 +839,6 @@ export type Database = {
           nda_text?: string | null
           primary_color?: string | null
           secondary_color?: string | null
-          security_contact_number?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
         }
