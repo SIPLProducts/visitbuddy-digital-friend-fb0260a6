@@ -109,29 +109,53 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
       scannerRef.current = scanner;
 
-      // Try preferred environment-facing camera first; fall back to any camera
+      // Build ordered list of camera configs to try.
+      // html5-qrcode only accepts: a string facingMode, { exact: ... }, or a deviceId string.
+      const attempts: Array<{ label: string; config: any }> = [
+        { label: 'environment (back)', config: { facingMode: 'environment' } },
+        { label: 'user (front)', config: { facingMode: 'user' } },
+      ];
+
+      // Try to enumerate cameras for desktop fallback (devices without facingMode).
       try {
-        await startScanWithConstraints(scanner, { facingMode: { ideal: 'environment' } } as any);
-      } catch (innerErr: any) {
-        console.warn('Primary camera constraint failed, retrying with fallback:', innerErr?.name || innerErr?.message);
-        if (innerErr?.name === 'OverconstrainedError' || innerErr?.name === 'NotFoundError' || innerErr?.name === 'NotReadableError') {
-          // Relax constraints
-          await startScanWithConstraints(scanner, { facingMode: 'user' });
-        } else {
-          throw innerErr;
+        const cams = await Html5Qrcode.getCameras();
+        if (cams && cams.length > 0) {
+          attempts.push({ label: `deviceId ${cams[0].label || cams[0].id}`, config: cams[0].id });
+        }
+      } catch (enumErr) {
+        console.warn('getCameras() failed:', String(enumErr));
+      }
+
+      let lastErr: unknown = null;
+      let started = false;
+      for (const attempt of attempts) {
+        try {
+          console.log('[QrScanner] Trying camera:', attempt.label);
+          await startScanWithConstraints(scanner, attempt.config);
+          started = true;
+          console.log('[QrScanner] Camera started:', attempt.label);
+          break;
+        } catch (attemptErr) {
+          lastErr = attemptErr;
+          console.warn('[QrScanner] Attempt failed:', attempt.label, String(attemptErr));
         }
       }
+
+      if (!started) {
+        throw lastErr ?? new Error('Could not start camera');
+      }
     } catch (err: any) {
-      console.error('Scanner error:', err?.name, err?.message, err);
+      const errStr = String(err?.message ?? err);
+      console.error('[QrScanner] All camera attempts failed:', errStr, err);
       if (isMountedRef.current) {
-        let message = err?.message || 'Could not start camera';
-        if (err?.name === 'NotAllowedError' || /permission/i.test(message)) {
+        let message = errStr || 'Could not start camera';
+        if (err?.name === 'NotAllowedError' || /permission|denied|notallowed/i.test(errStr)) {
           message = 'Camera permission denied. Please allow camera access in your browser settings.';
-        } else if (err?.name === 'NotFoundError') {
+        } else if (err?.name === 'NotFoundError' || /not\s*found|no camera|devices? found/i.test(errStr)) {
           message = 'No camera found on this device.';
-        } else if (err?.name === 'NotReadableError') {
+        } else if (err?.name === 'NotReadableError' || /in use|notreadable|could not start video/i.test(errStr)) {
           message = 'Camera is in use by another app. Close other apps and retry.';
-        } else if (err?.name === 'SecurityError') {
+        } else if (err?.name === 'SecurityError' || /https|secure/i.test(errStr)) {
           message = 'Camera blocked. The page must be served over HTTPS.';
         }
         setError(message);
