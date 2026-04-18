@@ -339,7 +339,45 @@ export default function UserManagement() {
     }
   };
 
-  // --- Create Role (Step Wizard) ---
+  const openChangePasswordDialog = (userId: string, userName: string) => {
+    setChangePasswordUserId(userId);
+    setChangePasswordUserName(userName);
+    setChangePasswordValue('');
+    setShowChangePassword(false);
+    setIsChangePasswordDialogOpen(true);
+  };
+
+  const handleChangePassword = async () => {
+    if (!changePasswordUserId) return;
+    if (!changePasswordValue || changePasswordValue.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-change-password', {
+        body: { user_id: changePasswordUserId, new_password: changePasswordValue },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(`Password updated for ${changePasswordUserName || 'user'}`);
+      logAudit({
+        action: 'user_password_changed',
+        entityType: 'user',
+        entityId: changePasswordUserId,
+        entityName: changePasswordUserName,
+        details: { method: 'admin_set' },
+      });
+      setIsChangePasswordDialogOpen(false);
+      setChangePasswordValue('');
+      setChangePasswordUserId('');
+      setChangePasswordUserName('');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to update password');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
   const openCreateRoleDialog = () => {
     setCreateRoleStep(1);
     setCreateRoleType('operator');
