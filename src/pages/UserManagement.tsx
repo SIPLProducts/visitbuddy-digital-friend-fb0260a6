@@ -1134,6 +1134,15 @@ export default function UserManagement() {
                               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onClick={() => handleOpenEditRole(role)} title="Edit role">
                                 <Edit className="h-4 w-4" />
                               </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-muted-foreground hover:text-foreground"
+                                onClick={() => openChangePasswordDialog(role.user_id, role.profile?.full_name || 'User')}
+                                title="Change password"
+                              >
+                                <KeyRound className="h-4 w-4" />
+                              </Button>
                               <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteRole(role.id)} title="Delete role">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
