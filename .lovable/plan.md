@@ -1,33 +1,34 @@
 
-## Issue
 
-Looking at the session replay, the camera DID start in the recorded session ("Scanning..." appeared, video element played). But the user reports it not working — likely failing intermittently or on a specific device (mobile/another browser) due to a timing/visibility bug in `QrScanner.tsx`.
+## Root cause (confirmed from console)
 
-## Root cause
+`Html5Qrcode.start()` validates the camera config and throws:
+> `'facingMode' should be string or object with exact as key.`
 
-In `src/components/checkin/QrScanner.tsx`, the `<div id="qr-reader">` has `style={{ display: 'none' }}` whenever `isScanning` is false. The flow is:
+Current code in `src/components/checkin/QrScanner.tsx`:
+- Primary: `{ facingMode: { ideal: 'environment' } }` ❌ (`ideal` not allowed by html5-qrcode)
+- Fallback: `{ facingMode: 'user' }` ✅ shape is fine, but it never runs because the catch only retries on specific error names — and even when it does, it fails on desktop laptops where the only camera is "environment-less" anyway.
 
-1. User clicks **Start Scanning** → `isScanning` is still `false` → `qr-reader` div is `display: none`
-2. Code calls `scanner.start(...)` against the **hidden** div
-3. `html5-qrcode` injects a `<video>` element into that hidden container and calls `play()`
-4. On many browsers (especially mobile Safari/Chrome and some desktop configs), `play()` on a `<video>` inside a `display:none` container fails silently or gets stuck → camera never appears
-5. Only AFTER `start()` resolves do we call `onToggleScanning(true)` → div becomes visible, but the video has already failed/stalled
+So both attempts throw before `getUserMedia` is ever called.
 
-There's also an `error.message` from `Html5Qrcode` that `getUserMedia` returned a stream but the video can't render → user sees spinner forever.
+## Fix (single file: `src/components/checkin/QrScanner.tsx`)
 
-## Fix
+1. **Use the shape html5-qrcode actually accepts.** Try in this order:
+   - `{ facingMode: "environment" }` (plain string — back camera on phones)
+   - `{ facingMode: "user" }` (front camera fallback)
+   - Enumerate cameras via `Html5Qrcode.getCameras()` and start with the first device's `deviceId` (works on desktops where `facingMode` isn't meaningful)
 
-In `src/components/checkin/QrScanner.tsx`:
+2. **Loop the fallbacks unconditionally** instead of branching on error name. If attempt 1 throws, try 2; if 2 throws, try 3. Only surface an error after all three fail.
 
-1. **Stop hiding the scanner container with `display:none`.** Instead, keep `qr-reader` always mounted at proper size; toggle visual placeholder vs. live view via opacity / positioning so the video element can autoplay properly.
-2. **Set `isScanning` (and thus container visibility) BEFORE calling `scanner.start()`** — flip UI state first, wait one tick for layout, then start. Roll back state if start fails.
-3. Add explicit `videoConstraints` with reasonable fallback and use `disableFlip: false`. Keep environment camera but also catch `OverconstrainedError` and retry with a relaxed `{ video: true }` constraint.
-4. Improve error surfacing: log specific error name to console and show readable message in the existing red error band instead of leaving the user on the perpetual "Initializing..." text.
-5. On mobile, html5-qrcode sometimes needs a `verbose: false` and a slightly larger qrbox — keep `{ width: 250, height: 250 }` but ensure container has a minimum 288px height (already there, just enforce when visible).
+3. **Improve error logging** — current `console.error` prints `undefined` for name/message because the thrown value from html5-qrcode is sometimes a plain string. Coerce with `String(err)` so the actual reason is visible.
 
-### Files to edit
-- `src/components/checkin/QrScanner.tsx` (only file changed)
+4. **Better user-facing messages** — distinguish "permission denied" / "no camera found" / "in use" by inspecting the final error string (since `err.name` isn't reliable here).
+
+### File touched
+- `src/components/checkin/QrScanner.tsx` (only)
 
 ### Result
-- Click **Start Scanning** → container becomes visible immediately with "Starting camera…" overlay → camera permission prompt → live video appears → QR scanned. Works reliably across desktop Chrome, mobile Chrome/Safari, and PWA-installed mode.
-- Failures (denied permission, no camera, browser unsupported) show a clear error message instead of a silent spinner.
+- Mobile: back camera starts immediately via `"environment"`.
+- Desktop laptop (no rear camera): falls through to `"user"` or first enumerated `deviceId` → built-in webcam works.
+- Real failures (denied, no hardware) show a precise reason instead of a generic "Could not start camera".
+
