@@ -51,6 +51,7 @@ import {
   Download,
   Monitor,
   Eye,
+  EyeOff,
   Edit,
   Loader2,
   CheckCircle2,
@@ -144,11 +145,20 @@ export default function UserManagement() {
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserFullName, setNewUserFullName] = useState('');
+  const [showNewUserPassword, setShowNewUserPassword] = useState(false);
 
   // Password reset
   const [isPasswordResetDialogOpen, setIsPasswordResetDialogOpen] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+
+  // Change password (admin sets a new password for an existing user)
+  const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [changePasswordUserId, setChangePasswordUserId] = useState('');
+  const [changePasswordUserName, setChangePasswordUserName] = useState('');
+  const [changePasswordValue, setChangePasswordValue] = useState('');
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   // Create Role dialog (step wizard)
   const [isCreateRoleDialogOpen, setIsCreateRoleDialogOpen] = useState(false);
@@ -754,7 +764,28 @@ export default function UserManagement() {
                     <Label htmlFor="password">Password *</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="password" type="password" placeholder="Minimum 6 characters" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} className="pl-10" />
+                      <Input
+                        id="password"
+                        type={showNewUserPassword ? 'text' : 'password'}
+                        placeholder="Minimum 6 characters"
+                        value={newUserPassword}
+                        onChange={(e) => setNewUserPassword(e.target.value)}
+                        className="pl-10 pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                        onClick={() => setShowNewUserPassword((s) => !s)}
+                        tabIndex={-1}
+                      >
+                        {showNewUserPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
                     </div>
                   </div>
                 </div>
