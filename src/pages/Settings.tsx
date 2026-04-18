@@ -35,8 +35,6 @@ interface TenantSettings {
   enable_nda: boolean;
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
-  checkout_warning_hour: number;
-  security_contact_number: string | null;
 }
 
 interface EmailConfig {
@@ -82,7 +80,7 @@ export default function Settings() {
   useEffect(() => {
     supabase.from('tenant_settings').select('*').limit(1).single()
       .then(({ data }) => {
-        if (data) setSettings({ ...data, checkout_warning_hour: (data as any).checkout_warning_hour ?? 18, security_contact_number: (data as any).security_contact_number ?? null } as any);
+        if (data) setSettings(data as any);
         setLoading(false);
       });
 
@@ -374,19 +372,6 @@ export default function Settings() {
                       <Input type="number" value={settings.auto_checkout_hours} onChange={e => update('auto_checkout_hours', parseInt(e.target.value) || 12)} min={1} max={72} />
                       <span className="text-sm text-muted-foreground">hrs</span>
                     </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Checkout Warning Hour (24h)</Label>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <Input type="number" value={settings.checkout_warning_hour} onChange={e => update('checkout_warning_hour', parseInt(e.target.value) || 18)} min={0} max={23} />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Security Contact Number</Label>
-                    <Input value={settings.security_contact_number || ''} onChange={e => update('security_contact_number', e.target.value)} placeholder="+91 XXXXX XXXXX" />
                   </div>
                 </div>
               </CardContent>
