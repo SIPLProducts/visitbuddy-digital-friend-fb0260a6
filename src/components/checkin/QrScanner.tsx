@@ -48,6 +48,29 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     };
   }, [cleanupScanner]);
 
+  const ensureVideoPlaying = async () => {
+    // Wait one frame for html5-qrcode to inject the <video>
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    const videoEl = document.querySelector<HTMLVideoElement>('#qr-reader video');
+    if (!videoEl) {
+      console.warn('[QrScanner] No video element found after start');
+      return;
+    }
+    // Re-apply autoplay-required attributes (in case re-parenting stripped them)
+    videoEl.setAttribute('playsinline', 'true');
+    videoEl.setAttribute('webkit-playsinline', 'true');
+    videoEl.setAttribute('autoplay', 'true');
+    videoEl.muted = true;
+    if (videoEl.paused) {
+      try {
+        await videoEl.play();
+        console.log('[QrScanner] Forced video.play() succeeded');
+      } catch (e) {
+        console.error('[QrScanner] Forced video.play() failed:', String(e));
+      }
+    }
+  };
+
   const startScanWithConstraints = async (
     scanner: Html5Qrcode,
     cameraConfig: MediaTrackConstraints | { facingMode: string }
@@ -78,6 +101,8 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         // Ignore scan failures (no QR found in frame)
       }
     );
+    // Force playback after stream attaches (critical for iPad/tablet Safari)
+    await ensureVideoPlaying();
   };
 
   const startScanning = async () => {
@@ -185,34 +210,31 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
 
   return (
     <div className="bg-card rounded-xl border border-border p-6 text-center">
-      {/* Scanner container - always rendered so html5-qrcode can attach video */}
+      {/* Stable scanner container - never changes size or visibility to keep video painting */}
       <div
         ref={containerRef}
-        className={`mx-auto mb-4 overflow-hidden rounded-lg relative ${
-          isScanning || isInitializing
-            ? 'w-72 h-72'
-            : 'w-48 h-48 bg-muted flex items-center justify-center'
-        }`}
+        className="mx-auto mb-4 overflow-hidden rounded-lg relative w-72 h-72 bg-muted"
       >
-        {/* Always-mounted target div for html5-qrcode */}
+        {/* Always-mounted, always-visible target div for html5-qrcode */}
         <div
           id="qr-reader"
           style={{
             width: '100%',
             height: '100%',
-            minHeight: isScanning || isInitializing ? '288px' : '0',
-            visibility: isScanning || isInitializing ? 'visible' : 'hidden',
-            position: isScanning || isInitializing ? 'relative' : 'absolute',
-            inset: 0,
+            position: 'relative',
           }}
         />
+        {/* Placeholder icon shown only when idle - sibling, not overlay */}
         {!isScanning && !isInitializing && (
-          <Camera className="h-16 w-16 text-muted-foreground relative z-10" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <Camera className="h-16 w-16 text-muted-foreground" />
+          </div>
         )}
+        {/* Small corner spinner during init - does NOT cover the video */}
         {isInitializing && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/80 backdrop-blur-sm z-10">
-            <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm text-muted-foreground">Starting camera...</span>
+          <div className="absolute top-2 right-2 flex items-center gap-2 bg-background/90 rounded-full px-3 py-1 shadow-sm">
+            <div className="h-3 w-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs text-muted-foreground">Starting…</span>
           </div>
         )}
       </div>
