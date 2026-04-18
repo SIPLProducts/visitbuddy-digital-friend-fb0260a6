@@ -1219,7 +1219,7 @@ export default function UserManagement() {
                   <TableBody>
                     {filteredUserRoles.filter(r => isHoAdmin || adminLocationIds.includes(r.location_id)).length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                           {searchQuery ? 'No users found matching your search' : 'No user roles assigned yet.'}
                         </TableCell>
                       </TableRow>
@@ -1233,6 +1233,9 @@ export default function UserManagement() {
                               </div>
                               <span className="font-medium">{role.profile?.full_name || 'Unknown User'}</span>
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">{userEmails[role.user_id] || '—'}</span>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
