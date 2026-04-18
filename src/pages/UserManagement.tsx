@@ -1670,6 +1670,27 @@ export default function UserManagement() {
 
         {/* CSV Import Result */}
         <CsvImportResult open={showImportResult} onOpenChange={setShowImportResult} result={importResult} entityName="Users" />
+      <AlertDialog open={!!deleteUserDialog} onOpenChange={(open) => !open && !deletingUser && setDeleteUserDialog(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete user permanently?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes <strong>{deleteUserDialog?.name}</strong>, their profile, and all role assignments across every location. The login account will no longer work. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingUser}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleDeleteUserFully(); }}
+              disabled={deletingUser}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deletingUser ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Delete permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </div>
   );
 }
