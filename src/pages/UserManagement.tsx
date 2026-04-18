@@ -697,7 +697,8 @@ export default function UserManagement() {
     return (
       role.profile?.full_name?.toLowerCase().includes(query) ||
       role.location?.name?.toLowerCase().includes(query) ||
-      role.role?.toLowerCase().includes(query)
+      role.role?.toLowerCase().includes(query) ||
+      userEmails[role.user_id]?.toLowerCase().includes(query)
     );
   });
 
@@ -1208,6 +1209,7 @@ export default function UserManagement() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>User</TableHead>
+                      <TableHead>Email</TableHead>
                       <TableHead>Location</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>HO Admin</TableHead>
@@ -1217,7 +1219,7 @@ export default function UserManagement() {
                   <TableBody>
                     {filteredUserRoles.filter(r => isHoAdmin || adminLocationIds.includes(r.location_id)).length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                           {searchQuery ? 'No users found matching your search' : 'No user roles assigned yet.'}
                         </TableCell>
                       </TableRow>
@@ -1231,6 +1233,9 @@ export default function UserManagement() {
                               </div>
                               <span className="font-medium">{role.profile?.full_name || 'Unknown User'}</span>
                             </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">{userEmails[role.user_id] || '—'}</span>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
