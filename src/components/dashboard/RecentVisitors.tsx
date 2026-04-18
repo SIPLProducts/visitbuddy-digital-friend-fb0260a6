@@ -82,20 +82,26 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
   };
 
   const handleCheckOut = async (visitor: Visitor) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('visitors')
       .update({
         status: 'checked_out',
         check_out_time: new Date().toISOString(),
+        checkout_method: 'security',
       })
-      .eq('id', visitor.id);
+      .eq('id', visitor.id)
+      .select('id');
 
     if (error) {
-      toast.error('Failed to check out visitor');
-    } else {
-      toast.success(`${visitor.name} checked out`);
-      onRefresh?.();
+      toast.error(`Failed to check out: ${error.message}`);
+      return;
     }
+    if (!data || data.length === 0) {
+      toast.error("You don't have permission to check out this visitor at this location.");
+      return;
+    }
+    toast.success(`${visitor.name} checked out`);
+    onRefresh?.();
   };
 
   const getSwipeActions = (visitor: Visitor) => {
