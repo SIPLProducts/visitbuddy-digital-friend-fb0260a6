@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
-import reslLogo from '@/assets/resl-logo.png';
+import reslBadgeLogo from '@/assets/resl-badge-logo.png';
 
 interface SafetyPermitBadgeProps {
   visitor: {
@@ -47,7 +47,7 @@ interface SafetyPermitBadgeProps {
 export function SafetyPermitBadge({ 
   visitor, 
   companyName = 'Resustainability', 
-  companyLogo = reslLogo 
+  companyLogo = reslBadgeLogo 
 }: SafetyPermitBadgeProps) {
   const getInitials = (name: string) => {
     return name
