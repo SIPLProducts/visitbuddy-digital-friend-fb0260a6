@@ -389,11 +389,20 @@ export default function Visitors() {
     const checkedIn = filteredVisitors.filter(v => selectedIds.has(v.id) && v.status === 'checked_in');
     if (checkedIn.length === 0) { toast.error('No checked-in visitors selected'); return; }
     setBulkLoading(true);
-    const { error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString(), checkout_method: 'security' }).in('id', checkedIn.map(v => v.id));
+    const { data, error } = await supabase.from('visitors').update({ status: 'checked_out', check_out_time: new Date().toISOString(), checkout_method: 'security' }).in('id', checkedIn.map(v => v.id)).select('id');
     setBulkLoading(false);
-    if (error) { toast.error('Bulk checkout failed'); return; }
-    await logAudit({ action: 'bulk_checkout', entityType: 'visitor', entityName: `${checkedIn.length} visitors`, details: { count: checkedIn.length } });
-    toast.success(`${checkedIn.length} visitors checked out`);
+    if (error) { toast.error(`Bulk checkout failed: ${error.message}`); return; }
+    const updatedCount = data?.length || 0;
+    if (updatedCount === 0) {
+      toast.error("You don't have permission to check out these visitors at this location.");
+      return;
+    }
+    await logAudit({ action: 'bulk_checkout', entityType: 'visitor', entityName: `${updatedCount} visitors`, details: { count: updatedCount } });
+    if (updatedCount < checkedIn.length) {
+      toast.warning(`${updatedCount} of ${checkedIn.length} visitors checked out (others were outside your location).`);
+    } else {
+      toast.success(`${updatedCount} visitors checked out`);
+    }
     setSelectedIds(new Set());
     fetchVisitors();
   };
