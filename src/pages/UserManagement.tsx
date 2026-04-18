@@ -366,7 +366,7 @@ export default function UserManagement() {
         entityType: 'user',
         entityId: changePasswordUserId,
         entityName: changePasswordUserName,
-        details: { method: 'admin_set' },
+        details: { change: 'password_reset_by_admin' },
       });
       setIsChangePasswordDialogOpen(false);
       setChangePasswordValue('');
