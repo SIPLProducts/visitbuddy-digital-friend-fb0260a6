@@ -64,6 +64,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { logAudit } from '@/lib/auditLog';
 import { toast } from 'sonner';
 import { useUserRoles, AppRole } from '@/hooks/useUserRoles';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail } from '@/components/shared/CsvImportResult';
 import { parseCsvFile, downloadCsvTemplate } from '@/components/shared/CsvImport';
 
