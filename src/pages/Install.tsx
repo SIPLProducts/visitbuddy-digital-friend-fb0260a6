@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Smartphone, Monitor, Share, Plus, CheckCircle2, ArrowRight } from 'lucide-react';
 import reslLogo from '@/assets/resl-logo.png';
+import { InstallButton } from '@/components/install/InstallButton';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -126,10 +127,7 @@ export default function Install() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={handleInstall} className="w-full h-12" size="lg">
-                <Download className="mr-2 h-5 w-5" />
-                Install VisiGuard
-              </Button>
+              <InstallButton size="lg" className="w-full h-12" label="Install VisiGuard" />
             </CardContent>
           </Card>
         ) : isIOS ? (
