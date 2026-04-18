@@ -677,6 +677,7 @@ export default function UserManagement() {
 
   // --- Derived Data ---
   const filteredUserRoles = userRoles.filter((role) => {
+    if (filterLocationId !== 'all' && role.location_id !== filterLocationId) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
