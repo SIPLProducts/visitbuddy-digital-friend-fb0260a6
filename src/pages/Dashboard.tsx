@@ -93,21 +93,21 @@ export default function Dashboard() {
 
     // Real-time subscriptions for live updates
     const visitorChannel = supabase
-      .channel('dashboard-visitors')
+      .channel(`dashboard-visitors-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
         fetchDashboardData();
       })
       .subscribe();
 
     const vehicleChannel = supabase
-      .channel('dashboard-vehicles')
+      .channel(`dashboard-vehicles-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
         fetchDashboardData();
       })
       .subscribe();
 
     const appointmentChannel = supabase
-      .channel('dashboard-appointments')
+      .channel(`dashboard-appointments-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
         fetchDashboardData();
       })

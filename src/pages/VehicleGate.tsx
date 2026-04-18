@@ -46,7 +46,7 @@ export default function VehicleGate() {
 
     // Subscribe to ANPR events
     const channel = supabase
-      .channel('anpr-vehicle-gate')
+      .channel(`anpr-vehicle-gate-${crypto.randomUUID()}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',

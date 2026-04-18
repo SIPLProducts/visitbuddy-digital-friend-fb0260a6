@@ -33,7 +33,7 @@ export function NotificationDropdown() {
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel('notifications-realtime')
+      .channel(`notifications-realtime-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload) => {
         setNotifications(prev => [payload.new as Notification, ...prev].slice(0, 10));
       })

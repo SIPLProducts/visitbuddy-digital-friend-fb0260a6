@@ -51,7 +51,7 @@ export default function CameraMonitor() {
     fetchData();
 
     const channel = supabase
-      .channel('anpr-monitor')
+      .channel(`anpr-monitor-${crypto.randomUUID()}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',

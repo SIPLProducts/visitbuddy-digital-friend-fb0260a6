@@ -123,7 +123,7 @@ export default function Visitors() {
 
     // Realtime subscription for auto-refresh when visitors are updated
     const channel = supabase
-      .channel('visitors-page-realtime')
+      .channel(`visitors-page-realtime-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
         fetchVisitors();
       })
