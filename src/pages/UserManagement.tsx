@@ -697,7 +697,8 @@ export default function UserManagement() {
     return (
       role.profile?.full_name?.toLowerCase().includes(query) ||
       role.location?.name?.toLowerCase().includes(query) ||
-      role.role?.toLowerCase().includes(query)
+      role.role?.toLowerCase().includes(query) ||
+      userEmails[role.user_id]?.toLowerCase().includes(query)
     );
   });
 
