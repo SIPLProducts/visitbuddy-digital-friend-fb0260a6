@@ -22,6 +22,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Table,
   TableBody,
   TableCell,
@@ -195,6 +205,10 @@ export default function UserManagement() {
   const [permissionChanges, setPermissionChanges] = useState<Record<string, { can_view: boolean; can_edit: boolean }>>({});
   const [savingPermissions, setSavingPermissions] = useState(false);
 
+  // Delete user confirmation
+  const [deleteUserDialog, setDeleteUserDialog] = useState<{ userId: string; name: string } | null>(null);
+  const [deletingUser, setDeletingUser] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -285,23 +299,23 @@ export default function UserManagement() {
 
   // --- Handlers ---
 
-  const handleDeleteRole = async (roleId: string) => {
+  const handleDeleteUserFully = async () => {
+    if (!deleteUserDialog) return;
+    setDeletingUser(true);
     try {
-      const roleToDelete = userRoles.find(r => r.id === roleId);
-      const { error } = await supabase
-        .from('user_location_roles')
-        .delete()
-        .eq('id', roleId);
+      const { data, error } = await supabase.functions.invoke('delete-user-fully', {
+        body: { userId: deleteUserDialog.userId },
+      });
       if (error) throw error;
-      toast.success('User role removed');
-      if (roleToDelete) {
-        const profile = profiles.find(p => p.user_id === roleToDelete.user_id);
-        logAudit({ action: 'user_role_changed', entityType: 'user', entityId: roleToDelete.user_id, entityName: profile?.full_name || roleToDelete.user_id, details: { change: 'deleted', role: roleToDelete.role, location_id: roleToDelete.location_id, is_ho_admin: roleToDelete.is_ho_admin }, locationId: roleToDelete.location_id });
-      }
+      if (data?.error) throw new Error(data.error);
+      toast.success('User deleted permanently');
+      setDeleteUserDialog(null);
       fetchData();
-    } catch (error) {
-      console.error('Error deleting role:', error);
-      toast.error('Failed to remove user role');
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast.error(error?.message || 'Failed to delete user');
+    } finally {
+      setDeletingUser(false);
     }
   };
 
@@ -1243,7 +1257,13 @@ export default function UserManagement() {
                               >
                                 <KeyRound className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteRole(role.id)} title="Delete role">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => setDeleteUserDialog({ userId: role.user_id, name: role.profile?.full_name || userEmails[role.user_id] || 'this user' })}
+                                title="Delete user permanently"
+                              >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
