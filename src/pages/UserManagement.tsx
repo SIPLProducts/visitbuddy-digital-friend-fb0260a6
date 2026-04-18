@@ -362,7 +362,7 @@ export default function UserManagement() {
       if ((data as any)?.error) throw new Error((data as any).error);
       toast.success(`Password updated for ${changePasswordUserName || 'user'}`);
       logAudit({
-        action: 'user_password_changed',
+        action: 'user_role_changed',
         entityType: 'user',
         entityId: changePasswordUserId,
         entityName: changePasswordUserName,
