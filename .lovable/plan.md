@@ -1,15 +1,16 @@
 
-The badge currently renders the logo on a red header band (`bg-red-600`) and applies `brightness-0 invert` to force the logo white. User wants the logo on a white background instead — applying to print, PDF, and all pages.
+The badge header currently has a **white background** with **dark gray "Resustainability"** text (just changed last turn). You want that text white — but white text on white background would be invisible.
 
-Need to check where the badge is used: SafetyPermitBadge.tsx is the single component, used in PrintBadge.tsx and likely email/badge contexts. The change is purely in the component header, so it applies everywhere automatically.
+I'll assume you want the most sensible result: keep the logo on white (your earlier requirement), and switch the company name to render on a **dark band directly below the logo** so the white text is readable.
 
 ## Plan
 
-Update `src/components/badge/SafetyPermitBadge.tsx` header section:
+Update the header in `src/components/badge/SafetyPermitBadge.tsx`:
 
-1. **Change header background** from `bg-red-600` to `bg-white` (with a bottom border so the header still feels framed against the rest of the badge).
-2. **Remove `brightness-0 invert`** from the logo `<img>` so the original red "re" mark renders in its true colors on the white background.
-3. **Change company name text color** from `text-white` to a dark color (e.g. `text-gray-800`) so it's readable on white.
-4. **Add print color preservation**: include `print:bg-white` and inline `style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}` on the header so browsers don't drop the white background or alter logo colors during print/PDF export.
+1. Keep the **logo area** white (logo on white background — preserves your earlier request, prints/PDF clean).
+2. Add a thin **dark gray band (`bg-gray-800`)** immediately under the logo containing the **"Resustainability"** text in **white** (`text-white`).
+3. Keep print color preservation (`print:bg-white` on logo area, `print:bg-gray-800` on text band, plus `WebkitPrintColorAdjust: 'exact'`) so both bands render correctly in print and PDF.
 
-That's the only change needed. Since `SafetyPermitBadge` is the single source rendered by PrintBadge and any badge dialogs, this fix automatically covers all pages, print preview, and PDF export.
+Result: logo sits clean on white (good for print), company name is white on a dark strip right beneath it — readable and matches "white text" intent.
+
+If instead you wanted the **whole header back to red/dark** with logo inverted to white again (like before), reply "make whole header dark" and I'll do that variant instead.
