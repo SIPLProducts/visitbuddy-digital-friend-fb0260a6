@@ -64,6 +64,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { logAudit } from '@/lib/auditLog';
 import { toast } from 'sonner';
 import { useUserRoles, AppRole } from '@/hooks/useUserRoles';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateEmail } from '@/components/shared/CsvImportResult';
 import { parseCsvFile, downloadCsvTemplate } from '@/components/shared/CsvImport';
 
@@ -135,6 +136,9 @@ export default function UserManagement() {
   const [rolePermissions, setRolePermissions] = useState<RoleScreenPermission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const { selectedLocationId: headerLocationId, isAllLocations: headerIsAll } = useSelectedLocation();
+  const [filterLocationId, setFilterLocationId] = useState<string>('all');
+  const [filterSeeded, setFilterSeeded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showImportResult, setShowImportResult] = useState(false);
@@ -200,6 +204,18 @@ export default function UserManagement() {
       fetchRolePermissions();
     }
   }, [selectedPermLocation, selectedPermRole]);
+
+  // Seed location filter from header selection once locations are loaded
+  useEffect(() => {
+    if (filterSeeded || rolesLoading) return;
+    if (locations.length === 0) return;
+    if (headerIsAll) {
+      setFilterLocationId('all');
+    } else if (headerLocationId && locations.find(l => l.id === headerLocationId)) {
+      setFilterLocationId(headerLocationId);
+    }
+    setFilterSeeded(true);
+  }, [headerLocationId, headerIsAll, locations, rolesLoading, filterSeeded]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -661,6 +677,7 @@ export default function UserManagement() {
 
   // --- Derived Data ---
   const filteredUserRoles = userRoles.filter((role) => {
+    if (filterLocationId !== 'all' && role.location_id !== filterLocationId) return false;
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -1142,10 +1159,28 @@ export default function UserManagement() {
               </Button>
             </div>
 
-            {/* Search */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search users, locations, or roles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+            {/* Search + Location filter */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative flex-1 min-w-[220px] max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search users, locations, or roles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+              </div>
+              <Select value={filterLocationId} onValueChange={setFilterLocationId}>
+                <SelectTrigger className="w-[220px]">
+                  <div className="flex items-center gap-2 truncate">
+                    <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <SelectValue placeholder="Filter by location" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {isHoAdmin && <SelectItem value="all">All Locations</SelectItem>}
+                  {accessibleLocations.map((loc) => (
+                    <SelectItem key={loc.id} value={loc.id}>
+                      {loc.name}{loc.city ? ` (${loc.city})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* User Roles Table */}
@@ -1228,15 +1263,36 @@ export default function UserManagement() {
               View all users grouped by their assigned location.
             </p>
 
-            {/* Search */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search users, locations, or roles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+            {/* Search + Location filter */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative flex-1 min-w-[220px] max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search users, locations, or roles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+              </div>
+              <Select value={filterLocationId} onValueChange={setFilterLocationId}>
+                <SelectTrigger className="w-[220px]">
+                  <div className="flex items-center gap-2 truncate">
+                    <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <SelectValue placeholder="Filter by location" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {isHoAdmin && <SelectItem value="all">All Locations</SelectItem>}
+                  {accessibleLocations.map((loc) => (
+                    <SelectItem key={loc.id} value={loc.id}>
+                      {loc.name}{loc.city ? ` (${loc.city})` : ''}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {(() => {
               const query = searchQuery.toLowerCase();
-              const grouped = scopedUserRoles.reduce((acc, role) => {
+              const baseRoles = filterLocationId === 'all'
+                ? scopedUserRoles
+                : scopedUserRoles.filter(r => r.location_id === filterLocationId);
+              const grouped = baseRoles.reduce((acc, role) => {
                 const locId = role.location_id;
                 if (!acc[locId]) acc[locId] = { location: role.location, roles: [] };
                 acc[locId].roles.push(role);
