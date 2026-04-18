@@ -1219,7 +1219,25 @@ export default function UserManagement() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-muted-foreground">{userEmails[role.user_id] || '—'}</span>
+                            {userEmails[role.user_id] ? (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  try {
+                                    await navigator.clipboard.writeText(userEmails[role.user_id]);
+                                    toast.success('Email copied to clipboard');
+                                  } catch {
+                                    toast.error('Failed to copy email');
+                                  }
+                                }}
+                                className="text-sm text-muted-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
+                                title="Click to copy"
+                              >
+                                {userEmails[role.user_id]}
+                              </button>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">—</span>
+                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
