@@ -1,42 +1,33 @@
 
-User wants a single direct "Install App" button users can click to install — instead of (or in addition to) the bottom-sheet banner. Click → installs automatically where the browser supports it; falls back to clear instructions where it doesn't.
+## Issue
 
-## Reality check (browser limits)
-- **Android Chrome / Edge / desktop Chromium**: One-tap install IS possible — must reuse the captured `beforeinstallprompt` event and call `.prompt()` on a user click. ✅
-- **iOS Safari**: No programmatic install API exists. Apple requires the user to manually tap Share → Add to Home Screen. We can't bypass this — best we can do is open a modal with clear visual steps. ⚠️
-- **Desktop browsers without prompt event yet**: Show "Open in Chrome to install" hint.
+Looking at the session replay, the camera DID start in the recorded session ("Scanning..." appeared, video element played). But the user reports it not working — likely failing intermittently or on a specific device (mobile/another browser) due to a timing/visibility bug in `QrScanner.tsx`.
 
-So "fully automatic on click" works on Android/Chromium. iOS is physically capped by Apple — we'll show a guided modal.
+## Root cause
 
-## Plan
+In `src/components/checkin/QrScanner.tsx`, the `<div id="qr-reader">` has `style={{ display: 'none' }}` whenever `isScanning` is false. The flow is:
 
-### 1. New component `src/components/install/InstallButton.tsx`
-A reusable button with three behaviors based on environment:
-- **Android/Chromium with captured prompt** → click fires `deferredPrompt.prompt()` directly → native install dialog → installed. One tap, no extra UI.
-- **iOS Safari** → click opens a small dialog showing the 3-step Share → Add to Home Screen visual guide (reuse content from existing `InstallPromptBanner`).
-- **Already installed** → button hidden (uses `display-mode: standalone` check).
-- **Desktop / no prompt available** → click opens dialog with "Open this site in Chrome and tap menu → Install app" hint.
+1. User clicks **Start Scanning** → `isScanning` is still `false` → `qr-reader` div is `display: none`
+2. Code calls `scanner.start(...)` against the **hidden** div
+3. `html5-qrcode` injects a `<video>` element into that hidden container and calls `play()`
+4. On many browsers (especially mobile Safari/Chrome and some desktop configs), `play()` on a `<video>` inside a `display:none` container fails silently or gets stuck → camera never appears
+5. Only AFTER `start()` resolves do we call `onToggleScanning(true)` → div becomes visible, but the video has already failed/stalled
 
-Uses the same module-scope `beforeinstallprompt` capture pattern already in `InstallPromptBanner.tsx` so the event is preserved across navigations.
+There's also an `error.message` from `Html5Qrcode` that `getUserMedia` returned a stream but the video can't render → user sees spinner forever.
 
-Props: `variant`, `size`, `className`, optional `label` — drops in anywhere.
+## Fix
 
-### 2. Wire it into the Header
-Edit `src/components/layout/Header.tsx`:
-- Replace the current "Install App" dropdown menu item (which just navigates to `/install`) with the new `<InstallButton />` directly inside the dropdown — clicking it now triggers install on the spot instead of routing away.
-- Also add a compact `<InstallButton size="sm" />` visible inline in the header on mobile/tablet (hidden on desktop and when installed) so users see a one-tap install affordance without opening the menu.
+In `src/components/checkin/QrScanner.tsx`:
 
-### 3. Use it on the existing `/install` page
-Edit `src/pages/Install.tsx`: replace its custom install button with `<InstallButton size="lg" />` so behavior stays consistent everywhere.
+1. **Stop hiding the scanner container with `display:none`.** Instead, keep `qr-reader` always mounted at proper size; toggle visual placeholder vs. live view via opacity / positioning so the video element can autoplay properly.
+2. **Set `isScanning` (and thus container visibility) BEFORE calling `scanner.start()`** — flip UI state first, wait one tick for layout, then start. Roll back state if start fails.
+3. Add explicit `videoConstraints` with reasonable fallback and use `disableFlip: false`. Keep environment camera but also catch `OverconstrainedError` and retry with a relaxed `{ video: true }` constraint.
+4. Improve error surfacing: log specific error name to console and show readable message in the existing red error band instead of leaving the user on the perpetual "Initializing..." text.
+5. On mobile, html5-qrcode sometimes needs a `verbose: false` and a slightly larger qrbox — keep `{ width: 250, height: 250 }` but ensure container has a minimum 288px height (already there, just enforce when visible).
 
-### 4. Optional: simplify the banner
-The existing `InstallPromptBanner` already does this work inline. Keep it as-is (auto post-login prompt) but have its primary action delegate to `InstallButton` logic so we have one source of truth. Lightweight refactor — just call the same shared `triggerInstall()` helper extracted to `src/lib/pwa.ts`.
+### Files to edit
+- `src/components/checkin/QrScanner.tsx` (only file changed)
 
-### Files
-- **New**: `src/components/install/InstallButton.tsx`, `src/lib/pwa.ts` (shared `getDeferredPrompt`, `triggerInstall`, `isStandalone`, `isIOS` helpers)
-- **Edit**: `src/components/layout/Header.tsx`, `src/pages/Install.tsx`, `src/components/install/InstallPromptBanner.tsx` (use shared helpers)
-
-### UX result
-- Android user clicks "Install App" anywhere (header chip, dropdown, /install page, or banner) → native Chrome install sheet appears instantly → app installed. Single click, fully automatic.
-- iOS user clicks → modal pops with 3 illustrated steps (limitation of Apple, unavoidable).
-- Already-installed users → button vanishes everywhere.
+### Result
+- Click **Start Scanning** → container becomes visible immediately with "Starting camera…" overlay → camera permission prompt → live video appears → QR scanned. Works reliably across desktop Chrome, mobile Chrome/Safari, and PWA-installed mode.
+- Failures (denied permission, no camera, browser unsupported) show a clear error message instead of a silent spinner.
