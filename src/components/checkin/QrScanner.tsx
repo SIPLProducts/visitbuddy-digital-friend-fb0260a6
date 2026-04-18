@@ -28,7 +28,6 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         if (scannerRef.current.isScanning) {
           await scannerRef.current.stop();
         }
-        // Clear the scanner instance
         scannerRef.current.clear();
         scannerRef.current = null;
       }
@@ -42,80 +41,102 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   // Track mounted state
   useEffect(() => {
     isMountedRef.current = true;
-    
+
     return () => {
       isMountedRef.current = false;
       cleanupScanner();
     };
   }, [cleanupScanner]);
 
+  const startScanWithConstraints = async (
+    scanner: Html5Qrcode,
+    cameraConfig: MediaTrackConstraints | { facingMode: string }
+  ) => {
+    await scanner.start(
+      cameraConfig as any,
+      {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+      },
+      (decodedText) => {
+        if (!isMountedRef.current) return;
+
+        try {
+          const data = JSON.parse(decodedText);
+          if (data.visitorId) {
+            onScan(data);
+            stopScanning();
+          } else {
+            toast.error('Invalid QR code format');
+          }
+        } catch {
+          toast.error('Could not parse QR code data');
+        }
+      },
+      () => {
+        // Ignore scan failures (no QR found in frame)
+      }
+    );
+  };
+
   const startScanning = async () => {
     if (isInitializing || isCleaningUpRef.current) return;
-    
+
     setError(null);
     setIsInitializing(true);
-    
+
+    // Flip UI state FIRST so the container becomes visible before camera starts
+    onToggleScanning(true);
+
     try {
       // Clean up any existing scanner first
       await cleanupScanner();
 
-      // Wait a tick for DOM to settle
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for the container to actually be laid out (visible) in the DOM
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       if (!isMountedRef.current) return;
 
-      // Ensure the container element exists
       const readerElement = document.getElementById('qr-reader');
       if (!readerElement) {
         throw new Error('Scanner container not found');
       }
 
-      // Clear any existing content in the reader element
+      // Clear any leftover content
       readerElement.innerHTML = '';
 
-      const scanner = new Html5Qrcode('qr-reader');
+      const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
       scannerRef.current = scanner;
 
-      await scanner.start(
-        { facingMode: 'environment' },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-        },
-        (decodedText) => {
-          if (!isMountedRef.current) return;
-          
-          try {
-            const data = JSON.parse(decodedText);
-            if (data.visitorId) {
-              onScan(data);
-              stopScanning();
-            } else {
-              toast.error('Invalid QR code format');
-            }
-          } catch {
-            toast.error('Could not parse QR code data');
-          }
-        },
-        () => {
-          // Ignore scan failures (no QR found in frame)
+      // Try preferred environment-facing camera first; fall back to any camera
+      try {
+        await startScanWithConstraints(scanner, { facingMode: { ideal: 'environment' } } as any);
+      } catch (innerErr: any) {
+        console.warn('Primary camera constraint failed, retrying with fallback:', innerErr?.name || innerErr?.message);
+        if (innerErr?.name === 'OverconstrainedError' || innerErr?.name === 'NotFoundError' || innerErr?.name === 'NotReadableError') {
+          // Relax constraints
+          await startScanWithConstraints(scanner, { facingMode: 'user' });
+        } else {
+          throw innerErr;
         }
-      );
-
-      if (isMountedRef.current) {
-        onToggleScanning(true);
       }
     } catch (err: any) {
-      console.error('Scanner error:', err);
+      console.error('Scanner error:', err?.name, err?.message, err);
       if (isMountedRef.current) {
-        if (err.name === 'NotAllowedError') {
-          setError('Camera permission denied. Please allow camera access.');
-        } else if (err.name === 'NotFoundError') {
-          setError('No camera found on this device.');
-        } else {
-          setError(err.message || 'Could not start camera');
+        let message = err?.message || 'Could not start camera';
+        if (err?.name === 'NotAllowedError' || /permission/i.test(message)) {
+          message = 'Camera permission denied. Please allow camera access in your browser settings.';
+        } else if (err?.name === 'NotFoundError') {
+          message = 'No camera found on this device.';
+        } else if (err?.name === 'NotReadableError') {
+          message = 'Camera is in use by another app. Close other apps and retry.';
+        } else if (err?.name === 'SecurityError') {
+          message = 'Camera blocked. The page must be served over HTTPS.';
         }
+        setError(message);
         onToggleScanning(false);
+        await cleanupScanner();
       }
     } finally {
       if (isMountedRef.current) {
@@ -132,7 +153,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     } catch (err) {
       console.error('Stop scanning error:', err);
     }
-    
+
     if (isMountedRef.current) {
       onToggleScanning(false);
     }
@@ -140,25 +161,32 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
 
   return (
     <div className="bg-card rounded-xl border border-border p-6 text-center">
-      {/* Scanner container - always render but hide when not scanning */}
-      <div 
+      {/* Scanner container - always rendered so html5-qrcode can attach video */}
+      <div
         ref={containerRef}
-        className={`mx-auto mb-4 overflow-hidden rounded-lg ${
-          isScanning 
-            ? 'w-72 h-72 relative' 
+        className={`mx-auto mb-4 overflow-hidden rounded-lg relative ${
+          isScanning || isInitializing
+            ? 'w-72 h-72'
             : 'w-48 h-48 bg-muted flex items-center justify-center'
         }`}
       >
-        {/* This div is used by html5-qrcode */}
-        <div 
-          id="qr-reader" 
-          style={isScanning ? { width: '100%', height: '100%', minHeight: '288px' } : { display: 'none' }}
+        {/* Always-mounted target div for html5-qrcode */}
+        <div
+          id="qr-reader"
+          style={{
+            width: '100%',
+            height: '100%',
+            minHeight: isScanning || isInitializing ? '288px' : '0',
+            visibility: isScanning || isInitializing ? 'visible' : 'hidden',
+            position: isScanning || isInitializing ? 'relative' : 'absolute',
+            inset: 0,
+          }}
         />
         {!isScanning && !isInitializing && (
-          <Camera className="h-16 w-16 text-muted-foreground" />
+          <Camera className="h-16 w-16 text-muted-foreground relative z-10" />
         )}
         {isInitializing && (
-          <div className="flex flex-col items-center gap-2">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted/80 backdrop-blur-sm z-10">
             <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <span className="text-sm text-muted-foreground">Starting camera...</span>
           </div>
@@ -176,7 +204,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         {isScanning ? 'Scanning...' : isInitializing ? 'Initializing...' : 'Ready to Scan'}
       </h3>
       <p className="text-sm text-muted-foreground mb-4">
-        {isScanning 
+        {isScanning
           ? "Point the camera at a visitor's WhatsApp badge QR code"
           : "Click the button below to activate the camera and scan a visitor's QR code"
         }
