@@ -205,6 +205,18 @@ export default function UserManagement() {
     }
   }, [selectedPermLocation, selectedPermRole]);
 
+  // Seed location filter from header selection once locations are loaded
+  useEffect(() => {
+    if (filterSeeded || rolesLoading) return;
+    if (locations.length === 0) return;
+    if (headerIsAll) {
+      setFilterLocationId('all');
+    } else if (headerLocationId && locations.find(l => l.id === headerLocationId)) {
+      setFilterLocationId(headerLocationId);
+    }
+    setFilterSeeded(true);
+  }, [headerLocationId, headerIsAll, locations, rolesLoading, filterSeeded]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
