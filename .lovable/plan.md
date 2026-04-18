@@ -1,21 +1,15 @@
 
-The uploaded image is the RESL "re" round red logo. The user wrote "Bridge" — almost certainly a typo for "Badge" (the safety permit badge).
+The badge currently renders the logo on a red header band (`bg-red-600`) and applies `brightness-0 invert` to force the logo white. User wants the logo on a white background instead — applying to print, PDF, and all pages.
 
-Currently `src/assets/resl-logo.png` is the single shared logo used in 9 places: visitor badge, proposal cover, proposal contact, login (Auth), Install page, Self-Service portal, Product Features doc, Resource Requirements doc, ApproveVisitor page, PrintBadge page.
-
-The Safety Permit Badge already has a red header with the logo rendered in white via `brightness-0 invert`, so this round red "re" mark will work great there.
+Need to check where the badge is used: SafetyPermitBadge.tsx is the single component, used in PrintBadge.tsx and likely email/badge contexts. The change is purely in the component header, so it applies everywhere automatically.
 
 ## Plan
 
-### Option A — Use only on the Safety Permit Badge (recommended, matches request)
-1. Save the new logo as a new asset: `src/assets/resl-badge-logo.png` (via lov-copy from `user-uploads://logo-01.png`).
-2. Update `src/components/badge/SafetyPermitBadge.tsx`:
-   - Import the new file as `reslBadgeLogo`.
-   - Replace the default `companyLogo = reslLogo` prop default with `reslBadgeLogo`.
-   - Keep the `brightness-0 invert` filter so the red "re" renders white on the red header band.
+Update `src/components/badge/SafetyPermitBadge.tsx` header section:
 
-### Option B — Replace the logo everywhere (login, proposals, install, self-service, etc.)
-Overwrite `src/assets/resl-logo.png` with the uploaded file. No code changes needed. All 9 usages pick it up automatically.
+1. **Change header background** from `bg-red-600` to `bg-white` (with a bottom border so the header still feels framed against the rest of the badge).
+2. **Remove `brightness-0 invert`** from the logo `<img>` so the original red "re" mark renders in its true colors on the white background.
+3. **Change company name text color** from `text-white` to a dark color (e.g. `text-gray-800`) so it's readable on white.
+4. **Add print color preservation**: include `print:bg-white` and inline `style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}` on the header so browsers don't drop the white background or alter logo colors during print/PDF export.
 
-### My default
-I'll go with **Option A** since you said "in Badge" specifically. If you actually meant everywhere, just say "use it everywhere" and I'll swap globally instead.
+That's the only change needed. Since `SafetyPermitBadge` is the single source rendered by PrintBadge and any badge dialogs, this fix automatically covers all pages, print preview, and PDF export.
