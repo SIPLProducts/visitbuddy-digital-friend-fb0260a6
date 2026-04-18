@@ -93,7 +93,7 @@ export default function Dashboard() {
 
     // Real-time subscriptions for live updates
     const visitorChannel = supabase
-      .channel('dashboard-visitors')
+      .channel(`dashboard-visitors-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
         fetchDashboardData();
       })
