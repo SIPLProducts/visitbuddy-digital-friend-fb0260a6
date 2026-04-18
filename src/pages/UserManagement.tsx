@@ -51,6 +51,7 @@ import {
   Download,
   Monitor,
   Eye,
+  EyeOff,
   Edit,
   Loader2,
   CheckCircle2,
@@ -144,11 +145,20 @@ export default function UserManagement() {
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserFullName, setNewUserFullName] = useState('');
+  const [showNewUserPassword, setShowNewUserPassword] = useState(false);
 
   // Password reset
   const [isPasswordResetDialogOpen, setIsPasswordResetDialogOpen] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+
+  // Change password (admin sets a new password for an existing user)
+  const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [changePasswordUserId, setChangePasswordUserId] = useState('');
+  const [changePasswordUserName, setChangePasswordUserName] = useState('');
+  const [changePasswordValue, setChangePasswordValue] = useState('');
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   // Create Role dialog (step wizard)
   const [isCreateRoleDialogOpen, setIsCreateRoleDialogOpen] = useState(false);
@@ -329,7 +339,45 @@ export default function UserManagement() {
     }
   };
 
-  // --- Create Role (Step Wizard) ---
+  const openChangePasswordDialog = (userId: string, userName: string) => {
+    setChangePasswordUserId(userId);
+    setChangePasswordUserName(userName);
+    setChangePasswordValue('');
+    setShowChangePassword(false);
+    setIsChangePasswordDialogOpen(true);
+  };
+
+  const handleChangePassword = async () => {
+    if (!changePasswordUserId) return;
+    if (!changePasswordValue || changePasswordValue.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-change-password', {
+        body: { user_id: changePasswordUserId, new_password: changePasswordValue },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success(`Password updated for ${changePasswordUserName || 'user'}`);
+      logAudit({
+        action: 'user_role_changed',
+        entityType: 'user',
+        entityId: changePasswordUserId,
+        entityName: changePasswordUserName,
+        details: { change: 'password_reset_by_admin' },
+      });
+      setIsChangePasswordDialogOpen(false);
+      setChangePasswordValue('');
+      setChangePasswordUserId('');
+      setChangePasswordUserName('');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to update password');
+    } finally {
+      setChangingPassword(false);
+    }
+  };
   const openCreateRoleDialog = () => {
     setCreateRoleStep(1);
     setCreateRoleType('operator');
@@ -754,7 +802,28 @@ export default function UserManagement() {
                     <Label htmlFor="password">Password *</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="password" type="password" placeholder="Minimum 6 characters" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} className="pl-10" />
+                      <Input
+                        id="password"
+                        type={showNewUserPassword ? 'text' : 'password'}
+                        placeholder="Minimum 6 characters"
+                        value={newUserPassword}
+                        onChange={(e) => setNewUserPassword(e.target.value)}
+                        className="pl-10 pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                        onClick={() => setShowNewUserPassword((s) => !s)}
+                        tabIndex={-1}
+                      >
+                        {showNewUserPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -768,6 +837,65 @@ export default function UserManagement() {
             </Dialog>
           </div>
         </div>
+
+        {/* Change Password Dialog (admin sets new password) */}
+        <Dialog open={isChangePasswordDialogOpen} onOpenChange={setIsChangePasswordDialogOpen}>
+          <DialogContent className="sm:max-w-[450px]">
+            <DialogHeader>
+              <DialogTitle>Change Password</DialogTitle>
+              <DialogDescription>
+                Set a new password for{' '}
+                <span className="font-medium text-foreground">{changePasswordUserName || 'this user'}</span>.
+                The user will need to use this new password on their next sign in.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="changePasswordValue">New Password *</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="changePasswordValue"
+                    type={showChangePassword ? 'text' : 'password'}
+                    placeholder="Minimum 6 characters"
+                    value={changePasswordValue}
+                    onChange={(e) => setChangePasswordValue(e.target.value)}
+                    className="pl-10 pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowChangePassword((s) => !s)}
+                    tabIndex={-1}
+                  >
+                    {showChangePassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsChangePasswordDialogOpen(false)} disabled={changingPassword}>
+                Cancel
+              </Button>
+              <Button onClick={handleChangePassword} disabled={changingPassword}>
+                {changingPassword ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  'Update Password'
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1064,6 +1192,15 @@ export default function UserManagement() {
                             <div className="flex items-center justify-end gap-1">
                               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onClick={() => handleOpenEditRole(role)} title="Edit role">
                                 <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-muted-foreground hover:text-foreground"
+                                onClick={() => openChangePasswordDialog(role.user_id, role.profile?.full_name || 'User')}
+                                title="Change password"
+                              >
+                                <KeyRound className="h-4 w-4" />
                               </Button>
                               <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteRole(role.id)} title="Delete role">
                                 <Trash2 className="h-4 w-4" />
