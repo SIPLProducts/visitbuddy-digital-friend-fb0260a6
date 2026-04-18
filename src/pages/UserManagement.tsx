@@ -130,6 +130,7 @@ export default function UserManagement() {
   const [userRoles, setUserRoles] = useState<UserRoleEntry[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [userEmails, setUserEmails] = useState<Record<string, string>>({});
   const [screens, setScreens] = useState<Screen[]>([]);
   const [rolePermissions, setRolePermissions] = useState<RoleScreenPermission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -223,6 +224,11 @@ export default function UserManagement() {
       setUserRoles(rolesWithProfiles);
       setLocations(locationsRes.data || []);
       setProfiles(profilesRes.data || []);
+
+      // Fetch emails (admin-only edge function); silently ignore failures
+      supabase.functions.invoke('list-user-emails').then(({ data, error }) => {
+        if (!error && data?.emails) setUserEmails(data.emails as Record<string, string>);
+      });
       setScreens(screensRes.data || []);
 
       if (locationsRes.data && locationsRes.data.length > 0 && !selectedPermLocation) {
@@ -1476,11 +1482,19 @@ export default function UserManagement() {
                 <Select value={assignUserId} onValueChange={setAssignUserId}>
                   <SelectTrigger><SelectValue placeholder="Select user" /></SelectTrigger>
                   <SelectContent className="bg-popover border border-border z-50 max-h-60">
-                    {profiles.map((profile) => (
-                      <SelectItem key={profile.user_id} value={profile.user_id}>
-                        {profile.full_name || 'Unknown User'}
-                      </SelectItem>
-                    ))}
+                    {profiles.map((profile) => {
+                      const email = userEmails[profile.user_id];
+                      return (
+                        <SelectItem key={profile.user_id} value={profile.user_id}>
+                          <div className="flex flex-col">
+                            <span>{profile.full_name || 'Unknown User'}</span>
+                            {email && (
+                              <span className="text-xs text-muted-foreground">{email}</span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
