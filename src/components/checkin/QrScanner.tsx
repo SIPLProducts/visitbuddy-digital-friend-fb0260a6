@@ -48,6 +48,29 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     };
   }, [cleanupScanner]);
 
+  const ensureVideoPlaying = async () => {
+    // Wait one frame for html5-qrcode to inject the <video>
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    const videoEl = document.querySelector<HTMLVideoElement>('#qr-reader video');
+    if (!videoEl) {
+      console.warn('[QrScanner] No video element found after start');
+      return;
+    }
+    // Re-apply autoplay-required attributes (in case re-parenting stripped them)
+    videoEl.setAttribute('playsinline', 'true');
+    videoEl.setAttribute('webkit-playsinline', 'true');
+    videoEl.setAttribute('autoplay', 'true');
+    videoEl.muted = true;
+    if (videoEl.paused) {
+      try {
+        await videoEl.play();
+        console.log('[QrScanner] Forced video.play() succeeded');
+      } catch (e) {
+        console.error('[QrScanner] Forced video.play() failed:', String(e));
+      }
+    }
+  };
+
   const startScanWithConstraints = async (
     scanner: Html5Qrcode,
     cameraConfig: MediaTrackConstraints | { facingMode: string }
@@ -78,6 +101,8 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         // Ignore scan failures (no QR found in frame)
       }
     );
+    // Force playback after stream attaches (critical for iPad/tablet Safari)
+    await ensureVideoPlaying();
   };
 
   const startScanning = async () => {
