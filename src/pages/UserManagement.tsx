@@ -1209,6 +1209,7 @@ export default function UserManagement() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>User</TableHead>
+                      <TableHead>Email</TableHead>
                       <TableHead>Location</TableHead>
                       <TableHead>Role</TableHead>
                       <TableHead>HO Admin</TableHead>
