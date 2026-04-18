@@ -1174,28 +1174,12 @@ export default function UserManagement() {
               </Button>
             </div>
 
-            {/* Search + Location filter */}
+            {/* Search */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative flex-1 min-w-[220px] max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Search users, locations, or roles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
               </div>
-              <Select value={filterLocationId} onValueChange={setFilterLocationId}>
-                <SelectTrigger className="w-[220px]">
-                  <div className="flex items-center gap-2 truncate">
-                    <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    <SelectValue placeholder="Filter by location" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  {isHoAdmin && <SelectItem value="all">All Locations</SelectItem>}
-                  {accessibleLocations.map((loc) => (
-                    <SelectItem key={loc.id} value={loc.id}>
-                      {loc.name}{loc.city ? ` (${loc.city})` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             {/* User Roles Table */}
