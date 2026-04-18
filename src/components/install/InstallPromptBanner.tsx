@@ -34,7 +34,7 @@ export function InstallPromptBanner() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(
-    capturedPrompt
+    getDeferredPrompt()
   );
   const [isIOS, setIsIOS] = useState(false);
 
@@ -44,19 +44,9 @@ export function InstallPromptBanner() {
     if (isStandaloneInstalled()) return;
     if (isDismissed()) return;
 
-    const ua = navigator.userAgent;
-    const iOS =
-      /iPad|iPhone|iPod/.test(ua) ||
-      (navigator.maxTouchPoints > 1 && /Mac/.test(ua));
-    setIsIOS(iOS);
+    setIsIOS(isIOSDevice());
 
-    const handler = (e: Event) => {
-      e.preventDefault();
-      const evt = e as BeforeInstallPromptEvent;
-      capturedPrompt = evt;
-      setDeferredPrompt(evt);
-    };
-    window.addEventListener('beforeinstallprompt', handler);
+    const unsub = subscribeToInstallPrompt((p) => setDeferredPrompt(p));
 
     const installedHandler = () => {
       setOpen(false);
@@ -68,18 +58,15 @@ export function InstallPromptBanner() {
 
     return () => {
       clearTimeout(t);
-      window.removeEventListener('beforeinstallprompt', handler);
+      unsub();
       window.removeEventListener('appinstalled', installedHandler);
     };
   }, [user]);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
+    const result = await triggerNativeInstall();
+    if (result === 'accepted') {
       setDeferredPrompt(null);
-      capturedPrompt = null;
       setOpen(false);
     }
   };
