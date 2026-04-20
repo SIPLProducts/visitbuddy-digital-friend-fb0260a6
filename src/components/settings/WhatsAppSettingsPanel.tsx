@@ -169,8 +169,8 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
           <div className="flex items-center justify-center rounded-lg border bg-muted/30 p-6 min-h-[280px]">
             {bridgeState === 'ready' || bridgeState === 'authenticated' ? (
               <div className="flex flex-col items-center gap-3 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
-                  <MessageCircle className="h-8 w-8 text-emerald-600" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <MessageCircle className="h-8 w-8 text-primary" />
                 </div>
                 <p className="font-medium">WhatsApp is connected</p>
                 <p className="text-sm text-muted-foreground">
