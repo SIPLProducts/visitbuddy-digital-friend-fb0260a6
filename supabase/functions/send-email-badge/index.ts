@@ -1,12 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer@6.9.10";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-const SENDER = "VisiGuard <visitor@resustainability.com>";
 
 interface BadgeEmailRequest {
   email: string;
@@ -26,17 +25,25 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
-    if (!resendApiKey) {
-      console.error("Missing RESEND_API_KEY");
+    const { data: smtp, error: smtpErr } = await supabase
+      .from("email_config")
+      .select("*")
+      .eq("is_active", true)
+      .limit(1)
+      .maybeSingle();
+
+    if (smtpErr || !smtp) {
+      console.error("No active SMTP configuration found");
       return new Response(
-        JSON.stringify({ error: "Email service not configured" }),
+        JSON.stringify({ error: "Email service not configured. Configure SMTP in Settings → Email." }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
-
-    const resend = new Resend(resendApiKey);
 
     const {
       email,
@@ -119,22 +126,34 @@ const handler = async (req: Request): Promise<Response> => {
 </body>
 </html>`;
 
-    const sendResult = await resend.emails.send({
-      from: SENDER,
-      to: [email],
-      subject: `Your Visitor Badge - ${visitorId}`,
-      html: htmlContent,
-    });
+    const fromAddr = smtp.sender_name
+      ? `"${smtp.sender_name}" <${smtp.sender_email}>`
+      : smtp.sender_email;
 
-    if (sendResult.error) {
-      console.error("Resend error:", sendResult.error);
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtp.smtp_host,
+        port: smtp.smtp_port,
+        secure: smtp.smtp_port === 465,
+        auth: { user: smtp.smtp_username, pass: smtp.smtp_password },
+        tls: { rejectUnauthorized: false },
+      });
+
+      const info = await transporter.sendMail({
+        from: fromAddr,
+        to: [email],
+        subject: `Your Visitor Badge - ${visitorId}`,
+        html: htmlContent,
+      });
+
+      console.log(`Badge email sent successfully to ${email} (id: ${info.messageId})`);
+    } catch (sendErr: any) {
+      console.error("SMTP send error:", sendErr?.message || sendErr);
       return new Response(
-        JSON.stringify({ error: "Failed to send email", details: sendResult.error.message }),
+        JSON.stringify({ error: "Failed to send email", details: sendErr?.message || String(sendErr) }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
-
-    console.log("Badge email sent successfully to:", email);
 
     return new Response(
       JSON.stringify({ success: true, message: "Badge sent to email successfully" }),
