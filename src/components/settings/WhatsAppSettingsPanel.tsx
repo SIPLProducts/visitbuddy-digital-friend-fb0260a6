@@ -311,6 +311,66 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
             )}
           </div>
 
+          {lastError && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>
+                Bridge call failed
+                {lastError.code ? ` — ${lastError.code}` : ''}
+                {typeof lastError.upstreamStatus === 'number' ? ` (HTTP ${lastError.upstreamStatus})` : ''}
+              </AlertTitle>
+              <AlertDescription>
+                <p className="text-sm">{lastError.message}</p>
+                {lastError.code === 'timeout' && (
+                  <p className="mt-1 text-xs">
+                    Render free tier sleeps after 15 min idle and takes 30–60 s to wake. Click{' '}
+                    <strong>Wake bridge</strong> below — it waits up to 75 s for the cold start.
+                  </p>
+                )}
+                {lastError.code === 'unauthorized' && (
+                  <p className="mt-1 text-xs">
+                    The Lovable secret <code>WHATSAPP_BRIDGE_API_KEY</code> doesn't match the
+                    Render env var <code>BRIDGE_API_KEY</code>. Make them identical.
+                  </p>
+                )}
+                {lastError.code === 'unreachable' && (
+                  <p className="mt-1 text-xs">
+                    Edge function couldn't reach <code>{lastError.upstreamHost ?? 'the bridge'}</code>.
+                    Check that <code>WHATSAPP_BRIDGE_URL</code> is correct (https://… no trailing slash).
+                  </p>
+                )}
+                {lastError.trailingSlash && (
+                  <p className="mt-1 text-xs">
+                    ⚠️ <code>WHATSAPP_BRIDGE_URL</code> has a trailing <code>/</code> — strip it for cleanliness.
+                  </p>
+                )}
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="mt-2 h-7 gap-1 px-2 text-xs">
+                      <Bug className="h-3 w-3" /> Show diagnostics
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <pre className="mt-2 max-h-48 overflow-auto rounded bg-muted/50 p-2 text-[10px] leading-tight">
+                      {JSON.stringify(
+                        {
+                          code: lastError.code,
+                          upstreamStatus: lastError.upstreamStatus,
+                          upstreamHost: lastError.upstreamHost,
+                          trailingSlash: lastError.trailingSlash,
+                          upstreamBody: lastError.upstreamBody,
+                          message: lastError.message,
+                        },
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  </CollapsibleContent>
+                </Collapsible>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex flex-wrap gap-2">
             {bridgeState === 'ready' || bridgeState === 'authenticated' ? (
               <Button variant="destructive" onClick={disconnect} disabled={busy} className="gap-2">
@@ -323,7 +383,16 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
                 {polling ? 'Polling…' : 'Connect WhatsApp'}
               </Button>
             )}
-            <Button variant="outline" onClick={refreshOnce} className="gap-2">
+            <Button
+              variant="secondary"
+              onClick={wakeBridge}
+              disabled={waking || unconfigured}
+              className="gap-2"
+            >
+              {waking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+              {waking ? 'Waking (up to 75s)…' : 'Wake bridge'}
+            </Button>
+            <Button variant="outline" onClick={() => refreshOnce()} className="gap-2">
               <RefreshCw className="h-4 w-4" /> Refresh status
             </Button>
             {polling && (
