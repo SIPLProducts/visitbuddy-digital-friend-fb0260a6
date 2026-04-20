@@ -310,7 +310,7 @@ export default function PrintBadge() {
           display: flex;
           align-items: center;
           justify-content: center;
-          background-color: #000000;
+          background-color: #ffffff;
         }
         .logo-box img {
           width: 48px;
