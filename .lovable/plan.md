@@ -1,100 +1,57 @@
 
 
-## Make the RE logo render inline immediately in approval (and all branded) emails
+## Add front/back camera picker to visitor photo capture
 
-### Problem
-In the approve-visitor email the logo area shows a clickable placeholder; only after tapping does the red "re" mark appear. That happens because the current implementation passes `path: logoUrl` to Nodemailer:
+Bring the same camera-selection UX from the QR scanner to the photo-capture flow used during check-in (and any other place that uses `CameraCapture`).
 
-```ts
-attachments: [{ filename: 're-logo.png', path: branding.logoUrl, cid: 're-logo', contentDisposition: 'inline' }]
-```
+### Where this shows up
+`CameraCapture` is used by:
+- `src/components/visitors/CheckInCaptureDialog.tsx` — capturing the visitor photo at check-in.
+- `src/components/checkin/CameraCapture.tsx` itself — the shared component.
 
-Nodemailer streams that remote URL into the MIME part at send time. With remote-streamed parts Gmail often classifies the part as a regular attachment (not inline) — so the `<img src="cid:re-logo">` initially renders as a placeholder until the user explicitly opens the attachment. Outlook web shows the same behaviour.
-
-The fix is to fetch the PNG bytes ourselves and pass them as a binary `content` Buffer with explicit `contentType` and `encoding`. That produces a proper `Content-Type: image/png; Content-Disposition: inline; Content-Transfer-Encoding: base64` MIME part that every major client renders inline on first open.
+Currently it calls `getUserMedia({ video: { facingMode: 'environment' } })` and falls back to `user`. On phones it usually lands on the back cam, but there's no way to switch to the front, and on devices with multiple back cameras you can't choose.
 
 ### Fix
 
-1. Add a small helper at the top of each email-sending Edge Function that fetches the logo once per request and returns a `Uint8Array`:
+Update `src/components/checkin/CameraCapture.tsx`:
 
-   ```ts
-   async function fetchLogoBytes(url: string): Promise<Uint8Array | null> {
-     try {
-       const res = await fetch(url, { cache: "no-store" });
-       if (!res.ok) return null;
-       const buf = new Uint8Array(await res.arrayBuffer());
-       return buf;
-     } catch { return null; }
-   }
-   ```
+1. On mount (once permission is granted), enumerate devices via `navigator.mediaDevices.enumerateDevices()` and keep only `videoinput` entries.
+2. If **2 or more** video inputs are found, show small chips above the video preview labelled by `device.label` (e.g. "Back camera", "Front camera", "USB Webcam"). Tapping a chip stops the current stream and re-opens with `getUserMedia({ video: { deviceId: { exact: chosenId } } })`.
+3. If only **1** input is found, just start it (no chips).
+4. Persist the chosen `deviceId` in `localStorage` under key `camera-capture-device-id`. Next mount auto-uses it; if the device is gone, fall back to facingMode default.
+5. Add a **"Switch camera"** text button next to Capture / Cancel that re-shows the picker.
+6. Initial start prefers, in order: saved deviceId → `facingMode: environment` → `facingMode: user`. Keep the existing 300ms init delay and AbortError handling intact (camera-capture-resiliency rule).
+7. Labels are empty until permission is granted, so enumerate **after** the first successful `getUserMedia` call, then re-render chips.
 
-2. Before sending, call it: `const logoBytes = await fetchLogoBytes(branding.logoUrl);`
+No prop or callback changes — `onCapture(blob)` and `onCancel()` stay identical, so `CheckInCaptureDialog` and any future caller (self-service portal, etc.) get the picker for free.
 
-3. Replace the existing `attachments` block with:
-
-   ```ts
-   attachments: logoBytes ? [{
-     filename: 're-logo.png',
-     content: logoBytes,
-     contentType: 'image/png',
-     cid: 're-logo',
-     contentDisposition: 'inline',
-     encoding: 'base64',
-   }] : undefined,
-   ```
-
-4. Keep the HTML side the same — `<img src="cid:re-logo" ...>` continues to work, just as a properly inline part now.
-
-5. If `logoBytes` is null (network blip), fall back gracefully: still send the email without the inline attachment so the rest of the message goes through. The header text "Re Sustainability" already provides branding.
-
-### Files to update
-All four branded-email Edge Functions:
-
-- `supabase/functions/approve-visitor/index.ts` — main culprit shown in the screenshot.
-- `supabase/functions/send-email-badge/index.ts` — visitor badge after check-in.
-- `supabase/functions/notify-host/index.ts` — host approval-required + visitor "request submitted" emails.
-- `supabase/functions/send-email/index.ts` — generic templated email sender used elsewhere.
-
-In each one:
-- Add `fetchLogoBytes(...)` helper.
-- Fetch `logoBytes` once after computing `branding`.
-- Pass it through to the `transporter.sendMail({...})` call (replacing the `path:` form).
-
-No HTML or layout changes needed — the previous CID-embed pass already fixed the layout. Only the attachment payload is changing from URL-streamed to binary buffer.
-
-### Deploy
-
-Redeploy:
-- `approve-visitor`
-- `send-email-badge`
-- `notify-host`
-- `send-email`
+### Out of scope
+- QR scanner picker (already done in previous change).
+- Vehicle ANPR camera flow (uses IP camera proxy, not `getUserMedia`).
+- Self-service portal photo step — already routes through `CameraCapture`, so it inherits the fix automatically; no separate edit needed.
+- Changing capture resolution, mirroring, or filters.
 
 ### Verification
 
 ```text
-1. Create a new visitor with email + phone.
-   → "Visit Request Submitted" email: red "re" mark visible immediately
-     in the header (no placeholder, no click required).
-   → Host "Approval Required" email: same — logo inline on first open.
+1. Open Visitors → Check In on a phone with front + back cameras.
+   → Above the live preview, two chips appear: "Back camera", "Front camera".
+   → Tap "Front camera" → preview switches to selfie cam.
+   → Capture → photo uploads, check-in completes as today.
+   → Open Check In again later → it auto-starts on "Front camera" (remembered).
+   → Tap "Switch camera" → picker reappears, pick "Back camera" → switches.
 
-2. Approve the visitor.
-   → "Visit Approved" email: header shows red "re" mark + "Re Sustainability"
-     in red, no clickable placeholder. QR code below renders as before.
+2. Open Check In on a laptop with one webcam.
+   → No chips shown, camera starts directly, capture works.
 
-3. Check the visitor in.
-   → Badge email arrives; header logo inline immediately, QR code intact.
+3. Open Check In on a tablet with 3 cameras (front + 2 back).
+   → Three chips, each labelled, switching works for all three.
 
-4. Open all three in:
-   - Gmail web
-   - Gmail mobile app
-   - Outlook web
-   → Logo visible on first render in every client.
+4. Deny camera permission.
+   → Existing error UI still shows; no chips render.
+
+5. Self-service portal photo step on phone.
+   → Same picker available; chosen camera persists separately is fine
+     (same localStorage key is OK — kiosk usually stays on back cam).
 ```
-
-### Out of scope
-- WhatsApp messages (text only, no inline image issue).
-- Print badge / on-screen Safety Permit (uses bundled local asset, already correct).
-- Visitor photo / QR code `<img>` tags inside the email body — these stay as remote URLs (they're dynamic per-visitor, CID-embedding adds no benefit and would slow the function down).
-- Switching SMTP provider or templates engine.
 
