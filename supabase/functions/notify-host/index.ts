@@ -533,7 +533,7 @@ _VisiGuard Visitor Management System_
       const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, approveLink, rejectLink, companions
+        currentDate, currentTime, approveLink, rejectLink, companions, branding, true
       );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
@@ -544,10 +544,8 @@ _VisiGuard Visitor Management System_
       // For direct check-in, still notify host via email
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, "", "", companions
-      ).replace(/Visitor Approval Required/g, "Visitor Arrival Notification")
-       .replace(/<div style="text-align:center;margin:24px 0;">[\s\S]*?<\/div>/,
-        '<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>');
+        currentDate, currentTime, "", "", companions, branding, false
+      );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
         `Visitor Arrival — ${visitor.name}`,
@@ -559,7 +557,7 @@ _VisiGuard Visitor Management System_
     if (visitor.email && isPendingApproval) {
       const visitorEmailHtml = generateVisitorConfirmationEmail(
         visitor.name, visitor.visitor_id, hostData.name,
-        departmentName, gateName, currentDate, currentTime, visitor.purpose
+        departmentName, gateName, currentDate, currentTime, visitor.purpose, branding
       );
       visitorEmailSent = await sendSmtpEmail(
         supabase, visitor.email,
