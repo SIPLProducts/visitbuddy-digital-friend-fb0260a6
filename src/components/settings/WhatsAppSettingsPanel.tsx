@@ -5,9 +5,11 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle, Loader2, MessageCircle, Power, QrCode, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Loader2, MessageCircle, Power, QrCode, RefreshCw, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 type Provider = 'twilio' | 'whatsapp_web';
 type BridgeState = 'disconnected' | 'qr' | 'authenticated' | 'ready' | 'unknown';
@@ -31,6 +33,11 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
   const [polling, setPolling] = useState(false);
   const [busy, setBusy] = useState(false);
   const [unconfigured, setUnconfigured] = useState(false);
+  const [testPhone, setTestPhone] = useState('9182686448');
+  const [testMessage, setTestMessage] = useState(
+    '✅ VisiGuard test — WhatsApp Web bridge is connected and sending from your scanned number.',
+  );
+  const [sending, setSending] = useState(false);
   const pollRef = useRef<number | null>(null);
 
   const stopPolling = () => {
@@ -94,6 +101,37 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
   };
 
   const status = statusLabel[bridgeState];
+
+  const normalizePhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) return '';
+    if (raw.trim().startsWith('+')) return `+${digits}`;
+    // Default to India country code if 10-digit local number
+    if (digits.length === 10) return `+91${digits}`;
+    return `+${digits}`;
+  };
+
+  const sendTest = async () => {
+    const phone = normalizePhone(testPhone);
+    if (!phone || !testMessage.trim()) {
+      toast.error('Phone number and message are required');
+      return;
+    }
+    if (bridgeState !== 'ready') {
+      toast.error('WhatsApp is not ready yet. Wait for status: Connected.');
+      return;
+    }
+    setSending(true);
+    try {
+      const data = await callBridge('send', { phone, message: testMessage });
+      const id = data?.id ?? data?.messageId ?? '';
+      toast.success(`Test message sent to ${phone}${id ? ` (id: ${id})` : ''}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Failed to send test message');
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -223,6 +261,55 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
               <Button variant="ghost" onClick={stopPolling}>Stop polling</Button>
             )}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Send className="h-5 w-5" /> Send Test Message
+          </CardTitle>
+          <CardDescription>
+            Fire a one-off WhatsApp message through the scanned number to verify end-to-end delivery.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="test-phone">Recipient phone</Label>
+            <Input
+              id="test-phone"
+              value={testPhone}
+              onChange={(e) => setTestPhone(e.target.value)}
+              placeholder="9182686448"
+            />
+            <p className="text-xs text-muted-foreground">
+              10-digit numbers default to +91 (India). Include + and country code for others.
+              Will send to: <span className="font-mono">{normalizePhone(testPhone) || '—'}</span>
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="test-message">Message</Label>
+            <Textarea
+              id="test-message"
+              value={testMessage}
+              onChange={(e) => setTestMessage(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <Button
+            onClick={sendTest}
+            disabled={sending || bridgeState !== 'ready'}
+            className="gap-2"
+          >
+            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {sending ? 'Sending…' : 'Send Test'}
+          </Button>
+          {bridgeState !== 'ready' && (
+            <p className="text-xs text-muted-foreground">
+              Connect WhatsApp first — the Send Test button activates when status is{' '}
+              <strong>Connected</strong>.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
