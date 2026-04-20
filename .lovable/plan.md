@@ -1,94 +1,100 @@
 
 
-## Fix broken logo + collapsed header layout in all branded emails
+## Make the RE logo render inline immediately in approval (and all branded) emails
 
-### Problem (from screenshot)
-The email shows a tiny broken-image icon next to the alt-text **"Re Sustainability"** stacked vertically. The header doesn't render at all because the email client (Gmail in this case) is not loading the remote logo from Supabase storage — it falls back to the alt-text and the table cells collapse.
+### Problem
+In the approve-visitor email the logo area shows a clickable placeholder; only after tapping does the red "re" mark appear. That happens because the current implementation passes `path: logoUrl` to Nodemailer:
 
-The logo URL itself works (HTTP 200, valid PNG, public, CORS open). The issue is purely how mail clients handle remote images:
-- Gmail's image proxy occasionally refuses Supabase storage URLs.
-- Many recipients have "Ask before displaying external images" turned on, so the image is blocked by default.
-- Outlook desktop blocks remote images by default for unknown senders.
+```ts
+attachments: [{ filename: 're-logo.png', path: branding.logoUrl, cid: 're-logo', contentDisposition: 'inline' }]
+```
 
-The reliable industry fix is to **embed the logo as an inline attachment using a CID (Content-ID)**. With CID embedding, the logo travels inside the email itself and renders on first open without any external fetch — no proxy, no permission prompt, no broken icon.
+Nodemailer streams that remote URL into the MIME part at send time. With remote-streamed parts Gmail often classifies the part as a regular attachment (not inline) — so the `<img src="cid:re-logo">` initially renders as a placeholder until the user explicitly opens the attachment. Outlook web shows the same behaviour.
+
+The fix is to fetch the PNG bytes ourselves and pass them as a binary `content` Buffer with explicit `contentType` and `encoding`. That produces a proper `Content-Type: image/png; Content-Disposition: inline; Content-Transfer-Encoding: base64` MIME part that every major client renders inline on first open.
 
 ### Fix
 
-Update every email-sending Edge Function to attach the RE logo as an inline image via Nodemailer and reference it as `cid:re-logo` inside the HTML, instead of pointing `<img src>` at a Supabase URL.
+1. Add a small helper at the top of each email-sending Edge Function that fetches the logo once per request and returns a `Uint8Array`:
 
-Nodemailer supports this natively:
+   ```ts
+   async function fetchLogoBytes(url: string): Promise<Uint8Array | null> {
+     try {
+       const res = await fetch(url, { cache: "no-store" });
+       if (!res.ok) return null;
+       const buf = new Uint8Array(await res.arrayBuffer());
+       return buf;
+     } catch { return null; }
+   }
+   ```
 
-```ts
-attachments: [{
-  filename: 're-logo.png',
-  path: 'https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/branding/re-logo-mark.png',
-  cid: 're-logo',           // referenced as <img src="cid:re-logo">
-  contentDisposition: 'inline',
-}]
-```
+2. Before sending, call it: `const logoBytes = await fetchLogoBytes(branding.logoUrl);`
 
-The function fetches the logo once at send time, embeds it, and the recipient sees the red "re" mark inline on every device.
+3. Replace the existing `attachments` block with:
 
-### Layout fix (same change)
+   ```ts
+   attachments: logoBytes ? [{
+     filename: 're-logo.png',
+     content: logoBytes,
+     contentType: 'image/png',
+     cid: 're-logo',
+     contentDisposition: 'inline',
+     encoding: 'base64',
+   }] : undefined,
+   ```
 
-While we're touching the header HTML, also harden the table so it doesn't collapse when the image is missing OR when the client narrows the viewport:
+4. Keep the HTML side the same — `<img src="cid:re-logo" ...>` continues to work, just as a properly inline part now.
 
-- Set the outer `<table>` to `width="100%"` with explicit pixel `width` on the logo cell (`80px`).
-- Add `mso-table-lspace:0;mso-table-rspace:0` to placate Outlook.
-- Force the header `<table>` to a fixed `min-width:320px` so it never wraps to a single column.
-- Add a non-breaking-space spacer column so the centered text never collapses underneath the logo cell.
-
-These changes make the header render correctly even on the rare client where the inline image still doesn't load.
+5. If `logoBytes` is null (network blip), fall back gracefully: still send the email without the inline attachment so the rest of the message goes through. The header text "Re Sustainability" already provides branding.
 
 ### Files to update
+All four branded-email Edge Functions:
 
-All four email-sending Edge Functions:
+- `supabase/functions/approve-visitor/index.ts` — main culprit shown in the screenshot.
+- `supabase/functions/send-email-badge/index.ts` — visitor badge after check-in.
+- `supabase/functions/notify-host/index.ts` — host approval-required + visitor "request submitted" emails.
+- `supabase/functions/send-email/index.ts` — generic templated email sender used elsewhere.
 
-1. `supabase/functions/send-email/index.ts`
-   - Change `<img src="${branding.logoUrl}">` → `<img src="cid:re-logo">`.
-   - Pass `attachments: [{ filename, path: branding.logoUrl, cid: 're-logo', contentDisposition: 'inline' }]` in the `transporter.sendMail({...})` call.
-   - Tighten header table widths (see "Layout fix" above).
+In each one:
+- Add `fetchLogoBytes(...)` helper.
+- Fetch `logoBytes` once after computing `branding`.
+- Pass it through to the `transporter.sendMail({...})` call (replacing the `path:` form).
 
-2. `supabase/functions/send-email-badge/index.ts` — same three changes.
-
-3. `supabase/functions/notify-host/index.ts` — `brandedHeader(...)` swaps to `cid:re-logo`. The `sendMail({...})` call adds the `attachments` array.
-
-4. `supabase/functions/approve-visitor/index.ts` — same three changes.
-
-The logo asset stays at `branding/re-logo-mark.png` in storage. The `<img>` tags inside the badge HTML (visitor photo, QR codes) are NOT changed — only the **company logo** in the header is moved to CID. Photos and QR codes remain at their public URLs because those are dynamic per-visitor and CID-embedding them adds no benefit.
+No HTML or layout changes needed — the previous CID-embed pass already fixed the layout. Only the attachment payload is changing from URL-streamed to binary buffer.
 
 ### Deploy
 
 Redeploy:
-- `send-email`
+- `approve-visitor`
 - `send-email-badge`
 - `notify-host`
-- `approve-visitor`
+- `send-email`
 
 ### Verification
 
 ```text
-1. Trigger the host-notification email (create a new visitor with host email).
-   → Open in Gmail web: red "re" logo is visible on first open, no
-     "Display images below" prompt, header renders horizontally with
-     "Re Sustainability" in red next to the logo.
+1. Create a new visitor with email + phone.
+   → "Visit Request Submitted" email: red "re" mark visible immediately
+     in the header (no placeholder, no click required).
+   → Host "Approval Required" email: same — logo inline on first open.
 
-2. Same email in Gmail mobile app and Outlook desktop.
-   → Logo visible, header in one row, no broken-image icon.
+2. Approve the visitor.
+   → "Visit Approved" email: header shows red "re" mark + "Re Sustainability"
+     in red, no clickable placeholder. QR code below renders as before.
 
-3. Approve the visitor.
-   → "Visit Approved" email: logo inline, header correct.
+3. Check the visitor in.
+   → Badge email arrives; header logo inline immediately, QR code intact.
 
-4. Check the visitor in (badge email).
-   → Visitor receives the badge email with logo inline + QR code intact.
-
-5. Send a generic test email through any template.
-   → Header logo renders without external fetching.
+4. Open all three in:
+   - Gmail web
+   - Gmail mobile app
+   - Outlook web
+   → Logo visible on first render in every client.
 ```
 
 ### Out of scope
-- WhatsApp message bodies — text only, no image embedding needed.
-- Print badge / Safety Permit on-screen — those use bundled local assets, already correct.
-- Changing the logo asset itself — staying with `re-logo-mark.png`.
-- Switching email provider — staying on the existing SMTP / Nodemailer flow.
+- WhatsApp messages (text only, no inline image issue).
+- Print badge / on-screen Safety Permit (uses bundled local asset, already correct).
+- Visitor photo / QR code `<img>` tags inside the email body — these stay as remote URLs (they're dynamic per-visitor, CID-embedding adds no benefit and would slow the function down).
+- Switching SMTP provider or templates engine.
 
