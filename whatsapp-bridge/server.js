@@ -9,6 +9,7 @@
 // WhatsApp ToS: using whatsapp-web.js to automate a personal number is against
 // WhatsApp's Terms of Service. Use a dedicated demo SIM. Number can be banned.
 
+import 'dotenv/config';
 import express from 'express';
 import qrcode from 'qrcode';
 import path from 'path';

@@ -35,6 +35,29 @@ npm install
 BRIDGE_API_KEY="some-long-random-string" node server.js
 ```
 
+### Using a `.env` file (easier on Windows)
+
+Instead of exporting env vars inline every time, copy `.env.example` to `.env`
+in the **same `whatsapp-bridge/` folder** and edit the values:
+
+```bash
+cd whatsapp-bridge
+cp .env.example .env       # Windows: copy .env.example .env
+# edit .env and set BRIDGE_API_KEY to a long random string
+npm install
+node server.js
+```
+
+The bridge auto-loads `whatsapp-bridge/.env` via `dotenv/config`. Recognised keys:
+
+| Key              | Required | Default            | Notes |
+| ---------------- | -------- | ------------------ | ----- |
+| `BRIDGE_API_KEY` | yes      | —                  | Must match `WHATSAPP_BRIDGE_API_KEY` in Lovable secrets. |
+| `PORT`           | no       | `3000`             | Keep `3000` so it matches `ngrok http 3000`. |
+| `SESSION_PATH`   | no       | `./wweb-session`   | Folder where the scanned WhatsApp session is persisted. |
+
+`.env` is gitignored — never commit it.
+
 In another terminal, expose it via ngrok:
 
 ```bash
