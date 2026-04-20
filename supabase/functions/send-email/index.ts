@@ -1,12 +1,10 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer@6.9.10";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-const SENDER_EMAIL = "visitor@resustainability.com";
-const SENDER_NAME = "VisiGuard";
 
 function generateHtmlEmail(subject: string, body: string): string {
   const bodyHtml = body
@@ -86,36 +84,54 @@ Deno.serve(async (req) => {
     const toEmails = (template.to_emails || []).filter(
       (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim())
     );
+    const ccEmails = (template.cc_emails || []).filter(
+      (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim())
+    );
 
     let status = "logged";
-    const resendKey = Deno.env.get("RESEND_API_KEY");
 
-    if (resendKey && toEmails.length > 0) {
-      const resp = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
-          to: toEmails,
-          cc: template.cc_emails?.length ? template.cc_emails : undefined,
-          subject,
-          html: generateHtmlEmail(subject, body),
-        }),
-      });
-
-      const result = await resp.json();
-      if (!resp.ok) {
-        console.error(`Resend error for template '${template_key}':`, result);
-        status = "failed";
-      } else {
-        status = "sent";
-        console.log(`Email sent via template '${template_key}' to ${toEmails.join(", ")} (id: ${result.id})`);
-      }
+    if (toEmails.length === 0) {
+      console.warn(`Email logged (no recipients) for template '${template_key}'`);
     } else {
-      console.warn(`Email logged (no RESEND_API_KEY or no recipients) for template '${template_key}'`);
+      // Fetch active SMTP config
+      const { data: smtp, error: smtpErr } = await supabase
+        .from("email_config")
+        .select("*")
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle();
+
+      if (smtpErr || !smtp) {
+        console.warn(`No active SMTP config — email logged for template '${template_key}'`);
+      } else {
+        try {
+          const transporter = nodemailer.createTransport({
+            host: smtp.smtp_host,
+            port: smtp.smtp_port,
+            secure: smtp.smtp_port === 465,
+            auth: { user: smtp.smtp_username, pass: smtp.smtp_password },
+            tls: { rejectUnauthorized: false },
+          });
+
+          const fromAddr = smtp.sender_name
+            ? `"${smtp.sender_name}" <${smtp.sender_email}>`
+            : smtp.sender_email;
+
+          const info = await transporter.sendMail({
+            from: fromAddr,
+            to: toEmails,
+            cc: ccEmails.length ? ccEmails : undefined,
+            subject,
+            html: generateHtmlEmail(subject, body),
+          });
+
+          status = "sent";
+          console.log(`Email sent via SMTP for template '${template_key}' to ${toEmails.join(", ")} (id: ${info.messageId})`);
+        } catch (sendErr: any) {
+          console.error(`SMTP send error for template '${template_key}':`, sendErr?.message || sendErr);
+          status = "failed";
+        }
+      }
     }
 
     // 4. Log it
@@ -129,7 +145,7 @@ Deno.serve(async (req) => {
     });
 
     return new Response(
-      JSON.stringify({ success: true, status }),
+      JSON.stringify({ success: status !== "failed", status }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
