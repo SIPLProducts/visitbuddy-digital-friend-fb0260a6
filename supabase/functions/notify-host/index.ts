@@ -165,7 +165,8 @@ async function sendSmtpEmail(
   supabase: any,
   to: string,
   subject: string,
-  html: string
+  html: string,
+  logoUrl?: string
 ): Promise<boolean> {
   try {
     const { data: smtp } = await supabase
@@ -195,6 +196,12 @@ async function sendSmtpEmail(
       to,
       subject,
       html,
+      attachments: logoUrl ? [{
+        filename: 're-logo.png',
+        path: logoUrl,
+        cid: 're-logo',
+        contentDisposition: 'inline',
+      }] : undefined,
     });
 
     await supabase.from("email_logs").insert({
