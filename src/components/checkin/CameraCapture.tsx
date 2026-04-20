@@ -577,12 +577,6 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                 Cancel
               </Button>
             )}
-            {videoDevices.length >= 2 && (
-              <Button variant="outline" onClick={handleSwitchCamera} className="gap-2" disabled={isStarting}>
-                <SwitchCamera className="h-4 w-4" />
-                Switch
-              </Button>
-            )}
             <Button onClick={capturePhoto} className="gap-2" size="lg">
               <Camera className="h-4 w-4" />
               Capture Photo
