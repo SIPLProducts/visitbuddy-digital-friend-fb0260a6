@@ -184,3 +184,43 @@ at the public URL (no trailing slash).
 
 In Settings → WhatsApp tab → **Disconnect** to clear the session. Or call
 `POST /logout` on the bridge directly.
+
+## 4. Stability — use `node run.js` instead of `node server.js`
+
+`whatsapp-web.js` + Puppeteer occasionally throw unrecoverable async errors
+(e.g. `Execution context was destroyed, most likely because of a navigation`)
+that kill the Node process. ngrok then has nothing to forward to and the
+app shows **"Failed to send a request to the Edge Function"**.
+
+The repo ships a tiny supervisor `run.js` that:
+
+- spawns `node server.js`
+- if it exits, restarts it after 2s
+- gives up only if it crashes more than 10 times in 60s
+
+Use it instead of running `server.js` directly:
+
+```bash
+cd whatsapp-bridge
+node run.js
+```
+
+`server.js` itself also now installs `unhandledRejection` /
+`uncaughtException` guards and rebuilds the WhatsApp client after a
+disconnect — so most transient errors no longer kill the process at all.
+The supervisor is the second line of defense for the cases that still do.
+
+### Common cause: WhatsApp Web open in a browser
+
+**Do not open `https://web.whatsapp.com` in any browser** while the bridge
+is running on the same number. WhatsApp will navigate the puppeteer-
+controlled tab, which destroys its execution context and crashes the
+bridge. Use only your phone for WhatsApp during demos.
+
+Other common triggers:
+
+- Laptop entered sleep — disable sleep while demoing.
+- ngrok was restarted — its URL changes; update `WHATSAPP_BRIDGE_URL` in
+  Lovable secrets.
+- Phone unlinked the device under *WhatsApp → Linked Devices* — re-scan
+  the QR from the Settings tab.
