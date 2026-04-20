@@ -110,8 +110,6 @@ ${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
 ━━━━━━━━━━━━━━━━━━━━
 📱 *Scan the QR code above for quick check-in*
 ✅ Please show this badge at the security desk.
-
-_Powered by VisiGuard VMS_
     `.trim();
 
     console.log(`Generated QR code URL: ${qrCodeUrl}`);

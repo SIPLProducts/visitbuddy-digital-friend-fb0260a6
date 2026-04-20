@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import reslLogo from '@/assets/resl-logo.png';
+import reslLogo from '@/assets/resl-badge-logo.png';
 
 interface VisitorData {
   visitor_id: string;

@@ -20,7 +20,7 @@ interface BadgeEmailRequest {
 }
 
 // ---- Shared branded header / footer ----
-const DEFAULT_LOGO_URL = "https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/branding/resl-logo.png";
+const DEFAULT_LOGO_URL = "https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/branding/re-logo-mark.png";
 const DEFAULT_COMPANY = "Re Sustainability";
 const DEFAULT_PRIMARY = "#dc2626";
 
@@ -149,10 +149,6 @@ const handler = async (req: Request): Promise<Response> => {
     </div>
     <div style="background:#f8fafc;padding:14px 16px;text-align:center;border-top:1px solid #e5e7eb;">
       <p style="margin:0;color:#6b7280;font-size:12px;">Please show this badge at the security desk upon arrival.</p>
-    </div>
-    <div style="background:#f1f5f9;padding:14px 16px;text-align:center;">
-      <p style="margin:0;color:#475569;font-size:12px;font-family:Arial,sans-serif;">Powered by <strong style="color:#0f172a;">Sharvi Infotech</strong></p>
-      <p style="margin:4px 0 0;"><a href="https://www.sharviinfotech.com/" style="color:#0ea5e9;font-size:11px;text-decoration:none;">www.sharviinfotech.com</a></p>
     </div>
   </div>
 </body>
