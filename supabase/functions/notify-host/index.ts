@@ -267,6 +267,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { visitorId }: NotifyHostRequest = await req.json();
+    const branding = await getBranding(supabase);
 
     if (!visitorId) {
       return new Response(
