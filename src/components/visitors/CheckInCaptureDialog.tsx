@@ -194,6 +194,9 @@ export function CheckInCaptureDialog({
         window.open(`/print-badge?id=${visitor.id}`, '_blank');
       }
 
+      // Fire-and-forget: send checkout QR badges
+      sendCheckoutBadges();
+
       onComplete();
     } catch (err: any) {
       console.error('Check-in error:', err);
