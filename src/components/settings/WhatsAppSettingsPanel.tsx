@@ -5,11 +5,12 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle, Loader2, MessageCircle, Power, QrCode, RefreshCw, Send } from 'lucide-react';
+import { AlertTriangle, Loader2, MessageCircle, Power, QrCode, RefreshCw, Send, Zap, Bug } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 type Provider = 'twilio' | 'whatsapp_web';
 type BridgeState = 'disconnected' | 'qr' | 'authenticated' | 'ready' | 'unknown';
@@ -19,11 +20,48 @@ interface Props {
   onProviderChange: (p: Provider) => void;
 }
 
-async function callBridge(action: 'qr' | 'status' | 'send' | 'logout', body?: Record<string, unknown>) {
+interface BridgeError {
+  message: string;
+  code?: string;
+  upstreamStatus?: number;
+  upstreamHost?: string;
+  upstreamBody?: string;
+  trailingSlash?: boolean;
+  raw?: any;
+}
+
+async function callBridge(
+  action: 'qr' | 'status' | 'send' | 'logout',
+  body?: Record<string, unknown>,
+) {
   const { data, error } = await supabase.functions.invoke('whatsapp-bridge', {
     body: { action, ...(body ?? {}) },
   });
-  if (error) throw error;
+  // Edge function returned non-2xx — supabase-js puts the JSON body in error.context
+  if (error) {
+    let parsed: any = null;
+    try {
+      const ctx: any = (error as any).context;
+      if (ctx && typeof ctx.json === 'function') {
+        parsed = await ctx.json();
+      } else if (ctx && typeof ctx.text === 'function') {
+        const t = await ctx.text();
+        try { parsed = JSON.parse(t); } catch { parsed = { raw: t }; }
+      }
+    } catch {
+      // ignore
+    }
+    const wrapped: BridgeError = {
+      message: parsed?.error ?? error.message ?? 'Bridge call failed',
+      code: parsed?.code,
+      upstreamStatus: parsed?.upstreamStatus,
+      upstreamHost: parsed?.upstreamHost,
+      upstreamBody: parsed?.upstreamBody ?? parsed?.details,
+      trailingSlash: parsed?.trailingSlash,
+      raw: parsed ?? error,
+    };
+    throw wrapped;
+  }
   return data as any;
 }
 
@@ -33,6 +71,8 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
   const [polling, setPolling] = useState(false);
   const [busy, setBusy] = useState(false);
   const [unconfigured, setUnconfigured] = useState(false);
+  const [waking, setWaking] = useState(false);
+  const [lastError, setLastError] = useState<BridgeError | null>(null);
   const [testPhone, setTestPhone] = useState('9182686448');
   const [testMessage, setTestMessage] = useState(
     '✅ VisiGuard test — WhatsApp Web bridge is connected and sending from your scanned number.',
@@ -48,20 +88,45 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
     setPolling(false);
   };
 
-  const refreshOnce = async () => {
+  const refreshOnce = async (opts?: { timeoutMs?: number }) => {
     try {
-      const data = await callBridge('qr');
+      const data = await callBridge('qr', opts ? { timeoutMs: opts.timeoutMs } : undefined);
       setUnconfigured(false);
+      setLastError(null);
       setBridgeState((data?.state ?? 'unknown') as BridgeState);
       setQrDataUrl(data?.qr ?? null);
       if (data?.state === 'ready' || data?.state === 'authenticated') {
         stopPolling();
       }
     } catch (e: any) {
-      const msg = e?.message ?? '';
-      if (msg.includes('not configured') || msg.includes('503')) setUnconfigured(true);
+      const err = e as BridgeError;
+      setLastError(err);
+      if (err.code === 'unconfigured') setUnconfigured(true);
       setBridgeState('unknown');
       stopPolling();
+    }
+  };
+
+  const wakeBridge = async () => {
+    setWaking(true);
+    setLastError(null);
+    try {
+      // 75s gives Render free tier room for a full cold start
+      const data = await callBridge('status', { timeoutMs: 75_000 });
+      setUnconfigured(false);
+      setBridgeState((data?.state ?? 'unknown') as BridgeState);
+      toast.success(`Bridge awake — state: ${data?.state ?? 'unknown'}`);
+      if (data?.state !== 'ready' && data?.state !== 'authenticated') {
+        // Kick off QR polling so the UI can grab the QR/state next
+        startConnect();
+      }
+    } catch (e: any) {
+      const err = e as BridgeError;
+      setLastError(err);
+      if (err.code === 'unconfigured') setUnconfigured(true);
+      toast.error(err.message ?? 'Failed to wake bridge');
+    } finally {
+      setWaking(false);
     }
   };
 
@@ -79,7 +144,9 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
       setBridgeState('disconnected');
       setQrDataUrl(null);
     } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to disconnect');
+      const err = e as BridgeError;
+      setLastError(err);
+      toast.error(err.message ?? 'Failed to disconnect');
     } finally {
       setBusy(false);
     }
@@ -127,7 +194,9 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
       const id = data?.id ?? data?.messageId ?? '';
       toast.success(`Test message sent to ${phone}${id ? ` (id: ${id})` : ''}`);
     } catch (e: any) {
-      toast.error(e?.message ?? 'Failed to send test message');
+      const err = e as BridgeError;
+      setLastError(err);
+      toast.error(err.message ?? 'Failed to send test message');
     } finally {
       setSending(false);
     }
@@ -242,6 +311,66 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
             )}
           </div>
 
+          {lastError && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>
+                Bridge call failed
+                {lastError.code ? ` — ${lastError.code}` : ''}
+                {typeof lastError.upstreamStatus === 'number' ? ` (HTTP ${lastError.upstreamStatus})` : ''}
+              </AlertTitle>
+              <AlertDescription>
+                <p className="text-sm">{lastError.message}</p>
+                {lastError.code === 'timeout' && (
+                  <p className="mt-1 text-xs">
+                    Render free tier sleeps after 15 min idle and takes 30–60 s to wake. Click{' '}
+                    <strong>Wake bridge</strong> below — it waits up to 75 s for the cold start.
+                  </p>
+                )}
+                {lastError.code === 'unauthorized' && (
+                  <p className="mt-1 text-xs">
+                    The Lovable secret <code>WHATSAPP_BRIDGE_API_KEY</code> doesn't match the
+                    Render env var <code>BRIDGE_API_KEY</code>. Make them identical.
+                  </p>
+                )}
+                {lastError.code === 'unreachable' && (
+                  <p className="mt-1 text-xs">
+                    Edge function couldn't reach <code>{lastError.upstreamHost ?? 'the bridge'}</code>.
+                    Check that <code>WHATSAPP_BRIDGE_URL</code> is correct (https://… no trailing slash).
+                  </p>
+                )}
+                {lastError.trailingSlash && (
+                  <p className="mt-1 text-xs">
+                    ⚠️ <code>WHATSAPP_BRIDGE_URL</code> has a trailing <code>/</code> — strip it for cleanliness.
+                  </p>
+                )}
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm" className="mt-2 h-7 gap-1 px-2 text-xs">
+                      <Bug className="h-3 w-3" /> Show diagnostics
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <pre className="mt-2 max-h-48 overflow-auto rounded bg-muted/50 p-2 text-[10px] leading-tight">
+                      {JSON.stringify(
+                        {
+                          code: lastError.code,
+                          upstreamStatus: lastError.upstreamStatus,
+                          upstreamHost: lastError.upstreamHost,
+                          trailingSlash: lastError.trailingSlash,
+                          upstreamBody: lastError.upstreamBody,
+                          message: lastError.message,
+                        },
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  </CollapsibleContent>
+                </Collapsible>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex flex-wrap gap-2">
             {bridgeState === 'ready' || bridgeState === 'authenticated' ? (
               <Button variant="destructive" onClick={disconnect} disabled={busy} className="gap-2">
@@ -254,7 +383,16 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
                 {polling ? 'Polling…' : 'Connect WhatsApp'}
               </Button>
             )}
-            <Button variant="outline" onClick={refreshOnce} className="gap-2">
+            <Button
+              variant="secondary"
+              onClick={wakeBridge}
+              disabled={waking || unconfigured}
+              className="gap-2"
+            >
+              {waking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+              {waking ? 'Waking (up to 75s)…' : 'Wake bridge'}
+            </Button>
+            <Button variant="outline" onClick={() => refreshOnce()} className="gap-2">
               <RefreshCw className="h-4 w-4" /> Refresh status
             </Button>
             {polling && (
