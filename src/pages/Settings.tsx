@@ -547,7 +547,15 @@ export default function Settings() {
             </Card>
           </TabsContent>
 
-          {/* Data Tab */}
+          {/* WhatsApp Tab */}
+          <TabsContent value="whatsapp">
+            <WhatsAppSettingsPanel
+              provider={settings.whatsapp_provider ?? 'twilio'}
+              onProviderChange={(p) => update('whatsapp_provider', p)}
+            />
+          </TabsContent>
+
+
           <TabsContent value="data">
             <Card>
               <CardHeader>
