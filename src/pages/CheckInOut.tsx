@@ -179,15 +179,24 @@ export default function CheckInOut() {
   const handleQrScan = async (data: { visitorId: string; name: string; action?: string }) => {
     toast.info(`QR scanned: ${data.name}`);
     
-    const { data: visitorData } = await supabase
+    // Try lookup by UUID first (new approval QR), then fall back to human-readable visitor_id (legacy printed badges)
+    const selectClause = `
+      *,
+      host:employees(*, department:departments(*)),
+      department:departments(*)
+    `;
+
+    const { data: byUuid } = await supabase
       .from('visitors')
-      .select(`
-        *,
-        host:employees(*, department:departments(*)),
-        department:departments(*)
-      `)
+      .select(selectClause)
+      .eq('id', data.visitorId)
+      .maybeSingle();
+
+    const visitorData = byUuid ?? (await supabase
+      .from('visitors')
+      .select(selectClause)
       .eq('visitor_id', data.visitorId)
-      .single();
+      .maybeSingle()).data;
 
     if (visitorData) {
       const visitor = visitorData as unknown as Visitor;
@@ -221,14 +230,18 @@ export default function CheckInOut() {
         return;
       }
       
-      // Handle regular check-in flow
+      // Handle regular check-in flow (explicit action='checkin' or no action with scheduled status)
       if (visitor.status === 'scheduled') {
         // Show camera dialog for photo capture
         setShowCameraDialog(true);
       } else if (visitor.status === 'checked_in') {
         toast.info('Visitor already checked in. Ready for check-out.');
-      } else {
+      } else if (visitor.status === 'pending_approval') {
+        toast.warning('This visitor is still awaiting host approval.');
+      } else if (visitor.status === 'checked_out') {
         toast.warning('Visitor has already checked out');
+      } else {
+        toast.warning(`Visitor status: ${visitor.status}`);
       }
     } else {
       toast.error('Visitor not found');
