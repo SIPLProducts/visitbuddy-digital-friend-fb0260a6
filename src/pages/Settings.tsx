@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { languages } from '@/i18n';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { WhatsAppSettingsPanel } from '@/components/settings/WhatsAppSettingsPanel';
 
 interface TenantSettings {
   id: string;

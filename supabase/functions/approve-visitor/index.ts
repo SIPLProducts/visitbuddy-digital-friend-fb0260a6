@@ -269,18 +269,23 @@ const handler = async (req: Request): Promise<Response> => {
 
     let whatsappSent = false;
     let smsSent = false;
-    let whatsappSid = null;
-    let smsSid = null;
+    let whatsappSid: string | null = null;
+    let smsSid: string | null = null;
+    let whatsappProvider: 'twilio' | 'whatsapp_web' = 'twilio';
 
-    // Send WhatsApp badge
-    if (accountSid && authToken && twilioWhatsAppNumber && visitor.phone) {
-      twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
-      let formattedPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
-      if (!formattedPhone.startsWith("+")) {
-        formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
-      }
+    // Read provider preference from tenant_settings (defaults to twilio)
+    try {
+      const { data: ts } = await supabase
+        .from('tenant_settings')
+        .select('whatsapp_provider')
+        .limit(1)
+        .single();
+      if (ts?.whatsapp_provider === 'whatsapp_web') whatsappProvider = 'whatsapp_web';
+    } catch (e) {
+      console.warn('Could not read whatsapp_provider, defaulting to twilio', e);
+    }
 
-      const message = `
+    const buildWhatsAppMessage = () => `
 🎫 *VisiGuard Visitor Pass - APPROVED*
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -303,6 +308,47 @@ ${visitor.gate?.name ? `🚪 *Entry Gate:* ${visitor.gate.name}` : ""}
 _Powered by VisiGuard VMS_
       `.trim();
 
+    // ---- WhatsApp Web (DEMO) path via bridge ----
+    if (whatsappProvider === 'whatsapp_web' && visitor.phone) {
+      try {
+        const bridgeUrl = Deno.env.get("WHATSAPP_BRIDGE_URL");
+        const bridgeKey = Deno.env.get("WHATSAPP_BRIDGE_API_KEY");
+        if (bridgeUrl && bridgeKey) {
+          const resp = await fetch(`${bridgeUrl.replace(/\/+$/, '')}/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': bridgeKey },
+            body: JSON.stringify({
+              phone: visitor.phone,
+              message: buildWhatsAppMessage(),
+              mediaUrl: qrCodeUrl,
+            }),
+          });
+          const result = await resp.json().catch(() => ({}));
+          if (resp.ok && result?.success) {
+            whatsappSent = true;
+            whatsappSid = result.id ?? 'wweb';
+            console.log('WhatsApp Web (bridge) message sent', whatsappSid);
+          } else {
+            console.error('WhatsApp Web bridge failed, falling back to Twilio:', result);
+          }
+        } else {
+          console.warn('whatsapp_web provider selected but bridge secrets are missing — falling back to Twilio');
+        }
+      } catch (bridgeErr) {
+        console.error('WhatsApp Web bridge error, falling back to Twilio:', bridgeErr);
+      }
+    }
+
+    // Send WhatsApp badge via Twilio (production path or fallback)
+    if (!whatsappSent && accountSid && authToken && twilioWhatsAppNumber && visitor.phone) {
+      twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
+      let formattedPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
+      if (!formattedPhone.startsWith("+")) {
+        formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
+      }
+
+      const message = buildWhatsAppMessage();
+
       try {
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
         const formData = new URLSearchParams();
@@ -323,7 +369,7 @@ _Powered by VisiGuard VMS_
         if (twilioResponse.ok) {
           whatsappSent = true;
           whatsappSid = twilioResult.sid;
-          console.log("WhatsApp badge sent:", twilioResult.sid);
+          console.log("WhatsApp badge sent (twilio):", twilioResult.sid);
         } else {
           console.error("Twilio WhatsApp error:", twilioResult);
         }
