@@ -1,58 +1,46 @@
 
 
-The user wants to completely remove the Resend concept and revert to the previously working SMTP-only configuration. Let me identify all Resend references.
+User wants the email branding plan to use a **white logo background** instead of black. Otherwise the previous plan stands. Need a logo URL choice still — let me re-present the concise plan with the white-header correction and re-ask the logo source.
 
-From earlier exploration:
-1. `supabase/functions/test-smtp/index.ts` — uses Resend
-2. `supabase/functions/send-email-badge/index.ts` — uses Resend
-3. `src/pages/Settings.tsx` — has Resend banner + duplicate test button
-4. `supabase/functions/send-email/index.ts` — already reverted to SMTP ✓
+## Updated Plan: Branded Email Templates (white logo header)
 
-Need to verify Settings.tsx state and check for any other Resend mentions.
+Re-theme all visitor/host approval & badge emails to match printed badge branding — but with a **white** header background (not black) for the logo.
 
-## Plan
+### Header (new, applied to all 4 templates)
+- **White background** strip (~88px tall), thin bottom border `#e5e7eb`
+- 56×56 logo (RESL) on the left, on white — no dark box
+- Right side: **Company name** ("Re Sustainability") in dark text + dynamic subtitle ("Visitor Approval Required", "Visit Approved", "Visit Submitted", etc.)
+- Subtitle uses tenant `primary_color` (fallback `#dc2626`) as a thin accent underline
 
-Fully purge Resend from the project, restoring the original SMTP-only flow (nodemailer + `email_config` table app password).
+### Footer (unchanged from prior plan)
+- Light gray bar (`#f8fafc`)
+- "Powered by **Sharvi Infotech**" + `www.sharviinfotech.com` link
 
-### Files to change
-
-**1. `supabase/functions/test-smtp/index.ts`** — rewrite to SMTP
-- Remove `Resend` import.
-- Use `nodemailer` (same pattern as `approve-visitor` and `send-email`).
-- Fetch active row from `email_config` (host, port, username, password, sender_email, sender_name).
-- If no active config → `{ error: "No active SMTP configuration found. Configure SMTP in Settings → Email." }`.
-- Build transporter with `secure: smtp_port === 465`, `tls: { rejectUnauthorized: false }`.
-- Send the existing "Configuration Verified" HTML, replacing `Provider: Resend` with `Provider: SMTP (<host>:<port>)`.
-- Return clean error messages on SMTP failure (helps with Gmail App Password issues).
-
-**2. `supabase/functions/send-email-badge/index.ts`** — rewrite to SMTP
-- Remove `Resend` import.
-- Use `nodemailer` + `email_config`.
-- Keep the existing badge HTML, request shape `{ email, visitorName, visitorId, ... }` — no caller changes.
-- If no active SMTP config → `{ error: "Email service not configured. Configure SMTP in Settings → Email." }`.
-
-**3. `src/pages/Settings.tsx`** — purge Resend UI
-- Remove the green **"PRIMARY: Email sending via Resend"** banner.
-- Remove the duplicate "Send test email via Resend" button at the top.
-- Remove the resend.com/domains link and the SPF/DKIM/DMARC paragraph.
-- Remove the "Custom SMTP (fallback)" subtitle — rename section to "SMTP Configuration".
-- Add a small note: "Gmail requires a 16-character App Password (not your regular password)."
-- Keep the existing **"Send Test Email"** button at the bottom of the SMTP form (unchanged — it already calls `test-smtp`).
-
-### What stays untouched
-- `email_config`, `email_templates`, `email_logs` table schemas — no migration.
-- `supabase.functions.invoke('test-smtp', { body: { to_email } })` signature — no client API change.
-- `send-email-badge` request/response shape — no caller changes.
-- `RESEND_API_KEY` secret stays in storage (harmless and unreferenced after this; user can remove later if desired).
-
-### Deploy
-After file edits, redeploy `test-smtp` and `send-email-badge` so the new SMTP code is live.
+### Tenant-driven branding (read once per call from `tenant_settings`)
+- `company_name` → header title (fallback "Re Sustainability")
+- `logo_url` → header logo (fallback: hosted RESL PNG — see logo question below)
+- `primary_color` → accent color on info panels & header underline (fallback `#dc2626`)
 
 ### Files to change
-- `supabase/functions/test-smtp/index.ts` — Resend → nodemailer SMTP
-- `supabase/functions/send-email-badge/index.ts` — Resend → nodemailer SMTP
-- `src/pages/Settings.tsx` — remove all Resend UI
-- Redeploy: `test-smtp`, `send-email-badge`
+1. `supabase/functions/notify-host/index.ts` — re-theme host approval + visitor confirmation
+2. `supabase/functions/approve-visitor/index.ts` — re-theme approved-badge email
+3. `supabase/functions/send-email-badge/index.ts` — re-theme badge HTML
+4. `supabase/functions/send-email/index.ts` — re-theme generic wrapper
+5. Redeploy all four functions
 
-After deploy: open **Settings → Email**, click **Send Test Email** → email sends through your Gmail SMTP + App Password, exactly like before.
+### Unchanged
+- SMTP delivery via nodemailer + `email_config`
+- Request/response shapes, `email_logs`, Approve/Reject buttons, QR images
+
+### One open question — logo URL
+
+Edge Functions can't import `src/assets/resl-logo.png`. Pick the source:
+
+**A.** Upload `resl-logo.png` to a public Supabase storage bucket (e.g. `branding/resl-logo.png`) and use that URL as the bundled fallback. **Recommended.**
+
+**B.** Provide an existing public logo URL (paste it) — hard-code as fallback.
+
+**C.** No bundled fallback — rely solely on `tenant_settings.logo_url` set from Settings → Branding.
+
+Reply with **A**, **B** (+ URL), or **C** and I'll implement.
 
