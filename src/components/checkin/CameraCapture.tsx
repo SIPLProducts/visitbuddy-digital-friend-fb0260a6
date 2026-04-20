@@ -184,7 +184,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         setError('Camera is in use. Try uploading a photo instead.');
         setActiveTab('upload');
       } else if (err.name === 'OverconstrainedError') {
-        // Saved deviceId no longer valid — clear and retry
+        // Saved deviceId / facingMode no longer valid — clear and retry with default
         try {
           localStorage.removeItem(DEVICE_STORAGE_KEY);
         } catch {
@@ -201,7 +201,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         setIsStarting(false);
       }
     }
-  }, [isStarting, stopCamera, selectedDeviceId, enumerateVideoDevices]);
+  }, [isStarting, stopCamera, selectedDeviceId, facingMode, enumerateVideoDevices]);
 
   // Handle video element events
   const handleVideoCanPlay = useCallback(() => {
