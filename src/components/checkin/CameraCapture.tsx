@@ -49,6 +49,15 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       return null;
     }
   });
+  const [facingMode, setFacingMode] = useState<FacingMode>(() => {
+    try {
+      const saved = localStorage.getItem(FACING_STORAGE_KEY);
+      return saved === 'user' ? 'user' : 'environment';
+    } catch {
+      return 'environment';
+    }
+  });
+  const [activeFacing, setActiveFacing] = useState<FacingMode>('environment');
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
