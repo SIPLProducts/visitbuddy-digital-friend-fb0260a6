@@ -87,6 +87,7 @@ Deno.serve(async (req) => {
     );
 
     const { template_key, variables } = await req.json();
+    const branding = await getBranding(supabase);
 
     if (!template_key) {
       return new Response(
@@ -157,7 +158,7 @@ Deno.serve(async (req) => {
             to: toEmails,
             cc: ccEmails.length ? ccEmails : undefined,
             subject,
-            html: generateHtmlEmail(subject, body),
+            html: generateHtmlEmail(subject, body, branding),
           });
 
           status = "sent";
