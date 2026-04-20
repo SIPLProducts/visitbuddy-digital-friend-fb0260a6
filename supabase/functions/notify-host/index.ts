@@ -542,7 +542,7 @@ _VisiGuard Visitor Management System_
     }
 
     // WhatsApp confirmation to visitor
-    if (accountSid && authToken && twilioWhatsAppNumber && visitor.phone) {
+    if (visitor.phone) {
       let formattedVisitorPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
       if (!formattedVisitorPhone.startsWith("+")) {
         formattedVisitorPhone = "+91" + formattedVisitorPhone.replace(/^0/, "");
@@ -569,7 +569,20 @@ ${hostNotificationSent ? "Your host has been notified of your arrival." : "Pleas
 _VisiGuard Visitor Management System_
       `.trim();
 
-      const visitorFormData = new URLSearchParams();
+      // Try bridge first if provider is whatsapp_web
+      if (whatsappProvider === "whatsapp_web") {
+        const bridgeRes = await sendViaBridge(formattedVisitorPhone, visitorMessage);
+        if (bridgeRes.ok) {
+          console.log("Visitor confirmation sent via bridge:", bridgeRes.id);
+          visitorNotificationSent = true;
+          visitorTransport = "whatsapp_web";
+        } else {
+          console.warn(`[notify-host] visitor bridge failed (${bridgeRes.error}), falling back to Twilio`);
+        }
+      }
+
+      if (!visitorNotificationSent && accountSid && authToken && twilioWhatsAppNumber && twilioUrl) {
+        const visitorFormData = new URLSearchParams();
       visitorFormData.append("To", `whatsapp:${formattedVisitorPhone}`);
       visitorFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       visitorFormData.append("Body", visitorMessage);
@@ -587,11 +600,13 @@ _VisiGuard Visitor Management System_
         if (twilioResponse.ok) {
           console.log("Visitor confirmation sent:", twilioResult.sid);
           visitorNotificationSent = true;
+          visitorTransport = "twilio";
         } else {
           console.error("Failed to send visitor confirmation:", twilioResult);
         }
       } catch (whatsappError) {
         console.error("WhatsApp send error to visitor:", whatsappError);
+      }
       }
     }
 
