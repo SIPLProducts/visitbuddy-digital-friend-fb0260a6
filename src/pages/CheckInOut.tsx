@@ -307,8 +307,10 @@ export default function CheckInOut() {
       toast.error('Failed to check in visitor');
     } else {
       toast.success(`${selectedVisitor.name} checked in with photo`);
+      const checkedInId = selectedVisitor.id;
       fetchVisitors();
       setSelectedVisitor(null);
+      sendCheckoutBadges(checkedInId);
     }
 
     setIsUploading(false);
