@@ -1,125 +1,59 @@
 
 
-## Send the checkout QR on EVERY check-in path (scan, manual, photo, dialog)
+## Fix the email header color — show red, not blue
 
-### Why no checkout QR arrived this time
-You checked in by **scanning the check-in QR** in the Scan tab. That path runs `handleQrScan` → it just flips the row to `checked_in` and refreshes the list — it never invokes `send-whatsapp-badge` / `send-email-badge` / `send-sms-badge`.
+### What's happening
+The branded email header in both `send-email` and `send-email-badge` reads the company name color from `tenant_settings.primary_color`. Your tenant currently has that value set to a blue (likely `#2563eb` or similar), so the "Re Sustainability" title renders blue even though the code falls back to red (`#dc2626`) only when no value is stored.
 
-The earlier fix only added the badge dispatch to **`CheckInCaptureDialog`** (the dialog launched from the Visitors table). Three other check-in paths in `CheckInOut.tsx` still skip it:
+There are two ways to fix this — pick one:
 
-| Where you checked in | Sends checkout QR today? |
-|---|---|
-| Visitors page → click Check In → CheckInCaptureDialog | ✅ yes (already fixed) |
-| Check-In/Out page → Scan tab → scan QR (your case) | ❌ no |
-| Check-In/Out page → Search → click "Check In" | ❌ no |
-| Check-In/Out page → Search → "Check In with Photo" | ❌ no |
+### Option A — Hardcode red in the email header (recommended, matches the Safety Permit badge)
+The Safety Permit badge already hardcodes `#dc2626` regardless of tenant settings (per project memory). Doing the same for emails keeps both channels visually consistent and immune to accidental color changes in Settings.
 
-Same for visitor-creation and host-approval — those already work correctly:
-- Create visitor → `notify-host` is invoked (host WhatsApp + email + visitor confirmation).
-- Host approves → `approve-visitor` is invoked (visitor receives the **check-in QR**).
-- Check-in → checkout QR should fire — broken on 3 of 4 paths.
+Edit two edge functions, replacing the dynamic primary color with the fixed brand red **only for the company-name title**:
 
-### The fix — one shared helper + four call sites
+- `supabase/functions/send-email/index.ts` — in `generateHtmlEmail`, change
+  ```html
+  color:${branding.primaryColor};
+  ```
+  on the `<div>` that renders `${branding.companyName}` to a hardcoded
+  ```html
+  color:#dc2626;
+  ```
+- `supabase/functions/send-email-badge/index.ts` — same change on the company-name `<div>` inside the header table.
 
-**1. Add a small helper inside `src/pages/CheckInOut.tsx`** (mirrors what `CheckInCaptureDialog` already does):
+No other styles change. The `branding.primaryColor` value still gets read (so future buttons/accents can use it), but the header title is locked to the Re Sustainability red.
 
-```ts
-const sendCheckoutBadges = async (visitorId: string) => {
-  const { data: v } = await supabase
-    .from('visitors')
-    .select(`name, visitor_id, phone, email, company, purpose,
-             host:employees(name), department:departments(name), gate:gates(name)`)
-    .eq('id', visitorId)
-    .maybeSingle();
-  if (!v) return;
+Then redeploy both functions:
+- `send-email`
+- `send-email-badge`
 
-  const payload = {
-    visitorName: v.name,
-    visitorId: v.visitor_id,
-    phone: v.phone || '',
-    email: v.email || '',
-    company: v.company || '',
-    purpose: v.purpose || '',
-    hostName: (v as any).host?.name || '',
-    departmentName: (v as any).department?.name || '',
-    gateName: (v as any).gate?.name || '',
-  };
+### Option B — Update the tenant setting instead
+If you'd rather keep the header dynamic, open Settings → Branding and set Primary Color to `#dc2626`. No code change. Downside: the next person who edits Settings can break the brand color again.
 
-  const tasks: Promise<any>[] = [];
-  if (payload.phone) {
-    tasks.push(supabase.functions.invoke('send-whatsapp-badge', { body: payload }));
-    tasks.push(supabase.functions.invoke('send-sms-badge',      { body: payload }));
-  }
-  if (payload.email) {
-    tasks.push(supabase.functions.invoke('send-email-badge',    { body: payload }));
-  }
-  const results = await Promise.allSettled(tasks);
-  const failed = results.filter(r => r.status === 'rejected').length;
-  if (tasks.length === 0) return;
-  if (failed === 0)            toast.success('Checkout QR sent via WhatsApp & email');
-  else if (failed < tasks.length) toast.warning('Checkout QR sent partially — some channels failed');
-  else                          toast.warning('Could not send checkout QR — please retry from visitor details');
-};
-```
+### Recommendation
+Go with **Option A**. The badge already hardcodes red for the same reason; mirroring it in email keeps "Re Sustainability" red everywhere it appears, regardless of who edits Settings.
 
-**2. Call it (fire-and-forget) right after every successful check-in** in `CheckInOut.tsx`:
+### Files touched (Option A)
+- Edit `supabase/functions/send-email/index.ts` — hardcode `#dc2626` on the company-name div in `generateHtmlEmail`.
+- Edit `supabase/functions/send-email-badge/index.ts` — hardcode `#dc2626` on the company-name div in the badge HTML.
+- Redeploy both edge functions.
 
-- **`handleQrScan`** — after the `status === 'scheduled'` branch's photo capture is *not* enabled, currently the scan opens the camera dialog. Move the badge dispatch into `handlePhotoCaptureAndCheckIn` (next bullet) so the QR goes out only after the photo step finishes.
-  Additionally, when a `'checked_in'` visitor is scanned (already-checked-in), do nothing extra (already handled).
-- **`handleCheckIn`** — after success toast: `sendCheckoutBadges(visitor.id);`
-- **`handlePhotoCaptureAndCheckIn`** — after success toast: `sendCheckoutBadges(selectedVisitor.id);`
-- **`handlePhotoCapture`** — leave as-is (this only attaches a photo to an already-checked-in visitor; status doesn't change, no second QR needed).
-
-**3. No changes to `CheckInCaptureDialog`** (already wired). No changes to `approve-visitor`, `notify-host`, or the badge edge functions.
-
-### Verifying the three notification stages stay consistent
-
-After this fix, every visitor lifecycle event will reliably trigger messaging:
-
-```
-EVENT                       WHO RECEIVES                    CHANNELS
-───────────────────────────  ──────────────────────────────  ──────────────────
-Visitor created              Host (approve/reject)           WhatsApp + Email
-                             Visitor (request submitted)     WhatsApp + Email
-Host approves                Visitor (check-in QR)           WhatsApp + Email + SMS
-Security checks visitor in   Visitor (checkout QR)           WhatsApp + Email + SMS
-   ↳ via Visitors dialog       ✅ (already works)
-   ↳ via Scan QR                ✅ (fix below)
-   ↳ via Search → Check In      ✅ (fix below)
-   ↳ via Search → Photo Check In ✅ (fix below)
-Visitor scans checkout QR    (no message — flips status)
-```
-
-### Files touched
-- **Edit** `src/pages/CheckInOut.tsx` only — add the `sendCheckoutBadges` helper, call it from `handleCheckIn` and `handlePhotoCaptureAndCheckIn` (and leave the QR-scan branch routing through the photo step that already exists).
-
-No DB migrations, no edge function changes, no new secrets.
+No DB changes, no template changes, no WhatsApp/SMS impact.
 
 ### What you'll do after the fix
-
 ```text
-1. Create a fresh visitor (with phone + email).
-   → Host inbox: approval email with Approve/Reject.
-   → Host WhatsApp: same approval message.
-   → Visitor: "Visit Request Submitted" (WhatsApp + email).
-
-2. Tap Approve in WhatsApp.
-   → Visitor: "Visit Approved — show this CHECK-IN QR" (WhatsApp + email).
-
-3. At the gate, on Check-In/Out page → Scan tab → scan the visitor's check-in QR.
-   → Camera dialog opens, capture photo.
-   → Visitor row flips to checked_in, badge prints.
-   → Visitor: "Checked In — use this QR to check out" (WhatsApp + email + SMS)
-     ← THIS is the part that was missing.
-
-4. Repeat with Search → Check In and Search → Check In with Photo to confirm
-   the same checkout QR arrives on those paths too.
-
-5. Visitor leaves and shows the checkout QR → status flips to checked_out.
+1. Trigger any email — create a visitor (host approval email) or
+   approve a visitor (visitor check-in QR email) or check a visitor in
+   (visitor checkout QR email).
+2. Open the received email.
+   → "Re Sustainability" in the header now renders in red (#dc2626),
+     matching the Safety Permit badge header.
+3. Body text, footer, and "Powered by Sharvi Infotech" line are unchanged.
 ```
 
 ### Out of scope
-- Vehicle WhatsApp (`send-vehicle-whatsapp`) — separate function.
-- The QR scanner library code — unchanged.
-- Auto-checkout cron at 6 PM — unchanged.
+- WhatsApp templates (text-only, no color).
+- The Safety Permit print badge (already red).
+- Other color usages of `primaryColor` elsewhere in the app.
 
