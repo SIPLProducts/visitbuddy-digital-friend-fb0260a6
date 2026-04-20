@@ -11,6 +11,18 @@
 
 import express from 'express';
 import qrcode from 'qrcode';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Ensure Puppeteer reads Chrome from the same project-relative folder that
+// `postinstall` wrote to. Render wipes ~/.cache between build & runtime, but
+// keeps everything under /opt/render/project/src — so we pin the cache there.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+if (!process.env.PUPPETEER_CACHE_DIR) {
+  process.env.PUPPETEER_CACHE_DIR = path.join(__dirname, '.puppeteer-cache');
+}
+
 import pkg from 'whatsapp-web.js';
 const { Client, LocalAuth, MessageMedia } = pkg;
 
