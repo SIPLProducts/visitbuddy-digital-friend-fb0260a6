@@ -155,12 +155,12 @@ function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl
       </div>
 
       <div style="text-align:center;margin:24px 0;">
-        <p style="color:#374151;font-size:14px;margin-bottom:12px;">Scan this QR code for quick check-out:</p>
-        <img src="${qrCodeUrl}" alt="QR Code" style="width:200px;height:200px;border:2px solid #e5e7eb;border-radius:8px;" />
+        <p style="color:#374151;font-size:14px;margin-bottom:12px;">Show this <strong>CHECK-IN</strong> QR code at the gate:</p>
+        <img src="${qrCodeUrl}" alt="Check-in QR Code" style="width:200px;height:200px;border:2px solid #e5e7eb;border-radius:8px;" />
       </div>
 
       <div style="background:#fef3c7;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #f59e0b;text-align:center;">
-        <p style="margin:0;color:#92400e;font-size:16px;font-weight:bold;">📱 Please show this email to the security guard at the entrance</p>
+        <p style="margin:0;color:#92400e;font-size:16px;font-weight:bold;">📱 Show this CHECK-IN QR to the security guard at the entrance</p>
       </div>
     </div>
     ${brandedFooter()}
