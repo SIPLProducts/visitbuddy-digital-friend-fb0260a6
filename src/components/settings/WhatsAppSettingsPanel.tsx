@@ -263,6 +263,55 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Send className="h-5 w-5" /> Send Test Message
+          </CardTitle>
+          <CardDescription>
+            Fire a one-off WhatsApp message through the scanned number to verify end-to-end delivery.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="test-phone">Recipient phone</Label>
+            <Input
+              id="test-phone"
+              value={testPhone}
+              onChange={(e) => setTestPhone(e.target.value)}
+              placeholder="9182686448"
+            />
+            <p className="text-xs text-muted-foreground">
+              10-digit numbers default to +91 (India). Include + and country code for others.
+              Will send to: <span className="font-mono">{normalizePhone(testPhone) || '—'}</span>
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="test-message">Message</Label>
+            <Textarea
+              id="test-message"
+              value={testMessage}
+              onChange={(e) => setTestMessage(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <Button
+            onClick={sendTest}
+            disabled={sending || bridgeState !== 'ready'}
+            className="gap-2"
+          >
+            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {sending ? 'Sending…' : 'Send Test'}
+          </Button>
+          {bridgeState !== 'ready' && (
+            <p className="text-xs text-muted-foreground">
+              Connect WhatsApp first — the Send Test button activates when status is{' '}
+              <strong>Connected</strong>.
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
