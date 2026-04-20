@@ -12,6 +12,7 @@
 import express from 'express';
 import qrcode from 'qrcode';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 // Ensure Puppeteer reads Chrome from the same project-relative folder that
@@ -21,6 +22,46 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 if (!process.env.PUPPETEER_CACHE_DIR) {
   process.env.PUPPETEER_CACHE_DIR = path.join(__dirname, '.puppeteer-cache');
+}
+
+// Detect the actual Chrome binary that `postinstall` downloaded so we can
+// pass an explicit `executablePath` to Puppeteer. whatsapp-web.js bundles
+// its own puppeteer-core which otherwise looks for a different revision in
+// the wrong cache dir on Render.
+function findInstalledChrome(cacheDir) {
+  try {
+    const chromeRoot = path.join(cacheDir, 'chrome');
+    if (!fs.existsSync(chromeRoot)) return null;
+    const builds = fs
+      .readdirSync(chromeRoot)
+      .filter((d) => d.startsWith('linux-') || d.startsWith('mac-') || d.startsWith('win'))
+      .sort()
+      .reverse();
+    for (const b of builds) {
+      const candidates = [
+        path.join(chromeRoot, b, 'chrome-linux64', 'chrome'),
+        path.join(chromeRoot, b, 'chrome-linux', 'chrome'),
+        path.join(chromeRoot, b, 'chrome-mac-arm64', 'Google Chrome for Testing.app', 'Contents', 'MacOS', 'Google Chrome for Testing'),
+        path.join(chromeRoot, b, 'chrome-mac-x64', 'Google Chrome for Testing.app', 'Contents', 'MacOS', 'Google Chrome for Testing'),
+      ];
+      for (const c of candidates) {
+        if (fs.existsSync(c)) return c;
+      }
+    }
+  } catch (e) {
+    console.error('[wweb-bridge] findInstalledChrome error', e);
+  }
+  return null;
+}
+
+if (!process.env.PUPPETEER_EXECUTABLE_PATH) {
+  const detected = findInstalledChrome(process.env.PUPPETEER_CACHE_DIR);
+  if (detected) {
+    process.env.PUPPETEER_EXECUTABLE_PATH = detected;
+    console.log('[wweb-bridge] detected Chrome at', detected);
+  } else {
+    console.warn('[wweb-bridge] no Chrome binary found under', process.env.PUPPETEER_CACHE_DIR);
+  }
 }
 
 import pkg from 'whatsapp-web.js';
