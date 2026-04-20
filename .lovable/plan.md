@@ -1,57 +1,66 @@
 
 
-## Add front/back camera picker to visitor photo capture
+## Make front/back camera choice obvious in visitor photo capture
 
-Bring the same camera-selection UX from the QR scanner to the photo-capture flow used during check-in (and any other place that uses `CameraCapture`).
+### Why you're still seeing only one camera
+The previous change does enumerate cameras and add chips, but it has three usability gaps that explain "I am getting only front camera":
 
-### Where this shows up
-`CameraCapture` is used by:
-- `src/components/visitors/CheckInCaptureDialog.tsx` — capturing the visitor photo at check-in.
-- `src/components/checkin/CameraCapture.tsx` itself — the shared component.
+1. **The chips only appear when the browser reports 2+ devices.** On many phones the browser reports a single "logical" camera until you actually request the back one — so no chips ever appear and the user is stuck on whatever facingMode came up first.
+2. **The video is always mirrored** (`transform: scaleX(-1)`). Even when it's the back camera, it looks like a selfie cam, so the user thinks it's the front camera.
+3. **The chips are small grey pills above the preview** — easy to miss, and they don't appear at all until after the stream starts and labels populate.
 
-Currently it calls `getUserMedia({ video: { facingMode: 'environment' } })` and falls back to `user`. On phones it usually lands on the back cam, but there's no way to switch to the front, and on devices with multiple back cameras you can't choose.
-
-### Fix
+### Fix — always show a Front / Back toggle
 
 Update `src/components/checkin/CameraCapture.tsx`:
 
-1. On mount (once permission is granted), enumerate devices via `navigator.mediaDevices.enumerateDevices()` and keep only `videoinput` entries.
-2. If **2 or more** video inputs are found, show small chips above the video preview labelled by `device.label` (e.g. "Back camera", "Front camera", "USB Webcam"). Tapping a chip stops the current stream and re-opens with `getUserMedia({ video: { deviceId: { exact: chosenId } } })`.
-3. If only **1** input is found, just start it (no chips).
-4. Persist the chosen `deviceId` in `localStorage` under key `camera-capture-device-id`. Next mount auto-uses it; if the device is gone, fall back to facingMode default.
-5. Add a **"Switch camera"** text button next to Capture / Cancel that re-shows the picker.
-6. Initial start prefers, in order: saved deviceId → `facingMode: environment` → `facingMode: user`. Keep the existing 300ms init delay and AbortError handling intact (camera-capture-resiliency rule).
-7. Labels are empty until permission is granted, so enumerate **after** the first successful `getUserMedia` call, then re-render chips.
+1. **Always-visible Front / Back segmented toggle** above the preview (not conditional on enumerating ≥2 devices). Two buttons: **"Back camera"** (default, environment) and **"Front camera"** (user). Active button highlighted in primary color.
 
-No prop or callback changes — `onCapture(blob)` and `onCancel()` stay identical, so `CheckInCaptureDialog` and any future caller (self-service portal, etc.) get the picker for free.
+2. **Toggle drives `facingMode` directly.** Tapping a button stops the current stream and re-opens with `getUserMedia({ video: { facingMode: 'environment' | 'user' } })`. This works on every phone, even when `enumerateDevices()` returns generic/empty labels.
 
-### Out of scope
-- QR scanner picker (already done in previous change).
-- Vehicle ANPR camera flow (uses IP camera proxy, not `getUserMedia`).
-- Self-service portal photo step — already routes through `CameraCapture`, so it inherits the fix automatically; no separate edit needed.
-- Changing capture resolution, mirroring, or filters.
+3. **If 3+ cameras exist** (e.g. tablet with wide + ultra-wide back cams), keep the existing per-device chips as a secondary row underneath the Front/Back toggle, so power users can still pick a specific lens.
+
+4. **Mirror only the front camera.** Track which mode is active in state; when `facingMode === 'environment'`, render the `<video>` with no transform and capture without flipping the canvas. When `facingMode === 'user'`, keep the current mirrored preview + flipped capture (so selfies feel natural). This makes it visually obvious which camera is live.
+
+5. **Persist the user's choice** in `localStorage` (`camera-capture-facing-mode`: `'environment' | 'user'`). On next mount, auto-start with the saved mode. Default for first-time use stays `environment` (back).
+
+6. **Active-camera indicator** — small badge in the corner of the preview ("Back" or "Front") so the operator always knows which lens is recording, regardless of mirroring.
+
+7. Keep the existing 300 ms init delay, AbortError handling, error fallbacks, Upload tab, and Capture/Cancel buttons untouched (camera-capture-resiliency rule).
+
+### Files to edit
+- `src/components/checkin/CameraCapture.tsx` — only file. `CheckInCaptureDialog` and any other caller (self-service portal, check-out flow) inherit the change automatically.
 
 ### Verification
 
 ```text
-1. Open Visitors → Check In on a phone with front + back cameras.
-   → Above the live preview, two chips appear: "Back camera", "Front camera".
-   → Tap "Front camera" → preview switches to selfie cam.
-   → Capture → photo uploads, check-in completes as today.
-   → Open Check In again later → it auto-starts on "Front camera" (remembered).
-   → Tap "Switch camera" → picker reappears, pick "Back camera" → switches.
+1. Open Visitors → Check In on a phone.
+   → Above the preview: two big buttons "Back camera" / "Front camera",
+     "Back camera" highlighted by default, preview shows back lens
+     (NOT mirrored), small "Back" badge in corner of preview.
+   → Tap "Front camera" → preview flips to selfie cam, mirrored,
+     badge says "Front".
+   → Capture → photo uploads, check-in completes.
+   → Re-open Check In → it auto-starts on Front (remembered).
 
 2. Open Check In on a laptop with one webcam.
-   → No chips shown, camera starts directly, capture works.
+   → Toggle still shows both buttons. Front works, Back falls back to
+     the only available camera with a small toast "Back camera not
+     available — using default". No crash.
 
-3. Open Check In on a tablet with 3 cameras (front + 2 back).
-   → Three chips, each labelled, switching works for all three.
+3. Open on a tablet with 3 cameras.
+   → Front/Back toggle on top, secondary row shows per-lens chips
+     ("Back wide", "Back ultra-wide"). Switching works at both levels.
 
 4. Deny camera permission.
-   → Existing error UI still shows; no chips render.
+   → Existing error UI renders, falls back to Upload tab. No regressions.
 
-5. Self-service portal photo step on phone.
-   → Same picker available; chosen camera persists separately is fine
-     (same localStorage key is OK — kiosk usually stays on back cam).
+5. Self-service portal photo step.
+   → Same Front/Back toggle inherited, same mirroring rule.
 ```
+
+### Out of scope
+- QR scanner camera picker (separate flow, already done).
+- Vehicle ANPR camera (uses IP camera proxy, not getUserMedia).
+- Capture resolution, filters, or zoom controls.
+- Per-location default-camera setting (always per-device localStorage).
 
