@@ -504,61 +504,34 @@ const handler = async (req: Request): Promise<Response> => {
         ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`
         : null;
 
-      const hostMessage = isPendingApproval
-        ? `
-🔔 *Visitor Approval Request*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${hostData.name}*,
-
-A visitor is waiting for your approval:
-
-👤 *Visitor:* ${visitor.name}
-🆔 *ID:* ${visitor.visitor_id}
-${visitor.phone ? `📱 *Mobile:* ${visitor.phone}` : ""}
-${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
-${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
-${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
-${companions.length > 0 ? `
-👥 *Accompanying Persons (${companions.length}):*
-${companions.map((c: any, i: number) => `  ${i + 1}. ${c.name}${c.phone ? ` (${c.phone})` : ''}`).join('\n')}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-━━━━━━━━━━━━━━━━━━━━
-✅ *Approve:* ${approveLink}
-❌ *Reject:* ${rejectLink}
-
-_VisiGuard Visitor Management System_
-        `.trim()
-        : `
-🔔 *Visitor Arrival Notification*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${hostData.name}*,
-
-A visitor has checked in to meet you:
-
-👤 *Visitor:* ${visitor.name}
-🆔 *ID:* ${visitor.visitor_id}
-${visitor.phone ? `📱 *Mobile:* ${visitor.phone}` : ""}
-${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
-${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
-${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-━━━━━━━━━━━━━━━━━━━━
-Please proceed to the reception to receive your visitor.
-
-_VisiGuard Visitor Management System_
-        `.trim();
+      const hostMessage = buildWhatsAppMessage({
+        branding,
+        subtitle: isPendingApproval ? "Visitor Approval Required" : "Visitor Arrival Notification",
+        recipientName: hostData.name,
+        intro: isPendingApproval
+          ? "A visitor is waiting for your approval. Please review the details below and take action."
+          : "A visitor has arrived to meet you. Details below.",
+        details: [
+          ["Visitor", visitor.name],
+          ["ID", visitor.visitor_id],
+          ["Phone", visitor.phone],
+          ["Company", visitor.company],
+          ["Purpose", visitor.purpose],
+          ["Department", departmentName],
+          ["Entry Gate", gateName],
+          ["Date", currentDate],
+          ["Time", currentTime],
+        ],
+        companions,
+        approveLink: isPendingApproval ? approveLink : null,
+        rejectLink: isPendingApproval ? rejectLink : null,
+        closingLine: isPendingApproval ? null : "Please proceed to the reception to receive your visitor.",
+      });
+      const hostMediaUrl = visitor.photo_url || branding.logoUrl;
 
       // Try bridge first if provider is whatsapp_web
       if (whatsappProvider === "whatsapp_web") {
-        const bridgeRes = await sendViaBridge(formattedHostPhone, hostMessage, visitor.photo_url);
+        const bridgeRes = await sendViaBridge(formattedHostPhone, hostMessage, hostMediaUrl);
         if (bridgeRes.ok) {
           console.log("Host notification sent via bridge:", bridgeRes.id);
           hostNotificationSent = true;
@@ -575,8 +548,8 @@ _VisiGuard Visitor Management System_
       hostFormData.append("To", `whatsapp:${formattedHostPhone}`);
       hostFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       hostFormData.append("Body", hostMessage);
-      if (visitor.photo_url) {
-        hostFormData.append("MediaUrl", visitor.photo_url);
+      if (hostMediaUrl) {
+        hostFormData.append("MediaUrl", hostMediaUrl);
       }
 
       try {
