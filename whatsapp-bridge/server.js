@@ -93,6 +93,34 @@ let state = 'disconnected'; // disconnected | qr | authenticated | ready
 let lastQrDataUrl = null;
 
 let client = null;
+let lastError = null;
+let rebuildTimer = null;
+let initRetryTimer = null;
+let isRebuilding = false;
+
+function scheduleRebuild(reason, delayMs = 3000) {
+  lastError = reason;
+  if (isRebuilding || rebuildTimer) {
+    console.warn('[wweb] rebuild already scheduled, skipping new request:', reason);
+    return;
+  }
+  isRebuilding = true;
+  console.warn(`[wweb] scheduling client rebuild in ${delayMs}ms — reason: ${reason}`);
+  rebuildTimer = setTimeout(async () => {
+    rebuildTimer = null;
+    try {
+      if (client) {
+        try { await client.destroy(); } catch (e) { console.warn('[wweb] destroy during rebuild failed:', e?.message); }
+      }
+    } finally {
+      client = null;
+      state = 'disconnected';
+      lastQrDataUrl = null;
+      isRebuilding = false;
+      ensureClient();
+    }
+  }, delayMs);
+}
 
 function buildClient() {
   const c = new Client({
@@ -144,6 +172,7 @@ function buildClient() {
     state = 'disconnected';
     lastQrDataUrl = null;
     console.warn('[wweb] disconnected', reason);
+    scheduleRebuild(`disconnected: ${reason || 'unknown'}`, 3000);
   });
 
   return c;
@@ -152,18 +181,43 @@ function buildClient() {
 async function ensureClient() {
   if (client) return client;
   client = buildClient();
-  client.initialize().catch((e) => console.error('[wweb] init error', e));
+  client.initialize().catch((e) => {
+    console.error('[wweb] init error', e);
+    lastError = `init error: ${e?.message || e}`;
+    if (initRetryTimer) clearTimeout(initRetryTimer);
+    initRetryTimer = setTimeout(() => {
+      initRetryTimer = null;
+      console.warn('[wweb] retrying initialize after init error');
+      client = null;
+      ensureClient();
+    }, 5000);
+  });
   return client;
 }
 
 // kick off on boot so QR is ready when /qr is hit
 ensureClient();
 
+// --- Global crash guards ---
+// whatsapp-web.js + puppeteer can throw async errors (e.g.
+// "Execution context was destroyed, most likely because of a navigation.")
+// from internal event listeners. Without these guards Node would terminate
+// and the bridge would go offline. Instead, log and rebuild the client.
+process.on('unhandledRejection', (reason) => {
+  const msg = reason instanceof Error ? reason.message : String(reason);
+  console.error('[wweb] unhandledRejection:', msg);
+  scheduleRebuild(`unhandledRejection: ${msg}`, 3000);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[wweb] uncaughtException:', err?.message || err);
+  scheduleRebuild(`uncaughtException: ${err?.message || err}`, 3000);
+});
+
 // --- Endpoints ---
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.get('/status', (_req, res) => {
-  res.json({ state, hasQr: !!lastQrDataUrl });
+  res.json({ state, hasQr: !!lastQrDataUrl, lastError });
 });
 
 app.get('/qr', async (_req, res) => {
