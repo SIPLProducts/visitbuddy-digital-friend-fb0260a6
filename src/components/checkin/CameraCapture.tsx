@@ -385,6 +385,39 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         </TabsList>
 
         <TabsContent value="camera" className="mt-4 space-y-3">
+          {showFacingToggle && (
+            <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-lg">
+              <button
+                type="button"
+                onClick={() => handleSelectFacing('environment')}
+                disabled={isStarting}
+                className={cn(
+                  'flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  activeFacing === 'environment'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-transparent text-foreground hover:bg-background'
+                )}
+              >
+                <Camera className="h-4 w-4" />
+                Back camera
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectFacing('user')}
+                disabled={isStarting}
+                className={cn(
+                  'flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  activeFacing === 'user'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-transparent text-foreground hover:bg-background'
+                )}
+              >
+                <Camera className="h-4 w-4" />
+                Front camera
+              </button>
+            </div>
+          )}
+
           {showDevicePicker && (
             <div className="flex flex-wrap gap-2">
               {videoDevices.map((device, idx) => {
