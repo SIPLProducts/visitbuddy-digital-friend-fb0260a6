@@ -257,12 +257,6 @@ export function SafetyPermitBadge({
         <p className="font-semibold">Data will not be shared to any 3rd parties.</p>
       </div>
 
-      {/* Powered By Footer */}
-      <div className="bg-gray-200 py-1.5 text-center border-t border-gray-300">
-        <p className="text-[9px] text-gray-600">
-          Powered by <span className="font-semibold text-gray-800">Sharvi Infotech</span>
-        </p>
-      </div>
     </div>
   );
 }

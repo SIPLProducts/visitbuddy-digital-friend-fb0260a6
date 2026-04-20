@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import reslLogo from '@/assets/resl-logo.png';
+import reslLogo from '@/assets/resl-badge-logo.png';
 
 interface VisitorData {
   visitor_id: string;
@@ -524,7 +524,6 @@ export default function PrintBadge() {
                   </svg>
                   <img src={reslLogo} alt="RESL" style={{ position: 'relative', zIndex: 1 }} />
                 </div>
-                <div className="company-text">Re Sustainability</div>
               </div>
 
               <div className="title-photo-row">
