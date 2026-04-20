@@ -1,98 +1,79 @@
 
 
-## Make WhatsApp messages mirror the email template
+## Send check-in QR on approval, send checkout QR on actual check-in
 
 ### What's wrong today
-The WhatsApp body is structured differently from the email and includes the literal text `_VisiGuard Visitor Management System_` at the bottom. The email instead uses the tenant's **company name + logo** in a branded header and a **"Powered by Sharvi Infotech"** footer. WhatsApp also can't render HTML/logos, but it *can* show the logo as an attached **image** alongside the text — so we can achieve full visual parity.
+| Stage | Currently sent | Should be sent |
+|---|---|---|
+| Host approves visitor | **Checkout QR** badge (WhatsApp + Email) | **Check-in QR** badge — visitor shows this at the gate to be scanned in |
+| Security checks visitor in (`CheckInCaptureDialog`) | Nothing (just opens print tab) | **Checkout QR** badge (WhatsApp + Email) — visitor shows this when leaving |
 
-### Goal
-Both host and visitor WhatsApp messages should look like the WhatsApp equivalent of the email — same company branding (logo image + name), same section ordering, same details, and the same footer wording. No "VisiGuard" string anywhere.
+The QR scanner (`QrScanner`) already supports both `action: 'checkin'` and `action: 'checkout'` payloads — we just need to send the right one at the right time.
 
-### What changes — `supabase/functions/notify-host/index.ts` only
+### Two-part fix
 
-**1. Build a shared WhatsApp template helper** that mirrors the email layout in WhatsApp text formatting:
+**Part 1 — `supabase/functions/approve-visitor/index.ts` → switch to a CHECK-IN QR**
+
+1. Change the QR payload from `action: 'checkout'` to `action: 'checkin'` (line 303).
+2. Re-word the WhatsApp + email subjects and bodies so they say "Show this **CHECK-IN** QR at the gate" (not "for quick check-out"). Keep the same branded layout from the previous parity fix — only the QR purpose label and the call-to-action text change. Email subject becomes `"Visit Approved — Show This QR at the Gate"`.
+3. The host security notification ("Visitor Approved — ready for check-in") stays as-is.
+
+**Part 2 — Trigger checkout-QR badge on actual check-in**
+
+Update `src/components/visitors/CheckInCaptureDialog.tsx` so that **after** the `status='checked_in'` DB update succeeds (in both `handleUseExistingPhoto` and `handleCapture`), it fires three `supabase.functions.invoke` calls in parallel — never blocking the UI:
 
 ```
-[Logo image attached]
-
-*{Company Name}*
-_{Subtitle — e.g. Visitor Approval Required}_
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *{Recipient}*,
-
-{Intro line — same wording as the email}
-
-📋 *Details*
-• Visitor: {name}
-• ID: {visitor_id}
-• Phone: {phone}
-• Company: {company}
-• Purpose: {purpose}
-• Department: {department}
-• Entry Gate: {gate}
-• Date: {date}
-• Time: {time}
-
-👥 *Accompanying Persons ({n})*    ← only if any
-1. {name} ({phone}) — 💻 Laptop, 📱 Mobile
-…
-
-✅ Approve: {link}                 ← only when pending
-❌ Reject:  {link}
-
-━━━━━━━━━━━━━━━━━━━━
-This is an automated message. Please do not reply.
-Powered by *Sharvi Infotech* — www.sharviinfotech.com
+- send-whatsapp-badge   (phone present)  → checkout QR
+- send-email-badge      (email present)  → checkout QR
+- send-sms-badge        (phone present)  → short text confirming check-in
 ```
 
-**2. Use `branding.companyName` and `branding.logoUrl`** (already fetched via `getBranding()`):
-- Header line uses the *actual* tenant company (e.g. "Re Sustainability"), not "VisiGuard".
-- The logo URL is sent as the message's `mediaUrl` so WhatsApp displays the company logo above the text — **for both** the WhatsApp Web bridge call and the Twilio fallback. For the host message, when a visitor photo exists we prefer the visitor photo (more useful for security); otherwise the logo is shown. For the visitor confirmation we always send the logo.
+These existing edge functions already build the **checkout QR** badge (`action: 'checkout'`) with the branded WhatsApp/email template — no changes needed inside them. The dialog will:
+- Pass `visitorName, visitorId, phone, email, company, purpose, hostName, departmentName, gateName, checkInTime`.
+- Respect the tenant's `whatsapp_provider` setting (the badge functions already do).
+- Show a non-blocking toast `"Check-in badge sent via WhatsApp & email"` on success, or a quiet warning if any single channel fails (check-in still succeeds).
+- Auto-print tab continues to open as today.
 
-**3. Wording parity**
-- Host pending: subtitle "Visitor Approval Required", intro "A visitor is waiting for your approval. Please review the details below and take action." (verbatim from email).
-- Host arrived: subtitle "Visitor Arrival Notification", intro "A visitor has arrived to meet you. Details below."
-- Visitor pending: subtitle "Visit Request Submitted", intro "Your visit request has been submitted and is now pending approval from your host." + status line "⏳ Status: Awaiting Host Approval".
-- Visitor checked-in: subtitle "Check-in Confirmed", intro "Your check-in has been recorded successfully!"
+### Resulting end-to-end flow
 
-**4. Remove every occurrence** of `_VisiGuard Visitor Management System_` and replace with the branded footer block above.
-
-**5. Bridge call** — `sendViaBridge(phone, message, mediaUrl)` already supports the third argument; we just need to pass the resolved logo/photo URL on every call (host message gets `visitor.photo_url ?? branding.logoUrl`, visitor message gets `branding.logoUrl`).
+```
+1. Visitor created            → host gets approval WhatsApp + email
+2. Host taps Approve          → visitor gets CHECK-IN QR via WhatsApp + email
+                                 (subject: "Visit Approved — Show This QR at the Gate")
+3. Visitor arrives, security scans the check-in QR
+   OR security clicks Check-In in the app
+   → status flips to checked_in, photo captured
+   → visitor gets CHECKOUT QR via WhatsApp + email + SMS
+                                 (subject: "Checked In — Use This QR to Check Out")
+4. Visitor leaves, security scans the checkout QR
+   → status flips to checked_out
+```
 
 ### Files touched
-- **Edit** `supabase/functions/notify-host/index.ts` only — add a `buildWhatsAppMessage(...)` helper, replace both inline host/visitor message blocks, and pass `mediaUrl` on every WhatsApp send (bridge + Twilio).
+- **Edit** `supabase/functions/approve-visitor/index.ts` — flip QR payload to `action: 'checkin'`, rename labels/subjects to "Show this CHECK-IN QR at the gate".
+- **Edit** `src/components/visitors/CheckInCaptureDialog.tsx` — after successful check-in, invoke `send-whatsapp-badge`, `send-email-badge`, `send-sms-badge` in parallel (fire-and-forget with toast feedback).
 
-### What you'll see after the fix
+No DB changes, no new secrets, no QR scanner changes (it already routes by `action`).
+
+### What you'll do after I apply the fix
 
 ```text
-1. Bridge stays running (no restart needed).
-2. Create a new visitor with host phone + visitor phone + visitor email.
-3. Within ~5 s on the host's WhatsApp:
-   [Visitor's photo, OR company logo if no photo]
-
-   *Re Sustainability*
-   _Visitor Approval Required_
-   ━━━━━━━━━━━━━━━━━━━━
-   Dear *Ramesh*,
-   A visitor is waiting for your approval...
-   📋 *Details*
-   • Visitor: ...
-   ...
-   ✅ Approve: <link>
-   ❌ Reject:  <link>
-   ━━━━━━━━━━━━━━━━━━━━
-   This is an automated message. Please do not reply.
-   Powered by *Sharvi Infotech* — www.sharviinfotech.com
-
-4. Visitor's WhatsApp shows the same layout with logo + "Visit Request
-   Submitted" subtitle + Awaiting Host Approval status line.
-5. The emails received in parallel are unchanged — both channels now
-   carry visually equivalent content.
+1. Create a new visitor (with phone + email).
+2. Host taps Approve in WhatsApp/email.
+   → Visitor receives WhatsApp + email saying:
+     "Show this CHECK-IN QR at the gate" + QR image.
+3. At the gate, security scans the QR (or clicks Check-In in the app)
+   → status becomes checked_in, photo captured, badge prints.
+   → Visitor receives WhatsApp + email + SMS saying:
+     "Checked In — Use This QR to Check Out" + a NEW (checkout) QR image.
+4. Visitor leaves and shows the checkout QR
+   → scanner flips status to checked_out (already working today).
+5. Approve-visitor logs should now show: action: 'checkin' in the QR payload.
+   Check-in dialog logs should show three invoke calls for badge channels.
 ```
 
 ### Out of scope
-- Vehicle WhatsApp (`send-vehicle-whatsapp`) — separate function, not touched here.
-- Approve-visitor badge WhatsApp — already branded; unchanged.
-- Bridge / Twilio plumbing — unchanged.
+- Vehicle WhatsApp (`send-vehicle-whatsapp`) — separate function, unchanged.
+- The QR scanner itself — already handles both actions.
+- Self-service portal — uses the same `approve-visitor` flow, gets the upgrade for free.
 
