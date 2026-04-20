@@ -100,6 +100,72 @@ function brandedFooter(): string {
     </div>`;
 }
 
+// ---- WhatsApp branded message builder (mirrors email layout) ----
+interface WhatsAppMessageOpts {
+  branding: Branding;
+  subtitle: string;
+  recipientName: string;
+  intro: string;
+  statusLine?: string | null;
+  details: Array<[string, string | null | undefined]>;
+  companions?: any[];
+  approveLink?: string | null;
+  rejectLink?: string | null;
+  closingLine?: string | null;
+}
+
+function buildWhatsAppMessage(opts: WhatsAppMessageOpts): string {
+  const lines: string[] = [];
+  lines.push(`*${opts.branding.companyName}*`);
+  lines.push(`_${opts.subtitle}_`);
+  lines.push("━━━━━━━━━━━━━━━━━━━━");
+  lines.push("");
+  lines.push(`Dear *${opts.recipientName}*,`);
+  lines.push("");
+  lines.push(opts.intro);
+  if (opts.statusLine) {
+    lines.push("");
+    lines.push(opts.statusLine);
+  }
+  lines.push("");
+  lines.push("📋 *Details*");
+  for (const [label, value] of opts.details) {
+    if (value && String(value).trim()) {
+      lines.push(`• ${label}: ${value}`);
+    }
+  }
+
+  if (opts.companions && opts.companions.length > 0) {
+    lines.push("");
+    lines.push(`👥 *Accompanying Persons (${opts.companions.length})*`);
+    opts.companions.forEach((c: any, i: number) => {
+      const devices: string[] = [];
+      if (c.has_laptop) devices.push(`💻 ${c.laptop_brand || "Laptop"}${c.laptop_serial ? ` (${c.laptop_serial})` : ""}`);
+      if (c.has_mobile) devices.push(`📱 ${c.mobile_brand || "Mobile"}${c.mobile_serial ? ` (${c.mobile_serial})` : ""}`);
+      const phonePart = c.phone ? ` (${c.phone})` : "";
+      const devicePart = devices.length ? ` — ${devices.join(", ")}` : "";
+      lines.push(`${i + 1}. ${c.name}${phonePart}${devicePart}`);
+    });
+  }
+
+  if (opts.approveLink && opts.rejectLink) {
+    lines.push("");
+    lines.push(`✅ Approve: ${opts.approveLink}`);
+    lines.push(`❌ Reject:  ${opts.rejectLink}`);
+  }
+
+  if (opts.closingLine) {
+    lines.push("");
+    lines.push(opts.closingLine);
+  }
+
+  lines.push("");
+  lines.push("━━━━━━━━━━━━━━━━━━━━");
+  lines.push("This is an automated message. Please do not reply.");
+  lines.push(`Powered by *Sharvi Infotech* — www.sharviinfotech.com`);
+  return lines.join("\n");
+}
+
 async function sendSmtpEmail(
   supabase: any,
   to: string,
