@@ -1,214 +1,82 @@
 
 
-## Permanently fix the QR scan flow so it never says “Visitor not found” after recognizing the visitor name
+## Remove "Sustainability" wordmark from RE logo and remove Sharvi branding everywhere
 
-### What is actually happening
-The scanner shows the toast:
-```text
-QR scanned: <visitor name>
-```
-before any database lookup happens.
+### Goal
+Across the app, wherever the **RE logo** appears, only the circular **"re"** mark should show. The grey **"Sustainability"** wordmark below it must be cropped out. The header banner / company name text stays untouched. All **"Powered by Sharvi Infotech"** lines are removed from emails, WhatsApp messages, and badges.
 
-So when you see:
-1. visitor name detected
-2. then “Visitor not found”
+### Approach for the logo
+The current asset `src/assets/resl-badge-logo.png` is a single image containing the red "re" circle **and** the grey "Sustainability" wordmark. Cropping it visually is the cleanest fix:
 
-that means the QR payload was read successfully, but the app failed in the lookup/handling step afterward.
+1. Generate a new asset `src/assets/re-logo-mark.png` that contains only the red circular "re" mark (top portion of the original image, no "Sustainability" text).
+2. Replace every import of `resl-badge-logo.png` with the new `re-logo-mark.png`. This automatically fixes:
+   - Safety Permit badge (`SafetyPermitBadge.tsx`)
+   - Print badge page (`PrintBadge.tsx`)
+   - Email logo (the same file is referenced from edge function HTML via a public URL)
 
-### Root causes found
+For the email functions, the logo is currently loaded as a hosted URL inside `brandedHeader(...)`. We will:
+- Upload the cropped `re-logo-mark.png` into the existing public `branding` storage bucket (e.g. `branding/re-logo-mark.png`).
+- Point each edge function's `brandedHeader` `<img src="...">` at that public URL.
 
-#### 1. The scan handler still does a risky UUID-first lookup
-In `src/pages/CheckInOut.tsx`, `handleQrScan(...)` always tries:
-```ts
-.eq('id', data.visitorId)
-```
-first, then falls back to:
-```ts
-.eq('visitor_id', data.visitorId)
-```
+### Files to change
 
-That is unsafe because many badge QRs use the human-readable ID like:
-```text
-VIS-XXXX-YYYY
-```
-not the UUID. Those should be looked up directly by `visitor_id`, not by `id` first.
+**Assets**
+- Add `src/assets/re-logo-mark.png` — cropped logo (red "re" circle only).
+- Upload same file to public storage `branding/re-logo-mark.png` for use by emails.
 
-#### 2. WhatsApp badge QR is still incomplete
-`supabase/functions/send-whatsapp-badge/index.ts` currently builds QR JSON like:
-```json
-{ "visitorId": "VIS-...", "name": "...", "timestamp": "..." }
-```
-It is missing:
-```json
-"action": "checkout"
-```
+**Frontend (logo swap only — headers untouched)**
+- `src/components/badge/SafetyPermitBadge.tsx` — change import from `resl-badge-logo.png` to `re-logo-mark.png`. Header band + company name text stay exactly as they are. Remove only the bottom "Powered by Sharvi Infotech" footer block.
+- `src/pages/PrintBadge.tsx` — same logo swap. Header banner stays. Remove the "Powered by Sharvi Infotech" line at the bottom of the printable page (if present).
 
-So checkout QRs sent through WhatsApp are ambiguous and the app has to guess what to do.
+**Edge functions — emails**
+For each function below, inside `brandedHeader(...)` swap the `<img src>` to the new `branding/re-logo-mark.png` public URL. Header text, company name and red colour stay. In `brandedFooter(...)` (and the plain-text variants), delete the line `Powered by Sharvi Infotech — www.sharviinfotech.com` (HTML + text).
 
-#### 3. The scanner can fire more than once for the same QR before fully stopping
-In `src/components/checkin/QrScanner.tsx`, the callback calls:
-```ts
-onScan(data);
-stopScanning();
-```
-but there is no duplicate-scan guard. On some devices, the same QR can be decoded again during shutdown. That can produce:
-- first call finds the visitor
-- second call races or resolves differently
-- user sees conflicting toasts like “QR scanned” and then “Visitor not found”
+- `supabase/functions/send-email/index.ts`
+- `supabase/functions/send-email-badge/index.ts`
+- `supabase/functions/notify-host/index.ts`
+- `supabase/functions/approve-visitor/index.ts`
 
-This matches your symptom very closely.
-
----
-
-## Permanent implementation
-
-### 1. Make visitor lookup ID-format aware
-Update `src/pages/CheckInOut.tsx` so `handleQrScan(...)`:
-
-- checks whether `data.visitorId` is a UUID
-- if it looks like UUID → query `visitors.id`
-- otherwise → query `visitors.visitor_id`
-- use `.maybeSingle()` only
-- handle query errors explicitly instead of falling through to generic “Visitor not found”
-
-Example behavior:
-```ts
-const looksLikeUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.visitorId);
-const lookupColumn = looksLikeUuid ? 'id' : 'visitor_id';
-```
-
-This removes the fragile UUID-first fallback logic.
-
-### 2. Make action handling resilient
-Still in `src/pages/CheckInOut.tsx`, update the scan logic so it does not depend only on `data.action`.
-
-Rules:
-- `action === 'checkin'` → scheduled visitor goes to check-in flow
-- `action === 'checkout'` → checked-in visitor is checked out
-- if `action` is missing:
-  - scheduled visitor → treat as check-in QR
-  - checked-in visitor → treat as checkout QR
-- pending approval → show friendly approval warning
-- checked out → show already checked out warning
-
-This ensures even older QRs keep working.
-
-### 3. Add duplicate-scan protection in the scanner
-Update `src/components/checkin/QrScanner.tsx` so once one QR is accepted, further decodes are ignored until cleanup completes.
-
-Add a ref like:
-```ts
-const hasHandledScanRef = useRef(false);
-```
-
-Then:
-- reset it when starting a new scan session
-- set it to `true` immediately before calling `onScan(data)`
-- ignore any later decode callbacks while it is true
-- also reset properly on stop/cleanup
-
-This prevents back-to-back duplicate processing from the same QR.
-
-### 4. Fix the WhatsApp badge payload
-Update `supabase/functions/send-whatsapp-badge/index.ts` so badge QR JSON includes:
-```json
-{
-  "visitorId": "...",
-  "name": "...",
-  "action": "checkout",
-  "timestamp": "..."
-}
-```
-
-That makes WhatsApp checkout badges explicit and consistent with printed/email badge formats.
-
-### 5. Keep vehicle QR flow isolated
-`src/pages/VehicleGate.tsx` uses `visitorId` as a vehicle pass ID. Leave its business logic separate, but harden it similarly if needed later. This visitor fix should not break vehicle scanning.
-
----
-
-## Files to update
-
-- `src/pages/CheckInOut.tsx`
-  - replace UUID-first/fallback lookup with format-aware lookup
-  - improve action inference
-  - improve error toasts
-- `src/components/checkin/QrScanner.tsx`
-  - add one-scan-per-session guard to prevent duplicate callbacks
+**Edge functions — WhatsApp**
+Remove the `_Powered by VisiGuard VMS_` / Sharvi footer line from the message body:
 - `supabase/functions/send-whatsapp-badge/index.ts`
-  - include `action: 'checkout'` in QR payload
-
-### Optional consistency update
 - `supabase/functions/send-vehicle-whatsapp/index.ts`
-  - add an explicit action field if vehicle passes should also support future scan-state logic consistently
+- `supabase/functions/notify-host/index.ts` (WhatsApp text branch — Sharvi line only)
+- `supabase/functions/approve-visitor/index.ts` (WhatsApp text branch — Sharvi line only)
 
----
+### Out of scope (intentionally untouched)
+- The **header band** ("VISITOR PASS", red banner, company name `Resustainability` shown in the dark band of the badge) — unchanged.
+- Auth / login screen Sharvi footer (internal staff-facing).
+- Product Proposal, User Manual, Resource Requirements, Product Features pages (internal sales/spec docs).
+- Long consent paragraph on the badge that mentions "Resustainability" — that is legal copy, not branding.
 
-## Expected result after the fix
+### Deploy
+Redeploy:
+- `send-email`
+- `send-email-badge`
+- `notify-host`
+- `approve-visitor`
+- `send-whatsapp-badge`
+- `send-vehicle-whatsapp`
 
-### Check-in QR
-Approval QR from the approval flow:
-```json
-{ "visitorId": "<uuid>", "name": "...", "action": "checkin" }
-```
-will always:
-- find the visitor by `id`
-- open the check-in flow
-- never fall into “Visitor not found”
-
-### Checkout QR
-Printed / email / WhatsApp badge QR:
-```json
-{ "visitorId": "VIS-...", "name": "...", "action": "checkout" }
-```
-will always:
-- find the visitor by `visitor_id`
-- check out the visitor if status is `checked_in`
-- never fail because of UUID mismatch
-
-### Duplicate scan case
-If the camera decodes the same QR twice in rapid succession:
-- only the first decode is processed
-- the second one is ignored
-- no conflicting “Visitor not found” toast appears afterward
-
----
-
-## Verification
-
+### Verification
 ```text
-1. Approve a visitor.
-   → Visitor gets check-in QR.
-   → Scan it.
-   → Toast shows QR scanned once.
-   → Visitor opens check-in/photo flow.
-   → No “Visitor not found”.
+1. Print a badge.
+   → Red "re" circle only. No grey "Sustainability" word under it.
+   → Red "Resustainability" header band still visible (unchanged).
+   → No "Powered by Sharvi Infotech" footer.
 
-2. Complete check-in.
-   → Visitor gets checkout QR by WhatsApp/email/SMS.
+2. New visitor created (phone + email).
+   → Host email + Visitor "Request Submitted" email show only the red "re" mark.
+   → No Sharvi line in HTML or plain text footer.
+   → Host WhatsApp message has no Sharvi line.
 
-3. Scan the checkout QR from WhatsApp.
-   → Visitor is found.
-   → Status changes to checked_out.
-   → No “Visitor not found”.
+3. Approve the visitor.
+   → Visitor "Visit Approved" email + WhatsApp: re-mark only, no Sharvi footer.
 
-4. Scan a printed badge QR with VIS-... format.
-   → Visitor is found by visitor_id.
-   → Checkout works.
+4. Check the visitor in.
+   → Checkout-QR email + WhatsApp: re-mark only, no Sharvi footer.
 
-5. Scan the same QR twice quickly.
-   → Only one action runs.
-   → No second erroneous toast.
-
-6. Scan a pending-approval visitor QR.
-   → Friendly warning:
-     “This visitor is still awaiting host approval.”
+5. Register a commercial vehicle.
+   → Driver WhatsApp pass: no Sharvi / "Powered by" line.
 ```
-
-## Out of scope
-
-- Email header color changes
-- Vehicle gate workflow redesign
-- Camera hardware/browser permission logic
-- Twilio delivery failures unrelated to QR content
 
