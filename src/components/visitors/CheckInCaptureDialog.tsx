@@ -72,6 +72,56 @@ export function CheckInCaptureDialog({
     setWatchlistChecked(true);
   };
 
+  // Fire badge channels after successful check-in (non-blocking).
+  const sendCheckoutBadges = async () => {
+    if (!visitor) return;
+    try {
+      // Fetch related names for the badge payload
+      const { data: full } = await supabase
+        .from('visitors')
+        .select('name, visitor_id, phone, email, company, purpose, host:employees(name), department:departments(name), gate:gates(name)')
+        .eq('id', visitor.id)
+        .maybeSingle();
+
+      const v: any = full ?? visitor;
+      const payload = {
+        visitorName: v.name,
+        visitorId: v.visitor_id,
+        phone: v.phone || '',
+        email: v.email || '',
+        company: v.company || '',
+        purpose: v.purpose || '',
+        hostName: v.host?.name || '',
+        departmentName: v.department?.name || '',
+        gateName: v.gate?.name || '',
+      };
+
+      const tasks: Promise<any>[] = [];
+      if (payload.phone) {
+        tasks.push(supabase.functions.invoke('send-whatsapp-badge', { body: payload }));
+        tasks.push(supabase.functions.invoke('send-sms-badge', { body: payload }));
+      }
+      if (payload.email) {
+        tasks.push(supabase.functions.invoke('send-email-badge', { body: payload }));
+      }
+
+      const results = await Promise.allSettled(tasks);
+      const failed = results.filter((r) => r.status === 'rejected' || (r.status === 'fulfilled' && (r.value as any)?.error)).length;
+
+      if (tasks.length > 0) {
+        if (failed === 0) {
+          toast.success('Check-out QR sent via WhatsApp & email');
+        } else if (failed < tasks.length) {
+          toast.warning('Check-out QR sent partially — some channels failed');
+        } else {
+          toast.warning('Could not send check-out QR — please retry from visitor details');
+        }
+      }
+    } catch (err) {
+      console.error('Failed to dispatch checkout badges:', err);
+    }
+  };
+
   // Use existing photo — just update status without re-uploading
   const handleUseExistingPhoto = async () => {
     if (!visitor) return;
@@ -93,6 +143,9 @@ export function CheckInCaptureDialog({
       if (autoPrint) {
         window.open(`/print-badge?id=${visitor.id}`, '_blank');
       }
+
+      // Fire-and-forget: send checkout QR badges
+      sendCheckoutBadges();
 
       onComplete();
     } catch (err: any) {
