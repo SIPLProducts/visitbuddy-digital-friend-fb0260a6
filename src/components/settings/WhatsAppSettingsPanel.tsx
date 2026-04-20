@@ -5,9 +5,11 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertTriangle, Loader2, MessageCircle, Power, QrCode, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Loader2, MessageCircle, Power, QrCode, RefreshCw, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 type Provider = 'twilio' | 'whatsapp_web';
 type BridgeState = 'disconnected' | 'qr' | 'authenticated' | 'ready' | 'unknown';
