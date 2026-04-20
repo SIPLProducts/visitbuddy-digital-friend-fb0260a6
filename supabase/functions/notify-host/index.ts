@@ -383,6 +383,7 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { visitorId }: NotifyHostRequest = await req.json();
     const branding = await getBranding(supabase);
+    const logoBytes = await fetchLogoBytes(branding.logoUrl);
 
     // Provider preference (twilio | whatsapp_web). Defaults to twilio.
     let whatsappProvider: "twilio" | "whatsapp_web" = "twilio";
@@ -684,7 +685,7 @@ const handler = async (req: Request): Promise<Response> => {
         supabase, hostData.email,
         `Visitor Approval Required — ${visitor.name}`,
         hostEmailHtml,
-        branding.logoUrl
+        logoBytes
       );
     } else if (hostData.email && !isPendingApproval) {
       // For direct check-in, still notify host via email
@@ -696,7 +697,7 @@ const handler = async (req: Request): Promise<Response> => {
         supabase, hostData.email,
         `Visitor Arrival — ${visitor.name}`,
         hostEmailHtml,
-        branding.logoUrl
+        logoBytes
       );
     }
 
@@ -710,7 +711,7 @@ const handler = async (req: Request): Promise<Response> => {
         supabase, visitor.email,
         "Visit Request Submitted — Awaiting Approval",
         visitorEmailHtml,
-        branding.logoUrl
+        logoBytes
       );
     }
 

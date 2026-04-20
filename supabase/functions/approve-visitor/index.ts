@@ -208,6 +208,7 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { visitorId, action, token }: ApprovalRequest = await req.json();
     const branding = await getBranding(supabase);
+    const logoBytes = await fetchLogoBytes(branding.logoUrl);
 
     if (!visitorId || !action) {
       return new Response(
@@ -493,7 +494,7 @@ const handler = async (req: Request): Promise<Response> => {
         visitor.email,
         `Visit Approved — Show This QR at the Gate`,
         emailHtml,
-        branding.logoUrl
+        logoBytes
       );
     }
 
