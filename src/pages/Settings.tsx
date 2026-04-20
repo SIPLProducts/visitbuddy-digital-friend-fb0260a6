@@ -177,6 +177,36 @@ export default function Settings() {
     setSettings(prev => prev ? { ...prev, [key]: value } : null);
   };
 
+  // Immediately persist a single field to the DB (used for toggles where there's no Save button).
+  const updateAndPersist = async (key: keyof TenantSettings, value: any) => {
+    if (!settings) return;
+    const previous = settings[key];
+    setSettings(prev => prev ? { ...prev, [key]: value } : null);
+    const { error } = await supabase
+      .from('tenant_settings')
+      .update({ [key]: value } as any)
+      .eq('id', settings.id);
+    if (error) {
+      // Revert on failure
+      setSettings(prev => prev ? { ...prev, [key]: previous } : null);
+      toast.error(`Failed to update ${String(key)}`);
+      return;
+    }
+    if (key === 'whatsapp_provider') {
+      toast.success(
+        value === 'whatsapp_web'
+          ? 'Switched to WhatsApp Web (Demo)'
+          : 'Switched to Twilio (Production)'
+      );
+    }
+    await logAudit({
+      action: 'settings_changed',
+      entityType: 'settings',
+      entityName: 'Tenant Settings',
+      details: { updated_fields: [String(key)], value },
+    });
+  };
+
   const updateEmail = (key: keyof EmailConfig, value: any) => {
     setEmailConfig(prev => ({ ...prev, [key]: value }));
   };
@@ -530,7 +560,7 @@ export default function Settings() {
           <TabsContent value="whatsapp">
             <WhatsAppSettingsPanel
               provider={settings.whatsapp_provider ?? 'twilio'}
-              onProviderChange={(p) => update('whatsapp_provider', p)}
+              onProviderChange={(p) => updateAndPersist('whatsapp_provider', p)}
             />
           </TabsContent>
 

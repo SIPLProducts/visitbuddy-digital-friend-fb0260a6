@@ -548,7 +548,29 @@ _VisiGuard Visitor Management System_
         formattedVisitorPhone = "+91" + formattedVisitorPhone.replace(/^0/, "");
       }
 
-      const visitorMessage = `
+      const isPendingApproval = visitor.status === "pending_approval";
+      const visitorMessage = isPendingApproval
+        ? `
+⏳ *Visit Request Submitted*
+━━━━━━━━━━━━━━━━━━━━
+
+Dear *${visitor.name}*,
+
+Your visit request has been submitted and is *awaiting host approval*.
+
+🆔 *Visitor ID:* ${visitor.visitor_id}
+${hostData.name ? `👤 *Host:* ${hostData.name}` : ""}
+${departmentName ? `🏢 *Department:* ${departmentName}` : ""}
+${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
+
+📅 *Date:* ${currentDate}
+⏰ *Time:* ${currentTime}
+
+You will receive another message once your host approves the visit.
+
+_VisiGuard Visitor Management System_
+        `.trim()
+        : `
 ✅ *Check-in Confirmed*
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -567,7 +589,7 @@ ${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
 ${hostNotificationSent ? "Your host has been notified of your arrival." : "Please wait at the reception area."}
 
 _VisiGuard Visitor Management System_
-      `.trim();
+        `.trim();
 
       // Try bridge first if provider is whatsapp_web
       if (whatsappProvider === "whatsapp_web") {
