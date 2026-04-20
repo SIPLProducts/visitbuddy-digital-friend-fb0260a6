@@ -85,10 +85,13 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       },
       (decodedText) => {
         if (!isMountedRef.current) return;
+        // Ignore further decodes once we've accepted one for this session
+        if (hasHandledScanRef.current) return;
 
         try {
           const data = JSON.parse(decodedText);
           if (data.visitorId) {
+            hasHandledScanRef.current = true;
             onScan(data);
             stopScanning();
           } else {
