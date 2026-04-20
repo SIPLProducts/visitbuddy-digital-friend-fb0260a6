@@ -440,7 +440,7 @@ const handler = async (req: Request): Promise<Response> => {
         formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
       }
 
-      const smsMessage = `VisiGuard: Your visit is APPROVED! ID: ${visitor.visitor_id}. Show this at security. Host: ${visitor.host?.name || 'N/A'}. Check WhatsApp for full badge.`;
+      const smsMessage = `${branding.companyName}: Your visit is APPROVED. ID: ${visitor.visitor_id}. Show the CHECK-IN QR (sent on WhatsApp/Email) at the gate. Host: ${visitor.host?.name || 'N/A'}.`;
 
       try {
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
@@ -477,7 +477,7 @@ const handler = async (req: Request): Promise<Response> => {
       emailSent = await sendSmtpEmail(
         supabase,
         visitor.email,
-        `Visit Approved — Please Show This to Security`,
+        `Visit Approved — Show This QR at the Gate`,
         emailHtml
       );
     }
