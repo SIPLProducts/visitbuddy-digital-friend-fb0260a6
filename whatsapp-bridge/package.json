@@ -6,7 +6,7 @@
   "description": "Demo-only WhatsApp Web bridge for VisiGuard. Exposes HTTP endpoints over a whatsapp-web.js session.",
   "scripts": {
     "start": "node server.js",
-    "postinstall": "cross-env PUPPETEER_CACHE_DIR=./.puppeteer-cache npx puppeteer browsers install chrome"
+    "postinstall": "node ./install-chrome.js"
   },
   "dependencies": {
     "express": "^4.19.2",
