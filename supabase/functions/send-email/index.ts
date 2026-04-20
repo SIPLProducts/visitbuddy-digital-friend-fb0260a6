@@ -53,7 +53,7 @@ function generateHtmlEmail(subject: string, body: string, branding: Branding): s
             <img src="${branding.logoUrl}" alt="${branding.companyName}" width="88" height="88" style="display:block;width:88px;height:88px;object-fit:contain;background:#ffffff;" />
           </td>
           <td style="vertical-align:middle;text-align:center;">
-            <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:800;color:${branding.primaryColor};line-height:1.2;">${branding.companyName}</div>
+            <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:800;color:#dc2626;line-height:1.2;">${branding.companyName}</div>
             <div style="font-family:Arial,sans-serif;font-size:12px;color:#64748b;margin-top:4px;">Automated Notification</div>
           </td>
           <td style="width:96px;">&nbsp;</td>
