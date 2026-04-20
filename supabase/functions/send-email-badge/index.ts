@@ -118,16 +118,17 @@ const handler = async (req: Request): Promise<Response> => {
 </head>
 <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif; background-color: #f5f5f5;">
   <div style="max-width: 400px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-    <div style="background:#ffffff;padding:18px 20px;border-bottom:1px solid #e5e7eb;">
+    <div style="background:#ffffff;padding:12px 8px;border-bottom:1px solid #e5e7eb;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
         <tr>
-          <td style="width:64px;vertical-align:middle;padding-right:12px;">
-            <img src="${branding.logoUrl}" alt="${branding.companyName}" width="56" height="56" style="display:block;width:56px;height:56px;object-fit:contain;background:#ffffff;border-radius:6px;" />
+          <td style="width:88px;vertical-align:middle;padding:0 4px 0 8px;">
+            <img src="${branding.logoUrl}" alt="${branding.companyName}" width="80" height="80" style="display:block;width:80px;height:80px;object-fit:contain;background:#ffffff;" />
           </td>
-          <td style="vertical-align:middle;">
-            <div style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#0f172a;line-height:1.2;">${branding.companyName}</div>
-            <div style="font-family:Arial,sans-serif;font-size:11px;color:#475569;margin-top:4px;border-top:2px solid ${branding.primaryColor};display:inline-block;padding-top:3px;">🎫 Visitor Safety Permit</div>
+          <td style="vertical-align:middle;text-align:center;">
+            <div style="font-family:Arial,sans-serif;font-size:20px;font-weight:800;color:${branding.primaryColor};line-height:1.2;">${branding.companyName}</div>
+            <div style="font-family:Arial,sans-serif;font-size:11px;color:#64748b;margin-top:4px;">🎫 Visitor Safety Permit</div>
           </td>
+          <td style="width:88px;">&nbsp;</td>
         </tr>
       </table>
     </div>
