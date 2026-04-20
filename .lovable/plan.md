@@ -1,59 +1,46 @@
 
-No — Render is not fully okay yet. The bridge is starting, but Chrome is not launching, so the service never reaches `qr` state. That is why you cannot get the QR code.
 
-### What the logs prove
-- Chrome **did download successfully** during build:
-  - `/opt/render/project/src/.puppeteer-cache/chrome/linux-131.0.6778.204/chrome-linux64/chrome`
-- But at runtime `whatsapp-web.js` is trying to auto-find a **different browser revision**:
-  - `Could not find Chrome (ver. 147.0.7727.57)`
-  - cache path shown: `/opt/render/.cache/puppeteer`
-- So the bridge is looking in the wrong place and for the wrong revision.
+User wants a test WhatsApp message sent to `9182686448` from their scanned WhatsApp Web number (the Render bridge).
 
-### Why this is happening
-1. Render is running an extra build command:
-   - `npm install && npx puppeteer browsers install chrome`
-   - This installs Chrome twice and the second install goes to the default Render cache path, which is not what the app should rely on.
-2. `server.js` currently only sets `PUPPETEER_CACHE_DIR`, but does **not** force the exact Chrome binary path.
-3. `whatsapp-web.js` uses its own nested `puppeteer-core`, so auto-resolution is unreliable here.
-4. Render is using **Node 25.9.0**, which is not a safe target for this stack. Node 20 is the better choice.
+Read-only mode — I can't actually invoke the bridge `/send` endpoint with a write to a phone. But I can present a tight plan that:
+1. Adds a one-click "Send test message" button to `WhatsAppSettingsPanel` so the admin can fire the test themselves and any future tests, AND
+2. Routes that test through the existing `whatsapp-bridge` edge function (which already supports `action: 'send'`).
 
-### Plan to fix it
-1. **Update `whatsapp-bridge/server.js`**
-   - Stop relying on auto-resolve.
-   - Detect the installed Chrome inside `.puppeteer-cache/chrome/.../chrome-linux64/chrome`
-   - Set `process.env.PUPPETEER_EXECUTABLE_PATH` to that exact file
-   - Pass `executablePath` into the Puppeteer config
-   - Load `whatsapp-web.js` only after those env values are set, so Puppeteer sees the correct path
+This is also a natural step toward the bigger "wire bridge into production sending" plan I already proposed — but kept minimal and isolated to the test button only.
 
-2. **Update `whatsapp-bridge/package.json`**
-   - Pin Node to a stable version for Render, preferably:
-     - `"node": "20.x"`
-   - Keep the existing project-local Chrome install in `postinstall`
+Phone formatting: `9182686448` → `+919182686448` (Indian, matches existing pattern in `send-whatsapp-badge`).
 
-3. **Update `whatsapp-bridge/README.md`**
-   - Correct the Render instructions:
-     - Build command should be only `npm install`
-     - Not `npm install && npx puppeteer browsers install chrome`
-   - Document the correct runtime paths for this service root
+## Plan — Add a "Send Test Message" button & send to +91 9182686448
 
-4. **Render settings to apply after code change**
-   - Runtime: Node
-   - Build command: `npm install`
-   - Start command: `node server.js`
-   - Environment variables:
-     - `BRIDGE_API_KEY`
-     - `PUPPETEER_CACHE_DIR=/opt/render/project/src/.puppeteer-cache`
-     - `SESSION_PATH=/opt/render/project/src/wweb-session`
-   - Optional immediate fallback:
-     - `PUPPETEER_EXECUTABLE_PATH=/opt/render/project/src/.puppeteer-cache/chrome/linux-131.0.6778.204/chrome-linux64/chrome`
-   - Then **Clear build cache & deploy**
+### What I'll build
+A small **Test Send** card inside `Settings → WhatsApp` that lets you fire a WhatsApp message through the scanned number on demand.
 
-### Expected result after fix
-Runtime logs should change from:
-- `Could not find Chrome...`
+### Changes
+1. **`src/components/settings/WhatsAppSettingsPanel.tsx`**
+   - Add a "Send Test Message" card below the QR card.
+   - Pre-fill the phone field with `9182686448` and message with:
+     `"✅ VisiGuard test — WhatsApp Web bridge is connected and sending from your scanned number."`
+   - Phone input + Message textarea + **Send Test** button.
+   - On click: call existing `whatsapp-bridge` edge function with `{ action: 'send', phone: '+919182686448', message }`.
+   - Disable the button unless `bridgeState === 'ready'`; show toast success with returned message id, or toast error with bridge response.
 
-to something like:
-- `PUPPETEER_EXECUTABLE_PATH: /opt/render/project/src/.puppeteer-cache/.../chrome`
-- `[wweb] QR generated, scan with WhatsApp app.`
+2. **No edge function changes needed** — `supabase/functions/whatsapp-bridge/index.ts` already proxies the `send` action to the Render bridge `/send` endpoint.
 
-Once that appears, the QR will load in **Settings → WhatsApp** inside the app.
+3. **Immediately after deploy** I'll fire the test from inside the panel to `+919182686448` and report back:
+   - The bridge HTTP response.
+   - Render runtime logs (`[wweb] sendMessage success` or the actual error).
+   - Whether the recipient received it.
+
+### Pre-flight checks I'll do during execution
+- Curl `whatsapp-bridge` with `action: 'status'` to confirm `state === 'ready'` (not just `authenticated`). If it's `authenticated` only, I'll wait/poll briefly — `whatsapp-web.js` needs `ready` before `/send` works.
+- Confirm `+919182686448` is a valid WhatsApp number on the bridge side (the bridge will return an error if the number isn't on WhatsApp).
+
+### Out of scope (separate follow-up)
+Wiring host-approval / badge / vehicle-pass edge functions to route through the bridge based on a tenant setting — that's the larger plan from the previous turn and is **not** included here. This change only adds the test-send capability.
+
+### Files to change
+- `src/components/settings/WhatsAppSettingsPanel.tsx`
+
+### Files unchanged
+- All edge functions, Render server, DB schema.
+
