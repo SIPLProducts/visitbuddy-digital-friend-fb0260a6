@@ -140,14 +140,10 @@ export default function Settings() {
       toast.error('Please enter a valid email address');
       return;
     }
-    if (!emailConfig.id) {
-      toast.error('Please save your SMTP configuration first');
-      return;
-    }
     setSendingTest(true);
     try {
       const { data, error } = await supabase.functions.invoke('test-smtp', {
-        body: { smtp_config_id: emailConfig.id, to_email: testEmail },
+        body: { to_email: testEmail },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -395,6 +391,36 @@ export default function Settings() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Resend (primary email provider) status banner */}
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-600 font-semibold">PRIMARY</span>
+                    <p className="font-medium text-sm">Email sending via Resend</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Sender: <code className="px-1 py-0.5 rounded bg-muted text-foreground">visitor@resustainability.com</code>
+                    {' '}— uses the <code className="px-1 py-0.5 rounded bg-muted text-foreground">RESEND_API_KEY</code> secret.
+                    Domain must be added &amp; verified in <a href="https://resend.com/domains" target="_blank" rel="noopener noreferrer" className="underline">resend.com/domains</a> by publishing the SPF + DKIM + DMARC DNS records on <strong>resustainability.com</strong>.
+                  </p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setTestDialogOpen(true)}
+                      disabled={!isHoAdmin}
+                    >
+                      Send test email via Resend
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Custom SMTP (fallback)</p>
+                  <p className="text-xs text-muted-foreground">Optional. Configure only if a customer requires their own SMTP server instead of Resend.</p>
+                </div>
+
                 {emailConfigLoading ? (
                   <p className="text-muted-foreground">Loading email configuration...</p>
                 ) : (

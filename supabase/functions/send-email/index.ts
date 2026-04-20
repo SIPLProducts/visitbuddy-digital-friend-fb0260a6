@@ -1,10 +1,12 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import nodemailer from "npm:nodemailer@6.9.10";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+const SENDER_EMAIL = "visitor@resustainability.com";
+const SENDER_NAME = "VisiGuard";
 
 function generateHtmlEmail(subject: string, body: string): string {
   const bodyHtml = body
@@ -85,38 +87,35 @@ Deno.serve(async (req) => {
       (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim())
     );
 
-    // 3. Fetch active SMTP config
-    const { data: smtp } = await supabase
-      .from("email_config")
-      .select("*")
-      .eq("is_active", true)
-      .limit(1)
-      .single();
-
     let status = "logged";
+    const resendKey = Deno.env.get("RESEND_API_KEY");
 
-    if (smtp && toEmails.length > 0) {
-      const transporter = nodemailer.createTransport({
-        host: smtp.smtp_host,
-        port: smtp.smtp_port,
-        secure: smtp.smtp_port === 465,
-        auth: { user: smtp.smtp_username, pass: smtp.smtp_password },
-        tls: { rejectUnauthorized: false },
+    if (resendKey && toEmails.length > 0) {
+      const resp = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${resendKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
+          to: toEmails,
+          cc: template.cc_emails?.length ? template.cc_emails : undefined,
+          subject,
+          html: generateHtmlEmail(subject, body),
+        }),
       });
 
-      await transporter.sendMail({
-        from: smtp.sender_name
-          ? `"${smtp.sender_name}" <${smtp.sender_email}>`
-          : smtp.sender_email,
-        to: toEmails,
-        cc: template.cc_emails?.length ? template.cc_emails : undefined,
-        subject,
-        html: generateHtmlEmail(subject, body),
-      });
-      status = "sent";
-      console.log(`Email sent via template '${template_key}' to ${toEmails.join(", ")}`);
+      const result = await resp.json();
+      if (!resp.ok) {
+        console.error(`Resend error for template '${template_key}':`, result);
+        status = "failed";
+      } else {
+        status = "sent";
+        console.log(`Email sent via template '${template_key}' to ${toEmails.join(", ")} (id: ${result.id})`);
+      }
     } else {
-      console.warn(`Email logged (no SMTP config or no recipients) for template '${template_key}'`);
+      console.warn(`Email logged (no RESEND_API_KEY or no recipients) for template '${template_key}'`);
     }
 
     // 4. Log it
