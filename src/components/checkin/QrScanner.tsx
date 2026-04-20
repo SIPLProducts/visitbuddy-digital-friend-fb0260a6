@@ -15,6 +15,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const containerRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
   const isCleaningUpRef = useRef(false);
+  const hasHandledScanRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
 
@@ -84,10 +85,13 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       },
       (decodedText) => {
         if (!isMountedRef.current) return;
+        // Ignore further decodes once we've accepted one for this session
+        if (hasHandledScanRef.current) return;
 
         try {
           const data = JSON.parse(decodedText);
           if (data.visitorId) {
+            hasHandledScanRef.current = true;
             onScan(data);
             stopScanning();
           } else {
@@ -110,6 +114,8 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
 
     setError(null);
     setIsInitializing(true);
+    // Allow a fresh scan for this new session
+    hasHandledScanRef.current = false;
 
     // Flip UI state FIRST so the container becomes visible before camera starts
     onToggleScanning(true);

@@ -217,64 +217,91 @@ export default function CheckInOut() {
 
   const handleQrScan = async (data: { visitorId: string; name: string; action?: string }) => {
     toast.info(`QR scanned: ${data.name}`);
-    
-    // Try lookup by UUID first (new approval QR), then fall back to human-readable visitor_id (legacy printed badges)
+
+    const rawId = (data.visitorId ?? '').toString().trim();
+    if (!rawId) {
+      toast.error('QR code is missing a visitor ID.');
+      return;
+    }
+
+    // Pick the right column based on ID format. UUIDs go to `id`,
+    // human-readable VIS-... codes go to `visitor_id`. This avoids the
+    // Postgres "invalid input syntax for type uuid" error that masks
+    // legitimate lookups as "Visitor not found".
+    const looksLikeUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawId);
+    const lookupColumn: 'id' | 'visitor_id' = looksLikeUuid ? 'id' : 'visitor_id';
+
     const selectClause = `
       *,
       host:employees(*, department:departments(*)),
       department:departments(*)
     `;
 
-    const { data: byUuid } = await supabase
+    const { data: visitorData, error: lookupError } = await supabase
       .from('visitors')
       .select(selectClause)
-      .eq('id', data.visitorId)
+      .eq(lookupColumn, rawId)
       .maybeSingle();
 
-    const visitorData = byUuid ?? (await supabase
-      .from('visitors')
-      .select(selectClause)
-      .eq('visitor_id', data.visitorId)
-      .maybeSingle()).data;
+    if (lookupError) {
+      console.error('[handleQrScan] lookup error', lookupError);
+      toast.error('Could not look up visitor. Please try again.');
+      return;
+    }
 
-    if (visitorData) {
-      const visitor = visitorData as unknown as Visitor;
-      setSelectedVisitor(visitor);
-      
-      // Handle checkout action from badge QR code
-      if (data.action === 'checkout') {
-        if (visitor.status === 'checked_in') {
-          // Auto check-out when QR with checkout action is scanned
-          const { error } = await supabase
-            .from('visitors')
-            .update({
-              status: 'checked_out',
-              check_out_time: new Date().toISOString(),
-              checkout_method: 'self',
-            })
-            .eq('id', visitor.id);
+    if (!visitorData) {
+      toast.error('Visitor not found. The QR may be from a deleted record.');
+      return;
+    }
 
-          if (error) {
-            toast.error('Failed to check out visitor');
-          } else {
-            toast.success(`${visitor.name} checked out successfully via QR scan`);
-            fetchVisitors();
-            setSelectedVisitor(null);
-          }
-        } else if (visitor.status === 'checked_out') {
-          toast.warning('Visitor has already checked out');
+    const visitor = visitorData as unknown as Visitor;
+    setSelectedVisitor(visitor);
+
+    // Infer the action when the QR payload doesn't carry one explicitly.
+    // - scheduled visitor → treat as check-in
+    // - checked-in visitor → treat as checkout (badge QR was scanned to leave)
+    const inferredAction =
+      data.action ??
+      (visitor.status === 'scheduled'
+        ? 'checkin'
+        : visitor.status === 'checked_in'
+          ? 'checkout'
+          : undefined);
+
+    if (inferredAction === 'checkout') {
+      if (visitor.status === 'checked_in') {
+        const { error } = await supabase
+          .from('visitors')
+          .update({
+            status: 'checked_out',
+            check_out_time: new Date().toISOString(),
+            checkout_method: 'self',
+          })
+          .eq('id', visitor.id);
+
+        if (error) {
+          toast.error('Failed to check out visitor');
         } else {
-          toast.warning('Visitor must check in first');
+          toast.success(`${visitor.name} checked out successfully via QR scan`);
+          fetchVisitors();
+          setSelectedVisitor(null);
         }
-        return;
+      } else if (visitor.status === 'checked_out') {
+        toast.warning('Visitor has already checked out');
+      } else if (visitor.status === 'pending_approval') {
+        toast.warning('This visitor is still awaiting host approval.');
+      } else {
+        toast.warning('Visitor must check in first');
       }
-      
-      // Handle regular check-in flow (explicit action='checkin' or no action with scheduled status)
+      return;
+    }
+
+    if (inferredAction === 'checkin') {
       if (visitor.status === 'scheduled') {
-        // Show camera dialog for photo capture
         setShowCameraDialog(true);
       } else if (visitor.status === 'checked_in') {
-        toast.info('Visitor already checked in. Ready for check-out.');
+        toast.info('Visitor already checked in.');
       } else if (visitor.status === 'pending_approval') {
         toast.warning('This visitor is still awaiting host approval.');
       } else if (visitor.status === 'checked_out') {
@@ -282,8 +309,16 @@ export default function CheckInOut() {
       } else {
         toast.warning(`Visitor status: ${visitor.status}`);
       }
+      return;
+    }
+
+    // No action and status doesn't suggest one (e.g. pending_approval / checked_out)
+    if (visitor.status === 'pending_approval') {
+      toast.warning('This visitor is still awaiting host approval.');
+    } else if (visitor.status === 'checked_out') {
+      toast.warning('Visitor has already checked out');
     } else {
-      toast.error('Visitor not found');
+      toast.warning(`Visitor status: ${visitor.status}`);
     }
   };
 
