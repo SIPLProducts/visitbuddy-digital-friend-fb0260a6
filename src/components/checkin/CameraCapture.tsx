@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, RotateCcw, Check, X, AlertCircle, Upload, ImageIcon } from 'lucide-react';
+import { Camera, RotateCcw, Check, X, AlertCircle, Upload, ImageIcon, SwitchCamera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,6 +10,20 @@ interface CameraCaptureProps {
   onCancel?: () => void;
   className?: string;
   autoStart?: boolean;
+}
+
+const DEVICE_STORAGE_KEY = 'camera-capture-device-id';
+
+function labelForDevice(device: MediaDeviceInfo, index: number): string {
+  if (device.label) {
+    // Shorten common verbose labels
+    return device.label
+      .replace(/\s*\(.*?\)\s*$/, '')
+      .replace(/camera\s*2,?\s*facing\s*back/i, 'Back camera')
+      .replace(/camera\s*2,?\s*facing\s*front/i, 'Front camera')
+      .trim() || `Camera ${index + 1}`;
+  }
+  return `Camera ${index + 1}`;
 }
 
 export function CameraCapture({ onCapture, onCancel, className, autoStart = true }: CameraCaptureProps) {
@@ -24,6 +38,14 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
   const [error, setError] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('camera');
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(DEVICE_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  });
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -33,50 +55,99 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     setIsVideoReady(false);
   }, []);
 
-  const startCamera = useCallback(async () => {
+  const enumerateVideoDevices = useCallback(async () => {
+    try {
+      if (!navigator.mediaDevices?.enumerateDevices) return;
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoInputs = devices.filter((d) => d.kind === 'videoinput');
+      if (isMountedRef.current) {
+        setVideoDevices(videoInputs);
+      }
+    } catch (e) {
+      console.warn('enumerateDevices failed:', e);
+    }
+  }, []);
+
+  const startCamera = useCallback(async (deviceIdOverride?: string) => {
     if (isStarting) return;
-    
+
     setIsStarting(true);
     setError(null);
     setIsVideoReady(false);
-    
+
     // Stop any existing stream first
     stopCamera();
-    
+
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Camera not supported on this device/browser');
       }
 
-      console.log('Requesting camera access...');
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          facingMode: 'user', 
-          width: { ideal: 640 }, 
-          height: { ideal: 480 } 
-        },
+      const targetDeviceId = deviceIdOverride !== undefined ? deviceIdOverride : selectedDeviceId;
+
+      // Build constraint chain: saved/explicit deviceId -> environment -> user
+      const constraintChain: MediaStreamConstraints[] = [];
+      if (targetDeviceId) {
+        constraintChain.push({
+          video: { deviceId: { exact: targetDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: false,
+        });
+      }
+      constraintChain.push({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
-      
+      constraintChain.push({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+
+      let mediaStream: MediaStream | null = null;
+      let lastErr: any = null;
+      for (const constraints of constraintChain) {
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+          break;
+        } catch (err) {
+          lastErr = err;
+          console.warn('getUserMedia attempt failed:', err);
+        }
+      }
+      if (!mediaStream) throw lastErr || new Error('Unable to start camera');
+
       if (!isMountedRef.current) {
-        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream.getTracks().forEach((track) => track.stop());
         return;
       }
-      
+
       streamRef.current = mediaStream;
-      console.log('Camera stream obtained:', mediaStream.active);
-      
+
+      // Determine which deviceId we actually got
+      const activeTrack = mediaStream.getVideoTracks()[0];
+      const settings = activeTrack?.getSettings?.();
+      const activeDeviceId = settings?.deviceId;
+      if (activeDeviceId && isMountedRef.current) {
+        setSelectedDeviceId(activeDeviceId);
+        try {
+          localStorage.setItem(DEVICE_STORAGE_KEY, activeDeviceId);
+        } catch {
+          /* ignore */
+        }
+      }
+
       // Wait a tick for the video element to be ready
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       if (videoRef.current && isMountedRef.current) {
         videoRef.current.srcObject = mediaStream;
-        console.log('Stream attached to video element');
       }
+
+      // Enumerate devices now that permission is granted (labels will be populated)
+      enumerateVideoDevices();
     } catch (err: any) {
       console.error('Camera error:', err);
       if (!isMountedRef.current) return;
-      
+
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
         setError('Camera permission denied. Try uploading a photo instead.');
         setActiveTab('upload');
@@ -86,6 +157,15 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
         setError('Camera is in use. Try uploading a photo instead.');
         setActiveTab('upload');
+      } else if (err.name === 'OverconstrainedError') {
+        // Saved deviceId no longer valid — clear and retry
+        try {
+          localStorage.removeItem(DEVICE_STORAGE_KEY);
+        } catch {
+          /* ignore */
+        }
+        setSelectedDeviceId(null);
+        setError('Selected camera unavailable. Tap "Try Again" to use the default.');
       } else {
         setError(err.message || 'Unable to access camera.');
         setActiveTab('upload');
@@ -95,15 +175,14 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         setIsStarting(false);
       }
     }
-  }, [isStarting, stopCamera]);
+  }, [isStarting, stopCamera, selectedDeviceId, enumerateVideoDevices]);
 
   // Handle video element events
   const handleVideoCanPlay = useCallback(() => {
-    console.log('Video can play, attempting to play...');
     if (videoRef.current) {
-      videoRef.current.play()
+      videoRef.current
+        .play()
         .then(() => {
-          console.log('Video playing successfully');
           if (isMountedRef.current) {
             setIsVideoReady(true);
           }
@@ -116,7 +195,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
 
   useEffect(() => {
     isMountedRef.current = true;
-    
+
     if (autoStart && activeTab === 'camera') {
       // Small delay to ensure dialog is fully rendered
       const timer = setTimeout(() => {
@@ -126,12 +205,32 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       }, 300);
       return () => clearTimeout(timer);
     }
-    
+
     return () => {
       isMountedRef.current = false;
       stopCamera();
     };
   }, [autoStart, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSelectDevice = useCallback(
+    (deviceId: string) => {
+      setSelectedDeviceId(deviceId);
+      try {
+        localStorage.setItem(DEVICE_STORAGE_KEY, deviceId);
+      } catch {
+        /* ignore */
+      }
+      startCamera(deviceId);
+    },
+    [startCamera]
+  );
+
+  const handleSwitchCamera = useCallback(() => {
+    if (videoDevices.length < 2) return;
+    const currentIdx = videoDevices.findIndex((d) => d.deviceId === selectedDeviceId);
+    const nextIdx = (currentIdx + 1) % videoDevices.length;
+    handleSelectDevice(videoDevices[nextIdx].deviceId);
+  }, [videoDevices, selectedDeviceId, handleSelectDevice]);
 
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
@@ -147,9 +246,13 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         ctx.drawImage(video, 0, 0);
         const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedImage(imageDataUrl);
-        canvas.toBlob((blob) => {
-          if (blob) setCapturedBlob(blob);
-        }, 'image/jpeg', 0.8);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) setCapturedBlob(blob);
+          },
+          'image/jpeg',
+          0.8
+        );
         stopCamera();
       }
     }
@@ -162,7 +265,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         setError('Please select an image file');
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
@@ -197,17 +300,22 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     onCancel?.();
   }, [stopCamera, onCancel]);
 
-  const handleTabChange = useCallback((value: string) => {
-    setActiveTab(value);
-    setCapturedImage(null);
-    setCapturedBlob(null);
-    setError(null);
-    if (value === 'camera') {
-      startCamera();
-    } else {
-      stopCamera();
-    }
-  }, [startCamera, stopCamera]);
+  const handleTabChange = useCallback(
+    (value: string) => {
+      setActiveTab(value);
+      setCapturedImage(null);
+      setCapturedBlob(null);
+      setError(null);
+      if (value === 'camera') {
+        startCamera();
+      } else {
+        stopCamera();
+      }
+    },
+    [startCamera, stopCamera]
+  );
+
+  const showDevicePicker = videoDevices.length >= 2 && !capturedImage && activeTab === 'camera' && !error;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -223,7 +331,31 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="camera" className="mt-4">
+        <TabsContent value="camera" className="mt-4 space-y-3">
+          {showDevicePicker && (
+            <div className="flex flex-wrap gap-2">
+              {videoDevices.map((device, idx) => {
+                const isActive = device.deviceId === selectedDeviceId;
+                return (
+                  <button
+                    key={device.deviceId || idx}
+                    type="button"
+                    onClick={() => handleSelectDevice(device.deviceId)}
+                    disabled={isStarting}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors',
+                      isActive
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background text-foreground border-border hover:bg-accent'
+                    )}
+                  >
+                    {labelForDevice(device, idx)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           <div className="relative aspect-[4/3] bg-muted rounded-lg overflow-hidden">
             {error && activeTab === 'camera' ? (
               <div className="absolute inset-0 flex items-center justify-center text-center p-4">
@@ -235,7 +367,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                     <p className="text-sm font-medium text-foreground mb-1">Camera Access Issue</p>
                     <p className="text-xs text-muted-foreground max-w-[250px]">{error}</p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={startCamera} disabled={isStarting}>
+                  <Button variant="outline" size="sm" onClick={() => startCamera()} disabled={isStarting}>
                     {isStarting ? 'Starting...' : 'Try Again'}
                   </Button>
                 </div>
@@ -276,14 +408,10 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                     <Camera className="h-8 w-8 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Camera not started
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Click below to start
-                    </p>
+                    <p className="text-sm font-medium text-foreground">Camera not started</p>
+                    <p className="text-xs text-muted-foreground">Click below to start</p>
                   </div>
-                  <Button onClick={startCamera} size="sm">
+                  <Button onClick={() => startCamera()} size="sm">
                     Start Camera
                   </Button>
                 </div>
@@ -337,7 +465,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         </Alert>
       )}
 
-      <div className="flex gap-2 justify-center">
+      <div className="flex flex-wrap gap-2 justify-center">
         {capturedImage ? (
           <>
             <Button variant="outline" onClick={retake} className="gap-2">
@@ -355,6 +483,12 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
               <Button variant="outline" onClick={handleCancel} className="gap-2">
                 <X className="h-4 w-4" />
                 Cancel
+              </Button>
+            )}
+            {videoDevices.length >= 2 && (
+              <Button variant="outline" onClick={handleSwitchCamera} className="gap-2" disabled={isStarting}>
+                <SwitchCamera className="h-4 w-4" />
+                Switch
               </Button>
             )}
             <Button onClick={capturePhoto} className="gap-2" size="lg">
