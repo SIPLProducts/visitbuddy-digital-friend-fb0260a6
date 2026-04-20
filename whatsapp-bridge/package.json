@@ -5,10 +5,12 @@
   "type": "module",
   "description": "Demo-only WhatsApp Web bridge for VisiGuard. Exposes HTTP endpoints over a whatsapp-web.js session.",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "express": "^4.19.2",
+    "puppeteer": "^23.0.0",
     "qrcode": "^1.5.4",
     "whatsapp-web.js": "^1.26.0"
   },
