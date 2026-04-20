@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "express": "^4.19.2",
+    "dotenv": "^16.4.5",
     "puppeteer": "^23.0.0",
     "qrcode": "^1.5.4",
     "whatsapp-web.js": "^1.26.0"
