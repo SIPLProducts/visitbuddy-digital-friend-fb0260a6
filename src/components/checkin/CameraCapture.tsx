@@ -472,10 +472,16 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                   playsInline
                   muted
                   className="absolute inset-0 w-full h-full object-cover"
-                  style={{ transform: 'scaleX(-1)' }}
+                  style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                   onCanPlay={handleVideoCanPlay}
                   onLoadedMetadata={handleVideoCanPlay}
                 />
+                {isVideoReady && (
+                  <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-xs font-medium text-foreground flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    {activeFacing === 'environment' ? 'Back' : 'Front'}
+                  </div>
+                )}
                 {!isVideoReady && (
                   <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
                     <div className="text-center space-y-2">
