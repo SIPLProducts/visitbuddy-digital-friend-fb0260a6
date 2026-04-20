@@ -11,6 +11,60 @@ interface NotifyHostRequest {
   visitorId: string;
 }
 
+// ---- Shared branded header / footer ----
+const DEFAULT_LOGO_URL = "https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/branding/resl-logo.png";
+const DEFAULT_COMPANY = "Re Sustainability";
+const DEFAULT_PRIMARY = "#dc2626";
+
+interface Branding {
+  companyName: string;
+  logoUrl: string;
+  primaryColor: string;
+}
+
+async function getBranding(supabase: any): Promise<Branding> {
+  try {
+    const { data } = await supabase
+      .from("tenant_settings")
+      .select("company_name, logo_url, primary_color")
+      .limit(1)
+      .maybeSingle();
+    return {
+      companyName: data?.company_name && data.company_name !== "VisiGuard" ? data.company_name : DEFAULT_COMPANY,
+      logoUrl: data?.logo_url || DEFAULT_LOGO_URL,
+      primaryColor: data?.primary_color || DEFAULT_PRIMARY,
+    };
+  } catch {
+    return { companyName: DEFAULT_COMPANY, logoUrl: DEFAULT_LOGO_URL, primaryColor: DEFAULT_PRIMARY };
+  }
+}
+
+function brandedHeader(b: Branding, subtitle: string): string {
+  return `<div style="background:#ffffff;padding:18px 24px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="width:64px;vertical-align:middle;padding-right:14px;">
+          <img src="${b.logoUrl}" alt="${b.companyName}" width="56" height="56" style="display:block;width:56px;height:56px;object-fit:contain;background:#ffffff;border-radius:6px;" />
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="font-family:Arial,sans-serif;font-size:18px;font-weight:700;color:#0f172a;line-height:1.2;">${b.companyName}</div>
+          <div style="font-family:Arial,sans-serif;font-size:12px;color:#475569;margin-top:4px;border-top:2px solid ${b.primaryColor};display:inline-block;padding-top:4px;">${subtitle}</div>
+        </td>
+      </tr>
+    </table>
+  </div>`;
+}
+
+function brandedFooter(): string {
+  return `<div style="background:#f8fafc;padding:14px 16px;text-align:center;border-top:1px solid #e5e7eb;">
+      <p style="margin:0;color:#9ca3af;font-size:11px;font-family:Arial,sans-serif;">This is an automated email. Please do not reply.</p>
+    </div>
+    <div style="background:#f1f5f9;padding:14px 16px;text-align:center;">
+      <p style="margin:0;color:#475569;font-size:12px;font-family:Arial,sans-serif;">Powered by <strong style="color:#0f172a;">Sharvi Infotech</strong></p>
+      <p style="margin:4px 0 0;"><a href="https://www.sharviinfotech.com/" style="color:#0ea5e9;font-size:11px;text-decoration:none;font-family:Arial,sans-serif;">www.sharviinfotech.com</a></p>
+    </div>`;
+}
+
 async function sendSmtpEmail(
   supabase: any,
   to: string,
@@ -79,22 +133,23 @@ function generateHostApprovalEmail(
   currentTime: string,
   approveLink: string,
   rejectLink: string,
-  accompanyingVisitors: any[] = []
+  accompanyingVisitors: any[] = [],
+  branding: Branding,
+  isPendingApproval: boolean = true
 ): string {
+  const subtitle = isPendingApproval ? "Visitor Approval Required" : "Visitor Arrival Notification";
+  const accent = branding.primaryColor;
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5;">
   <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    <div style="background:linear-gradient(135deg,#0891b2,#0e7490);padding:20px;text-align:center;">
-      <h1 style="margin:0;color:white;font-size:20px;">VisiGuard VMS</h1>
-      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">Visitor Approval Required</p>
-    </div>
+    ${brandedHeader(branding, subtitle)}
     <div style="padding:24px;">
       <h2 style="margin:0 0 16px;color:#1f2937;font-size:18px;">Dear ${hostName},</h2>
-      <p style="color:#374151;font-size:14px;line-height:1.6;">A visitor is waiting for your approval. Please review the details below and take action.</p>
+      <p style="color:#374151;font-size:14px;line-height:1.6;">${isPendingApproval ? "A visitor is waiting for your approval. Please review the details below and take action." : "A visitor has arrived to meet you. Details below."}</p>
       
-      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #0891b2;">
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid ${accent};">
         <table style="width:100%;font-size:14px;color:#374151;">
           <tr><td style="padding:4px 8px;font-weight:bold;">Visitor:</td><td style="padding:4px 8px;">${visitor.name}</td></tr>
           <tr><td style="padding:4px 8px;font-weight:bold;">ID:</td><td style="padding:4px 8px;">${visitor.visitor_id}</td></tr>
@@ -133,19 +188,12 @@ function generateHostApprovalEmail(
       </div>
       ` : ''}
 
-      <div style="text-align:center;margin:24px 0;">
+      ${isPendingApproval ? `<div style="text-align:center;margin:24px 0;">
         <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">✅ Approve Visit</a>
         <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">❌ Reject Visit</a>
-      </div>
+      </div>` : `<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>`}
     </div>
-    <div style="background:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;color:#9ca3af;font-size:11px;">This is an automated email from VisiGuard VMS. Please do not reply.</p>
-    </div>
-    <div style="background:#1e293b;padding:16px;text-align:center;">
-      <p style="margin:0;color:#f1f5f9;font-size:12px;">🚀 Built with excellence by <strong>Sharvi Info Tech Pvt. Ltd.</strong></p>
-      <p style="margin:6px 0;"><a href="https://www.sharviinfotech.com/" style="color:#38bdf8;font-size:11px;text-decoration:none;">🌐 www.sharviinfotech.com</a></p>
-      <p style="margin:0;color:#94a3b8;font-size:11px;font-style:italic;">Transforming ideas into powerful digital solutions.</p>
-    </div>
+    ${brandedFooter()}
   </div>
 </body>
 </html>`;
@@ -159,17 +207,15 @@ function generateVisitorConfirmationEmail(
   gateName: string,
   currentDate: string,
   currentTime: string,
-  purpose?: string
+  purpose: string | undefined,
+  branding: Branding
 ): string {
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5;">
   <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    <div style="background:linear-gradient(135deg,#0891b2,#0e7490);padding:20px;text-align:center;">
-      <h1 style="margin:0;color:white;font-size:20px;">VisiGuard VMS</h1>
-      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">Visit Request Submitted</p>
-    </div>
+    ${brandedHeader(branding, "Visit Request Submitted")}
     <div style="padding:24px;">
       <h2 style="margin:0 0 16px;color:#1f2937;font-size:18px;">Dear ${visitorName},</h2>
       <p style="color:#374151;font-size:14px;line-height:1.6;">Your visit request has been submitted and is now pending approval from your host.</p>
@@ -192,14 +238,7 @@ function generateVisitorConfirmationEmail(
 
       <p style="color:#374151;font-size:14px;line-height:1.6;">You will receive another email once your visit has been approved. Please wait for confirmation before proceeding to the facility.</p>
     </div>
-    <div style="background:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;color:#9ca3af;font-size:11px;">This is an automated email from VisiGuard VMS. Please do not reply.</p>
-    </div>
-    <div style="background:#1e293b;padding:16px;text-align:center;">
-      <p style="margin:0;color:#f1f5f9;font-size:12px;">🚀 Built with excellence by <strong>Sharvi Info Tech Pvt. Ltd.</strong></p>
-      <p style="margin:6px 0;"><a href="https://www.sharviinfotech.com/" style="color:#38bdf8;font-size:11px;text-decoration:none;">🌐 www.sharviinfotech.com</a></p>
-      <p style="margin:0;color:#94a3b8;font-size:11px;font-style:italic;">Transforming ideas into powerful digital solutions.</p>
-    </div>
+    ${brandedFooter()}
   </div>
 </body>
 </html>`;
@@ -228,6 +267,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { visitorId }: NotifyHostRequest = await req.json();
+    const branding = await getBranding(supabase);
 
     if (!visitorId) {
       return new Response(
@@ -493,7 +533,7 @@ _VisiGuard Visitor Management System_
       const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, approveLink, rejectLink, companions
+        currentDate, currentTime, approveLink, rejectLink, companions, branding, true
       );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
@@ -504,10 +544,8 @@ _VisiGuard Visitor Management System_
       // For direct check-in, still notify host via email
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, "", "", companions
-      ).replace(/Visitor Approval Required/g, "Visitor Arrival Notification")
-       .replace(/<div style="text-align:center;margin:24px 0;">[\s\S]*?<\/div>/,
-        '<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>');
+        currentDate, currentTime, "", "", companions, branding, false
+      );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
         `Visitor Arrival — ${visitor.name}`,
@@ -519,7 +557,7 @@ _VisiGuard Visitor Management System_
     if (visitor.email && isPendingApproval) {
       const visitorEmailHtml = generateVisitorConfirmationEmail(
         visitor.name, visitor.visitor_id, hostData.name,
-        departmentName, gateName, currentDate, currentTime, visitor.purpose
+        departmentName, gateName, currentDate, currentTime, visitor.purpose, branding
       );
       visitorEmailSent = await sendSmtpEmail(
         supabase, visitor.email,

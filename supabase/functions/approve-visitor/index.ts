@@ -13,6 +13,60 @@ interface ApprovalRequest {
   token?: string;
 }
 
+// ---- Shared branded header / footer ----
+const DEFAULT_LOGO_URL = "https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/branding/resl-logo.png";
+const DEFAULT_COMPANY = "Re Sustainability";
+const DEFAULT_PRIMARY = "#dc2626";
+
+interface Branding {
+  companyName: string;
+  logoUrl: string;
+  primaryColor: string;
+}
+
+async function getBranding(supabase: any): Promise<Branding> {
+  try {
+    const { data } = await supabase
+      .from("tenant_settings")
+      .select("company_name, logo_url, primary_color")
+      .limit(1)
+      .maybeSingle();
+    return {
+      companyName: data?.company_name && data.company_name !== "VisiGuard" ? data.company_name : DEFAULT_COMPANY,
+      logoUrl: data?.logo_url || DEFAULT_LOGO_URL,
+      primaryColor: data?.primary_color || DEFAULT_PRIMARY,
+    };
+  } catch {
+    return { companyName: DEFAULT_COMPANY, logoUrl: DEFAULT_LOGO_URL, primaryColor: DEFAULT_PRIMARY };
+  }
+}
+
+function brandedHeader(b: Branding, subtitle: string): string {
+  return `<div style="background:#ffffff;padding:18px 24px;border-bottom:1px solid #e5e7eb;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="width:64px;vertical-align:middle;padding-right:14px;">
+          <img src="${b.logoUrl}" alt="${b.companyName}" width="56" height="56" style="display:block;width:56px;height:56px;object-fit:contain;background:#ffffff;border-radius:6px;" />
+        </td>
+        <td style="vertical-align:middle;">
+          <div style="font-family:Arial,sans-serif;font-size:18px;font-weight:700;color:#0f172a;line-height:1.2;">${b.companyName}</div>
+          <div style="font-family:Arial,sans-serif;font-size:12px;color:#475569;margin-top:4px;border-top:2px solid ${b.primaryColor};display:inline-block;padding-top:4px;">${subtitle}</div>
+        </td>
+      </tr>
+    </table>
+  </div>`;
+}
+
+function brandedFooter(): string {
+  return `<div style="background:#f8fafc;padding:14px 16px;text-align:center;border-top:1px solid #e5e7eb;">
+      <p style="margin:0;color:#9ca3af;font-size:11px;font-family:Arial,sans-serif;">This is an automated email. Please do not reply.</p>
+    </div>
+    <div style="background:#f1f5f9;padding:14px 16px;text-align:center;">
+      <p style="margin:0;color:#475569;font-size:12px;font-family:Arial,sans-serif;">Powered by <strong style="color:#0f172a;">Sharvi Infotech</strong></p>
+      <p style="margin:4px 0 0;"><a href="https://www.sharviinfotech.com/" style="color:#0ea5e9;font-size:11px;text-decoration:none;font-family:Arial,sans-serif;">www.sharviinfotech.com</a></p>
+    </div>`;
+}
+
 async function sendSmtpEmail(
   supabase: any,
   to: string,
@@ -72,16 +126,13 @@ async function sendSmtpEmail(
   }
 }
 
-function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl: string): string {
+function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl: string, branding: Branding): string {
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5;">
   <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    <div style="background:linear-gradient(135deg,#16a34a,#15803d);padding:20px;text-align:center;">
-      <h1 style="margin:0;color:white;font-size:20px;">VisiGuard VMS</h1>
-      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">Visit Approved ✅</p>
-    </div>
+    ${brandedHeader(branding, "Visit Approved ✅")}
     <div style="padding:24px;">
       <h2 style="margin:0 0 16px;color:#1f2937;font-size:18px;">Dear ${visitor.name},</h2>
       
@@ -111,14 +162,7 @@ function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl
         <p style="margin:0;color:#92400e;font-size:16px;font-weight:bold;">📱 Please show this email to the security guard at the entrance</p>
       </div>
     </div>
-    <div style="background:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;color:#9ca3af;font-size:11px;">This is an automated email from VisiGuard VMS. Please do not reply.</p>
-    </div>
-    <div style="background:#1e293b;padding:16px;text-align:center;">
-      <p style="margin:0;color:#f1f5f9;font-size:12px;">🚀 Built with excellence by <strong>Sharvi Info Tech Pvt. Ltd.</strong></p>
-      <p style="margin:6px 0;"><a href="https://www.sharviinfotech.com/" style="color:#38bdf8;font-size:11px;text-decoration:none;">🌐 www.sharviinfotech.com</a></p>
-      <p style="margin:0;color:#94a3b8;font-size:11px;font-style:italic;">Transforming ideas into powerful digital solutions.</p>
-    </div>
+    ${brandedFooter()}
   </div>
 </body>
 </html>`;
@@ -147,6 +191,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { visitorId, action, token }: ApprovalRequest = await req.json();
+    const branding = await getBranding(supabase);
 
     if (!visitorId || !action) {
       return new Response(
@@ -419,7 +464,7 @@ _Powered by VisiGuard VMS_
     // ---- Email to visitor on approval ----
     let emailSent = false;
     if (visitor.email) {
-      const emailHtml = generateApprovedBadgeEmail(visitor, currentDate, qrCodeUrl);
+      const emailHtml = generateApprovedBadgeEmail(visitor, currentDate, qrCodeUrl, branding);
       emailSent = await sendSmtpEmail(
         supabase,
         visitor.email,
