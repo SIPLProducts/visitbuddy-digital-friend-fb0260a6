@@ -109,8 +109,6 @@ ${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
 ━━━━━━━━━━━━━━━━━━━━
 📱 *Scan the QR code above at the gate*
 ✅ Show this pass to security for entry.
-
-_Powered by VisiGuard VMS_
     `.trim();
 
     console.log(`Generated QR code URL: ${qrCodeUrl}`);

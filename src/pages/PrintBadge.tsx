@@ -524,7 +524,6 @@ export default function PrintBadge() {
                   </svg>
                   <img src={reslLogo} alt="RESL" style={{ position: 'relative', zIndex: 1 }} />
                 </div>
-                <div className="company-text">Re Sustainability</div>
               </div>
 
               <div className="title-photo-row">
