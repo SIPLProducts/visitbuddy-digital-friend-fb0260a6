@@ -43,16 +43,16 @@ async function getBranding(supabase: any): Promise<Branding> {
 
 function brandedHeader(b: Branding, subtitle: string): string {
   return `<div style="background:#ffffff;padding:12px 8px;border-bottom:1px solid #e5e7eb;">
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;min-width:320px;border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0;">
       <tr>
-        <td style="width:96px;vertical-align:middle;padding:0 4px 0 8px;">
-          <img src="${b.logoUrl}" alt="${b.companyName}" width="88" height="88" style="display:block;width:88px;height:88px;object-fit:contain;background:#ffffff;" />
+        <td width="96" style="width:96px;vertical-align:middle;padding:0 4px 0 8px;">
+          <img src="cid:re-logo" alt="${b.companyName}" width="80" height="80" style="display:block;width:80px;height:80px;object-fit:contain;background:#ffffff;border:0;outline:none;text-decoration:none;" />
         </td>
         <td style="vertical-align:middle;text-align:center;">
           <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:800;color:#dc2626;line-height:1.2;">${b.companyName}</div>
           <div style="font-family:Arial,sans-serif;font-size:12px;color:#64748b;margin-top:4px;">${subtitle}</div>
         </td>
-        <td style="width:96px;">&nbsp;</td>
+        <td width="96" style="width:96px;">&nbsp;</td>
       </tr>
     </table>
   </div>`;
