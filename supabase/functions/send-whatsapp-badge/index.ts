@@ -87,6 +87,7 @@ const handler = async (req: Request): Promise<Response> => {
     const qrCodeData = encodeURIComponent(JSON.stringify({
       visitorId,
       name: visitorName,
+      action: 'checkout',
       timestamp: new Date().toISOString()
     }));
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${qrCodeData}&format=png`;
