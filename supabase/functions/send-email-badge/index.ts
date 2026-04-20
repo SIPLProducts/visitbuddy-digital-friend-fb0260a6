@@ -19,6 +19,28 @@ interface BadgeEmailRequest {
   qrCodeUrl?: string;
 }
 
+// ---- Shared branded header / footer ----
+const DEFAULT_LOGO_URL = "https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/branding/resl-logo.png";
+const DEFAULT_COMPANY = "Re Sustainability";
+const DEFAULT_PRIMARY = "#dc2626";
+
+async function getBranding(supabase: any) {
+  try {
+    const { data } = await supabase
+      .from("tenant_settings")
+      .select("company_name, logo_url, primary_color")
+      .limit(1)
+      .maybeSingle();
+    return {
+      companyName: data?.company_name && data.company_name !== "VisiGuard" ? data.company_name : DEFAULT_COMPANY,
+      logoUrl: data?.logo_url || DEFAULT_LOGO_URL,
+      primaryColor: data?.primary_color || DEFAULT_PRIMARY,
+    };
+  } catch {
+    return { companyName: DEFAULT_COMPANY, logoUrl: DEFAULT_LOGO_URL, primaryColor: DEFAULT_PRIMARY };
+  }
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -44,6 +66,8 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+
+    const branding = await getBranding(supabase);
 
     const {
       email,
