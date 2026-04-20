@@ -267,27 +267,6 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     }
   };
 
-  // Legacy alias kept in case closure referenced it — unused after refactor.
-  const _unused = async (err: any) => {
-      const errStr = String(err?.message ?? err);
-      console.error('[QrScanner] All camera attempts failed:', errStr, err);
-      if (isMountedRef.current) {
-        let message = errStr || 'Could not start camera';
-        if (err?.name === 'NotAllowedError' || /permission|denied|notallowed/i.test(errStr)) {
-          message = 'Camera permission denied. Please allow camera access in your browser settings.';
-        } else if (err?.name === 'NotFoundError' || /not\s*found|no camera|devices? found/i.test(errStr)) {
-          message = 'No camera found on this device.';
-        } else if (err?.name === 'NotReadableError' || /in use|notreadable|could not start video/i.test(errStr)) {
-          message = 'Camera is in use by another app. Close other apps and retry.';
-        } else if (err?.name === 'SecurityError' || /https|secure/i.test(errStr)) {
-          message = 'Camera blocked. The page must be served over HTTPS.';
-        }
-        setError(message);
-        onToggleScanning(false);
-        await cleanupScanner();
-      }
-  };
-
   const stopScanning = async () => {
     try {
       if (scannerRef.current?.isScanning) {
@@ -340,21 +319,55 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         </div>
       )}
 
+      {showPicker && cameras.length > 1 && (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-foreground mb-2">Choose a camera</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {cameras.map((cam, idx) => (
+              <Button
+                key={cam.id}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => selectCamera(cam.id)}
+              >
+                <Camera className="h-3.5 w-3.5" />
+                {describeCamera(cam.label, idx)}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <h3 className="font-semibold text-foreground mb-2">
-        {isScanning ? 'Scanning...' : isInitializing ? 'Initializing...' : 'Ready to Scan'}
+        {isScanning ? 'Scanning...' : isInitializing ? 'Initializing...' : showPicker ? 'Select Camera' : 'Ready to Scan'}
       </h3>
       <p className="text-sm text-muted-foreground mb-4">
         {isScanning
           ? "Point the camera at a visitor's WhatsApp badge QR code"
+          : showPicker
+          ? "Pick which camera to use for scanning"
           : "Click the button below to activate the camera and scan a visitor's QR code"
         }
       </p>
 
       {isScanning ? (
-        <Button variant="outline" className="gap-2" onClick={stopScanning}>
-          <StopCircle className="h-4 w-4" />
-          Stop Scanning
-        </Button>
+        <div className="flex flex-col items-center gap-2">
+          <Button variant="outline" className="gap-2" onClick={stopScanning}>
+            <StopCircle className="h-4 w-4" />
+            Stop Scanning
+          </Button>
+          {cameras.length > 1 && (
+            <button
+              type="button"
+              onClick={handleSwitchCamera}
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Switch camera
+            </button>
+          )}
+        </div>
       ) : (
         <Button className="gap-2" onClick={startScanning} disabled={isInitializing}>
           <Camera className="h-4 w-4" />
