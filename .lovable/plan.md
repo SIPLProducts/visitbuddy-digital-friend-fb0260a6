@@ -1,55 +1,59 @@
 
+No — Render is not fully okay yet. The bridge is starting, but Chrome is not launching, so the service never reaches `qr` state. That is why you cannot get the QR code.
 
-User wants email header refinements:
-1. Logo bigger
-2. Less padding between edge and logo (logo flush-ish to left)
-3. "Re Sustainability" company name in **red** (`primary_color` / `#dc2626`)
-4. Company name **centered** (middle of header), not next to logo
+### What the logs prove
+- Chrome **did download successfully** during build:
+  - `/opt/render/project/src/.puppeteer-cache/chrome/linux-131.0.6778.204/chrome-linux64/chrome`
+- But at runtime `whatsapp-web.js` is trying to auto-find a **different browser revision**:
+  - `Could not find Chrome (ver. 147.0.7727.57)`
+  - cache path shown: `/opt/render/.cache/puppeteer`
+- So the bridge is looking in the wrong place and for the wrong revision.
 
-Currently all 4 email functions use a 2-cell table layout with logo (56×56) on the left and company name in dark color next to it with a small accent underline.
+### Why this is happening
+1. Render is running an extra build command:
+   - `npm install && npx puppeteer browsers install chrome`
+   - This installs Chrome twice and the second install goes to the default Render cache path, which is not what the app should rely on.
+2. `server.js` currently only sets `PUPPETEER_CACHE_DIR`, but does **not** force the exact Chrome binary path.
+3. `whatsapp-web.js` uses its own nested `puppeteer-core`, so auto-resolution is unreliable here.
+4. Render is using **Node 25.9.0**, which is not a safe target for this stack. Node 20 is the better choice.
 
-Need to redesign the header block in all 4 edge functions to:
-- Larger logo (≈88×88)
-- Minimal left padding (≈8px) so logo sits close to edge
-- Company name centered horizontally in red, larger font
-- Subtitle ("Visitor Approval Required" etc.) stays below name, also centered, smaller/grey
+### Plan to fix it
+1. **Update `whatsapp-bridge/server.js`**
+   - Stop relying on auto-resolve.
+   - Detect the installed Chrome inside `.puppeteer-cache/chrome/.../chrome-linux64/chrome`
+   - Set `process.env.PUPPETEER_EXECUTABLE_PATH` to that exact file
+   - Pass `executablePath` into the Puppeteer config
+   - Load `whatsapp-web.js` only after those env values are set, so Puppeteer sees the correct path
 
-Best email-safe layout: 3-cell table — left logo cell (fixed width), center cell with name+subtitle (text-align:center), right spacer cell mirroring logo width to keep the name truly centered.
+2. **Update `whatsapp-bridge/package.json`**
+   - Pin Node to a stable version for Render, preferably:
+     - `"node": "20.x"`
+   - Keep the existing project-local Chrome install in `postinstall`
 
-## Plan
+3. **Update `whatsapp-bridge/README.md`**
+   - Correct the Render instructions:
+     - Build command should be only `npm install`
+     - Not `npm install && npx puppeteer browsers install chrome`
+   - Document the correct runtime paths for this service root
 
-Redesign the email header in all 4 Edge Functions for a bigger flush-left logo and a centered red company name.
+4. **Render settings to apply after code change**
+   - Runtime: Node
+   - Build command: `npm install`
+   - Start command: `node server.js`
+   - Environment variables:
+     - `BRIDGE_API_KEY`
+     - `PUPPETEER_CACHE_DIR=/opt/render/project/src/.puppeteer-cache`
+     - `SESSION_PATH=/opt/render/project/src/wweb-session`
+   - Optional immediate fallback:
+     - `PUPPETEER_EXECUTABLE_PATH=/opt/render/project/src/.puppeteer-cache/chrome/linux-131.0.6778.204/chrome-linux64/chrome`
+   - Then **Clear build cache & deploy**
 
-### New header structure (applied to all 4 templates)
+### Expected result after fix
+Runtime logs should change from:
+- `Could not find Chrome...`
 
-```text
-[ logo 88×88 ]        Re Sustainability        [ spacer 88px ]
-                       <subtitle, grey, sm>
-```
+to something like:
+- `PUPPETEER_EXECUTABLE_PATH: /opt/render/project/src/.puppeteer-cache/.../chrome`
+- `[wweb] QR generated, scan with WhatsApp app.`
 
-- White background strip, ~104px tall, bottom border `#e5e7eb`
-- Outer table padding: `padding: 12px 8px` (was `18px 24px`) — logo sits ~8px from left edge
-- 3-column layout (email-safe):
-  - Left cell: width `96px`, logo `88×88` (was `56×56`), `object-fit:contain`, no border-radius box
-  - Center cell: `text-align:center`, vertical-align middle
-    - Company name: `font-size: 22px; font-weight: 800; color: <primary_color || #dc2626>` (was dark `#0f172a`, now red)
-    - Subtitle below: `font-size: 12px; color: #64748b; margin-top: 4px` (no underline accent — centered text doesn't need it)
-  - Right cell: width `96px`, empty spacer (keeps name visually centered)
-
-Keeps the layout email-client-safe (Outlook, Gmail) by using a single `<table>` with explicit widths and inline styles.
-
-### Files to update
-
-1. `supabase/functions/notify-host/index.ts` — both `generateHostApprovalEmail` and `generateVisitorConfirmationEmail`
-2. `supabase/functions/approve-visitor/index.ts` — `generateApprovedBadgeEmail`
-3. `supabase/functions/send-email-badge/index.ts` — inline badge HTML
-4. `supabase/functions/send-email/index.ts` — `generateHtmlEmail` wrapper
-
-### Unchanged
-- White header background, footer, branding fetch from `tenant_settings`, SMTP delivery, fallbacks (RESL logo URL + `#dc2626`).
-
-### Deploy
-Redeploy all four functions: `notify-host`, `approve-visitor`, `send-email-badge`, `send-email`.
-
-After deploy, send a test approval/badge email — header shows a large RESL logo flush to the left and "Re Sustainability" centered in red.
-
+Once that appears, the QR will load in **Settings → WhatsApp** inside the app.
