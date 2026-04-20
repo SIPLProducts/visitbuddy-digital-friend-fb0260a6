@@ -1,58 +1,73 @@
 
+## Diagnosis
 
-## Diagnosis confirmed
+The bridge code already includes the browser download step in `whatsapp-bridge/package.json`:
 
-Two issues from your Render logs:
-1. **Chrome missing** — `whatsapp-web.js` uses Puppeteer which needs Chromium. Render's Node environment doesn't have it, and the current `package.json` doesn't install it.
-2. **API_KEY was `false` on first boot** — already fixed itself on the second deploy (`API_KEY set: true`). Ignore.
+- `puppeteer` dependency is present
+- `postinstall: npx puppeteer browsers install chrome` is present
 
-Render is running as a plain **Node service**, not Docker, so the `Dockerfile` (which had Chromium) is being skipped. The `package.json` needs to install Chromium itself during build.
+But your Render log still says Chrome is being searched in:
 
-## Fix (one file change + one Render setting)
-
-### 1. Update `whatsapp-bridge/package.json`
-Add a `postinstall` script that downloads Chromium during Render's build, and pin a Chrome version env-var so Puppeteer downloads the exact one `whatsapp-web.js` expects.
-
-```json
-{
-  "name": "visiguard-whatsapp-bridge",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "start": "node server.js",
-    "postinstall": "npx puppeteer browsers install chrome"
-  },
-  "dependencies": {
-    "express": "^4.19.2",
-    "puppeteer": "^23.0.0",
-    "qrcode": "^1.5.4",
-    "whatsapp-web.js": "^1.26.0"
-  },
-  "engines": { "node": ">=18" }
-}
+```text
+/opt/render/.cache/puppeteer
 ```
 
-Adding `puppeteer` (full package, not `-core`) gives a working browser fetcher; the `postinstall` then pulls the matching Chromium into `/opt/render/.cache/puppeteer`.
+That means the missing piece is most likely **Render configuration**, not app code:
+- either `PUPPETEER_CACHE_DIR` was not added
+- or it was added after the last deploy but the build cache was not cleared
+- or the service is still not building from the `whatsapp-bridge/` folder you updated
 
-### 2. Update Render service settings
-- **Build Command**: `npm install` (default — postinstall will run automatically)
-- **Add environment variable**: `PUPPETEER_CACHE_DIR` = `/opt/render/project/src/.cache/puppeteer`
-  *(This survives across deploys on Render's persistent project dir; the default `~/.cache` gets wiped between builds, which is the root cause.)*
-- Click **Manual Deploy → Clear build cache & deploy**.
+## Plan
 
-### 3. (Optional but recommended) Render render.yaml
-Not required — the two changes above are enough. Keep `Dockerfile` as a fallback for self-hosting.
+1. **Verify Render service settings**
+   - Confirm the service is using the `whatsapp-bridge` folder as its root.
+   - Confirm this env var exists exactly:
+     - `PUPPETEER_CACHE_DIR=/opt/render/project/src/.cache/puppeteer`
 
-## What happens after deploy
+2. **Force a clean rebuild**
+   - In Render, run **Manual Deploy → Clear build cache & deploy**
+   - This is important because the Chrome download happens during build, not at runtime.
 
-- Build logs will show `Downloading Chromium...` (~150 MB, takes ~1 min the first time, cached after).
-- `node server.js` starts → `whatsapp-web.js` finds Chrome at the cache path → QR generation works.
-- Lovable Settings → WhatsApp → **Connect WhatsApp** → QR appears within ~5–10 seconds.
+3. **Use the log to confirm whether the fix applied**
+   - After redeploy, if the error still mentions:
+     ```text
+     /opt/render/.cache/puppeteer
+     ```
+     then Render did **not** pick up the env var.
+   - If the cache path changes to:
+     ```text
+     /opt/render/project/src/.cache/puppeteer
+     ```
+     then the env var is applied and we only need to confirm Chrome actually downloaded during build.
 
-## Files to change
+4. **Check build logs, not just runtime logs**
+   - Look for a browser download step during build, such as Chromium/Chrome being installed by Puppeteer.
+   - If there is no browser download in the build logs, the postinstall script is not running from the updated package.
 
-- `whatsapp-bridge/package.json` — add `puppeteer` dep + `postinstall` script
+5. **Fallback if Node service keeps failing**
+   - Switch the Render service to a **Docker-based deploy** using the existing `whatsapp-bridge/Dockerfile`.
+   - That path is more reliable because Chromium is installed in the container image instead of relying on Render cache behavior.
 
-That's the only code change. Everything else is in your Render dashboard.
+## Expected outcome after the correct redeploy
 
+When fixed, the next startup should no longer show “Could not find Chrome”.
+Then:
+- `/status` should stop returning `disconnected`
+- clicking **Connect WhatsApp** in Settings should produce a QR within a few seconds
+
+## Technical notes
+
+Current codebase state:
+- `whatsapp-bridge/package.json` already has the needed `postinstall`
+- `whatsapp-bridge/server.js` is fine for QR generation once Chrome exists
+- the failure is happening before WhatsApp can initialize
+
+So the most likely next action is:
+```text
+Set/verify PUPPETEER_CACHE_DIR on Render → Clear build cache & deploy
+```
+
+If you want, the next implementation step I would take after approval is to harden the bridge for hosting by:
+- logging the effective browser/cache paths on startup
+- documenting the exact Render setup in the bridge README
+- adding a Docker-first fallback deployment note
