@@ -114,6 +114,8 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
 
     setError(null);
     setIsInitializing(true);
+    // Allow a fresh scan for this new session
+    hasHandledScanRef.current = false;
 
     // Flip UI state FIRST so the container becomes visible before camera starts
     onToggleScanning(true);
