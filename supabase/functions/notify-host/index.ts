@@ -418,9 +418,13 @@ const handler = async (req: Request): Promise<Response> => {
     let hostNotificationSent = false;
     let hostMessageSid = "";
     let visitorNotificationSent = false;
+    let hostTransport: "twilio" | "whatsapp_web" | null = null;
+    let visitorTransport: "twilio" | "whatsapp_web" | null = null;
 
-    if (accountSid && authToken && twilioWhatsAppNumber && hostData.phone) {
-      twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
+    if (hostData.phone) {
+      if (twilioWhatsAppNumber) {
+        twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
+      }
 
       let formattedHostPhone = hostData.phone.replace(/\s/g, "").replace(/-/g, "");
       if (!formattedHostPhone.startsWith("+")) {
@@ -486,7 +490,22 @@ Please proceed to the reception to receive your visitor.
 _VisiGuard Visitor Management System_
         `.trim();
 
-      const hostFormData = new URLSearchParams();
+      // Try bridge first if provider is whatsapp_web
+      if (whatsappProvider === "whatsapp_web") {
+        const bridgeRes = await sendViaBridge(formattedHostPhone, hostMessage, visitor.photo_url);
+        if (bridgeRes.ok) {
+          console.log("Host notification sent via bridge:", bridgeRes.id);
+          hostNotificationSent = true;
+          hostMessageSid = bridgeRes.id || "";
+          hostTransport = "whatsapp_web";
+        } else {
+          console.warn(`[notify-host] bridge failed (${bridgeRes.error}), falling back to Twilio`);
+        }
+      }
+
+      // Twilio path (default, or fallback when bridge failed)
+      if (!hostNotificationSent && accountSid && authToken && twilioWhatsAppNumber && twilioUrl) {
+        const hostFormData = new URLSearchParams();
       hostFormData.append("To", `whatsapp:${formattedHostPhone}`);
       hostFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       hostFormData.append("Body", hostMessage);
@@ -508,14 +527,18 @@ _VisiGuard Visitor Management System_
           console.log("Host notification sent successfully:", twilioResult.sid);
           hostNotificationSent = true;
           hostMessageSid = twilioResult.sid;
+          hostTransport = "twilio";
         } else {
           console.error("Failed to send host notification:", twilioResult);
         }
       } catch (whatsappError) {
         console.error("WhatsApp send error to host:", whatsappError);
       }
+      } else if (!hostNotificationSent) {
+        console.log("Twilio not configured, skipping host WhatsApp fallback");
+      }
     } else {
-      console.log("Twilio not configured or host has no phone, skipping WhatsApp to host");
+      console.log("Host has no phone, skipping WhatsApp to host");
     }
 
     // WhatsApp confirmation to visitor
