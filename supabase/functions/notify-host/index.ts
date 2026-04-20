@@ -39,6 +39,40 @@ async function getBranding(supabase: any): Promise<Branding> {
   }
 }
 
+// ---- WhatsApp Web bridge helper ----
+const BRIDGE_URL = Deno.env.get("WHATSAPP_BRIDGE_URL");
+const BRIDGE_KEY = Deno.env.get("WHATSAPP_BRIDGE_API_KEY");
+
+async function sendViaBridge(
+  phone: string,
+  message: string,
+  mediaUrl?: string | null,
+): Promise<{ ok: boolean; id?: string; error?: string }> {
+  if (!BRIDGE_URL || !BRIDGE_KEY) {
+    return { ok: false, error: "bridge_not_configured" };
+  }
+  try {
+    const base = BRIDGE_URL.replace(/\/+$/, "");
+    const res = await fetch(`${base}/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": BRIDGE_KEY,
+      },
+      body: JSON.stringify({ phone, message, mediaUrl: mediaUrl ?? null }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("[bridge] send failed", res.status, data);
+      return { ok: false, error: data?.error || `http_${res.status}` };
+    }
+    return { ok: true, id: data?.id ?? undefined };
+  } catch (e: any) {
+    console.error("[bridge] send threw", e?.message || e);
+    return { ok: false, error: e?.message || "bridge_unreachable" };
+  }
+}
+
 function brandedHeader(b: Branding, subtitle: string): string {
   return `<div style="background:#ffffff;padding:12px 8px;border-bottom:1px solid #e5e7eb;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
@@ -270,6 +304,20 @@ const handler = async (req: Request): Promise<Response> => {
     const { visitorId }: NotifyHostRequest = await req.json();
     const branding = await getBranding(supabase);
 
+    // Provider preference (twilio | whatsapp_web). Defaults to twilio.
+    let whatsappProvider: "twilio" | "whatsapp_web" = "twilio";
+    try {
+      const { data: ts } = await supabase
+        .from("tenant_settings")
+        .select("whatsapp_provider")
+        .limit(1)
+        .maybeSingle();
+      if (ts?.whatsapp_provider === "whatsapp_web") whatsappProvider = "whatsapp_web";
+    } catch (e) {
+      console.warn("Could not read whatsapp_provider, defaulting to twilio");
+    }
+    console.log(`[notify-host] whatsapp_provider = ${whatsappProvider}`);
+
     if (!visitorId) {
       return new Response(
         JSON.stringify({ error: "Visitor ID is required" }),
@@ -370,9 +418,13 @@ const handler = async (req: Request): Promise<Response> => {
     let hostNotificationSent = false;
     let hostMessageSid = "";
     let visitorNotificationSent = false;
+    let hostTransport: "twilio" | "whatsapp_web" | null = null;
+    let visitorTransport: "twilio" | "whatsapp_web" | null = null;
 
-    if (accountSid && authToken && twilioWhatsAppNumber && hostData.phone) {
-      twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
+    if (hostData.phone) {
+      if (twilioWhatsAppNumber) {
+        twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
+      }
 
       let formattedHostPhone = hostData.phone.replace(/\s/g, "").replace(/-/g, "");
       if (!formattedHostPhone.startsWith("+")) {
@@ -438,7 +490,22 @@ Please proceed to the reception to receive your visitor.
 _VisiGuard Visitor Management System_
         `.trim();
 
-      const hostFormData = new URLSearchParams();
+      // Try bridge first if provider is whatsapp_web
+      if (whatsappProvider === "whatsapp_web") {
+        const bridgeRes = await sendViaBridge(formattedHostPhone, hostMessage, visitor.photo_url);
+        if (bridgeRes.ok) {
+          console.log("Host notification sent via bridge:", bridgeRes.id);
+          hostNotificationSent = true;
+          hostMessageSid = bridgeRes.id || "";
+          hostTransport = "whatsapp_web";
+        } else {
+          console.warn(`[notify-host] bridge failed (${bridgeRes.error}), falling back to Twilio`);
+        }
+      }
+
+      // Twilio path (default, or fallback when bridge failed)
+      if (!hostNotificationSent && accountSid && authToken && twilioWhatsAppNumber && twilioUrl) {
+        const hostFormData = new URLSearchParams();
       hostFormData.append("To", `whatsapp:${formattedHostPhone}`);
       hostFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       hostFormData.append("Body", hostMessage);
@@ -460,18 +527,22 @@ _VisiGuard Visitor Management System_
           console.log("Host notification sent successfully:", twilioResult.sid);
           hostNotificationSent = true;
           hostMessageSid = twilioResult.sid;
+          hostTransport = "twilio";
         } else {
           console.error("Failed to send host notification:", twilioResult);
         }
       } catch (whatsappError) {
         console.error("WhatsApp send error to host:", whatsappError);
       }
+      } else if (!hostNotificationSent) {
+        console.log("Twilio not configured, skipping host WhatsApp fallback");
+      }
     } else {
-      console.log("Twilio not configured or host has no phone, skipping WhatsApp to host");
+      console.log("Host has no phone, skipping WhatsApp to host");
     }
 
     // WhatsApp confirmation to visitor
-    if (accountSid && authToken && twilioWhatsAppNumber && visitor.phone) {
+    if (visitor.phone) {
       let formattedVisitorPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
       if (!formattedVisitorPhone.startsWith("+")) {
         formattedVisitorPhone = "+91" + formattedVisitorPhone.replace(/^0/, "");
@@ -498,7 +569,20 @@ ${hostNotificationSent ? "Your host has been notified of your arrival." : "Pleas
 _VisiGuard Visitor Management System_
       `.trim();
 
-      const visitorFormData = new URLSearchParams();
+      // Try bridge first if provider is whatsapp_web
+      if (whatsappProvider === "whatsapp_web") {
+        const bridgeRes = await sendViaBridge(formattedVisitorPhone, visitorMessage);
+        if (bridgeRes.ok) {
+          console.log("Visitor confirmation sent via bridge:", bridgeRes.id);
+          visitorNotificationSent = true;
+          visitorTransport = "whatsapp_web";
+        } else {
+          console.warn(`[notify-host] visitor bridge failed (${bridgeRes.error}), falling back to Twilio`);
+        }
+      }
+
+      if (!visitorNotificationSent && accountSid && authToken && twilioWhatsAppNumber && twilioUrl) {
+        const visitorFormData = new URLSearchParams();
       visitorFormData.append("To", `whatsapp:${formattedVisitorPhone}`);
       visitorFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       visitorFormData.append("Body", visitorMessage);
@@ -516,11 +600,13 @@ _VisiGuard Visitor Management System_
         if (twilioResponse.ok) {
           console.log("Visitor confirmation sent:", twilioResult.sid);
           visitorNotificationSent = true;
+          visitorTransport = "twilio";
         } else {
           console.error("Failed to send visitor confirmation:", twilioResult);
         }
       } catch (whatsappError) {
         console.error("WhatsApp send error to visitor:", whatsappError);
+      }
       }
     }
 
@@ -571,9 +657,12 @@ _VisiGuard Visitor Management System_
       JSON.stringify({
         success: true,
         message: "Notifications processed",
+        whatsappProvider,
         hostNotified: hostNotificationSent,
+        hostTransport,
         hostMessageSid: hostMessageSid || null,
         visitorNotified: visitorNotificationSent,
+        visitorTransport,
         hostEmailSent,
         visitorEmailSent,
         visitor: { id: visitor.visitor_id, name: visitor.name },
