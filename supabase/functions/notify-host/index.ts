@@ -588,51 +588,31 @@ const handler = async (req: Request): Promise<Response> => {
       }
 
       const isPendingApproval = visitor.status === "pending_approval";
-      const visitorMessage = isPendingApproval
-        ? `
-⏳ *Visit Request Submitted*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${visitor.name}*,
-
-Your visit request has been submitted and is *awaiting host approval*.
-
-🆔 *Visitor ID:* ${visitor.visitor_id}
-${hostData.name ? `👤 *Host:* ${hostData.name}` : ""}
-${departmentName ? `🏢 *Department:* ${departmentName}` : ""}
-${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-You will receive another message once your host approves the visit.
-
-_VisiGuard Visitor Management System_
-        `.trim()
-        : `
-✅ *Check-in Confirmed*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${visitor.name}*,
-
-Your check-in has been recorded successfully!
-
-🆔 *Visitor ID:* ${visitor.visitor_id}
-${hostData.name ? `👤 *Host:* ${hostData.name}` : ""}
-${departmentName ? `🏢 *Department:* ${departmentName}` : ""}
-${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-${hostNotificationSent ? "Your host has been notified of your arrival." : "Please wait at the reception area."}
-
-_VisiGuard Visitor Management System_
-        `.trim();
+      const visitorMessage = buildWhatsAppMessage({
+        branding,
+        subtitle: isPendingApproval ? "Visit Request Submitted" : "Check-in Confirmed",
+        recipientName: visitor.name,
+        intro: isPendingApproval
+          ? "Your visit request has been submitted and is now pending approval from your host."
+          : "Your check-in has been recorded successfully!",
+        statusLine: isPendingApproval ? "⏳ Status: Awaiting Host Approval" : null,
+        details: [
+          ["Visitor ID", visitor.visitor_id],
+          ["Purpose", visitor.purpose],
+          ["Host", hostData.name],
+          ["Department", departmentName],
+          ["Entry Gate", gateName],
+          ["Date", currentDate],
+          ["Time", currentTime],
+        ],
+        closingLine: isPendingApproval
+          ? "You will receive another message once your host approves the visit."
+          : (hostNotificationSent ? "Your host has been notified of your arrival." : "Please wait at the reception area."),
+      });
 
       // Try bridge first if provider is whatsapp_web
       if (whatsappProvider === "whatsapp_web") {
-        const bridgeRes = await sendViaBridge(formattedVisitorPhone, visitorMessage);
+        const bridgeRes = await sendViaBridge(formattedVisitorPhone, visitorMessage, branding.logoUrl);
         if (bridgeRes.ok) {
           console.log("Visitor confirmation sent via bridge:", bridgeRes.id);
           visitorNotificationSent = true;
@@ -647,6 +627,9 @@ _VisiGuard Visitor Management System_
       visitorFormData.append("To", `whatsapp:${formattedVisitorPhone}`);
       visitorFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       visitorFormData.append("Body", visitorMessage);
+      if (branding.logoUrl) {
+        visitorFormData.append("MediaUrl", branding.logoUrl);
+      }
 
       try {
         const twilioResponse = await fetch(twilioUrl!, {
