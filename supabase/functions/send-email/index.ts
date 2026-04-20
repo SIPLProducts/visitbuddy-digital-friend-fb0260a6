@@ -33,6 +33,16 @@ async function getBranding(supabase: any): Promise<Branding> {
   }
 }
 
+async function fetchLogoBytes(url: string): Promise<Uint8Array | null> {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return null;
+    return new Uint8Array(await res.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
 function generateHtmlEmail(subject: string, body: string, branding: Branding): string {
   const bodyHtml = body
     .replace(/&/g, "&amp;")
@@ -85,6 +95,7 @@ Deno.serve(async (req) => {
 
     const { template_key, variables } = await req.json();
     const branding = await getBranding(supabase);
+    const logoBytes = await fetchLogoBytes(branding.logoUrl);
 
     if (!template_key) {
       return new Response(
@@ -156,12 +167,14 @@ Deno.serve(async (req) => {
             cc: ccEmails.length ? ccEmails : undefined,
             subject,
             html: generateHtmlEmail(subject, body, branding),
-            attachments: [{
+            attachments: logoBytes ? [{
               filename: 're-logo.png',
-              path: branding.logoUrl,
+              content: logoBytes,
+              contentType: 'image/png',
               cid: 're-logo',
               contentDisposition: 'inline',
-            }],
+              encoding: 'base64',
+            }] : undefined,
           });
 
           status = "sent";
