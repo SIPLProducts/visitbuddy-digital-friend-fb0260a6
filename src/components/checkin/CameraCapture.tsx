@@ -364,7 +364,11 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     [startCamera, stopCamera]
   );
 
-  const showDevicePicker = videoDevices.length >= 2 && !capturedImage && activeTab === 'camera' && !error;
+  // Show per-lens chips only when user has 3+ cameras (e.g. wide + ultra-wide back).
+  // Front/Back toggle is always shown when on the camera tab.
+  const showDevicePicker = videoDevices.length >= 3 && !capturedImage && activeTab === 'camera' && !error;
+  const showFacingToggle = !capturedImage && activeTab === 'camera' && !error;
+  const isMirrored = activeFacing === 'user';
 
   return (
     <div className={cn('space-y-4', className)}>
