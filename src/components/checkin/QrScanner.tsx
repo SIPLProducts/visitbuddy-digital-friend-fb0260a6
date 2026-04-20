@@ -15,6 +15,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const containerRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
   const isCleaningUpRef = useRef(false);
+  const hasHandledScanRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
 
