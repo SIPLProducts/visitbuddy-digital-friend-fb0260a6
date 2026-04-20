@@ -44,6 +44,10 @@ function findInstalledChrome(cacheDir) {
         path.join(chromeRoot, b, 'chrome-linux', 'chrome'),
         path.join(chromeRoot, b, 'chrome-mac-arm64', 'Google Chrome for Testing.app', 'Contents', 'MacOS', 'Google Chrome for Testing'),
         path.join(chromeRoot, b, 'chrome-mac-x64', 'Google Chrome for Testing.app', 'Contents', 'MacOS', 'Google Chrome for Testing'),
+        // Windows Chrome-for-Testing layouts
+        path.join(chromeRoot, b, 'chrome-win64', 'chrome.exe'),
+        path.join(chromeRoot, b, 'chrome-win32', 'chrome.exe'),
+        path.join(chromeRoot, b, 'chrome-win', 'chrome.exe'),
       ];
       for (const c of candidates) {
         if (fs.existsSync(c)) return c;

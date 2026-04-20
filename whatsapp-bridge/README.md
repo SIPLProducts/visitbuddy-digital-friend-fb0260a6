@@ -29,11 +29,31 @@ All endpoints require header `x-api-key: <BRIDGE_API_KEY>`.
 
 ## 1. Run locally for a quick demo
 
+> **Requires Node 20.x.** Node 18 may install but `whatsapp-web.js` /
+> Puppeteer are unstable on it. Download from <https://nodejs.org/> →
+> verify with `node -v` (should print `v20.x.x`).
+
 ```bash
 cd whatsapp-bridge
 npm install
 BRIDGE_API_KEY="some-long-random-string" node server.js
 ```
+
+### Windows note
+
+On Windows, run the same commands from **Command Prompt** or **PowerShell**:
+
+```cmd
+cd whatsapp-bridge
+npm install
+node server.js
+```
+
+`npm install` will download Chromium (~170 MB) into
+`whatsapp-bridge\.puppeteer-cache\` via the `install-chrome.js` helper —
+this resolves the cache path to an absolute directory, which Puppeteer
+requires on Windows. Put your `BRIDGE_API_KEY` (and optional `PORT` /
+`SESSION_PATH`) in `whatsapp-bridge\.env` instead of exporting it inline.
 
 ### Using a `.env` file (easier on Windows)
 
