@@ -266,9 +266,12 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // Flip horizontally since video is mirrored
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
+        // Mirror capture only for the front camera (preview is mirrored to feel like a selfie).
+        // Back camera is not mirrored, so capture as-is.
+        if (activeFacing === 'user') {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+        }
         ctx.drawImage(video, 0, 0);
         const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedImage(imageDataUrl);
@@ -282,7 +285,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         stopCamera();
       }
     }
-  }, [stopCamera]);
+  }, [stopCamera, activeFacing]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
