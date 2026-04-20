@@ -133,22 +133,23 @@ function generateHostApprovalEmail(
   currentTime: string,
   approveLink: string,
   rejectLink: string,
-  accompanyingVisitors: any[] = []
+  accompanyingVisitors: any[] = [],
+  branding: Branding,
+  isPendingApproval: boolean = true
 ): string {
+  const subtitle = isPendingApproval ? "Visitor Approval Required" : "Visitor Arrival Notification";
+  const accent = branding.primaryColor;
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5;">
   <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    <div style="background:linear-gradient(135deg,#0891b2,#0e7490);padding:20px;text-align:center;">
-      <h1 style="margin:0;color:white;font-size:20px;">VisiGuard VMS</h1>
-      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">Visitor Approval Required</p>
-    </div>
+    ${brandedHeader(branding, subtitle)}
     <div style="padding:24px;">
       <h2 style="margin:0 0 16px;color:#1f2937;font-size:18px;">Dear ${hostName},</h2>
-      <p style="color:#374151;font-size:14px;line-height:1.6;">A visitor is waiting for your approval. Please review the details below and take action.</p>
+      <p style="color:#374151;font-size:14px;line-height:1.6;">${isPendingApproval ? "A visitor is waiting for your approval. Please review the details below and take action." : "A visitor has arrived to meet you. Details below."}</p>
       
-      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #0891b2;">
+      <div style="background:#f8fafc;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid ${accent};">
         <table style="width:100%;font-size:14px;color:#374151;">
           <tr><td style="padding:4px 8px;font-weight:bold;">Visitor:</td><td style="padding:4px 8px;">${visitor.name}</td></tr>
           <tr><td style="padding:4px 8px;font-weight:bold;">ID:</td><td style="padding:4px 8px;">${visitor.visitor_id}</td></tr>
@@ -187,19 +188,12 @@ function generateHostApprovalEmail(
       </div>
       ` : ''}
 
-      <div style="text-align:center;margin:24px 0;">
+      ${isPendingApproval ? `<div style="text-align:center;margin:24px 0;">
         <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">✅ Approve Visit</a>
         <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">❌ Reject Visit</a>
-      </div>
+      </div>` : `<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>`}
     </div>
-    <div style="background:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;color:#9ca3af;font-size:11px;">This is an automated email from VisiGuard VMS. Please do not reply.</p>
-    </div>
-    <div style="background:#1e293b;padding:16px;text-align:center;">
-      <p style="margin:0;color:#f1f5f9;font-size:12px;">🚀 Built with excellence by <strong>Sharvi Info Tech Pvt. Ltd.</strong></p>
-      <p style="margin:6px 0;"><a href="https://www.sharviinfotech.com/" style="color:#38bdf8;font-size:11px;text-decoration:none;">🌐 www.sharviinfotech.com</a></p>
-      <p style="margin:0;color:#94a3b8;font-size:11px;font-style:italic;">Transforming ideas into powerful digital solutions.</p>
-    </div>
+    ${brandedFooter()}
   </div>
 </body>
 </html>`;
