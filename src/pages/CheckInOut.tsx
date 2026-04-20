@@ -95,6 +95,44 @@ export default function CheckInOut() {
     return data.publicUrl;
   };
 
+  const sendCheckoutBadges = async (visitorId: string) => {
+    const { data: v } = await supabase
+      .from('visitors')
+      .select(`name, visitor_id, phone, email, company, purpose,
+               host:employees(name), department:departments(name), gate:gates(name)`)
+      .eq('id', visitorId)
+      .maybeSingle();
+    if (!v) return;
+
+    const payload = {
+      visitorName: v.name,
+      visitorId: v.visitor_id,
+      phone: v.phone || '',
+      email: v.email || '',
+      company: v.company || '',
+      purpose: v.purpose || '',
+      hostName: (v as any).host?.name || '',
+      departmentName: (v as any).department?.name || '',
+      gateName: (v as any).gate?.name || '',
+    };
+
+    const tasks: Promise<any>[] = [];
+    if (payload.phone) {
+      tasks.push(supabase.functions.invoke('send-whatsapp-badge', { body: payload }));
+      tasks.push(supabase.functions.invoke('send-sms-badge', { body: payload }));
+    }
+    if (payload.email) {
+      tasks.push(supabase.functions.invoke('send-email-badge', { body: payload }));
+    }
+    if (tasks.length === 0) return;
+
+    const results = await Promise.allSettled(tasks);
+    const failed = results.filter((r) => r.status === 'rejected').length;
+    if (failed === 0) toast.success('Checkout QR sent via WhatsApp & email');
+    else if (failed < tasks.length) toast.warning('Checkout QR sent partially — some channels failed');
+    else toast.warning('Could not send checkout QR — please retry from visitor details');
+  };
+
   const handlePhotoCapture = async (blob: Blob) => {
     if (!selectedVisitor) return;
 
