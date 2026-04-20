@@ -1,13 +1,28 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
-import { Camera, StopCircle, AlertCircle } from 'lucide-react';
+import { Camera, StopCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface QrScannerProps {
   onScan: (data: { visitorId: string; name: string; timestamp: string; action?: string }) => void;
   isScanning: boolean;
   onToggleScanning: (scanning: boolean) => void;
+}
+
+interface CameraDevice {
+  id: string;
+  label: string;
+}
+
+const STORAGE_KEY = 'qr-scanner-camera-id';
+
+function describeCamera(label: string, index: number): string {
+  if (!label) return `Camera ${index + 1}`;
+  const lower = label.toLowerCase();
+  if (/back|rear|environment/.test(lower)) return 'Back camera';
+  if (/front|user|face/.test(lower)) return 'Front camera';
+  return label;
 }
 
 export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerProps) {
@@ -18,6 +33,8 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const hasHandledScanRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [cameras, setCameras] = useState<CameraDevice[]>([]);
+  const [showPicker, setShowPicker] = useState(false);
 
   // Safe cleanup function
   const cleanupScanner = useCallback(async () => {

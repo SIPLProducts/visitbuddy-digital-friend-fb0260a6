@@ -46,7 +46,7 @@ interface SafetyPermitBadgeProps {
 
 export function SafetyPermitBadge({ 
   visitor, 
-  companyName = 'Resustainability', 
+  companyName = 'Re Sustainability', 
   companyLogo = reslBadgeLogo 
 }: SafetyPermitBadgeProps) {
   const getInitials = (name: string) => {
