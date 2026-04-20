@@ -10,13 +10,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock, Globe, Mail, Trash2, Send, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Building2, Palette, Shield, FileText, Database, Save, Check, Bell, HelpCircle, RotateCcw, Settings as SettingsIcon, Clock, Globe, Mail, Trash2, Send, Eye, EyeOff, AlertTriangle, MessageCircle, QrCode, Loader2, Power } from 'lucide-react';
 import { toast } from 'sonner';
 import { logAudit } from '@/lib/auditLog';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { languages } from '@/i18n';
 import { useUserRoles } from '@/hooks/useUserRoles';
+import { WhatsAppSettingsPanel } from '@/components/settings/WhatsAppSettingsPanel';
 
 interface TenantSettings {
   id: string;
@@ -35,6 +36,7 @@ interface TenantSettings {
   enable_nda: boolean;
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
+  whatsapp_provider: 'twilio' | 'whatsapp_web';
 }
 
 interface EmailConfig {
@@ -203,6 +205,7 @@ export default function Settings() {
             <TabsTrigger value="policies" className="gap-1.5"><FileText className="h-4 w-4" /> {t('settings.policies')}</TabsTrigger>
             <TabsTrigger value="security" className="gap-1.5"><Shield className="h-4 w-4" /> {t('settings.security')}</TabsTrigger>
             <TabsTrigger value="email" className="gap-1.5"><Mail className="h-4 w-4" /> Email</TabsTrigger>
+            <TabsTrigger value="whatsapp" className="gap-1.5"><MessageCircle className="h-4 w-4" /> WhatsApp</TabsTrigger>
             <TabsTrigger value="data" className="gap-1.5"><Database className="h-4 w-4" /> {t('settings.data')}</TabsTrigger>
             <TabsTrigger value="notifications" className="gap-1.5"><Bell className="h-4 w-4" /> {t('settings.notifications')}</TabsTrigger>
             <TabsTrigger value="help" className="gap-1.5"><HelpCircle className="h-4 w-4" /> {t('settings.help')}</TabsTrigger>
@@ -545,7 +548,15 @@ export default function Settings() {
             </Card>
           </TabsContent>
 
-          {/* Data Tab */}
+          {/* WhatsApp Tab */}
+          <TabsContent value="whatsapp">
+            <WhatsAppSettingsPanel
+              provider={settings.whatsapp_provider ?? 'twilio'}
+              onProviderChange={(p) => update('whatsapp_provider', p)}
+            />
+          </TabsContent>
+
+
           <TabsContent value="data">
             <Card>
               <CardHeader>

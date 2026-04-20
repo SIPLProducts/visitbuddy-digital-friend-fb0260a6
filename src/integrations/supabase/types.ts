@@ -801,6 +801,7 @@ export type Database = {
           secondary_color: string | null
           session_timeout_minutes: number | null
           updated_at: string
+          whatsapp_provider: string
         }
         Insert: {
           auto_checkout_hours?: number | null
@@ -821,6 +822,7 @@ export type Database = {
           secondary_color?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
+          whatsapp_provider?: string
         }
         Update: {
           auto_checkout_hours?: number | null
@@ -841,6 +843,7 @@ export type Database = {
           secondary_color?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
+          whatsapp_provider?: string
         }
         Relationships: []
       }
