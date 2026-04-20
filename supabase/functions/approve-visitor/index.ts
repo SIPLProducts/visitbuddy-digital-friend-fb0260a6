@@ -41,6 +41,16 @@ async function getBranding(supabase: any): Promise<Branding> {
   }
 }
 
+async function fetchLogoBytes(url: string): Promise<Uint8Array | null> {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return null;
+    return new Uint8Array(await res.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
 function brandedHeader(b: Branding, subtitle: string): string {
   return `<div style="background:#ffffff;padding:12px 8px;border-bottom:1px solid #e5e7eb;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;min-width:320px;border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0;">
@@ -69,7 +79,7 @@ async function sendSmtpEmail(
   to: string,
   subject: string,
   html: string,
-  logoUrl?: string
+  logoBytes?: Uint8Array | null
 ): Promise<boolean> {
   try {
     const { data: smtp } = await supabase
@@ -99,11 +109,13 @@ async function sendSmtpEmail(
       to,
       subject,
       html,
-      attachments: logoUrl ? [{
+      attachments: logoBytes ? [{
         filename: 're-logo.png',
-        path: logoUrl,
+        content: logoBytes,
+        contentType: 'image/png',
         cid: 're-logo',
         contentDisposition: 'inline',
+        encoding: 'base64',
       }] : undefined,
     });
 

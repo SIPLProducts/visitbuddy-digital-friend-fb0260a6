@@ -39,6 +39,16 @@ async function getBranding(supabase: any): Promise<Branding> {
   }
 }
 
+async function fetchLogoBytes(url: string): Promise<Uint8Array | null> {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return null;
+    return new Uint8Array(await res.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
 // ---- WhatsApp Web bridge helper ----
 const BRIDGE_URL = Deno.env.get("WHATSAPP_BRIDGE_URL");
 const BRIDGE_KEY = Deno.env.get("WHATSAPP_BRIDGE_API_KEY");
@@ -166,7 +176,7 @@ async function sendSmtpEmail(
   to: string,
   subject: string,
   html: string,
-  logoUrl?: string
+  logoBytes?: Uint8Array | null
 ): Promise<boolean> {
   try {
     const { data: smtp } = await supabase
@@ -196,11 +206,13 @@ async function sendSmtpEmail(
       to,
       subject,
       html,
-      attachments: logoUrl ? [{
+      attachments: logoBytes ? [{
         filename: 're-logo.png',
-        path: logoUrl,
+        content: logoBytes,
+        contentType: 'image/png',
         cid: 're-logo',
         contentDisposition: 'inline',
+        encoding: 'base64',
       }] : undefined,
     });
 
