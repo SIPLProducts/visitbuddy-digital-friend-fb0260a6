@@ -126,73 +126,149 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     await ensureVideoPlaying();
   };
 
-  const startScanning = async () => {
-    if (isInitializing || isCleaningUpRef.current) return;
+  const handleStartError = (err: any) => {
+    const errStr = String(err?.message ?? err);
+    console.error('[QrScanner] All camera attempts failed:', errStr, err);
+    if (!isMountedRef.current) return;
+    let message = errStr || 'Could not start camera';
+    if (err?.name === 'NotAllowedError' || /permission|denied|notallowed/i.test(errStr)) {
+      message = 'Camera permission denied. Please allow camera access in your browser settings.';
+    } else if (err?.name === 'NotFoundError' || /not\s*found|no camera|devices? found/i.test(errStr)) {
+      message = 'No camera found on this device.';
+    } else if (err?.name === 'NotReadableError' || /in use|notreadable|could not start video/i.test(errStr)) {
+      message = 'Camera is in use by another app. Close other apps and retry.';
+    } else if (err?.name === 'SecurityError' || /https|secure/i.test(errStr)) {
+      message = 'Camera blocked. The page must be served over HTTPS.';
+    }
+    setError(message);
+  };
 
+  const startWithConfig = async (config: any) => {
     setError(null);
     setIsInitializing(true);
-    // Allow a fresh scan for this new session
     hasHandledScanRef.current = false;
-
-    // Flip UI state FIRST so the container becomes visible before camera starts
     onToggleScanning(true);
+    setShowPicker(false);
 
     try {
-      // Clean up any existing scanner first
       await cleanupScanner();
-
-      // Wait for the container to actually be laid out (visible) in the DOM
       await new Promise(resolve => setTimeout(resolve, 150));
-
       if (!isMountedRef.current) return;
 
       const readerElement = document.getElementById('qr-reader');
-      if (!readerElement) {
-        throw new Error('Scanner container not found');
-      }
-
-      // Clear any leftover content
+      if (!readerElement) throw new Error('Scanner container not found');
       readerElement.innerHTML = '';
 
       const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
       scannerRef.current = scanner;
 
-      // Build ordered list of camera configs to try.
-      // html5-qrcode only accepts: a string facingMode, { exact: ... }, or a deviceId string.
-      const attempts: Array<{ label: string; config: any }> = [
+      await startScanWithConstraints(scanner, config);
+    } catch (err: any) {
+      handleStartError(err);
+      onToggleScanning(false);
+      await cleanupScanner();
+    } finally {
+      if (isMountedRef.current) setIsInitializing(false);
+    }
+  };
+
+  const startScanning = async () => {
+    if (isInitializing || isCleaningUpRef.current) return;
+
+    setError(null);
+
+    // 1. Try to enumerate cameras so user can choose.
+    let cams: Array<{ id: string; label: string }> = [];
+    try {
+      const result = await Html5Qrcode.getCameras();
+      cams = (result || []).map((c) => ({ id: c.id, label: c.label || '' }));
+    } catch (enumErr) {
+      console.warn('[QrScanner] getCameras() failed:', String(enumErr));
+    }
+
+    if (cams.length > 1) {
+      setCameras(cams);
+      // Auto-pick remembered camera if it's still present.
+      const remembered = localStorage.getItem(STORAGE_KEY);
+      if (remembered && cams.some((c) => c.id === remembered)) {
+        await startWithConfig(remembered);
+        return;
+      }
+      // Otherwise show the picker.
+      setShowPicker(true);
+      return;
+    }
+
+    // 2. Single camera — start it directly.
+    if (cams.length === 1) {
+      await startWithConfig(cams[0].id);
+      return;
+    }
+
+    // 3. Enumeration failed — fall back to facingMode attempts.
+    setIsInitializing(true);
+    hasHandledScanRef.current = false;
+    onToggleScanning(true);
+
+    try {
+      await cleanupScanner();
+      await new Promise(resolve => setTimeout(resolve, 150));
+      if (!isMountedRef.current) return;
+
+      const readerElement = document.getElementById('qr-reader');
+      if (!readerElement) throw new Error('Scanner container not found');
+      readerElement.innerHTML = '';
+
+      const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
+      scannerRef.current = scanner;
+
+      const attempts = [
         { label: 'environment (back)', config: { facingMode: 'environment' } },
         { label: 'user (front)', config: { facingMode: 'user' } },
       ];
-
-      // Try to enumerate cameras for desktop fallback (devices without facingMode).
-      try {
-        const cams = await Html5Qrcode.getCameras();
-        if (cams && cams.length > 0) {
-          attempts.push({ label: `deviceId ${cams[0].label || cams[0].id}`, config: cams[0].id });
-        }
-      } catch (enumErr) {
-        console.warn('getCameras() failed:', String(enumErr));
-      }
-
       let lastErr: unknown = null;
       let started = false;
       for (const attempt of attempts) {
         try {
-          console.log('[QrScanner] Trying camera:', attempt.label);
           await startScanWithConstraints(scanner, attempt.config);
           started = true;
-          console.log('[QrScanner] Camera started:', attempt.label);
           break;
         } catch (attemptErr) {
           lastErr = attemptErr;
-          console.warn('[QrScanner] Attempt failed:', attempt.label, String(attemptErr));
         }
       }
-
-      if (!started) {
-        throw lastErr ?? new Error('Could not start camera');
-      }
+      if (!started) throw lastErr ?? new Error('Could not start camera');
     } catch (err: any) {
+      handleStartError(err);
+      onToggleScanning(false);
+      await cleanupScanner();
+    } finally {
+      if (isMountedRef.current) setIsInitializing(false);
+    }
+  };
+
+  const selectCamera = async (deviceId: string) => {
+    localStorage.setItem(STORAGE_KEY, deviceId);
+    await startWithConfig(deviceId);
+  };
+
+  const handleSwitchCamera = async () => {
+    // Stop current scanner and show the picker again.
+    await stopScanning();
+    try {
+      const result = await Html5Qrcode.getCameras();
+      const cams = (result || []).map((c) => ({ id: c.id, label: c.label || '' }));
+      if (cams.length > 1) {
+        setCameras(cams);
+        setShowPicker(true);
+      }
+    } catch (enumErr) {
+      console.warn('[QrScanner] getCameras() failed:', String(enumErr));
+    }
+  };
+
+  // Legacy alias kept in case closure referenced it — unused after refactor.
+  const _unused = async (err: any) => {
       const errStr = String(err?.message ?? err);
       console.error('[QrScanner] All camera attempts failed:', errStr, err);
       if (isMountedRef.current) {
@@ -210,11 +286,6 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         onToggleScanning(false);
         await cleanupScanner();
       }
-    } finally {
-      if (isMountedRef.current) {
-        setIsInitializing(false);
-      }
-    }
   };
 
   const stopScanning = async () => {
