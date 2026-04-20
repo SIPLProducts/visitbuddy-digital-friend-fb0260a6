@@ -1,82 +1,85 @@
 
 
-## Remove "Sustainability" wordmark from RE logo and remove Sharvi branding everywhere
+## Restore "Re Sustainability" red header + add camera picker for QR scanner
 
-### Goal
-Across the app, wherever the **RE logo** appears, only the circular **"re"** mark should show. The grey **"Sustainability"** wordmark below it must be cropped out. The header banner / company name text stays untouched. All **"Powered by Sharvi Infotech"** lines are removed from emails, WhatsApp messages, and badges.
+Two targeted fixes — no other surfaces touched.
 
-### Approach for the logo
-The current asset `src/assets/resl-badge-logo.png` is a single image containing the red "re" circle **and** the grey "Sustainability" wordmark. Cropping it visually is the cleanest fix:
+### 1. Restore the red "Re Sustainability" header text everywhere it was removed
 
-1. Generate a new asset `src/assets/re-logo-mark.png` that contains only the red circular "re" mark (top portion of the original image, no "Sustainability" text).
-2. Replace every import of `resl-badge-logo.png` with the new `re-logo-mark.png`. This automatically fixes:
-   - Safety Permit badge (`SafetyPermitBadge.tsx`)
-   - Print badge page (`PrintBadge.tsx`)
-   - Email logo (the same file is referenced from edge function HTML via a public URL)
+The previous edit accidentally stripped the **"Re Sustainability"** header text. Bring it back exactly as before, in red (`#dc2626`), bold. The only thing that should NOT appear is the grey **"Sustainability"** wordmark that lived *inside the logo image* — that part stays gone (the new cropped logo `re-logo-mark.png` already handles that).
 
-For the email functions, the logo is currently loaded as a hosted URL inside `brandedHeader(...)`. We will:
-- Upload the cropped `re-logo-mark.png` into the existing public `branding` storage bucket (e.g. `branding/re-logo-mark.png`).
-- Point each edge function's `brandedHeader` `<img src="...">` at that public URL.
+So the result is:
+- Logo image = red "re" circle only (no grey wordmark under it). ✅ already done.
+- Text next to / under logo = **"Re Sustainability"** in red. ⬅ restore this.
 
-### Files to change
+**Files to update**
 
-**Assets**
-- Add `src/assets/re-logo-mark.png` — cropped logo (red "re" circle only).
-- Upload same file to public storage `branding/re-logo-mark.png` for use by emails.
+- `src/pages/PrintBadge.tsx` — re-add the `<div class="company-text">Re Sustainability</div>` element next to the logo inside the `.header` block, using the existing `.company-text` CSS rule (red, bold, centered) that's still defined in the stylesheet.
+- `src/components/badge/SafetyPermitBadge.tsx` — restore the `companyName` default prop back to `"Re Sustainability"` (or `"Resustainability"` to match the prior look — confirm which you want; plan assumes `"Re Sustainability"` per your message). The dark band under the logo will once again render that text in white.
+- Email edge functions — set `DEFAULT_COMPANY = "Re Sustainability"` in:
+  - `supabase/functions/send-email/index.ts`
+  - `supabase/functions/send-email-badge/index.ts`
+  - `supabase/functions/notify-host/index.ts`
+  - `supabase/functions/approve-visitor/index.ts`
 
-**Frontend (logo swap only — headers untouched)**
-- `src/components/badge/SafetyPermitBadge.tsx` — change import from `resl-badge-logo.png` to `re-logo-mark.png`. Header band + company name text stay exactly as they are. Remove only the bottom "Powered by Sharvi Infotech" footer block.
-- `src/pages/PrintBadge.tsx` — same logo swap. Header banner stays. Remove the "Powered by Sharvi Infotech" line at the bottom of the printable page (if present).
+  These already render the company name in red inside `brandedHeader(...)`. Only the constant changes.
 
-**Edge functions — emails**
-For each function below, inside `brandedHeader(...)` swap the `<img src>` to the new `branding/re-logo-mark.png` public URL. Header text, company name and red colour stay. In `brandedFooter(...)` (and the plain-text variants), delete the line `Powered by Sharvi Infotech — www.sharviinfotech.com` (HTML + text).
+The cropped logo asset (`re-logo-mark.png`) stays — that's what removes the grey "Sustainability" wordmark *from inside the image*.
 
-- `supabase/functions/send-email/index.ts`
-- `supabase/functions/send-email-badge/index.ts`
-- `supabase/functions/notify-host/index.ts`
-- `supabase/functions/approve-visitor/index.ts`
+### 2. Let the user pick the camera (back vs front) in the QR scanner
 
-**Edge functions — WhatsApp**
-Remove the `_Powered by VisiGuard VMS_` / Sharvi footer line from the message body:
-- `supabase/functions/send-whatsapp-badge/index.ts`
-- `supabase/functions/send-vehicle-whatsapp/index.ts`
-- `supabase/functions/notify-host/index.ts` (WhatsApp text branch — Sharvi line only)
-- `supabase/functions/approve-visitor/index.ts` (WhatsApp text branch — Sharvi line only)
+Currently `src/components/checkin/QrScanner.tsx` tries `environment` first then falls back to `user`. On laptops/tablets the back camera doesn't exist, so it ends up on the front cam silently with no way to switch.
 
-### Out of scope (intentionally untouched)
-- The **header band** ("VISITOR PASS", red banner, company name `Resustainability` shown in the dark band of the badge) — unchanged.
-- Auth / login screen Sharvi footer (internal staff-facing).
-- Product Proposal, User Manual, Resource Requirements, Product Features pages (internal sales/spec docs).
-- Long consent paragraph on the badge that mentions "Resustainability" — that is legal copy, not branding.
+Change the scanner so the user can choose:
+
+- After clicking **Start Scanning**, call `Html5Qrcode.getCameras()` to enumerate.
+- **One camera** → start it directly.
+- **Two or more cameras** → render small chips/buttons listing each camera by label (e.g. "Back camera", "Front camera", "USB Webcam"). Clicking one starts that camera.
+- Persist the chosen `deviceId` in `localStorage` (key `qr-scanner-camera-id`) so next time it auto-starts on the same camera without asking.
+- Show a small **"Switch camera"** link below the scanner once running so the user can change it any time.
+- Keep current `environment`-first fallback only when enumeration fails or labels are empty (older browsers / permissions denied path).
+- Preserve the existing duplicate-scan guard (`hasHandledScanRef`) and `onScan` contract — no behaviour change there.
+
+Affected file:
+- `src/components/checkin/QrScanner.tsx`
 
 ### Deploy
-Redeploy:
+
+Redeploy these four edge functions (only the `DEFAULT_COMPANY` constant changes):
 - `send-email`
 - `send-email-badge`
 - `notify-host`
 - `approve-visitor`
-- `send-whatsapp-badge`
-- `send-vehicle-whatsapp`
 
 ### Verification
+
 ```text
 1. Print a badge.
-   → Red "re" circle only. No grey "Sustainability" word under it.
-   → Red "Resustainability" header band still visible (unchanged).
-   → No "Powered by Sharvi Infotech" footer.
+   → Logo = red "re" circle, NO grey "Sustainability" wordmark under the image.
+   → Header text next to logo = "Re Sustainability" in red.
 
-2. New visitor created (phone + email).
-   → Host email + Visitor "Request Submitted" email show only the red "re" mark.
-   → No Sharvi line in HTML or plain text footer.
-   → Host WhatsApp message has no Sharvi line.
+2. Open Safety Permit badge.
+   → Logo on top, dark band reads "Re Sustainability" in white.
 
-3. Approve the visitor.
-   → Visitor "Visit Approved" email + WhatsApp: re-mark only, no Sharvi footer.
+3. Trigger any visitor email (host notify, approval, badge, checkout).
+   → Header shows red "re" logo image + "Re Sustainability" text in red.
 
-4. Check the visitor in.
-   → Checkout-QR email + WhatsApp: re-mark only, no Sharvi footer.
+4. Open Check-In/Out → Start Scanning on a phone with front + back cameras.
+   → Camera picker appears: "Back camera", "Front camera".
+   → Select "Back camera" → scanner starts on rear lens.
+   → Stop, Start again → it auto-picks "Back camera" (remembered).
+   → Click "Switch camera" → picker reappears.
 
-5. Register a commercial vehicle.
-   → Driver WhatsApp pass: no Sharvi / "Powered by" line.
+5. Open Check-In/Out → Start Scanning on a laptop with one webcam.
+   → Starts directly, no picker shown.
+
+6. Scan a QR.
+   → Same as today: lookup runs, no duplicate toasts.
 ```
+
+### Out of scope
+- WhatsApp message bodies (Sharvi line already removed previously, staying removed).
+- "Powered by Sharvi Infotech" footers (already removed, staying removed).
+- Vehicle gate scanner (separate flow, untouched).
+- Long legal consent paragraph that mentions "Re Sustainability" (legal copy, untouched).
 
