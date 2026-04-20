@@ -74,28 +74,43 @@ No `PUPPETEER_*` variables are needed in this mode — the Dockerfile already se
 ### Option B — Native Node service on Render
 
 If you deploy as a plain Node service (not Docker), Render does **not** ship
-Chromium. The included `postinstall` script downloads it during build, but the
-default cache path (`~/.cache/puppeteer`) is wiped between deploys. You must
-pin the cache to the project tree:
+Chromium. The included `postinstall` script downloads it during build into
+`./.puppeteer-cache` **inside the project tree** so it survives into runtime
+(Render wipes `~/.cache/puppeteer` between build & run — that's the cause of
+the `Could not find Chrome` error).
 
-1. Render dashboard → your service → **Settings**:
+`server.js` also sets `PUPPETEER_CACHE_DIR` at boot as a safety net.
+
+1. Render dashboard → **New → Web Service** → connect your repo.
+2. **Settings**:
+   - **Runtime**: Node
    - **Root Directory**: `whatsapp-bridge`
-   - **Build Command**: `npm install` (default — `postinstall` runs automatically)
+   - **Build Command**: `npm install`
    - **Start Command**: `node server.js`
-2. **Environment** → add:
-   - `BRIDGE_API_KEY` — long random string
-   - `PUPPETEER_CACHE_DIR` = `/opt/render/project/src/.cache/puppeteer`
-   - `SESSION_PATH` = `/opt/render/project/src/.wweb-session` *(or attach a
-     disk and use `/data/wweb-session`)*
-3. **Manual Deploy → Clear build cache & deploy**.
-4. Watch the **build** logs for `Downloading Chromium` (~150 MB, ~1 min first
-   time, cached after).
-5. Watch the **runtime** logs — the bridge prints its effective paths on boot:
+3. **Environment → Add Environment Variable**:
+   - `BRIDGE_API_KEY` — long random string (must match `WHATSAPP_BRIDGE_API_KEY` in Lovable)
+   - `PUPPETEER_CACHE_DIR` = `/opt/render/project/src/whatsapp-bridge/.puppeteer-cache`
+   - `SESSION_PATH` = `/opt/render/project/src/whatsapp-bridge/wweb-session`
+     *(or attach a Persistent Disk mounted at `/data` and use `/data/wweb-session` so the QR survives restarts)*
+   - `PORT` is auto-injected by Render — leave it unset.
+4. **Manual Deploy → Clear build cache & deploy**.
+5. Watch the **build** logs for `Downloading Chrome` (~170 MB, ~1 min first
+   time, then cached). The line ends with the install path — confirm it points
+   inside `/opt/render/project/src/whatsapp-bridge/.puppeteer-cache`.
+6. Watch the **runtime** logs — the bridge prints its effective paths on boot:
    ```text
-   [wweb-bridge] PUPPETEER_CACHE_DIR: /opt/render/project/src/.cache/puppeteer
+   [wweb-bridge] PUPPETEER_CACHE_DIR: /opt/render/project/src/whatsapp-bridge/.puppeteer-cache
    ```
-   If this line shows a different path, the env var did not apply — re-check
-   step 2 and redeploy with cache cleared.
+   Then you should see `[wweb] QR generated, scan with WhatsApp app.` — open
+   VisiGuard → **Settings → WhatsApp** to scan it.
+
+### Notes for Render free tier
+
+- The instance **sleeps after ~15 min** of inactivity. The first request after
+  sleep takes ~10–20 sec while Chrome relaunches. Use the **Starter** plan +
+  a Persistent Disk for a stable demo.
+- Without a Persistent Disk, the WhatsApp session at `SESSION_PATH` is wiped
+  on every redeploy → you'll need to scan the QR again.
 
 After deploy on either option, point the Lovable secret `WHATSAPP_BRIDGE_URL`
 at the public URL (no trailing slash).
