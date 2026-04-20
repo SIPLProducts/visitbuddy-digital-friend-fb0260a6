@@ -331,28 +331,36 @@ const handler = async (req: Request): Promise<Response> => {
       console.warn('Could not read whatsapp_provider, defaulting to twilio', e);
     }
 
-    const buildWhatsAppMessage = () => `
-🎫 *VisiGuard Visitor Pass - APPROVED*
-━━━━━━━━━━━━━━━━━━━━
-
-✅ Your visit has been approved!
-
-👤 *Name:* ${visitor.name}
-🆔 *Visitor ID:* ${visitor.visitor_id}
-${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
-${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
-${visitor.host?.name ? `👔 *Host:* ${visitor.host.name}` : ""}
-${visitor.department?.name ? `🏛️ *Department:* ${visitor.department.name}` : ""}
-${visitor.gate?.name ? `🚪 *Entry Gate:* ${visitor.gate.name}` : ""}
-
-📅 *Date:* ${currentDate}
-
-━━━━━━━━━━━━━━━━━━━━
-📱 *Show this badge at the security desk*
-📸 *Scan QR for quick check-out*
-
-_Powered by VisiGuard VMS_
-      `.trim();
+    const buildWhatsAppMessage = () => {
+      const lines: string[] = [
+        `*${branding.companyName}*`,
+        `_Visit Approved — Show This QR at the Gate_`,
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        `Dear *${visitor.name}*,`,
+        "",
+        "✅ Your visit has been approved. Please show the *CHECK-IN QR* below to security at the gate.",
+        "",
+        "📋 *Details*",
+        `• Visitor: ${visitor.name}`,
+        `• ID: ${visitor.visitor_id}`,
+      ];
+      if (visitor.company) lines.push(`• Company: ${visitor.company}`);
+      if (visitor.purpose) lines.push(`• Purpose: ${visitor.purpose}`);
+      if (visitor.host?.name) lines.push(`• Host: ${visitor.host.name}`);
+      if (visitor.department?.name) lines.push(`• Department: ${visitor.department.name}`);
+      if (visitor.gate?.name) lines.push(`• Entry Gate: ${visitor.gate.name}`);
+      lines.push(`• Date: ${currentDate}`);
+      lines.push(
+        "",
+        "📱 *Show this CHECK-IN QR at the gate to be scanned in.*",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "This is an automated message. Please do not reply.",
+        "Powered by *Sharvi Infotech* — www.sharviinfotech.com",
+      );
+      return lines.join("\n");
+    };
 
     // ---- WhatsApp Web (DEMO) path via bridge ----
     if (whatsappProvider === 'whatsapp_web' && visitor.phone) {
