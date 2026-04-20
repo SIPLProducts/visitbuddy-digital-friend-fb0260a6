@@ -1,63 +1,49 @@
 
 
-## What just happened
+## Fix — `spawnSync EINVAL` on Windows when running `npx.cmd`
 
-Your scan worked — `[wweb] ready — sending enabled` proves it. Then a puppeteer navigation inside WhatsApp Web threw an unhandled error and killed the Node process. ngrok then has nothing to forward to → the Settings page shows the same "Failed to send a request" red banner.
+### Root cause
+On Windows, Node 20's `spawnSync` refuses to run `.cmd` files unless `shell: true` is set. The current `install-chrome.js` passes `shell: false`, so `npx.cmd` fails immediately with `EINVAL`. Chrome never downloads, no QR appears.
 
-This is a known stability issue with `whatsapp-web.js` on Windows + Puppeteer 23. The fix is server-side hardening (process doesn't die) plus an auto-restart wrapper so transient crashes self-heal.
+### Fix
+Update `whatsapp-bridge/install-chrome.js` so the spawn call works on Windows:
+- On Windows: use `shell: true` and run the bare command `npx puppeteer browsers install chrome` (the shell resolves `npx` → `npx.cmd` correctly).
+- On macOS/Linux: keep `shell: false` and `cmd = 'npx'` as-is.
+- Add a clearer log line on success showing where Chrome was installed.
 
-## Plan
+That's the only code change needed. `server.js` already auto-detects the binary under `.puppeteer-cache\chrome\win64-...\chrome-win64\chrome.exe` once it exists.
 
-### 1) Harden `whatsapp-bridge/server.js`
-- Add `process.on('unhandledRejection', ...)` and `process.on('uncaughtException', ...)` handlers that log the error, mark `state = 'disconnected'`, destroy the broken client, and rebuild it after 3 seconds — instead of crashing the whole process.
-- Wrap `client.initialize()` in a try/catch with auto-retry (5s backoff).
-- On the `disconnected` event, automatically rebuild the client after 3s instead of staying dead.
-- Add a `lastError` field exposed on `/status` so the Settings page can show *why* it dropped.
+### Files to change
+- **Edit** `whatsapp-bridge/install-chrome.js` — switch to `shell: true` on Windows so `npx.cmd` is invocable.
 
-### 2) Add a tiny auto-restart wrapper script
-Create `whatsapp-bridge/run.js` — a supervisor that:
-- Spawns `node server.js` as a child
-- If it exits with a non-zero code, restarts it after 2s (with a max of 10 restarts per minute to avoid crash loops)
-- Forwards stdout/stderr so your existing terminal output is unchanged
-
-You'll then run **`node run.js`** instead of `node server.js`. Same one command, but the bridge survives crashes.
-
-### 3) README update
-Add a short "If you see Execution context was destroyed" section to `whatsapp-bridge/README.md` explaining:
-- Use `node run.js` (not `node server.js`) for stable demos
-- Common cause: opening WhatsApp Web in a browser tab on the same number, or sleeping the laptop
-- Don't open `web.whatsapp.com` in any browser while the bridge is running on the same number — that triggers the navigation that crashes Puppeteer
-
-### 4) No code changes needed in Lovable
-Edge functions, secrets, Settings UI, dispatcher in `approve-visitor` — all already correct. The only failure point is laptop-side process stability.
-
-## Files I'll change
-
-- **Edit** `whatsapp-bridge/server.js` — add global error handlers + auto-rebuild on disconnect
-- **New** `whatsapp-bridge/run.js` — supervisor wrapper with auto-restart
-- **Edit** `whatsapp-bridge/README.md` — document `node run.js` and the WhatsApp Web tab gotcha
-
-## What you'll do after I implement this
+### What you'll do after I apply the fix
 
 ```text
 1. cd C:\Users\HP\visitbuddy-digital-friend-fb0260a6\whatsapp-bridge
-2. node run.js              ← new command, replaces "node server.js"
-3. (ngrok keeps running in its own window — don't restart it)
-4. Refresh Settings → WhatsApp tab in Lovable
-5. Status will show "Connected" (your phone session is still linked,
-   the bridge will reconnect automatically, no re-scan needed)
-6. Click "Send Test Message" → message arrives on your phone
-7. Approve a real visitor → badge sent via your WhatsApp number
+2. node install-chrome.js
+   → expect "Downloading Chrome 131.0.6778.x..." then "chrome@131... C:\...\chrome.exe"
+   → takes 1–3 minutes, ~150 MB
+3. dir .puppeteer-cache\chrome      ← confirm a win64-* folder exists
+4. node run.js
+   → boot log should now include:
+     [wweb-bridge] detected Chrome at C:\...\chrome.exe
+     [wweb] QR generated, scan with WhatsApp app.
+5. Refresh Settings → WhatsApp tab in Lovable → click Refresh status
+6. Phone → WhatsApp → Linked Devices → Unlink old "active" device → Link new device → scan QR
+7. Status flips to Connected → click Send Test Message → message arrives
+8. Approve a real visitor → badge sent via your WhatsApp number
 ```
 
-If the bridge ever crashes again, `run.js` restarts it within 2 seconds and the saved session reconnects automatically — no manual intervention needed.
+### Fallback if `node install-chrome.js` still fails after the fix
 
-## Important: don't open WhatsApp Web in a browser
+Run this single one-liner from the `whatsapp-bridge` folder (uses the local `puppeteer` package directly, bypassing `npx` entirely):
 
-While `node run.js` is running and your phone is linked to it, **do not open `https://web.whatsapp.com` in Chrome/Edge** on the same number. Doing so triggers WhatsApp to "navigate" the puppeteer-controlled tab, which is exactly the crash you just hit. Use only your phone for WhatsApp during the demo.
+```cmd
+node -e "process.env.PUPPETEER_CACHE_DIR=require('path').resolve('.puppeteer-cache'); require('puppeteer/lib/cjs/puppeteer/node/cli.js')" install --browser chrome
+```
 
-## Out of scope
+If that also fails (firewall / proxy), I'll guide a manual download from `https://googlechromelabs.github.io/chrome-for-testing/` with the exact unzip path.
 
-- Switching off `whatsapp-web.js` (Twilio path remains the production-recommended option; Web bridge stays the demo path)
-- Migrating to a stable URL (still need ngrok unless you want to set up Cloudflare Tunnel — separate task)
+### Out of scope
+- ngrok URL stability, Twilio fallback, deploying the bridge to Render — separate steps.
 
