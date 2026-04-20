@@ -304,6 +304,20 @@ const handler = async (req: Request): Promise<Response> => {
     const { visitorId }: NotifyHostRequest = await req.json();
     const branding = await getBranding(supabase);
 
+    // Provider preference (twilio | whatsapp_web). Defaults to twilio.
+    let whatsappProvider: "twilio" | "whatsapp_web" = "twilio";
+    try {
+      const { data: ts } = await supabase
+        .from("tenant_settings")
+        .select("whatsapp_provider")
+        .limit(1)
+        .maybeSingle();
+      if (ts?.whatsapp_provider === "whatsapp_web") whatsappProvider = "whatsapp_web";
+    } catch (e) {
+      console.warn("Could not read whatsapp_provider, defaulting to twilio");
+    }
+    console.log(`[notify-host] whatsapp_provider = ${whatsappProvider}`);
+
     if (!visitorId) {
       return new Response(
         JSON.stringify({ error: "Visitor ID is required" }),
