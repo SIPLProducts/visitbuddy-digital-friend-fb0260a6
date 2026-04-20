@@ -657,9 +657,12 @@ _VisiGuard Visitor Management System_
       JSON.stringify({
         success: true,
         message: "Notifications processed",
+        whatsappProvider,
         hostNotified: hostNotificationSent,
+        hostTransport,
         hostMessageSid: hostMessageSid || null,
         visitorNotified: visitorNotificationSent,
+        visitorTransport,
         hostEmailSent,
         visitorEmailSent,
         visitor: { id: visitor.visitor_id, name: visitor.name },
