@@ -125,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
             <img src="${branding.logoUrl}" alt="${branding.companyName}" width="80" height="80" style="display:block;width:80px;height:80px;object-fit:contain;background:#ffffff;" />
           </td>
           <td style="vertical-align:middle;text-align:center;">
-            <div style="font-family:Arial,sans-serif;font-size:20px;font-weight:800;color:${branding.primaryColor};line-height:1.2;">${branding.companyName}</div>
+            <div style="font-family:Arial,sans-serif;font-size:20px;font-weight:800;color:#dc2626;line-height:1.2;">${branding.companyName}</div>
             <div style="font-family:Arial,sans-serif;font-size:11px;color:#64748b;margin-top:4px;">🎫 Visitor Safety Permit</div>
           </td>
           <td style="width:88px;">&nbsp;</td>
