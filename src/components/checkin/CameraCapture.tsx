@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, RotateCcw, Check, X, AlertCircle, Upload, ImageIcon, SwitchCamera } from 'lucide-react';
+import { Camera, RotateCcw, Check, X, AlertCircle, Upload, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,6 +13,9 @@ interface CameraCaptureProps {
 }
 
 const DEVICE_STORAGE_KEY = 'camera-capture-device-id';
+const FACING_STORAGE_KEY = 'camera-capture-facing-mode';
+
+type FacingMode = 'environment' | 'user';
 
 function labelForDevice(device: MediaDeviceInfo, index: number): string {
   if (device.label) {
