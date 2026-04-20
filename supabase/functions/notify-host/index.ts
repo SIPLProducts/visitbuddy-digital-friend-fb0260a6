@@ -100,6 +100,72 @@ function brandedFooter(): string {
     </div>`;
 }
 
+// ---- WhatsApp branded message builder (mirrors email layout) ----
+interface WhatsAppMessageOpts {
+  branding: Branding;
+  subtitle: string;
+  recipientName: string;
+  intro: string;
+  statusLine?: string | null;
+  details: Array<[string, string | null | undefined]>;
+  companions?: any[];
+  approveLink?: string | null;
+  rejectLink?: string | null;
+  closingLine?: string | null;
+}
+
+function buildWhatsAppMessage(opts: WhatsAppMessageOpts): string {
+  const lines: string[] = [];
+  lines.push(`*${opts.branding.companyName}*`);
+  lines.push(`_${opts.subtitle}_`);
+  lines.push("━━━━━━━━━━━━━━━━━━━━");
+  lines.push("");
+  lines.push(`Dear *${opts.recipientName}*,`);
+  lines.push("");
+  lines.push(opts.intro);
+  if (opts.statusLine) {
+    lines.push("");
+    lines.push(opts.statusLine);
+  }
+  lines.push("");
+  lines.push("📋 *Details*");
+  for (const [label, value] of opts.details) {
+    if (value && String(value).trim()) {
+      lines.push(`• ${label}: ${value}`);
+    }
+  }
+
+  if (opts.companions && opts.companions.length > 0) {
+    lines.push("");
+    lines.push(`👥 *Accompanying Persons (${opts.companions.length})*`);
+    opts.companions.forEach((c: any, i: number) => {
+      const devices: string[] = [];
+      if (c.has_laptop) devices.push(`💻 ${c.laptop_brand || "Laptop"}${c.laptop_serial ? ` (${c.laptop_serial})` : ""}`);
+      if (c.has_mobile) devices.push(`📱 ${c.mobile_brand || "Mobile"}${c.mobile_serial ? ` (${c.mobile_serial})` : ""}`);
+      const phonePart = c.phone ? ` (${c.phone})` : "";
+      const devicePart = devices.length ? ` — ${devices.join(", ")}` : "";
+      lines.push(`${i + 1}. ${c.name}${phonePart}${devicePart}`);
+    });
+  }
+
+  if (opts.approveLink && opts.rejectLink) {
+    lines.push("");
+    lines.push(`✅ Approve: ${opts.approveLink}`);
+    lines.push(`❌ Reject:  ${opts.rejectLink}`);
+  }
+
+  if (opts.closingLine) {
+    lines.push("");
+    lines.push(opts.closingLine);
+  }
+
+  lines.push("");
+  lines.push("━━━━━━━━━━━━━━━━━━━━");
+  lines.push("This is an automated message. Please do not reply.");
+  lines.push(`Powered by *Sharvi Infotech* — www.sharviinfotech.com`);
+  return lines.join("\n");
+}
+
 async function sendSmtpEmail(
   supabase: any,
   to: string,
@@ -438,61 +504,34 @@ const handler = async (req: Request): Promise<Response> => {
         ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`
         : null;
 
-      const hostMessage = isPendingApproval
-        ? `
-🔔 *Visitor Approval Request*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${hostData.name}*,
-
-A visitor is waiting for your approval:
-
-👤 *Visitor:* ${visitor.name}
-🆔 *ID:* ${visitor.visitor_id}
-${visitor.phone ? `📱 *Mobile:* ${visitor.phone}` : ""}
-${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
-${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
-${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
-${companions.length > 0 ? `
-👥 *Accompanying Persons (${companions.length}):*
-${companions.map((c: any, i: number) => `  ${i + 1}. ${c.name}${c.phone ? ` (${c.phone})` : ''}`).join('\n')}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-━━━━━━━━━━━━━━━━━━━━
-✅ *Approve:* ${approveLink}
-❌ *Reject:* ${rejectLink}
-
-_VisiGuard Visitor Management System_
-        `.trim()
-        : `
-🔔 *Visitor Arrival Notification*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${hostData.name}*,
-
-A visitor has checked in to meet you:
-
-👤 *Visitor:* ${visitor.name}
-🆔 *ID:* ${visitor.visitor_id}
-${visitor.phone ? `📱 *Mobile:* ${visitor.phone}` : ""}
-${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
-${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
-${gateName ? `🚪 *Entry Point:* ${gateName}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-━━━━━━━━━━━━━━━━━━━━
-Please proceed to the reception to receive your visitor.
-
-_VisiGuard Visitor Management System_
-        `.trim();
+      const hostMessage = buildWhatsAppMessage({
+        branding,
+        subtitle: isPendingApproval ? "Visitor Approval Required" : "Visitor Arrival Notification",
+        recipientName: hostData.name,
+        intro: isPendingApproval
+          ? "A visitor is waiting for your approval. Please review the details below and take action."
+          : "A visitor has arrived to meet you. Details below.",
+        details: [
+          ["Visitor", visitor.name],
+          ["ID", visitor.visitor_id],
+          ["Phone", visitor.phone],
+          ["Company", visitor.company],
+          ["Purpose", visitor.purpose],
+          ["Department", departmentName],
+          ["Entry Gate", gateName],
+          ["Date", currentDate],
+          ["Time", currentTime],
+        ],
+        companions,
+        approveLink: isPendingApproval ? approveLink : null,
+        rejectLink: isPendingApproval ? rejectLink : null,
+        closingLine: isPendingApproval ? null : "Please proceed to the reception to receive your visitor.",
+      });
+      const hostMediaUrl = visitor.photo_url || branding.logoUrl;
 
       // Try bridge first if provider is whatsapp_web
       if (whatsappProvider === "whatsapp_web") {
-        const bridgeRes = await sendViaBridge(formattedHostPhone, hostMessage, visitor.photo_url);
+        const bridgeRes = await sendViaBridge(formattedHostPhone, hostMessage, hostMediaUrl);
         if (bridgeRes.ok) {
           console.log("Host notification sent via bridge:", bridgeRes.id);
           hostNotificationSent = true;
@@ -509,8 +548,8 @@ _VisiGuard Visitor Management System_
       hostFormData.append("To", `whatsapp:${formattedHostPhone}`);
       hostFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       hostFormData.append("Body", hostMessage);
-      if (visitor.photo_url) {
-        hostFormData.append("MediaUrl", visitor.photo_url);
+      if (hostMediaUrl) {
+        hostFormData.append("MediaUrl", hostMediaUrl);
       }
 
       try {
@@ -549,51 +588,31 @@ _VisiGuard Visitor Management System_
       }
 
       const isPendingApproval = visitor.status === "pending_approval";
-      const visitorMessage = isPendingApproval
-        ? `
-⏳ *Visit Request Submitted*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${visitor.name}*,
-
-Your visit request has been submitted and is *awaiting host approval*.
-
-🆔 *Visitor ID:* ${visitor.visitor_id}
-${hostData.name ? `👤 *Host:* ${hostData.name}` : ""}
-${departmentName ? `🏢 *Department:* ${departmentName}` : ""}
-${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-You will receive another message once your host approves the visit.
-
-_VisiGuard Visitor Management System_
-        `.trim()
-        : `
-✅ *Check-in Confirmed*
-━━━━━━━━━━━━━━━━━━━━
-
-Dear *${visitor.name}*,
-
-Your check-in has been recorded successfully!
-
-🆔 *Visitor ID:* ${visitor.visitor_id}
-${hostData.name ? `👤 *Host:* ${hostData.name}` : ""}
-${departmentName ? `🏢 *Department:* ${departmentName}` : ""}
-${gateName ? `🚪 *Entry Gate:* ${gateName}` : ""}
-
-📅 *Date:* ${currentDate}
-⏰ *Time:* ${currentTime}
-
-${hostNotificationSent ? "Your host has been notified of your arrival." : "Please wait at the reception area."}
-
-_VisiGuard Visitor Management System_
-        `.trim();
+      const visitorMessage = buildWhatsAppMessage({
+        branding,
+        subtitle: isPendingApproval ? "Visit Request Submitted" : "Check-in Confirmed",
+        recipientName: visitor.name,
+        intro: isPendingApproval
+          ? "Your visit request has been submitted and is now pending approval from your host."
+          : "Your check-in has been recorded successfully!",
+        statusLine: isPendingApproval ? "⏳ Status: Awaiting Host Approval" : null,
+        details: [
+          ["Visitor ID", visitor.visitor_id],
+          ["Purpose", visitor.purpose],
+          ["Host", hostData.name],
+          ["Department", departmentName],
+          ["Entry Gate", gateName],
+          ["Date", currentDate],
+          ["Time", currentTime],
+        ],
+        closingLine: isPendingApproval
+          ? "You will receive another message once your host approves the visit."
+          : (hostNotificationSent ? "Your host has been notified of your arrival." : "Please wait at the reception area."),
+      });
 
       // Try bridge first if provider is whatsapp_web
       if (whatsappProvider === "whatsapp_web") {
-        const bridgeRes = await sendViaBridge(formattedVisitorPhone, visitorMessage);
+        const bridgeRes = await sendViaBridge(formattedVisitorPhone, visitorMessage, branding.logoUrl);
         if (bridgeRes.ok) {
           console.log("Visitor confirmation sent via bridge:", bridgeRes.id);
           visitorNotificationSent = true;
@@ -608,6 +627,9 @@ _VisiGuard Visitor Management System_
       visitorFormData.append("To", `whatsapp:${formattedVisitorPhone}`);
       visitorFormData.append("From", `whatsapp:${twilioWhatsAppNumber}`);
       visitorFormData.append("Body", visitorMessage);
+      if (branding.logoUrl) {
+        visitorFormData.append("MediaUrl", branding.logoUrl);
+      }
 
       try {
         const twilioResponse = await fetch(twilioUrl!, {
