@@ -671,7 +671,8 @@ const handler = async (req: Request): Promise<Response> => {
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
         `Visitor Approval Required — ${visitor.name}`,
-        hostEmailHtml
+        hostEmailHtml,
+        branding.logoUrl
       );
     } else if (hostData.email && !isPendingApproval) {
       // For direct check-in, still notify host via email
@@ -682,7 +683,8 @@ const handler = async (req: Request): Promise<Response> => {
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
         `Visitor Arrival — ${visitor.name}`,
-        hostEmailHtml
+        hostEmailHtml,
+        branding.logoUrl
       );
     }
 
@@ -695,7 +697,8 @@ const handler = async (req: Request): Promise<Response> => {
       visitorEmailSent = await sendSmtpEmail(
         supabase, visitor.email,
         "Visit Request Submitted — Awaiting Approval",
-        visitorEmailHtml
+        visitorEmailHtml,
+        branding.logoUrl
       );
     }
 

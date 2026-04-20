@@ -480,7 +480,8 @@ const handler = async (req: Request): Promise<Response> => {
         supabase,
         visitor.email,
         `Visit Approved — Show This QR at the Gate`,
-        emailHtml
+        emailHtml,
+        branding.logoUrl
       );
     }
 
