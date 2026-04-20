@@ -520,7 +520,7 @@ export default function PrintBadge() {
               <div className="header">
                 <div className="logo-box" style={{ position: 'relative', overflow: 'hidden' }}>
                   <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                    <rect width="100%" height="100%" fill="#000000" />
+                    <rect width="100%" height="100%" fill="#ffffff" />
                   </svg>
                   <img src={reslLogo} alt="RESL" style={{ position: 'relative', zIndex: 1 }} />
                 </div>
