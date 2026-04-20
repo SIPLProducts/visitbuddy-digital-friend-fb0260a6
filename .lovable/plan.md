@@ -1,65 +1,69 @@
 
 
-## Route visitor-creation WhatsApp through your Web bridge (parity with email)
+## Why no WhatsApp arrived (and what to fix)
 
-### What you're getting
-Today, when a visitor is created:
-- **Email** to host (with Approve/Reject buttons) ✅ working
-- **Email** to visitor (status: awaiting approval) ✅ working
-- **WhatsApp** to host + visitor — sent, but **only via Twilio** (sandbox, expiring URLs, paid)
+### Root cause
+Your edge function logs prove it:
 
-After this fix, those same two WhatsApp messages will be sent through your **WhatsApp Web bridge** (your own number, free, no sandbox opt-in) whenever Settings → WhatsApp Provider = `WhatsApp Web`. Twilio remains the automatic fallback if the bridge is offline.
+```
+[notify-host] whatsapp_provider = twilio
+Host notification sent successfully: SM2cbca495d028b926e998d9e10a93adc8
+```
 
-### What changes
+The Settings → WhatsApp toggle in the UI is set to "WhatsApp Web", but the **database** (`tenant_settings.whatsapp_provider`) is still `twilio`. So `notify-host` correctly took the Twilio path. Twilio then SMSed your host (different SID prefix `SM` = Twilio SMS, not the bridge), and you saw nothing on the WhatsApp Web side because nothing was sent there.
 
-**File: `supabase/functions/notify-host/index.ts`** — add the same provider-aware sending block that `approve-visitor` already uses.
+The **bridge code is already wired correctly** for both host and visitor — it just never gets a chance to run while the DB row says `twilio`.
 
-1. Read `whatsapp_provider` from `tenant_settings` at the top of the handler (defaults to `twilio`).
-2. Add a small helper `sendViaBridge(phone, message, mediaUrl?)` that POSTs to `${WHATSAPP_BRIDGE_URL}/send` with the `x-api-key` header — exactly like `approve-visitor`.
-3. **Host message**: if provider is `whatsapp_web`, try the bridge first. If the bridge call fails (or secrets missing), fall back to the existing Twilio path. Bridge sends the same text body and includes `mediaUrl = visitor.photo_url` when present.
-4. **Visitor confirmation message**: same pattern — bridge first when provider is `whatsapp_web`, else Twilio.
-5. The Twilio block stays untouched — it just becomes the fallback rather than the only path.
-6. Approve/Reject links inside the host WhatsApp message stay identical (they're plain URLs to `/approve-visitor` — they work over either transport).
-7. Add provider tag (`'twilio' | 'whatsapp_web'`) to the response JSON so the UI can show which transport actually delivered.
+There's a secondary issue: the **toggle in Settings doesn't appear to be persisting** to the DB (or you didn't click Save after flipping it). This is the actual fix.
 
-No template changes, no new tables, no new secrets — `WHATSAPP_BRIDGE_URL` and `WHATSAPP_BRIDGE_API_KEY` are already configured.
+### Two-part fix
 
-### Behaviour matrix after the change
+**Part 1 — Persist the provider toggle (UI bug, real cause)**
 
-| Provider setting | Bridge running? | Host phone present | What sends |
-|---|---|---|---|
-| `whatsapp_web` | ✅ yes | ✅ | **Bridge** (your number) |
-| `whatsapp_web` | ❌ no | ✅ | Falls back to **Twilio** |
-| `twilio` | — | ✅ | **Twilio** (unchanged) |
-| any | — | ❌ no phone | Skipped (email still sends) |
+Open `src/pages/Settings.tsx` (or whichever parent renders `WhatsAppSettingsPanel`) and verify:
+1. The `provider` value passed into `<WhatsAppSettingsPanel provider={...} onProviderChange={...} />` is loaded from `useTenantSettings().settings.whatsapp_provider`.
+2. `onProviderChange` calls `updateSettings({ whatsapp_provider: newValue })` **immediately on toggle** (not behind a separate Save button), so the DB row flips the moment the user clicks the switch.
+3. After the update, show a `toast.success("Provider switched to WhatsApp Web")` so the user gets feedback.
 
-Same matrix applies to the visitor confirmation message.
+This single change ensures `[notify-host] whatsapp_provider = whatsapp_web` appears in the next log run, which then triggers the bridge path.
+
+**Part 2 — Make the WhatsApp body match the email content (already true for host, tighten visitor)**
+
+I re-read the host WhatsApp body (lines 441–491) — it **already includes** everything the email shows: visitor name, ID, phone, company, purpose, gate, accompanying persons, date/time, and the approve/reject links. So the host WhatsApp ≡ host email. ✅
+
+The visitor WhatsApp body (lines 551–570) currently says "Check-in Confirmed" even when the visitor is `pending_approval`, which is misleading and doesn't match the visitor email ("Visit Request Submitted — Awaiting Approval"). Fix:
+- Use a `pending_approval` variant: title "⏳ Visit Request Submitted", status line "Awaiting host approval", and remove the "your host has been notified" line until status flips to scheduled.
+- Keep the existing "Check-in Confirmed" copy for the non-pending direct check-in path.
 
 ### Files touched
-- **Edit** `supabase/functions/notify-host/index.ts` — provider switch + bridge helper + bridge-first send for both host and visitor messages.
+- **Edit** `src/pages/Settings.tsx` — wire `provider`/`onProviderChange` to `useTenantSettings().settings.whatsapp_provider` and call `updateSettings` on toggle, with toast confirmation.
+- **Edit** `supabase/functions/notify-host/index.ts` — split visitor WhatsApp body into pending vs. checked-in variants (parity with visitor email).
 
 ### What you'll do after I apply the fix
 
 ```text
-1. Make sure your bridge is still running:
-   - Terminal shows: [wweb] ready — sending enabled
-   - Settings → WhatsApp shows: Connected (green)
-2. Settings → WhatsApp tab → confirm "Provider" is set to WhatsApp Web (not Twilio).
-3. Create a new visitor with:
-   - a host that has a phone number on their employee record
-   - a visitor phone number
-   - a visitor email (so you can compare email vs WhatsApp content)
-4. Within ~5 seconds expect:
-   - Host's phone: WhatsApp from YOUR number with Approve/Reject links + visitor photo
-   - Visitor's phone: WhatsApp confirmation with their visitor ID
-   - Host's inbox: same email as before (unchanged)
-   - Visitor's inbox: same email as before (unchanged)
-5. Tap Approve in the WhatsApp message → status flips to scheduled →
-   approve-visitor sends the approved badge over the bridge too (already wired).
+1. Settings → WhatsApp → flip the "Use WhatsApp Web (Demo)" switch.
+   Toast appears: "Switched to WhatsApp Web". Active provider chip turns secondary.
+2. Reload the page → toggle stays on (proves it persisted).
+3. Make sure the bridge terminal still shows: [wweb] ready — sending enabled
+4. Create a new visitor (host with phone, visitor with phone + email).
+5. Within ~5 s expect:
+   - Host's WhatsApp (from YOUR scanned number): full approval message with
+     visitor name, ID, mobile, company, purpose, gate, date/time, accompanying
+     persons, ✅ Approve and ❌ Reject links — same content as the email.
+   - Visitor's WhatsApp: "⏳ Visit Request Submitted — Awaiting Host Approval"
+     with their visitor ID, host, gate, date/time.
+   - Host's email: unchanged.
+   - Visitor's email: unchanged.
+6. Check edge function logs — should now read:
+   [notify-host] whatsapp_provider = whatsapp_web
+   Host notification sent via bridge: <id>
+   Visitor confirmation sent via bridge: <id>
+7. Tap Approve link in the host's WhatsApp → status flips to scheduled →
+   approve-visitor sends the badge over the bridge too (already working).
 ```
 
 ### Out of scope
-- Self-service portal already calls `notify-host`, so it gets the upgrade for free — no extra work.
-- Vehicle WhatsApp (`send-vehicle-whatsapp`) — separate function, not part of this request.
+- Vehicle WhatsApp (`send-vehicle-whatsapp`) — separate function.
 - Render deployment / ngrok stable URL — separate task.
 
