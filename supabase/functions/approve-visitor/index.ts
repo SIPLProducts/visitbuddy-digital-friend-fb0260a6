@@ -126,16 +126,13 @@ async function sendSmtpEmail(
   }
 }
 
-function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl: string): string {
+function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl: string, branding: Branding): string {
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:20px;font-family:Arial,sans-serif;background-color:#f5f5f5;">
   <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-    <div style="background:linear-gradient(135deg,#16a34a,#15803d);padding:20px;text-align:center;">
-      <h1 style="margin:0;color:white;font-size:20px;">VisiGuard VMS</h1>
-      <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:13px;">Visit Approved ✅</p>
-    </div>
+    ${brandedHeader(branding, "Visit Approved ✅")}
     <div style="padding:24px;">
       <h2 style="margin:0 0 16px;color:#1f2937;font-size:18px;">Dear ${visitor.name},</h2>
       
@@ -165,14 +162,7 @@ function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl
         <p style="margin:0;color:#92400e;font-size:16px;font-weight:bold;">📱 Please show this email to the security guard at the entrance</p>
       </div>
     </div>
-    <div style="background:#f8fafc;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;color:#9ca3af;font-size:11px;">This is an automated email from VisiGuard VMS. Please do not reply.</p>
-    </div>
-    <div style="background:#1e293b;padding:16px;text-align:center;">
-      <p style="margin:0;color:#f1f5f9;font-size:12px;">🚀 Built with excellence by <strong>Sharvi Info Tech Pvt. Ltd.</strong></p>
-      <p style="margin:6px 0;"><a href="https://www.sharviinfotech.com/" style="color:#38bdf8;font-size:11px;text-decoration:none;">🌐 www.sharviinfotech.com</a></p>
-      <p style="margin:0;color:#94a3b8;font-size:11px;font-style:italic;">Transforming ideas into powerful digital solutions.</p>
-    </div>
+    ${brandedFooter()}
   </div>
 </body>
 </html>`;
