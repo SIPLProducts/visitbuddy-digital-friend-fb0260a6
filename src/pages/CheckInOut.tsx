@@ -176,6 +176,7 @@ export default function CheckInOut() {
       toast.success(`${visitor.name} checked in successfully`);
       fetchVisitors();
       setSelectedVisitor(null);
+      sendCheckoutBadges(visitor.id);
     }
   };
 
