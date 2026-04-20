@@ -121,6 +121,18 @@ at the public URL (no trailing slash).
   didn't download Chromium (check build logs for the download step) or
   `PUPPETEER_CACHE_DIR` is unset/wrong (check the boot log line above). The
   fastest fix is to switch to Docker deploy (Option A).
+  As a hard override, set `PUPPETEER_EXECUTABLE_PATH` directly to the
+  installed binary, e.g.
+  `/opt/render/project/src/whatsapp-bridge/.puppeteer-cache/chrome/linux-131.0.6778.204/chrome-linux64/chrome`,
+  then **Clear build cache & deploy**.
+- **Two Chrome installs in build logs** (one in `.puppeteer-cache`, one in
+  `/opt/render/.cache/puppeteer`) → your Render **Build Command** still has
+  `&& npx puppeteer browsers install chrome` appended. Remove it — leave
+  only `npm install`. The `postinstall` script already installs Chrome into
+  the project-local cache.
+- **Node version warning** → pin Render to Node 20 by keeping `"engines": { "node": "20.x" }`
+  in `whatsapp-bridge/package.json` (already set). Newer Node majors can
+  break `whatsapp-web.js` / `puppeteer`.
 - **`Bridge unavailable`** in the Lovable Settings UI → the Render service is
   asleep or crashed. Open `https://<your-bridge>.onrender.com/health` in a
   browser to wake it; check Render logs.
