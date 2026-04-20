@@ -80,7 +80,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     }
   }, []);
 
-  const startCamera = useCallback(async (deviceIdOverride?: string) => {
+  const startCamera = useCallback(async (deviceIdOverride?: string, facingOverride?: FacingMode) => {
     if (isStarting) return;
 
     setIsStarting(true);
@@ -96,21 +96,27 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       }
 
       const targetDeviceId = deviceIdOverride !== undefined ? deviceIdOverride : selectedDeviceId;
+      const targetFacing: FacingMode = facingOverride ?? facingMode;
 
-      // Build constraint chain: saved/explicit deviceId -> environment -> user
+      // Build constraint chain: explicit deviceId -> requested facingMode -> opposite -> any
       const constraintChain: MediaStreamConstraints[] = [];
-      if (targetDeviceId) {
+      // Only honor saved deviceId when caller didn't ask for a specific facingMode
+      if (targetDeviceId && !facingOverride) {
         constraintChain.push({
           video: { deviceId: { exact: targetDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
         });
       }
       constraintChain.push({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { ideal: targetFacing }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
       constraintChain.push({
-        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: targetFacing === 'environment' ? 'user' : 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      constraintChain.push({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
 
@@ -138,6 +144,14 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       const activeTrack = mediaStream.getVideoTracks()[0];
       const settings = activeTrack?.getSettings?.();
       const activeDeviceId = settings?.deviceId;
+      const settingsFacing = (settings as any)?.facingMode as FacingMode | undefined;
+      // Trust the actual facingMode from the track, fall back to what we asked for
+      const resolvedFacing: FacingMode = settingsFacing === 'user' || settingsFacing === 'environment'
+        ? settingsFacing
+        : targetFacing;
+      if (isMountedRef.current) {
+        setActiveFacing(resolvedFacing);
+      }
       if (activeDeviceId && isMountedRef.current) {
         setSelectedDeviceId(activeDeviceId);
         try {
