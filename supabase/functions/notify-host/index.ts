@@ -39,6 +39,40 @@ async function getBranding(supabase: any): Promise<Branding> {
   }
 }
 
+// ---- WhatsApp Web bridge helper ----
+const BRIDGE_URL = Deno.env.get("WHATSAPP_BRIDGE_URL");
+const BRIDGE_KEY = Deno.env.get("WHATSAPP_BRIDGE_API_KEY");
+
+async function sendViaBridge(
+  phone: string,
+  message: string,
+  mediaUrl?: string | null,
+): Promise<{ ok: boolean; id?: string; error?: string }> {
+  if (!BRIDGE_URL || !BRIDGE_KEY) {
+    return { ok: false, error: "bridge_not_configured" };
+  }
+  try {
+    const base = BRIDGE_URL.replace(/\/+$/, "");
+    const res = await fetch(`${base}/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": BRIDGE_KEY,
+      },
+      body: JSON.stringify({ phone, message, mediaUrl: mediaUrl ?? null }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("[bridge] send failed", res.status, data);
+      return { ok: false, error: data?.error || `http_${res.status}` };
+    }
+    return { ok: true, id: data?.id ?? undefined };
+  } catch (e: any) {
+    console.error("[bridge] send threw", e?.message || e);
+    return { ok: false, error: e?.message || "bridge_unreachable" };
+  }
+}
+
 function brandedHeader(b: Branding, subtitle: string): string {
   return `<div style="background:#ffffff;padding:12px 8px;border-bottom:1px solid #e5e7eb;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;">
