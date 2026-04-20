@@ -1,72 +1,55 @@
 
 
-User is deploying the `whatsapp-bridge` to Render (non-Docker, native Node environment) and Puppeteer can't find Chrome at `/opt/render/.cache/puppeteer`. Need a Docker-free fix.
+User wants email header refinements:
+1. Logo bigger
+2. Less padding between edge and logo (logo flush-ish to left)
+3. "Re Sustainability" company name in **red** (`primary_color` / `#dc2626`)
+4. Company name **centered** (middle of header), not next to logo
 
-Root cause: On Render's free/standard Node runtime, `npm install --omit=dev` runs but `postinstall` runs `npx puppeteer browsers install chrome` — this download succeeds at build time into a build cache directory, but at runtime Render mounts a different filesystem, so Chrome is gone OR the path mismatches. Also, with `--omit=dev`, puppeteer's full package may be skipped depending on dependency placement.
+Currently all 4 email functions use a 2-cell table layout with logo (56×56) on the left and company name in dark color next to it with a small accent underline.
 
-The robust fix without Docker: install Chrome into a path **inside the project source tree** (`./.puppeteer-cache`) so it persists into runtime, and point Puppeteer at it explicitly via `PUPPETEER_CACHE_DIR`. Render persists everything under `/opt/render/project/src` between build and runtime — but NOT `~/.cache`. That's exactly the bug.
+Need to redesign the header block in all 4 edge functions to:
+- Larger logo (≈88×88)
+- Minimal left padding (≈8px) so logo sits close to edge
+- Company name centered horizontally in red, larger font
+- Subtitle ("Visitor Approval Required" etc.) stays below name, also centered, smaller/grey
+
+Best email-safe layout: 3-cell table — left logo cell (fixed width), center cell with name+subtitle (text-align:center), right spacer cell mirroring logo width to keep the name truly centered.
 
 ## Plan
 
-Make the WhatsApp bridge work on Render's native Node runtime (no Docker) by relocating Puppeteer's Chrome cache into the project directory.
+Redesign the email header in all 4 Edge Functions for a bigger flush-left logo and a centered red company name.
 
-### 1. `whatsapp-bridge/package.json` — fix install + cache location
+### New header structure (applied to all 4 templates)
 
-- Move `puppeteer` out of being a transitive-only dep (already a direct dep ✓).
-- Replace `postinstall` with one that installs Chrome into a project-relative folder:
-  ```
-  "postinstall": "PUPPETEER_CACHE_DIR=$(pwd)/.puppeteer-cache npx puppeteer browsers install chrome"
-  ```
-- Drop `--omit=dev` reliance (Render's default `npm install` is fine for this single-purpose service; document below).
-
-### 2. `whatsapp-bridge/server.js` — point Puppeteer at the project cache at runtime
-
-Add at the very top, before `import pkg from 'whatsapp-web.js'`:
-```js
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-if (!process.env.PUPPETEER_CACHE_DIR) {
-  process.env.PUPPETEER_CACHE_DIR = path.join(__dirname, '.puppeteer-cache');
-}
-```
-This guarantees runtime reads from the same folder build wrote to.
-
-### 3. `whatsapp-bridge/.gitignore` (new)
-
-```
-node_modules
-wweb-session
-.puppeteer-cache
+```text
+[ logo 88×88 ]        Re Sustainability        [ spacer 88px ]
+                       <subtitle, grey, sm>
 ```
 
-### 4. `whatsapp-bridge/README.md` — Render deploy section (new/updated)
+- White background strip, ~104px tall, bottom border `#e5e7eb`
+- Outer table padding: `padding: 12px 8px` (was `18px 24px`) — logo sits ~8px from left edge
+- 3-column layout (email-safe):
+  - Left cell: width `96px`, logo `88×88` (was `56×56`), `object-fit:contain`, no border-radius box
+  - Center cell: `text-align:center`, vertical-align middle
+    - Company name: `font-size: 22px; font-weight: 800; color: <primary_color || #dc2626>` (was dark `#0f172a`, now red)
+    - Subtitle below: `font-size: 12px; color: #64748b; margin-top: 4px` (no underline accent — centered text doesn't need it)
+  - Right cell: width `96px`, empty spacer (keeps name visually centered)
 
-Add a "Deploy to Render (no Docker)" block:
+Keeps the layout email-client-safe (Outlook, Gmail) by using a single `<table>` with explicit widths and inline styles.
 
-- Service type: **Web Service** → Runtime **Node**
-- Root Directory: `whatsapp-bridge`
-- Build command: `npm install`
-- Start command: `node server.js`
-- Environment variables:
-  - `BRIDGE_API_KEY` = strong random string (set the same value in Lovable secret `WHATSAPP_BRIDGE_API_KEY`)
-  - `SESSION_PATH` = `/opt/render/project/src/whatsapp-bridge/wweb-session` (so the QR scan persists across restarts on Render's persistent disk; on free tier it resets, that's expected)
-  - `PUPPETEER_CACHE_DIR` = `/opt/render/project/src/whatsapp-bridge/.puppeteer-cache` (explicit, matches what `postinstall` wrote)
-  - `PORT` = `10000` (Render auto-injects, no action needed)
-- After first deploy, copy the Render URL (`https://whatsapp-integration-vvms.onrender.com`) into Lovable secret `WHATSAPP_BRIDGE_URL`.
+### Files to update
 
-Also note: Render's free tier sleeps after 15 min of inactivity — first request after sleep will trigger a fresh Chrome launch (~10–20 sec). For a steady demo, use the **Starter plan** + a **Persistent Disk** mounted at `/opt/render/project/src/whatsapp-bridge/wweb-session` so the WhatsApp session survives restarts (otherwise you must rescan the QR after each deploy/sleep cycle).
+1. `supabase/functions/notify-host/index.ts` — both `generateHostApprovalEmail` and `generateVisitorConfirmationEmail`
+2. `supabase/functions/approve-visitor/index.ts` — `generateApprovedBadgeEmail`
+3. `supabase/functions/send-email-badge/index.ts` — inline badge HTML
+4. `supabase/functions/send-email/index.ts` — `generateHtmlEmail` wrapper
 
-### Why this fixes the error
+### Unchanged
+- White header background, footer, branding fetch from `tenant_settings`, SMTP delivery, fallbacks (RESL logo URL + `#dc2626`).
 
-- **Before:** `postinstall` wrote Chrome to `/opt/render/.cache/puppeteer` (Render's default). At runtime Render's process can't see it (different layer / wiped between build and run on some plans). Puppeteer crashes with "Could not find Chrome".
-- **After:** Both build and runtime use `./.puppeteer-cache` inside the project source tree, which Render preserves end-to-end. `server.js` sets `PUPPETEER_CACHE_DIR` programmatically as a safety net even if the env var is missing.
+### Deploy
+Redeploy all four functions: `notify-host`, `approve-visitor`, `send-email-badge`, `send-email`.
 
-### Files to change
-- `whatsapp-bridge/package.json` — update `postinstall` script
-- `whatsapp-bridge/server.js` — set `PUPPETEER_CACHE_DIR` at startup
-- `whatsapp-bridge/.gitignore` — new
-- `whatsapp-bridge/README.md` — add Render-without-Docker deploy steps
-
-Then on Render: clear build cache → redeploy. Logs should show `[wweb] QR generated` instead of the Chrome-not-found error.
+After deploy, send a test approval/badge email — header shows a large RESL logo flush to the left and "Re Sustainability" centered in red.
 
