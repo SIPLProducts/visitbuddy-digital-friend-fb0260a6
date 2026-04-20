@@ -102,6 +102,37 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
 
   const status = statusLabel[bridgeState];
 
+  const normalizePhone = (raw: string) => {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) return '';
+    if (raw.trim().startsWith('+')) return `+${digits}`;
+    // Default to India country code if 10-digit local number
+    if (digits.length === 10) return `+91${digits}`;
+    return `+${digits}`;
+  };
+
+  const sendTest = async () => {
+    const phone = normalizePhone(testPhone);
+    if (!phone || !testMessage.trim()) {
+      toast.error('Phone number and message are required');
+      return;
+    }
+    if (bridgeState !== 'ready') {
+      toast.error('WhatsApp is not ready yet. Wait for status: Connected.');
+      return;
+    }
+    setSending(true);
+    try {
+      const data = await callBridge('send', { phone, message: testMessage });
+      const id = data?.id ?? data?.messageId ?? '';
+      toast.success(`Test message sent to ${phone}${id ? ` (id: ${id})` : ''}`);
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Failed to send test message');
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
