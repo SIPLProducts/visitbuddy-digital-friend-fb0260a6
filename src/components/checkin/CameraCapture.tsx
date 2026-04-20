@@ -258,6 +258,26 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     handleSelectDevice(videoDevices[nextIdx].deviceId);
   }, [videoDevices, selectedDeviceId, handleSelectDevice]);
 
+  const handleSelectFacing = useCallback(
+    (mode: FacingMode) => {
+      setFacingMode(mode);
+      try {
+        localStorage.setItem(FACING_STORAGE_KEY, mode);
+      } catch {
+        /* ignore */
+      }
+      // Clear deviceId pin so the browser picks the right lens for this facingMode
+      setSelectedDeviceId(null);
+      try {
+        localStorage.removeItem(DEVICE_STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+      startCamera(undefined, mode);
+    },
+    [startCamera]
+  );
+
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
