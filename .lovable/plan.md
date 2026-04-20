@@ -1,70 +1,75 @@
 
 
-## The real situation (now fully clear)
+## Understanding
 
-- **Sender address required:** `visitor@resustainability.com` (client's mailbox on client's domain)
-- **Sending app:** VisiGuard on `visiguard.sharvisoftwareservices.com` (our domain)
-- **Client's IT request:** "Give us the DNS TXT records (SPF/DKIM/DMARC) so we can publish them on **resustainability.com**, authorizing your app to send mail as `@resustainability.com`."
+For **demo purposes only**, add WhatsApp Web automation alongside the existing Twilio integration. Twilio remains the production path; WhatsApp Web is a temporary demo channel that lets the user scan a QR code in Settings, connect their personal WhatsApp, and have approval messages auto-sent through it.
 
-This is **third-party domain authentication**: the client publishes records on *their* domain that name *our* sending infrastructure as authorized. No DNS access to either domain is needed from us — we just need an email service that can generate domain-specific SPF/DKIM/DMARC records for `resustainability.com`.
+A toggle in Settings picks the active provider (`twilio` | `whatsapp_web`). Approval flow checks the toggle and routes accordingly. No removal of Twilio code.
 
-Gmail SMTP cannot do this (records would belong to Google, not to `resustainability.com`). We need to switch to **Resend**, which lets us add `resustainability.com` as a sending domain and produces the exact records the client must publish.
+## Hard constraint (must be acknowledged)
 
-## Why Resend (not Lovable Email)
+WhatsApp Web automation (`whatsapp-web.js` / Baileys) requires a **persistent Node.js server with headless Chromium** running 24/7. Supabase Edge Functions are stateless and short-lived — they cannot host the WhatsApp session. So this needs:
 
-Lovable Email delegates a *subdomain* of *our* domain to Lovable's nameservers. It cannot host a sending identity on the client's domain (`resustainability.com`) — the client would have to delegate NS to Lovable, which they will not do for a single mailbox.
+- **An external bridge server** (Node + `whatsapp-web.js` + Express) hosted somewhere you control: Render, Railway, Fly.io, a VPS, or even your laptop with ngrok for the demo.
+- Lovable side only acts as a **proxy** to that bridge.
 
-**Resend** supports adding `resustainability.com` directly: it generates SPF (TXT), DKIM (3 CNAMEs), and optional DMARC (TXT) records. The client's IT team publishes them on `resustainability.com`. Once verified, we send `From: visitor@resustainability.com` via Resend's API. `RESEND_API_KEY` is already in project secrets.
+I will write the bridge server source code into the repo at `whatsapp-bridge/` (with README + Dockerfile), but **you must deploy and run it** outside Lovable. For a quick demo, running it locally + ngrok works fine.
+
+Also: WhatsApp may ban the number — use a **dedicated demo SIM**, not personal/business.
 
 ## Plan
 
-### Step 1 — Add the domain in Resend (manual, one-time)
-You (or whoever owns the Resend account) log into resend.com → **Domains → Add Domain** → enter `resustainability.com`. Resend immediately displays:
-- 1× SPF TXT record
-- 3× DKIM CNAME records
-- 1× DMARC TXT record (optional)
-- 1× MX record for bounces (optional)
+### 1. Bridge server (you deploy externally)
+New folder `whatsapp-bridge/` containing:
+- `server.js` — Express + `whatsapp-web.js` with `LocalAuth` (session persists on disk)
+- Endpoints: `GET /qr` (current QR data URL), `GET /status`, `POST /send` ({phone, message, mediaUrl}), `POST /logout`
+- `BRIDGE_API_KEY` header check on all endpoints
+- `package.json`, `Dockerfile`, `README.md` with deploy steps (Render/Railway/local+ngrok)
 
-Copy these and forward them verbatim to the client's IT team. They publish them on `resustainability.com` DNS. Once Resend shows "Verified", we proceed to Step 2.
+### 2. Add runtime secrets in Lovable
+- `WHATSAPP_BRIDGE_URL` — public URL of bridge
+- `WHATSAPP_BRIDGE_API_KEY` — shared secret
 
-> No code changes happen in Step 1. I cannot do this for you — Resend dashboard access is required.
+### 3. New Edge Function `whatsapp-bridge` (proxy)
+`supabase/functions/whatsapp-bridge/index.ts` with action router: `qr` | `status` | `send` | `logout`. Forwards to bridge with the API key. Register in `supabase/config.toml` with `verify_jwt = false`.
 
-### Step 2 — Migrate Edge Functions from Nodemailer/Gmail to Resend
+### 4. Settings UI — new "WhatsApp Web (Demo)" tab
+In `src/pages/Settings.tsx`:
+- Provider toggle: **Twilio (Production)** ↔ **WhatsApp Web (Demo)** — stored in `tenant_settings` (new column `whatsapp_provider text default 'twilio'`)
+- Demo warning banner about ToS / ban risk
+- "Connect WhatsApp" button → polls `?action=qr` every 3s, displays QR image until status flips to `ready`
+- Connection status badge: Disconnected / Awaiting Scan / Connected
+- "Disconnect" button
 
-Rewrite three functions to send via Resend using `visitor@resustainability.com` as the sender:
+### 5. Wire into approval flow
+In `supabase/functions/approve-visitor/index.ts`:
+- Read `whatsapp_provider` from `tenant_settings`
+- If `whatsapp_web`: call `whatsapp-bridge` with action `send`, body `{phone, message, mediaUrl: qrCodeUrl}`
+- If `twilio` (default): keep existing `send-whatsapp-badge` call
+- On bridge failure, fall back to Twilio and log warning
 
-- **`supabase/functions/send-email/index.ts`** — replace nodemailer transport with Resend API call (`https://api.resend.com/emails`). Keep template lookup, placeholder replacement, and `email_logs` insert intact. Sender = `"VisiGuard" <visitor@resustainability.com>`.
-- **`supabase/functions/send-email-badge/index.ts`** — replace `from: "VisiGuard <onboarding@resend.dev>"` with `visitor@resustainability.com`. Drop the sandbox owner-redirect fallback (no longer needed once domain is verified).
-- **`supabase/functions/test-smtp/index.ts`** — repurpose to send a test email via Resend so users can verify the new setup from Settings.
+Twilio code remains 100% intact for `notify-host`, `send-vehicle-whatsapp`, etc. — only the approval message is dual-routed for the demo.
 
-All three use the existing `RESEND_API_KEY` secret.
-
-### Step 3 — Update Settings UI
-
-In `src/pages/Settings.tsx` SMTP tab:
-- Add a status banner: "Email sending is configured via Resend — sender: visitor@resustainability.com (verified)".
-- Keep the existing custom-SMTP form below as a fallback for future clients who insist on their own SMTP.
-- Update the "Send test email" button to call the new test function.
-
-### Step 4 — Hand records to the client
-
-After Step 1, message your client's IT team with the records Resend generated. Sample wording:
-
-> *"To send mail as `visitor@resustainability.com` from VisiGuard, please add the following DNS records to `resustainability.com`. They authorize Resend (our email service provider) to send on your behalf and let receiving mail servers verify the authenticity of our messages."*
->
-> Then list the SPF + 3 DKIM CNAMEs + DMARC + MX rows from Resend's dashboard.
+### 6. DB migration
+Add column `whatsapp_provider text not null default 'twilio'` to `tenant_settings` with check constraint `in ('twilio','whatsapp_web')`.
 
 ## Files affected
 
-- `supabase/functions/send-email/index.ts` — rewrite (nodemailer → Resend)
-- `supabase/functions/send-email-badge/index.ts` — rewrite, drop sandbox fallback
-- `supabase/functions/test-smtp/index.ts` — repurpose for Resend test
-- `src/pages/Settings.tsx` — add Resend status banner in SMTP tab
+- **New** `whatsapp-bridge/server.js`, `package.json`, `Dockerfile`, `README.md` (you deploy)
+- **New** `supabase/functions/whatsapp-bridge/index.ts`
+- `supabase/config.toml` — register function (`verify_jwt = false`)
+- `supabase/functions/approve-visitor/index.ts` — provider switch
+- `src/pages/Settings.tsx` — new WhatsApp Web tab
+- `src/hooks/useTenantSettings.ts` — add `whatsapp_provider` field
+- DB migration — add `whatsapp_provider` column
 
-## What I need from you to proceed
+## What you do after I implement
 
-1. Confirm you (or the Resend account owner) will add `resustainability.com` in resend.com and forward the displayed DNS records to the client's IT team.
-2. Once the client publishes them and Resend shows **Verified**, tell me and I'll execute Steps 2–3 in one pass.
-
-If you want, I can also pre-write the email to send to the client's IT team explaining what each record does — say the word.
+1. `cd whatsapp-bridge && npm install && node server.js` (or deploy to Render).
+2. If local: `ngrok http 3000` → copy HTTPS URL.
+3. Add `WHATSAPP_BRIDGE_URL` + `WHATSAPP_BRIDGE_API_KEY` secrets in Lovable.
+4. Settings → WhatsApp Web tab → Connect → scan QR with WhatsApp app.
+5. Switch provider toggle to "WhatsApp Web (Demo)".
+6. Approve a test visitor → message arrives from your scanned number.
+7. After demo, flip toggle back to Twilio.
 
