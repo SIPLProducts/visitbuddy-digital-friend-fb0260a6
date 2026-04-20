@@ -18,6 +18,7 @@ interface TenantSettings {
   enable_nda: boolean;
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
+  whatsapp_provider: 'twilio' | 'whatsapp_web';
 }
 
 const defaults: TenantSettings = {
@@ -37,6 +38,7 @@ const defaults: TenantSettings = {
   enable_nda: true,
   enable_photo_capture: true,
   enable_watchlist_check: true,
+  whatsapp_provider: 'twilio',
 };
 
 export function useTenantSettings() {
