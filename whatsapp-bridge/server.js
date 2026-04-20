@@ -123,10 +123,16 @@ function scheduleRebuild(reason, delayMs = 3000) {
 }
 
 function buildClient() {
+  const isWindows = process.platform === 'win32';
   const c = new Client({
     authStrategy: new LocalAuth({ dataPath: process.env.SESSION_PATH || './wweb-session' }),
     puppeteer: {
-      headless: true,
+      // 'shell' = legacy headless, which is what whatsapp-web.js@1.26's
+      // bundled puppeteer-core was built against. The new `headless: true`
+      // (Chrome's new headless mode) crashes on Windows with
+      // "Target.setAutoAttach: Target closed" before WA can attach.
+      headless: 'shell',
+      timeout: 60000,
       // Honor PUPPETEER_EXECUTABLE_PATH if set (e.g. Docker with system chromium).
       // Otherwise let puppeteer auto-resolve from PUPPETEER_CACHE_DIR.
       ...(process.env.PUPPETEER_EXECUTABLE_PATH
@@ -136,7 +142,13 @@ function buildClient() {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--disable-gpu',
+        // NOTE: deliberately NOT passing --disable-gpu on Windows — combined
+        // with --no-sandbox in headless-shell mode it triggers an immediate
+        // target close on Chrome 131. Linux/Docker still benefits from it.
+        ...(isWindows ? [] : ['--disable-gpu']),
+        '--disable-features=Translate,BackForwardCache,AcceptCHFrame',
+        '--no-first-run',
+        '--no-default-browser-check',
       ],
     },
   });
