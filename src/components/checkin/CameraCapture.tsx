@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, RotateCcw, Check, X, AlertCircle, Upload, ImageIcon, SwitchCamera } from 'lucide-react';
+import { Camera, RotateCcw, Check, X, AlertCircle, Upload, ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,6 +13,9 @@ interface CameraCaptureProps {
 }
 
 const DEVICE_STORAGE_KEY = 'camera-capture-device-id';
+const FACING_STORAGE_KEY = 'camera-capture-facing-mode';
+
+type FacingMode = 'environment' | 'user';
 
 function labelForDevice(device: MediaDeviceInfo, index: number): string {
   if (device.label) {
@@ -46,6 +49,15 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       return null;
     }
   });
+  const [facingMode, setFacingMode] = useState<FacingMode>(() => {
+    try {
+      const saved = localStorage.getItem(FACING_STORAGE_KEY);
+      return saved === 'user' ? 'user' : 'environment';
+    } catch {
+      return 'environment';
+    }
+  });
+  const [activeFacing, setActiveFacing] = useState<FacingMode>('environment');
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -68,7 +80,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     }
   }, []);
 
-  const startCamera = useCallback(async (deviceIdOverride?: string) => {
+  const startCamera = useCallback(async (deviceIdOverride?: string, facingOverride?: FacingMode) => {
     if (isStarting) return;
 
     setIsStarting(true);
@@ -84,21 +96,27 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       }
 
       const targetDeviceId = deviceIdOverride !== undefined ? deviceIdOverride : selectedDeviceId;
+      const targetFacing: FacingMode = facingOverride ?? facingMode;
 
-      // Build constraint chain: saved/explicit deviceId -> environment -> user
+      // Build constraint chain: explicit deviceId -> requested facingMode -> opposite -> any
       const constraintChain: MediaStreamConstraints[] = [];
-      if (targetDeviceId) {
+      // Only honor saved deviceId when caller didn't ask for a specific facingMode
+      if (targetDeviceId && !facingOverride) {
         constraintChain.push({
           video: { deviceId: { exact: targetDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: false,
         });
       }
       constraintChain.push({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { ideal: targetFacing }, width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
       constraintChain.push({
-        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: targetFacing === 'environment' ? 'user' : 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      constraintChain.push({
+        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
 
@@ -126,6 +144,14 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       const activeTrack = mediaStream.getVideoTracks()[0];
       const settings = activeTrack?.getSettings?.();
       const activeDeviceId = settings?.deviceId;
+      const settingsFacing = (settings as any)?.facingMode as FacingMode | undefined;
+      // Trust the actual facingMode from the track, fall back to what we asked for
+      const resolvedFacing: FacingMode = settingsFacing === 'user' || settingsFacing === 'environment'
+        ? settingsFacing
+        : targetFacing;
+      if (isMountedRef.current) {
+        setActiveFacing(resolvedFacing);
+      }
       if (activeDeviceId && isMountedRef.current) {
         setSelectedDeviceId(activeDeviceId);
         try {
@@ -158,7 +184,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         setError('Camera is in use. Try uploading a photo instead.');
         setActiveTab('upload');
       } else if (err.name === 'OverconstrainedError') {
-        // Saved deviceId no longer valid — clear and retry
+        // Saved deviceId / facingMode no longer valid — clear and retry with default
         try {
           localStorage.removeItem(DEVICE_STORAGE_KEY);
         } catch {
@@ -175,7 +201,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         setIsStarting(false);
       }
     }
-  }, [isStarting, stopCamera, selectedDeviceId, enumerateVideoDevices]);
+  }, [isStarting, stopCamera, selectedDeviceId, facingMode, enumerateVideoDevices]);
 
   // Handle video element events
   const handleVideoCanPlay = useCallback(() => {
@@ -232,6 +258,26 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     handleSelectDevice(videoDevices[nextIdx].deviceId);
   }, [videoDevices, selectedDeviceId, handleSelectDevice]);
 
+  const handleSelectFacing = useCallback(
+    (mode: FacingMode) => {
+      setFacingMode(mode);
+      try {
+        localStorage.setItem(FACING_STORAGE_KEY, mode);
+      } catch {
+        /* ignore */
+      }
+      // Clear deviceId pin so the browser picks the right lens for this facingMode
+      setSelectedDeviceId(null);
+      try {
+        localStorage.removeItem(DEVICE_STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+      startCamera(undefined, mode);
+    },
+    [startCamera]
+  );
+
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
@@ -240,9 +286,12 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
       canvas.height = video.videoHeight;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // Flip horizontally since video is mirrored
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
+        // Mirror capture only for the front camera (preview is mirrored to feel like a selfie).
+        // Back camera is not mirrored, so capture as-is.
+        if (activeFacing === 'user') {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+        }
         ctx.drawImage(video, 0, 0);
         const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedImage(imageDataUrl);
@@ -256,7 +305,7 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         stopCamera();
       }
     }
-  }, [stopCamera]);
+  }, [stopCamera, activeFacing]);
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -315,7 +364,11 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
     [startCamera, stopCamera]
   );
 
-  const showDevicePicker = videoDevices.length >= 2 && !capturedImage && activeTab === 'camera' && !error;
+  // Show per-lens chips only when user has 3+ cameras (e.g. wide + ultra-wide back).
+  // Front/Back toggle is always shown when on the camera tab.
+  const showDevicePicker = videoDevices.length >= 3 && !capturedImage && activeTab === 'camera' && !error;
+  const showFacingToggle = !capturedImage && activeTab === 'camera' && !error;
+  const isMirrored = activeFacing === 'user';
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -332,6 +385,39 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
         </TabsList>
 
         <TabsContent value="camera" className="mt-4 space-y-3">
+          {showFacingToggle && (
+            <div className="grid grid-cols-2 gap-2 p-1 bg-muted rounded-lg">
+              <button
+                type="button"
+                onClick={() => handleSelectFacing('environment')}
+                disabled={isStarting}
+                className={cn(
+                  'flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  activeFacing === 'environment'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-transparent text-foreground hover:bg-background'
+                )}
+              >
+                <Camera className="h-4 w-4" />
+                Back camera
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectFacing('user')}
+                disabled={isStarting}
+                className={cn(
+                  'flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  activeFacing === 'user'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-transparent text-foreground hover:bg-background'
+                )}
+              >
+                <Camera className="h-4 w-4" />
+                Front camera
+              </button>
+            </div>
+          )}
+
           {showDevicePicker && (
             <div className="flex flex-wrap gap-2">
               {videoDevices.map((device, idx) => {
@@ -386,10 +472,16 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                   playsInline
                   muted
                   className="absolute inset-0 w-full h-full object-cover"
-                  style={{ transform: 'scaleX(-1)' }}
+                  style={{ transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                   onCanPlay={handleVideoCanPlay}
                   onLoadedMetadata={handleVideoCanPlay}
                 />
+                {isVideoReady && (
+                  <div className="absolute top-2 left-2 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm border border-border text-xs font-medium text-foreground flex items-center gap-1.5 shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    {activeFacing === 'environment' ? 'Back' : 'Front'}
+                  </div>
+                )}
                 {!isVideoReady && (
                   <div className="absolute inset-0 flex items-center justify-center bg-muted/80">
                     <div className="text-center space-y-2">
@@ -483,12 +575,6 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
               <Button variant="outline" onClick={handleCancel} className="gap-2">
                 <X className="h-4 w-4" />
                 Cancel
-              </Button>
-            )}
-            {videoDevices.length >= 2 && (
-              <Button variant="outline" onClick={handleSwitchCamera} className="gap-2" disabled={isStarting}>
-                <SwitchCamera className="h-4 w-4" />
-                Switch
               </Button>
             )}
             <Button onClick={capturePhoto} className="gap-2" size="lg">
