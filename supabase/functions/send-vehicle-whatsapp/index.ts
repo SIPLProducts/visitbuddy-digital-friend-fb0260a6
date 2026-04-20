@@ -85,6 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
       vehicleNumber: vehicleNumber,
       name: driverName,
       type: "vehicle",
+      action: "checkout",
       timestamp: new Date().toISOString()
     }));
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${qrCodeData}&format=png`;
