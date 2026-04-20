@@ -191,6 +191,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { visitorId, action, token }: ApprovalRequest = await req.json();
+    const branding = await getBranding(supabase);
 
     if (!visitorId || !action) {
       return new Response(
@@ -463,7 +464,7 @@ _Powered by VisiGuard VMS_
     // ---- Email to visitor on approval ----
     let emailSent = false;
     if (visitor.email) {
-      const emailHtml = generateApprovedBadgeEmail(visitor, currentDate, qrCodeUrl);
+      const emailHtml = generateApprovedBadgeEmail(visitor, currentDate, qrCodeUrl, branding);
       emailSent = await sendSmtpEmail(
         supabase,
         visitor.email,
