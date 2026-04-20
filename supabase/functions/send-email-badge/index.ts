@@ -126,22 +126,34 @@ const handler = async (req: Request): Promise<Response> => {
 </body>
 </html>`;
 
-    const sendResult = await resend.emails.send({
-      from: SENDER,
-      to: [email],
-      subject: `Your Visitor Badge - ${visitorId}`,
-      html: htmlContent,
-    });
+    const fromAddr = smtp.sender_name
+      ? `"${smtp.sender_name}" <${smtp.sender_email}>`
+      : smtp.sender_email;
 
-    if (sendResult.error) {
-      console.error("Resend error:", sendResult.error);
+    try {
+      const transporter = nodemailer.createTransport({
+        host: smtp.smtp_host,
+        port: smtp.smtp_port,
+        secure: smtp.smtp_port === 465,
+        auth: { user: smtp.smtp_username, pass: smtp.smtp_password },
+        tls: { rejectUnauthorized: false },
+      });
+
+      const info = await transporter.sendMail({
+        from: fromAddr,
+        to: [email],
+        subject: `Your Visitor Badge - ${visitorId}`,
+        html: htmlContent,
+      });
+
+      console.log(`Badge email sent successfully to ${email} (id: ${info.messageId})`);
+    } catch (sendErr: any) {
+      console.error("SMTP send error:", sendErr?.message || sendErr);
       return new Response(
-        JSON.stringify({ error: "Failed to send email", details: sendResult.error.message }),
+        JSON.stringify({ error: "Failed to send email", details: sendErr?.message || String(sendErr) }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
-
-    console.log("Badge email sent successfully to:", email);
 
     return new Response(
       JSON.stringify({ success: true, message: "Badge sent to email successfully" }),
