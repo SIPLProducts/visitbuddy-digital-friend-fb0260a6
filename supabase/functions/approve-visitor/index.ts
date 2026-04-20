@@ -155,12 +155,12 @@ function generateApprovedBadgeEmail(visitor: any, currentDate: string, qrCodeUrl
       </div>
 
       <div style="text-align:center;margin:24px 0;">
-        <p style="color:#374151;font-size:14px;margin-bottom:12px;">Scan this QR code for quick check-out:</p>
-        <img src="${qrCodeUrl}" alt="QR Code" style="width:200px;height:200px;border:2px solid #e5e7eb;border-radius:8px;" />
+        <p style="color:#374151;font-size:14px;margin-bottom:12px;">Show this <strong>CHECK-IN</strong> QR code at the gate:</p>
+        <img src="${qrCodeUrl}" alt="Check-in QR Code" style="width:200px;height:200px;border:2px solid #e5e7eb;border-radius:8px;" />
       </div>
 
       <div style="background:#fef3c7;border-radius:8px;padding:16px;margin:16px 0;border-left:4px solid #f59e0b;text-align:center;">
-        <p style="margin:0;color:#92400e;font-size:16px;font-weight:bold;">📱 Please show this email to the security guard at the entrance</p>
+        <p style="margin:0;color:#92400e;font-size:16px;font-weight:bold;">📱 Show this CHECK-IN QR to the security guard at the entrance</p>
       </div>
     </div>
     ${brandedFooter()}
@@ -300,7 +300,7 @@ const handler = async (req: Request): Promise<Response> => {
     const qrCodeData = encodeURIComponent(JSON.stringify({
       visitorId: visitor.id,
       name: visitor.name,
-      action: 'checkout',
+      action: 'checkin',
       timestamp: new Date().toISOString()
     }));
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${qrCodeData}&format=png`;
@@ -331,28 +331,36 @@ const handler = async (req: Request): Promise<Response> => {
       console.warn('Could not read whatsapp_provider, defaulting to twilio', e);
     }
 
-    const buildWhatsAppMessage = () => `
-🎫 *VisiGuard Visitor Pass - APPROVED*
-━━━━━━━━━━━━━━━━━━━━
-
-✅ Your visit has been approved!
-
-👤 *Name:* ${visitor.name}
-🆔 *Visitor ID:* ${visitor.visitor_id}
-${visitor.company ? `🏢 *Company:* ${visitor.company}` : ""}
-${visitor.purpose ? `📋 *Purpose:* ${visitor.purpose}` : ""}
-${visitor.host?.name ? `👔 *Host:* ${visitor.host.name}` : ""}
-${visitor.department?.name ? `🏛️ *Department:* ${visitor.department.name}` : ""}
-${visitor.gate?.name ? `🚪 *Entry Gate:* ${visitor.gate.name}` : ""}
-
-📅 *Date:* ${currentDate}
-
-━━━━━━━━━━━━━━━━━━━━
-📱 *Show this badge at the security desk*
-📸 *Scan QR for quick check-out*
-
-_Powered by VisiGuard VMS_
-      `.trim();
+    const buildWhatsAppMessage = () => {
+      const lines: string[] = [
+        `*${branding.companyName}*`,
+        `_Visit Approved — Show This QR at the Gate_`,
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        `Dear *${visitor.name}*,`,
+        "",
+        "✅ Your visit has been approved. Please show the *CHECK-IN QR* below to security at the gate.",
+        "",
+        "📋 *Details*",
+        `• Visitor: ${visitor.name}`,
+        `• ID: ${visitor.visitor_id}`,
+      ];
+      if (visitor.company) lines.push(`• Company: ${visitor.company}`);
+      if (visitor.purpose) lines.push(`• Purpose: ${visitor.purpose}`);
+      if (visitor.host?.name) lines.push(`• Host: ${visitor.host.name}`);
+      if (visitor.department?.name) lines.push(`• Department: ${visitor.department.name}`);
+      if (visitor.gate?.name) lines.push(`• Entry Gate: ${visitor.gate.name}`);
+      lines.push(`• Date: ${currentDate}`);
+      lines.push(
+        "",
+        "📱 *Show this CHECK-IN QR at the gate to be scanned in.*",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "This is an automated message. Please do not reply.",
+        "Powered by *Sharvi Infotech* — www.sharviinfotech.com",
+      );
+      return lines.join("\n");
+    };
 
     // ---- WhatsApp Web (DEMO) path via bridge ----
     if (whatsappProvider === 'whatsapp_web' && visitor.phone) {
@@ -432,7 +440,7 @@ _Powered by VisiGuard VMS_
         formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
       }
 
-      const smsMessage = `VisiGuard: Your visit is APPROVED! ID: ${visitor.visitor_id}. Show this at security. Host: ${visitor.host?.name || 'N/A'}. Check WhatsApp for full badge.`;
+      const smsMessage = `${branding.companyName}: Your visit is APPROVED. ID: ${visitor.visitor_id}. Show the CHECK-IN QR (sent on WhatsApp/Email) at the gate. Host: ${visitor.host?.name || 'N/A'}.`;
 
       try {
         const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
@@ -469,7 +477,7 @@ _Powered by VisiGuard VMS_
       emailSent = await sendSmtpEmail(
         supabase,
         visitor.email,
-        `Visit Approved — Please Show This to Security`,
+        `Visit Approved — Show This QR at the Gate`,
         emailHtml
       );
     }
