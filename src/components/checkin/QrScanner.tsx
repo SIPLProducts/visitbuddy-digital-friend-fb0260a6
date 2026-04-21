@@ -92,19 +92,22 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       let stream: MediaStream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: chosen } },
+          video: { facingMode: { exact: chosen } },
           audio: false,
         });
       } catch (firstErr) {
-        // Fallback to opposite facing
-        const opposite: FacingMode = chosen === 'environment' ? 'user' : 'environment';
+        // Stricter exact match failed (often: requested lens not present).
+        // Try the relaxed "ideal" form on the same side first.
         try {
           stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: opposite } },
+            video: { facingMode: { ideal: chosen } },
             audio: false,
           });
+          if (chosen === 'environment') {
+            toast.message('Rear camera unavailable on this device — using available lens.');
+          }
         } catch {
-          // Final fallback: any video
+          // Final fallback: any video input.
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         }
       }
