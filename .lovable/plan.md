@@ -1,75 +1,51 @@
 
 
-## Make QR scan match on both ID columns + diagnose RLS-hidden visitors
+## Fix "Cannot transition to a new state, already under transition" on QR scan
 
 ### Root cause
 
-The QR payload's `visitorId` field is **not** consistent across the codebase:
+`html5-qrcode` throws this error whenever `start()`, `stop()`, or `clear()` is invoked while another transition is still in flight. Our current code triggers it three ways:
 
-| Source | Encodes |
-|---|---|
-| `send-whatsapp-badge` (Twilio WhatsApp QR) | `visitor.visitor_id` (e.g. `VIS-D80467B8-474E`) |
-| Printed badge (`PrintBadge.tsx`, `BadgePrinting.tsx`, `SafetyPermitBadge.tsx`) | `visitor.visitor_id` (VIS- code) |
-| **`approve-visitor` edge function** (host approval email/WhatsApp) | `visitor.id` (**raw UUID**) |
+1. **`cleanupScanner()` calls `scanner.clear()` unconditionally**, even on a freshly-constructed scanner that was never started, and even when a previous `start()` is still resolving. The library treats `clear()` as a state transition and throws.
+2. **`handleFacingChange` → `stopScanning()` → `startScanning()`** can fire while `isInitializing` is still true (the user taps the other pill during the ~1s startup window). Both transitions race.
+3. **The Start Scanning button isn't disabled while `isInitializing`** in the right way — a double-tap kicks off two `startScanning()` runs. Same race.
 
-Today's scanner picks the lookup column by regex: UUID-shape → `visitors.id`, otherwise → `visitors.visitor_id`. That handles the *format*, but it fails the moment any of the following happens:
+### Fix in `src/components/checkin/QrScanner.tsx`
 
-1. The text decoded from the QR has a stray newline, lowercase chars, or the regex narrowly misses (e.g. an old badge where the JSON's `visitorId` was lowercased somewhere) → it queries the wrong column → row not found.
-2. The visitor exists, but their `gate_id` belongs to a location the **current logged-in user is not assigned to**. RLS (`Users can view visitors at their locations`) silently filters the row out → looks identical to "not found".
-3. The QR encodes a UUID-from-`approve-visitor` but the visitor row was later deleted/regenerated.
+1. **Single transition lock.** Add `isTransitioningRef` (ref, not state, so it's synchronous). Set it true at the top of `startScanning` / `stopScanning` / `cleanupScanner`, release in `finally`. If any of these is called while the lock is held, await the in-flight promise (stored in `pendingTransitionRef`) instead of starting a new one.
 
-### Fix in `src/pages/CheckInOut.tsx` → `handleQrScan`
+2. **Guard `clear()`.** Wrap it in its own try/catch and only call it when `scanner` exists and is **not** scanning. Swallow the "already under transition" error specifically (match by message), since by the time we see it the scanner is effectively gone.
 
-1. **Normalise the scanned text** before lookup: `trim()`, drop stray whitespace, and uppercase it only when it matches the `VIS-` shape (UUIDs stay lowercase to satisfy Postgres UUID parsing).
-2. **Query both columns in one round-trip** using `.or()`:
-   ```ts
-   const cleaned = rawId.trim();
-   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleaned);
-   const visIdCandidate = cleaned.toUpperCase();
+3. **Make `handleFacingChange` safe.**
+   - Always update local state + persist preference immediately (so the UI reflects the choice even if the camera can't switch right now).
+   - Only attempt the hot-swap when `isScanning === true` AND `isInitializing === false` AND the lock is free.
+   - Use a small await on the pending transition before stop/start, instead of a fixed 150ms sleep.
 
-   const filter = isUuid
-     ? `id.eq.${cleaned},visitor_id.eq.${visIdCandidate}`
-     : `visitor_id.eq.${visIdCandidate}`;
+4. **Disable pills during transition.** Both Front/Back buttons get `disabled={isInitializing || isTransitioning}` (new state mirroring the ref for render). Same for the Start Scanning button.
 
-   const { data, error } = await supabase
-     .from('visitors').select(selectClause).or(filter).maybeSingle();
-   ```
-   This means a UUID payload still finds the row even if the column shifted, and a `VIS-` payload survives lowercase drift.
-3. **Distinguish RLS-hidden from truly-missing**: when the primary query returns no row, call the existing `approve-visitor` edge function (already runs as service role) with a new lightweight `mode: 'lookup'` branch that only returns `{ exists, location_id, gate_id, name }` — no mutation. If `exists === true`, surface a clearer toast:
-   > *"This badge belongs to a different location. Switch to that location to scan it."*
-   Otherwise keep the current "Visitor not found" message.
-4. **Console-log the raw scanned string + chosen filter** for future field debugging.
+5. **Stop swallowing the specific error silently.** When we do hit "Cannot transition…" despite the guards, log it and silently no-op (don't surface as a red error toast — it's transient and the next user action will recover).
 
-### Edge function change
-
-Extend `supabase/functions/approve-visitor/index.ts`:
-- Accept `{ mode: 'lookup', visitorId }` (where `visitorId` may be UUID or VIS- code).
-- Look up by `id` then by `visitor_id` using the service-role client (bypasses RLS).
-- Return `{ exists: boolean, location_id, gate_id, name }`. No state changes. Same auth posture as today (it's already a public function used by approval links).
-
-### Align future QR payloads
-
-To stop the inconsistency at the source, change `approve-visitor` (lines 316-321) to encode `visitorId: visitor.visitor_id` instead of `visitor.id`, matching every other badge channel. Backwards compat is preserved by the new dual-column lookup above, so old in-flight WhatsApps issued today still scan correctly.
+6. **Reset `hasHandledScanRef` consistently** so a stop+start cycle can scan again.
 
 ### Verification
 
 ```text
-1. Approve a new visitor via the host-approval link → scan the WhatsApp badge.
-   → Visitor matched, check-in dialog opens. No "Visitor not found".
-2. Scan a printed badge (VIS- code). Same result.
-3. Scan a badge issued for Location A while logged in as a Gate Security
-   user assigned to Location B.
-   → Toast: "This badge belongs to a different location…"
-   → Console shows the lookup payload + the location id returned by the
-     edge function.
-4. Scan a deleted visitor's old badge.
-   → Toast: "Visitor not found. The QR may be from a deleted record."
-5. Existing flows (camera toggle, scan-once guard, checkout-by-QR) unchanged.
+1. Open Check-In/Out → Scan tab.
+   → Pills visible. Tap "Front camera" before starting → no error,
+     pill highlights, no camera spinning up.
+2. Tap "Start Scanning" → front cam opens.
+3. While running, tap "Back camera" → smooth swap, no console error,
+   no red banner.
+4. Spam-tap the Start button or alternate pills rapidly → each tap is
+   either ignored or queued; no "Cannot transition…" surfaces.
+5. Stop Scanning → tap Start again → scans normally, dual-column
+   visitor lookup unchanged.
+6. Navigate away mid-scan → component unmounts cleanly, no console
+   warnings.
 ```
 
 ### Out of scope
-- Changing QR image generator / qrserver.com URL.
-- Reissuing badges for already-checked-in visitors.
-- Gate-level role scoping (still location-level).
-- ANPR scanning.
+- Visitor lookup logic (the `.or()` filter + RLS fallback added previously stays).
+- Photo capture component (already works).
+- ANPR scanner.
 
