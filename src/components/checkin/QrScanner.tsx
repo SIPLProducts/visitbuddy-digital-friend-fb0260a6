@@ -165,7 +165,6 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
-    setShowPicker(false);
 
     try {
       await cleanupScanner();
