@@ -1,51 +1,65 @@
 
 
-## Fix "Cannot transition to a new state, already under transition" on QR scan
+## Replace `html5-qrcode` with native `getUserMedia` + `@zxing/browser` decoder
 
-### Root cause
+### Why "Start Scanning" never opens the camera
 
-`html5-qrcode` throws this error whenever `start()`, `stop()`, or `clear()` is invoked while another transition is still in flight. Our current code triggers it three ways:
+The `CameraCapture` component (used for the visitor photo) opens the camera fine because it uses **native `navigator.mediaDevices.getUserMedia` + a real `<video ref>`** that React owns. Permissions and stream are not the problem.
 
-1. **`cleanupScanner()` calls `scanner.clear()` unconditionally**, even on a freshly-constructed scanner that was never started, and even when a previous `start()` is still resolving. The library treats `clear()` as a state transition and throws.
-2. **`handleFacingChange` → `stopScanning()` → `startScanning()`** can fire while `isInitializing` is still true (the user taps the other pill during the ~1s startup window). Both transitions race.
-3. **The Start Scanning button isn't disabled while `isInitializing`** in the right way — a double-tap kicks off two `startScanning()` runs. Same race.
+The QR scanner uses **`html5-qrcode`**, which:
+- Constructs its own `<video>` and injects it into a div by id (`#qr-reader`).
+- Manages an internal state machine ("transitioning", "starting", "scanning") that is the source of every prior bug in this thread (`Cannot transition to a new state…`, blank video while `isScanning=true`, double-mount issues with React 18 strict mode, etc.).
+- In the current code, `onToggleScanning(true)` is fired **before** `start()` resolves, so the UI flips to "Scanning…" even when `start()` silently swallows an error in the fallback chain and no `<video>` ever attaches. That's exactly what you're seeing: the label says "Scanning…" but the viewport stays blank.
 
-### Fix in `src/components/checkin/QrScanner.tsx`
+We've patched around this twice. The library is the wrong tool for our setup. Photo capture proves the platform/permissions are healthy.
 
-1. **Single transition lock.** Add `isTransitioningRef` (ref, not state, so it's synchronous). Set it true at the top of `startScanning` / `stopScanning` / `cleanupScanner`, release in `finally`. If any of these is called while the lock is held, await the in-flight promise (stored in `pendingTransitionRef`) instead of starting a new one.
+### The fix: rewrite `QrScanner.tsx` using the photo-capture pattern
 
-2. **Guard `clear()`.** Wrap it in its own try/catch and only call it when `scanner` exists and is **not** scanning. Swallow the "already under transition" error specifically (match by message), since by the time we see it the scanner is effectively gone.
+**Library choice:** `@zxing/browser` (mature, MIT, ~30KB gz, works on iOS Safari/Chrome/Firefox, decodes from a video element we control). Add it; remove `html5-qrcode`.
 
-3. **Make `handleFacingChange` safe.**
-   - Always update local state + persist preference immediately (so the UI reflects the choice even if the camera can't switch right now).
-   - Only attempt the hot-swap when `isScanning === true` AND `isInitializing === false` AND the lock is free.
-   - Use a small await on the pending transition before stop/start, instead of a fixed 150ms sleep.
+**`src/components/checkin/QrScanner.tsx`** — rewrite to mirror `CameraCapture.tsx`:
 
-4. **Disable pills during transition.** Both Front/Back buttons get `disabled={isInitializing || isTransitioning}` (new state mirroring the ref for render). Same for the Start Scanning button.
+1. Own the `<video ref={videoRef} playsInline muted autoPlay>` element directly inside the 288×288 viewport.
+2. `startScanning()`:
+   - Call `navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facingMode } } })` exactly like `CameraCapture`.
+   - Assign stream to `videoRef.current.srcObject`, await `loadedmetadata`, call `video.play()`.
+   - **Only then** call `onToggleScanning(true)` and surface "Scanning…" — fixes the "says scanning, no camera" symptom.
+   - Start a `BrowserMultiFormatReader.decodeFromVideoElement(videoRef.current, callback)` loop from `@zxing/browser`. On a successful decode, parse the JSON payload, call `onScan`, and stop.
+3. `stopScanning()`: stop the zxing reader, stop all tracks on the stream, clear `srcObject`, set `isScanning=false`.
+4. Front/Back pill: same UX as today; on change, stop tracks and re-call `getUserMedia` with the new `facingMode`. No state-machine race because we own everything.
+5. Errors: re-use the existing `handleStartError` mapping (`NotAllowedError`, `NotFoundError`, `NotReadableError`, `SecurityError`).
+6. Cleanup on unmount: stop tracks + reader; no `clear()`/`stop()` race.
+7. Keep the existing props (`onScan`, `isScanning`, `onToggleScanning`) so `CheckInOut.tsx` is untouched.
+8. Keep the scan-once guard (`hasHandledScanRef`) and the `localStorage` facing-mode persistence key (`qr-scanner-facing-mode`).
 
-5. **Stop swallowing the specific error silently.** When we do hit "Cannot transition…" despite the guards, log it and silently no-op (don't surface as a red error toast — it's transient and the next user action will recover).
+**`package.json`**
+- Add `@zxing/browser` (and its peer `@zxing/library`).
+- Remove `html5-qrcode` (no other consumer in the repo).
 
-6. **Reset `hasHandledScanRef` consistently** so a stop+start cycle can scan again.
+**No other files change.** `CheckInOut.tsx`, `CheckInCaptureDialog.tsx`, `CameraFeed.tsx`, the dual-column visitor lookup, the cross-location RLS fallback, and the `approve-visitor` edge function all stay as-is.
 
 ### Verification
 
 ```text
-1. Open Check-In/Out → Scan tab.
-   → Pills visible. Tap "Front camera" before starting → no error,
-     pill highlights, no camera spinning up.
-2. Tap "Start Scanning" → front cam opens.
-3. While running, tap "Back camera" → smooth swap, no console error,
-   no red banner.
-4. Spam-tap the Start button or alternate pills rapidly → each tap is
-   either ignored or queued; no "Cannot transition…" surfaces.
-5. Stop Scanning → tap Start again → scans normally, dual-column
-   visitor lookup unchanged.
-6. Navigate away mid-scan → component unmounts cleanly, no console
-   warnings.
+1. Check-In/Out → Scan QR Code tab → tap Start Scanning.
+   → Browser permission prompt (first time) → live rear-camera feed
+     fills the 288×288 viewport. Header reads "Scanning…" only after
+     the video is actually playing.
+2. Tap "Front camera" pill → preview swaps to selfie cam, no error,
+   no "Cannot transition…" toast.
+3. Point at a printed VIS- badge or WhatsApp QR → check-in dialog opens
+   (existing dual-column lookup unchanged).
+4. Spam-tap Start / Stop / pill swaps → no console errors, video either
+   plays or shows the mapped permission/in-use error toast.
+5. Switch tab to Search and back → camera releases on stop, restarts
+   cleanly on Start.
+6. iPhone Safari (PWA) and Android Chrome both show the live feed —
+   parity with the photo capture component.
 ```
 
 ### Out of scope
-- Visitor lookup logic (the `.or()` filter + RLS fallback added previously stays).
+- Any change to visitor lookup, RLS fallback, or the `approve-visitor` edge function.
 - Photo capture component (already works).
-- ANPR scanner.
+- ANPR camera flow.
+- Torch / zoom controls.
 
