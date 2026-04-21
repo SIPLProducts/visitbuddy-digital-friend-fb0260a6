@@ -9,7 +9,8 @@ const corsHeaders = {
 
 interface ApprovalRequest {
   visitorId: string;
-  action: 'approve' | 'reject';
+  action?: 'approve' | 'reject';
+  mode?: 'lookup';
   token?: string;
 }
 
@@ -206,7 +207,40 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const { visitorId, action, token }: ApprovalRequest = await req.json();
+    const { visitorId, action, token, mode }: ApprovalRequest = await req.json();
+
+    // Lightweight lookup mode — used by the QR scanner to disambiguate
+    // RLS-hidden visitors (badge from another location) vs truly missing.
+    if (mode === 'lookup') {
+      if (!visitorId) {
+        return new Response(JSON.stringify({ exists: false }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        });
+      }
+      const raw = String(visitorId).trim();
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw);
+      const orFilter = isUuid
+        ? `id.eq.${raw.toLowerCase()},visitor_id.eq.${raw.toUpperCase()}`
+        : `visitor_id.eq.${raw.toUpperCase()}`;
+      const { data: rows } = await supabase
+        .from('visitors')
+        .select('id, name, gate_id, gates:gates(location_id, locations:locations(name))')
+        .or(orFilter)
+        .limit(1);
+      const row: any = rows && rows.length > 0 ? rows[0] : null;
+      return new Response(
+        JSON.stringify({
+          exists: !!row,
+          name: row?.name ?? null,
+          gate_id: row?.gate_id ?? null,
+          location_id: row?.gates?.location_id ?? null,
+          location_name: row?.gates?.locations?.name ?? null,
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+
     const branding = await getBranding(supabase);
     const logoBytes = await fetchLogoBytes(branding.logoUrl);
 
@@ -314,7 +348,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // QR code for badge
     const qrCodeData = encodeURIComponent(JSON.stringify({
-      visitorId: visitor.id,
+      visitorId: visitor.visitor_id,
       name: visitor.name,
       action: 'checkin',
       timestamp: new Date().toISOString()

@@ -224,13 +224,16 @@ export default function CheckInOut() {
       return;
     }
 
-    // Pick the right column based on ID format. UUIDs go to `id`,
-    // human-readable VIS-... codes go to `visitor_id`. This avoids the
-    // Postgres "invalid input syntax for type uuid" error that masks
-    // legitimate lookups as "Visitor not found".
+    // Normalise scanned text. UUIDs must stay lowercase for Postgres uuid
+    // parsing; VIS- codes are uppercase in the DB.
     const looksLikeUuid =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawId);
-    const lookupColumn: 'id' | 'visitor_id' = looksLikeUuid ? 'id' : 'visitor_id';
+    const visIdCandidate = rawId.toUpperCase();
+    const orFilter = looksLikeUuid
+      ? `id.eq.${rawId.toLowerCase()},visitor_id.eq.${visIdCandidate}`
+      : `visitor_id.eq.${visIdCandidate}`;
+
+    console.log('[handleQrScan] raw=%s filter=%s', rawId, orFilter);
 
     const selectClause = `
       *,
@@ -238,11 +241,11 @@ export default function CheckInOut() {
       department:departments(*)
     `;
 
-    const { data: visitorData, error: lookupError } = await supabase
+    const { data: visitorRows, error: lookupError } = await supabase
       .from('visitors')
       .select(selectClause)
-      .eq(lookupColumn, rawId)
-      .maybeSingle();
+      .or(orFilter)
+      .limit(1);
 
     if (lookupError) {
       console.error('[handleQrScan] lookup error', lookupError);
@@ -250,7 +253,27 @@ export default function CheckInOut() {
       return;
     }
 
+    const visitorData = visitorRows && visitorRows.length > 0 ? visitorRows[0] : null;
+
     if (!visitorData) {
+      // Could be RLS-hidden (different location). Ask the service-role
+      // edge function whether it actually exists.
+      try {
+        const { data: lookup } = await supabase.functions.invoke('approve-visitor', {
+          body: { mode: 'lookup', visitorId: rawId },
+        });
+        console.log('[handleQrScan] cross-location lookup', lookup);
+        if (lookup?.exists) {
+          toast.error(
+            `This badge belongs to a different location${
+              lookup.location_name ? ` (${lookup.location_name})` : ''
+            }. Switch to that location to scan it.`
+          );
+          return;
+        }
+      } catch (e) {
+        console.error('[handleQrScan] cross-location lookup failed', e);
+      }
       toast.error('Visitor not found. The QR may be from a deleted record.');
       return;
     }
