@@ -338,7 +338,18 @@ export default function NewVehicle({ inline = false, onClose }: NewVehicleProps)
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Location</Label>
-                  <Select onValueChange={(value) => form.setValue('location_id', value)}>
+                  <Select
+                    value={form.watch('location_id') || ''}
+                    onValueChange={(value) => {
+                      form.setValue('location_id', value);
+                      // Clear gate if it doesn't belong to the new location
+                      const currentGateId = form.getValues('gate_id');
+                      if (currentGateId) {
+                        const stillValid = gates.some(g => g.id === currentGateId && g.location_id === value);
+                        if (!stillValid) form.setValue('gate_id', undefined);
+                      }
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select location" />
                     </SelectTrigger>
@@ -353,16 +364,24 @@ export default function NewVehicle({ inline = false, onClose }: NewVehicleProps)
                 </div>
                 <div className="space-y-2">
                   <Label>Gate</Label>
-                  <Select onValueChange={(value) => form.setValue('gate_id', value)}>
+                  <Select
+                    value={form.watch('gate_id') || ''}
+                    onValueChange={(value) => form.setValue('gate_id', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select gate" />
                     </SelectTrigger>
                     <SelectContent>
-                      {gates.map((gate) => (
-                        <SelectItem key={gate.id} value={gate.id}>
-                          {gate.name}{gate.building ? ` — ${gate.building}` : ''}
-                        </SelectItem>
-                      ))}
+                      {gates
+                        .filter((gate) => {
+                          const loc = form.watch('location_id');
+                          return !loc || gate.location_id === loc;
+                        })
+                        .map((gate) => (
+                          <SelectItem key={gate.id} value={gate.id}>
+                            {gate.name}{gate.building ? ` — ${gate.building}` : ''}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
