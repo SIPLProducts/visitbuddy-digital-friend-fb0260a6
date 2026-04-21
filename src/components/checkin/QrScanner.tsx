@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
-import { Camera, StopCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Camera, StopCircle, AlertCircle, RefreshCw, SwitchCamera } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface QrScannerProps {
   onScan: (data: { visitorId: string; name: string; timestamp: string; action?: string }) => void;
@@ -15,7 +16,18 @@ interface CameraDevice {
   label: string;
 }
 
-const STORAGE_KEY = 'qr-scanner-camera-id';
+const FACING_KEY = 'qr-scanner-facing-mode';
+const LEGACY_DEVICE_KEY = 'qr-scanner-camera-id';
+
+type FacingMode = 'environment' | 'user';
+
+function readStoredFacing(): FacingMode {
+  try {
+    const v = localStorage.getItem(FACING_KEY);
+    if (v === 'user' || v === 'environment') return v;
+  } catch {}
+  return 'environment';
+}
 
 function describeCamera(label: string, index: number): string {
   if (!label) return `Camera ${index + 1}`;
@@ -34,7 +46,12 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
-  const [showPicker, setShowPicker] = useState(false);
+  const [facingMode, setFacingMode] = useState<FacingMode>(readStoredFacing);
+
+  // Clear legacy storage key on mount
+  useEffect(() => {
+    try { localStorage.removeItem(LEGACY_DEVICE_KEY); } catch {}
+  }, []);
 
   // Safe cleanup function
   const cleanupScanner = useCallback(async () => {
