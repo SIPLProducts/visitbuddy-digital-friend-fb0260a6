@@ -92,19 +92,22 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       let stream: MediaStream;
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: chosen } },
+          video: { facingMode: { exact: chosen } },
           audio: false,
         });
       } catch (firstErr) {
-        // Fallback to opposite facing
-        const opposite: FacingMode = chosen === 'environment' ? 'user' : 'environment';
+        // Stricter exact match failed (often: requested lens not present).
+        // Try the relaxed "ideal" form on the same side first.
         try {
           stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: opposite } },
+            video: { facingMode: { ideal: chosen } },
             audio: false,
           });
+          if (chosen === 'environment') {
+            toast.message('Rear camera unavailable on this device — using available lens.');
+          }
         } catch {
-          // Final fallback: any video
+          // Final fallback: any video input.
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         }
       }
@@ -179,6 +182,28 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     await startScanning(next);
   };
 
+  const checkAvailableCameras = async () => {
+    try {
+      // Some browsers hide labels (and even devices) until permission is granted.
+      // Request a quick permission probe first so the count is accurate.
+      try {
+        const probe = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        probe.getTracks().forEach((t) => t.stop());
+      } catch {}
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cams = devices.filter((d) => d.kind === 'videoinput');
+      if (cams.length === 0) {
+        toast.error('No video input devices detected. Check camera permissions.');
+      } else if (cams.length === 1) {
+        toast.message('Detected 1 video input — this device has only one camera, so both pills open the same lens.');
+      } else {
+        toast.success(`Detected ${cams.length} video inputs — front/back toggle should work.`);
+      }
+    } catch (e: any) {
+      toast.error('Unable to list cameras: ' + (e?.message ?? 'unknown error'));
+    }
+  };
+
   return (
     <div className="bg-card rounded-xl border border-border p-6 text-center">
       <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full mb-4">
@@ -211,6 +236,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
           Front camera
         </button>
       </div>
+
+      <p className="text-xs text-muted-foreground -mt-2 mb-3">
+        If only one camera is available, both options open the same lens.{' '}
+        <button
+          type="button"
+          onClick={checkAvailableCameras}
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          Camera not switching?
+        </button>
+      </p>
 
       <div className="mx-auto mb-4 overflow-hidden rounded-lg relative w-72 h-72 bg-muted">
         <video
