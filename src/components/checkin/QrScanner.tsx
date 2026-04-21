@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { Button } from '@/components/ui/button';
-import { Camera, StopCircle, AlertCircle, RefreshCw, SwitchCamera } from 'lucide-react';
+import { Camera, StopCircle, AlertCircle, SwitchCamera } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -11,14 +11,7 @@ interface QrScannerProps {
   onToggleScanning: (scanning: boolean) => void;
 }
 
-interface CameraDevice {
-  id: string;
-  label: string;
-}
-
 const FACING_KEY = 'qr-scanner-facing-mode';
-const LEGACY_DEVICE_KEY = 'qr-scanner-camera-id';
-
 type FacingMode = 'environment' | 'user';
 
 function readStoredFacing(): FacingMode {
@@ -29,150 +22,42 @@ function readStoredFacing(): FacingMode {
   return 'environment';
 }
 
-function describeCamera(label: string, index: number): string {
-  if (!label) return `Camera ${index + 1}`;
-  const lower = label.toLowerCase();
-  if (/back|rear|environment/.test(lower)) return 'Back camera';
-  if (/front|user|face/.test(lower)) return 'Front camera';
-  return label;
-}
-
 export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerProps) {
-  const scannerRef = useRef<Html5Qrcode | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const readerRef = useRef<BrowserMultiFormatReader | null>(null);
+  const controlsRef = useRef<IScannerControls | null>(null);
   const isMountedRef = useRef(true);
-  const isCleaningUpRef = useRef(false);
   const hasHandledScanRef = useRef(false);
-  const isTransitioningRef = useRef(false);
-  const pendingTransitionRef = useRef<Promise<void> | null>(null);
+  const startingRef = useRef(false);
+
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [facingMode, setFacingMode] = useState<FacingMode>(readStoredFacing);
 
-  // Clear legacy storage key on mount
-  useEffect(() => {
-    try { localStorage.removeItem(LEGACY_DEVICE_KEY); } catch {}
-  }, []);
-
-  const beginTransition = () => {
-    isTransitioningRef.current = true;
-    if (isMountedRef.current) setIsTransitioning(true);
-  };
-  const endTransition = () => {
-    isTransitioningRef.current = false;
-    pendingTransitionRef.current = null;
-    if (isMountedRef.current) setIsTransitioning(false);
-  };
-
-  const isTransitionRaceError = (err: any) => {
-    const msg = String(err?.message ?? err ?? '').toLowerCase();
-    return msg.includes('transition');
-  };
-
-  // Safe cleanup function
-  const cleanupScanner = useCallback(async () => {
-    if (isCleaningUpRef.current) return;
-    isCleaningUpRef.current = true;
-
-    try {
-      if (scannerRef.current) {
-        if (scannerRef.current.isScanning) {
-          try {
-            await scannerRef.current.stop();
-          } catch (e) {
-            if (!isTransitionRaceError(e)) console.warn('[QrScanner] stop during cleanup:', e);
-          }
-        }
-        try {
-          scannerRef.current.clear();
-        } catch (e) {
-          if (!isTransitionRaceError(e)) console.warn('[QrScanner] clear during cleanup:', e);
-        }
-        scannerRef.current = null;
-      }
-    } catch (err) {
-      console.error('Cleanup error:', err);
-    } finally {
-      isCleaningUpRef.current = false;
+  const stopStream = useCallback(() => {
+    try { controlsRef.current?.stop(); } catch {}
+    controlsRef.current = null;
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => { try { t.stop(); } catch {} });
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      try { videoRef.current.srcObject = null; } catch {}
     }
   }, []);
 
-  // Track mounted state
   useEffect(() => {
     isMountedRef.current = true;
-
     return () => {
       isMountedRef.current = false;
-      cleanupScanner();
+      stopStream();
     };
-  }, [cleanupScanner]);
-
-  const ensureVideoPlaying = async () => {
-    // Wait one frame for html5-qrcode to inject the <video>
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    const videoEl = document.querySelector<HTMLVideoElement>('#qr-reader video');
-    if (!videoEl) {
-      console.warn('[QrScanner] No video element found after start');
-      return;
-    }
-    // Re-apply autoplay-required attributes (in case re-parenting stripped them)
-    videoEl.setAttribute('playsinline', 'true');
-    videoEl.setAttribute('webkit-playsinline', 'true');
-    videoEl.setAttribute('autoplay', 'true');
-    videoEl.muted = true;
-    if (videoEl.paused) {
-      try {
-        await videoEl.play();
-        console.log('[QrScanner] Forced video.play() succeeded');
-      } catch (e) {
-        console.error('[QrScanner] Forced video.play() failed:', String(e));
-      }
-    }
-  };
-
-  const startScanWithConstraints = async (
-    scanner: Html5Qrcode,
-    cameraConfig: MediaTrackConstraints | { facingMode: string }
-  ) => {
-    await scanner.start(
-      cameraConfig as any,
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1.0,
-      },
-      (decodedText) => {
-        if (!isMountedRef.current) return;
-        // Ignore further decodes once we've accepted one for this session
-        if (hasHandledScanRef.current) return;
-
-        try {
-          const data = JSON.parse(decodedText);
-          if (data.visitorId) {
-            hasHandledScanRef.current = true;
-            onScan(data);
-            stopScanning();
-          } else {
-            toast.error('Invalid QR code format');
-          }
-        } catch {
-          toast.error('Could not parse QR code data');
-        }
-      },
-      () => {
-        // Ignore scan failures (no QR found in frame)
-      }
-    );
-    // Force playback after stream attaches (critical for iPad/tablet Safari)
-    await ensureVideoPlaying();
-  };
+  }, [stopStream]);
 
   const handleStartError = (err: any) => {
     const errStr = String(err?.message ?? err);
-    console.error('[QrScanner] All camera attempts failed:', errStr, err);
-    if (!isMountedRef.current) return;
+    console.error('[QrScanner] camera error:', errStr, err);
     let message = errStr || 'Could not start camera';
     if (err?.name === 'NotAllowedError' || /permission|denied|notallowed/i.test(errStr)) {
       message = 'Camera permission denied. Please allow camera access in your browser settings.';
@@ -183,177 +68,124 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     } else if (err?.name === 'SecurityError' || /https|secure/i.test(errStr)) {
       message = 'Camera blocked. The page must be served over HTTPS.';
     }
-    setError(message);
-  };
-
-  const startWithConfig = async (config: any) => {
-    if (pendingTransitionRef.current) {
-      try { await pendingTransitionRef.current; } catch {}
-    }
-    if (isTransitioningRef.current) return;
-    beginTransition();
-    setError(null);
-    setIsInitializing(true);
-    hasHandledScanRef.current = false;
-    onToggleScanning(true);
-
-    const run = (async () => {
-      await cleanupScanner();
-      await new Promise(resolve => setTimeout(resolve, 150));
-      if (!isMountedRef.current) return;
-
-      const readerElement = document.getElementById('qr-reader');
-      if (!readerElement) throw new Error('Scanner container not found');
-      readerElement.innerHTML = '';
-
-      const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
-      scannerRef.current = scanner;
-
-      await startScanWithConstraints(scanner, config);
-    })();
-    pendingTransitionRef.current = run;
-    try {
-      await run;
-    } catch (err: any) {
-      if (isTransitionRaceError(err)) {
-        console.warn('[QrScanner] transition race ignored:', err);
-      } else {
-        handleStartError(err);
-      }
-      onToggleScanning(false);
-      await cleanupScanner();
-    } finally {
-      if (isMountedRef.current) setIsInitializing(false);
-      endTransition();
-    }
+    if (isMountedRef.current) setError(message);
   };
 
   const startScanning = async (overrideFacing?: FacingMode) => {
-    if (isInitializing || isCleaningUpRef.current || isTransitioningRef.current) {
-      if (pendingTransitionRef.current) {
-        try { await pendingTransitionRef.current; } catch {}
-      }
-      return;
-    }
-
+    if (startingRef.current) return;
+    startingRef.current = true;
     setError(null);
-    const chosen: FacingMode = overrideFacing ?? facingMode;
-
-    // Best-effort enumeration so we can populate the secondary picker
-    // and fall back to a deviceId if facingMode constraints fail.
-    let cams: Array<{ id: string; label: string }> = [];
-    try {
-      const result = await Html5Qrcode.getCameras();
-      cams = (result || []).map((c) => ({ id: c.id, label: c.label || '' }));
-      setCameras(cams);
-    } catch (enumErr) {
-      console.warn('[QrScanner] getCameras() failed:', String(enumErr));
-    }
-
-    beginTransition();
     setIsInitializing(true);
     hasHandledScanRef.current = false;
-    onToggleScanning(true);
 
-    const run = (async () => {
-      await cleanupScanner();
-      await new Promise(resolve => setTimeout(resolve, 150));
-      if (!isMountedRef.current) return;
+    const chosen: FacingMode = overrideFacing ?? facingMode;
 
-      const readerElement = document.getElementById('qr-reader');
-      if (!readerElement) throw new Error('Scanner container not found');
-      readerElement.innerHTML = '';
+    try {
+      // Tear down any prior stream
+      stopStream();
 
-      const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
-      scannerRef.current = scanner;
+      // Wait a frame so the <video> element is mounted
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      const video = videoRef.current;
+      if (!video) throw new Error('Video element not ready');
 
-      const opposite: FacingMode = chosen === 'environment' ? 'user' : 'environment';
-      const attempts: Array<{ label: string; config: any }> = [
-        { label: `${chosen} (preferred)`, config: { facingMode: { ideal: chosen } } },
-        { label: `${opposite} (fallback)`, config: { facingMode: { ideal: opposite } } },
-      ];
-      for (const c of cams) {
-        attempts.push({ label: `deviceId ${c.label || c.id}`, config: c.id });
-      }
-      let lastErr: unknown = null;
-      let started = false;
-      for (const attempt of attempts) {
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: chosen } },
+          audio: false,
+        });
+      } catch (firstErr) {
+        // Fallback to opposite facing
+        const opposite: FacingMode = chosen === 'environment' ? 'user' : 'environment';
         try {
-          await startScanWithConstraints(scanner, attempt.config);
-          started = true;
-          break;
-        } catch (attemptErr) {
-          console.warn('[QrScanner] attempt failed:', attempt.label, String(attemptErr));
-          lastErr = attemptErr;
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: opposite } },
+            audio: false,
+          });
+        } catch {
+          // Final fallback: any video
+          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         }
       }
-      if (!started) throw lastErr ?? new Error('Could not start camera');
-    })();
-    pendingTransitionRef.current = run;
-    try {
-      await run;
+
+      if (!isMountedRef.current) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
+
+      streamRef.current = stream;
+      video.setAttribute('playsinline', 'true');
+      video.setAttribute('webkit-playsinline', 'true');
+      video.muted = true;
+      video.srcObject = stream;
+
+      await new Promise<void>((resolve, reject) => {
+        const onLoaded = () => { video.removeEventListener('loadedmetadata', onLoaded); resolve(); };
+        const onErr = () => { video.removeEventListener('error', onErr); reject(new Error('Video load error')); };
+        video.addEventListener('loadedmetadata', onLoaded);
+        video.addEventListener('error', onErr);
+      });
+
+      await video.play();
+
+      if (!readerRef.current) readerRef.current = new BrowserMultiFormatReader();
+      controlsRef.current = await readerRef.current.decodeFromVideoElement(video, (result, _err, controls) => {
+        if (!isMountedRef.current || hasHandledScanRef.current) return;
+        if (!result) return;
+        const text = result.getText();
+        try {
+          const data = JSON.parse(text);
+          if (data.visitorId) {
+            hasHandledScanRef.current = true;
+            try { controls.stop(); } catch {}
+            onScan(data);
+            stopScanningInternal();
+          } else {
+            toast.error('Invalid QR code format');
+          }
+        } catch {
+          toast.error('Could not parse QR code data');
+        }
+      });
+
+      onToggleScanning(true);
     } catch (err: any) {
-      if (isTransitionRaceError(err)) {
-        console.warn('[QrScanner] transition race ignored:', err);
-      } else {
-        handleStartError(err);
-      }
+      handleStartError(err);
+      stopStream();
       onToggleScanning(false);
-      await cleanupScanner();
     } finally {
+      startingRef.current = false;
       if (isMountedRef.current) setIsInitializing(false);
-      endTransition();
     }
   };
 
-  const selectCamera = async (deviceId: string) => {
-    await startWithConfig(deviceId);
-  };
-
-  const handleFacingChange = async (next: FacingMode) => {
-    // Always reflect choice immediately
-    setFacingMode(next);
-    try { localStorage.setItem(FACING_KEY, next); } catch {}
-    // Only hot-swap if running and no transition in flight
-    if (!isScanning || isInitializing || isTransitioningRef.current) {
-      if (pendingTransitionRef.current) {
-        try { await pendingTransitionRef.current; } catch {}
-      }
-      if (!isScanning) return;
-    }
-    await stopScanning();
-    if (pendingTransitionRef.current) {
-      try { await pendingTransitionRef.current; } catch {}
-    }
-    await startScanning(next);
+  const stopScanningInternal = () => {
+    stopStream();
+    hasHandledScanRef.current = false;
+    if (isMountedRef.current) onToggleScanning(false);
   };
 
   const stopScanning = async () => {
-    if (pendingTransitionRef.current && isTransitioningRef.current) {
-      try { await pendingTransitionRef.current; } catch {}
-    }
-    try {
-      if (scannerRef.current?.isScanning) {
-        await scannerRef.current.stop();
-      }
-    } catch (err) {
-      if (!isTransitionRaceError(err)) console.error('Stop scanning error:', err);
-    }
+    stopScanningInternal();
+  };
 
-    hasHandledScanRef.current = false;
-    if (isMountedRef.current) {
-      onToggleScanning(false);
-    }
+  const handleFacingChange = async (next: FacingMode) => {
+    setFacingMode(next);
+    try { localStorage.setItem(FACING_KEY, next); } catch {}
+    if (!isScanning && !isInitializing) return;
+    stopStream();
+    onToggleScanning(false);
+    await startScanning(next);
   };
 
   return (
     <div className="bg-card rounded-xl border border-border p-6 text-center">
-      {/* Always-visible Front/Back camera toggle */}
       <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full mb-4">
         <button
           type="button"
           onClick={() => handleFacingChange('environment')}
-          disabled={isInitializing || isTransitioning}
+          disabled={isInitializing}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'environment'
@@ -367,7 +199,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         <button
           type="button"
           onClick={() => handleFacingChange('user')}
-          disabled={isInitializing || isTransitioning}
+          disabled={isInitializing}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'user'
@@ -380,27 +212,22 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         </button>
       </div>
 
-      {/* Stable scanner container - never changes size or visibility to keep video painting */}
-      <div
-        ref={containerRef}
-        className="mx-auto mb-4 overflow-hidden rounded-lg relative w-72 h-72 bg-muted"
-      >
-        {/* Always-mounted, always-visible target div for html5-qrcode */}
-        <div
-          id="qr-reader"
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'relative',
-          }}
+      <div className="mx-auto mb-4 overflow-hidden rounded-lg relative w-72 h-72 bg-muted">
+        <video
+          ref={videoRef}
+          playsInline
+          muted
+          autoPlay
+          className={cn(
+            'w-full h-full object-cover',
+            !isScanning && !isInitializing && 'opacity-0'
+          )}
         />
-        {/* Placeholder icon shown only when idle - sibling, not overlay */}
         {!isScanning && !isInitializing && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <Camera className="h-16 w-16 text-muted-foreground" />
           </div>
         )}
-        {/* Small corner spinner during init - does NOT cover the video */}
         {isInitializing && (
           <div className="absolute top-2 right-2 flex items-center gap-2 bg-background/90 rounded-full px-3 py-1 shadow-sm">
             <div className="h-3 w-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -413,26 +240,6 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         <div className="flex items-center justify-center gap-2 text-destructive mb-4">
           <AlertCircle className="h-4 w-4" />
           <span className="text-sm">{error}</span>
-        </div>
-      )}
-
-      {cameras.length > 2 && (
-        <div className="mb-4">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Specific camera (optional)</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {cameras.map((cam, idx) => (
-              <Button
-                key={cam.id}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => selectCamera(cam.id)}
-              >
-                <Camera className="h-3.5 w-3.5" />
-                {describeCamera(cam.label, idx)}
-              </Button>
-            ))}
-          </div>
         </div>
       )}
 
@@ -454,7 +261,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
           </Button>
         </div>
       ) : (
-        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing || isTransitioning}>
+        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing}>
           <Camera className="h-4 w-4" />
           {isInitializing ? 'Starting...' : 'Start Scanning'}
         </Button>
