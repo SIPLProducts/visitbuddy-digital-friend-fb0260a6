@@ -188,40 +188,23 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     }
   };
 
-  const startScanning = async () => {
+  const startScanning = async (overrideFacing?: FacingMode) => {
     if (isInitializing || isCleaningUpRef.current) return;
 
     setError(null);
+    const chosen: FacingMode = overrideFacing ?? facingMode;
 
-    // 1. Try to enumerate cameras so user can choose.
+    // Best-effort enumeration so we can populate the secondary picker
+    // and fall back to a deviceId if facingMode constraints fail.
     let cams: Array<{ id: string; label: string }> = [];
     try {
       const result = await Html5Qrcode.getCameras();
       cams = (result || []).map((c) => ({ id: c.id, label: c.label || '' }));
+      setCameras(cams);
     } catch (enumErr) {
       console.warn('[QrScanner] getCameras() failed:', String(enumErr));
     }
 
-    if (cams.length > 1) {
-      setCameras(cams);
-      // Auto-pick remembered camera if it's still present.
-      const remembered = localStorage.getItem(STORAGE_KEY);
-      if (remembered && cams.some((c) => c.id === remembered)) {
-        await startWithConfig(remembered);
-        return;
-      }
-      // Otherwise show the picker.
-      setShowPicker(true);
-      return;
-    }
-
-    // 2. Single camera — start it directly.
-    if (cams.length === 1) {
-      await startWithConfig(cams[0].id);
-      return;
-    }
-
-    // 3. Enumeration failed — fall back to facingMode attempts.
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
@@ -238,10 +221,14 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
       scannerRef.current = scanner;
 
-      const attempts = [
-        { label: 'environment (back)', config: { facingMode: 'environment' } },
-        { label: 'user (front)', config: { facingMode: 'user' } },
+      const opposite: FacingMode = chosen === 'environment' ? 'user' : 'environment';
+      const attempts: Array<{ label: string; config: any }> = [
+        { label: `${chosen} (preferred)`, config: { facingMode: { ideal: chosen } } },
+        { label: `${opposite} (fallback)`, config: { facingMode: { ideal: opposite } } },
       ];
+      for (const c of cams) {
+        attempts.push({ label: `deviceId ${c.label || c.id}`, config: c.id });
+      }
       let lastErr: unknown = null;
       let started = false;
       for (const attempt of attempts) {
@@ -250,6 +237,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
           started = true;
           break;
         } catch (attemptErr) {
+          console.warn('[QrScanner] attempt failed:', attempt.label, String(attemptErr));
           lastErr = attemptErr;
         }
       }
