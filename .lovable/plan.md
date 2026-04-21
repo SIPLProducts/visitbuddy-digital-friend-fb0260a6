@@ -1,54 +1,74 @@
 
 
-## Diagnose & fix "client only sees front camera, no toggle"
+## Surface a clear, actionable message when the camera/toggle misbehaves
 
-The toggle pills are unconditionally rendered in `QrScanner.tsx` (no role, device, or feature gate). If the client doesn't see them, it's environmental — almost always one of these three:
+Today the QR scanner silently falls back when something is off — the user just sees a blank viewport or a single lens with no explanation. We'll add explicit, human-readable banners that tell the client exactly **why** and **what to do**.
 
-### Likely causes
+### What we'll change
 
-1. **Stale PWA / browser cache.** The client installed the app before the rewrite (when `html5-qrcode` had a different UI without pills). The service worker is serving the old bundle.
-2. **Single-camera device.** The pills render fine, but tapping "Back camera" still opens the front lens because `getUserMedia` with `facingMode: { ideal: 'environment' }` falls back to the only available camera (typical on laptops, kiosks, some tablets).
-3. **HTTP context / iframe.** Camera enumeration and `facingMode` selection require a secure context. Inside certain embedded views or over plain HTTP, the browser silently grants only the default lens.
+**`src/components/checkin/QrScanner.tsx`** — add a visible "diagnostic banner" above the camera viewport that renders one of the following messages based on detected state. Banner uses the existing `Alert` component (amber for warnings, red for errors, blue for info).
 
-### Fix plan
+#### Detection + messages
 
-**1. Force pill visibility + add a clear hint (`src/components/checkin/QrScanner.tsx`)**
-- Add a small caption under the pills: "If only one camera is available, both options open the same lens."
-- Render a `Camera not switching?` link that on click does `await navigator.mediaDevices.enumerateDevices()` and toasts how many `videoinput` devices the browser actually exposes. This instantly tells support whether it's a single-camera device or a permissions issue.
+On mount (and on Start Scanning) run a quick environment probe and pick the first matching state:
 
-**2. Use a stricter constraint when the user explicitly picks a side**
-- Today: `facingMode: { ideal: chosen }` → browser is free to ignore.
-- Change to: try `{ exact: chosen }` first. On `OverconstrainedError`, fall back to `{ ideal: chosen }`, then to `video: true`. This makes "Back camera" actually open the rear lens on phones that have one, and surfaces a clean error on devices that don't.
+| Condition | Banner colour | Message shown to client |
+|---|---|---|
+| `window.isSecureContext === false` | red | **Camera blocked — insecure connection.** Cameras only work over HTTPS. Open this app from `https://…` (not `http://` or an IP address) and try again. |
+| `navigator.mediaDevices?.getUserMedia` missing | red | **This browser does not support camera access.** Use Chrome, Edge, Safari, or Firefox (latest version). In-app browsers (Instagram, LinkedIn, Gmail) often block cameras — open in your real browser. |
+| Permissions API reports `denied` | red | **Camera permission was denied.** Tap the lock/camera icon in your browser address bar → set Camera to **Allow** → reload this page. On iOS: Settings → Safari → Camera → Allow. |
+| `enumerateDevices()` returns 0 video inputs | red | **No camera detected on this device.** Connect a webcam or use a phone/tablet with a built-in camera. |
+| `enumerateDevices()` returns exactly 1 video input | amber | **Only one camera detected.** This device has a single lens, so both Back and Front pills will open the same camera. The toggle is normal on phones with two cameras. |
+| `getUserMedia` threw `NotReadableError` | red | **Camera is in use by another app.** Close Zoom, Teams, WhatsApp Web, or any other tab using the camera, then tap Start Scanning again. |
+| `getUserMedia` threw `OverconstrainedError` for the requested side | amber | **Rear camera unavailable.** Falling back to the front lens. (Common on laptops and tablets.) |
+| Inside an iframe with no camera permission policy | red | **Embedded view is blocking the camera.** Open the app in its own browser tab using this link: `<copy URL>`. |
+| All good, scanning fine | (no banner) | — |
 
-**3. Bust the PWA cache for old installs**
-- Bump the service-worker / manifest version string in `src/lib/pwa.ts` (or wherever the SW is registered) so installed clients pick up the new bundle on next launch.
-- Add a one-time `window.location.reload()` guarded by a `localStorage` flag (`qr-scanner-v2-reloaded`) so PWAs that cached the pre-rewrite scanner force a refresh exactly once.
+The current single-line caption ("If only one camera is available…") is replaced by these context-specific banners so the message matches the actual problem.
 
-**4. Ask the client for two facts** (handled in chat after deploy, not in code)
-- Device + browser (e.g. "Samsung A14 / Chrome", "iPad / Safari", "Windows laptop / Edge").
-- Whether the app is opened as an installed PWA or in a browser tab.
-   With the new "Camera not switching?" diagnostic toast, they can self-report the `videoinput` count.
+#### Toggle pill behaviour
+
+- Pills stay rendered always (no regression), but when only 1 camera is detected the **inactive** pill gets `aria-disabled` styling + a tooltip: *"Only one camera on this device."*
+- When `isSecureContext` is false or no devices exist, both pills go disabled and the Start Scanning button is disabled with a tooltip explaining why.
+
+#### Diagnostic toast → upgraded to inline panel
+
+The existing "Camera not switching?" link stays, but tapping it now expands a small details panel under the banner showing:
+- Secure context: ✅/❌
+- `getUserMedia` available: ✅/❌
+- Permission state: granted / denied / prompt / unknown
+- Video inputs detected: N
+- User-Agent (truncated, for support copy/paste)
+- A "Copy diagnostics" button that copies the above as plain text so the client can paste into chat/WhatsApp for support.
 
 ### Files touched
-- `src/components/checkin/QrScanner.tsx` — diagnostic link, stricter `getUserMedia` constraint, helper caption.
-- `src/lib/pwa.ts` — bump cache version string.
-- No other files. Visitor lookup, RLS fallback, photo capture, ANPR all unchanged.
+
+- `src/components/checkin/QrScanner.tsx` — banner state, environment probe on mount, message map, expanded diagnostics panel, pill disable logic.
+
+No other files. No DB, no edge function, no RLS, no auth changes. Visitor lookup, photo capture, ANPR, badge printing all unchanged.
 
 ### Verification
+
 ```text
-1. Reload preview → pills still visible, new caption underneath.
-2. Tap "Camera not switching?" → toast: "Detected N video input(s)".
-   - On a phone with 2 cams → toggling actually swaps lens.
-   - On a laptop with 1 cam → toast says "1 video input"; back-pill
-     toasts "Rear camera unavailable on this device" (from the
-     OverconstrainedError fallback path) but still opens the front lens.
-3. Existing scan flow / dual-column lookup unchanged.
-4. Client reopens PWA → one-shot reload pulls the latest bundle, pills
-   appear.
+1. Desktop Chrome over https → no banner, both pills enabled, scan works.
+2. Desktop Chrome with 1 webcam → amber banner: "Only one camera detected…",
+   front pill highlighted with tooltip on back pill.
+3. Block camera in browser settings, reload → red banner with step-by-step
+   re-enable instructions; Start button disabled.
+4. Open over http:// (or file://) → red banner: "Camera blocked — insecure
+   connection."; Start button disabled.
+5. Open Zoom in another window, tap Start → red banner: "Camera in use by
+   another app."
+6. Open inside Instagram in-app browser → red banner: "This browser does
+   not support camera access. Open in Chrome/Safari."
+7. Tap "Camera not switching?" → diagnostics panel expands with the 5
+   environment facts + Copy diagnostics button.
+8. Phone with 2 cameras → no banner, toggle swaps lens as before.
 ```
 
 ### Out of scope
-- Changing visitor lookup or RLS.
+- Visitor lookup / RLS fallback.
 - Photo capture component.
-- ANPR.
+- ANPR scanner.
+- Service-worker cache reload (already shipped).
 
