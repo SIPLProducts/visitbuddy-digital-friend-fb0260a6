@@ -43,8 +43,11 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const isMountedRef = useRef(true);
   const isCleaningUpRef = useRef(false);
   const hasHandledScanRef = useRef(false);
+  const isTransitioningRef = useRef(false);
+  const pendingTransitionRef = useRef<Promise<void> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [facingMode, setFacingMode] = useState<FacingMode>(readStoredFacing);
 
@@ -52,6 +55,21 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   useEffect(() => {
     try { localStorage.removeItem(LEGACY_DEVICE_KEY); } catch {}
   }, []);
+
+  const beginTransition = () => {
+    isTransitioningRef.current = true;
+    if (isMountedRef.current) setIsTransitioning(true);
+  };
+  const endTransition = () => {
+    isTransitioningRef.current = false;
+    pendingTransitionRef.current = null;
+    if (isMountedRef.current) setIsTransitioning(false);
+  };
+
+  const isTransitionRaceError = (err: any) => {
+    const msg = String(err?.message ?? err ?? '').toLowerCase();
+    return msg.includes('transition');
+  };
 
   // Safe cleanup function
   const cleanupScanner = useCallback(async () => {
@@ -61,9 +79,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     try {
       if (scannerRef.current) {
         if (scannerRef.current.isScanning) {
-          await scannerRef.current.stop();
+          try {
+            await scannerRef.current.stop();
+          } catch (e) {
+            if (!isTransitionRaceError(e)) console.warn('[QrScanner] stop during cleanup:', e);
+          }
         }
-        scannerRef.current.clear();
+        try {
+          scannerRef.current.clear();
+        } catch (e) {
+          if (!isTransitionRaceError(e)) console.warn('[QrScanner] clear during cleanup:', e);
+        }
         scannerRef.current = null;
       }
     } catch (err) {
@@ -161,12 +187,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   };
 
   const startWithConfig = async (config: any) => {
+    if (pendingTransitionRef.current) {
+      try { await pendingTransitionRef.current; } catch {}
+    }
+    if (isTransitioningRef.current) return;
+    beginTransition();
     setError(null);
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
 
-    try {
+    const run = (async () => {
       await cleanupScanner();
       await new Promise(resolve => setTimeout(resolve, 150));
       if (!isMountedRef.current) return;
@@ -179,17 +210,31 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       scannerRef.current = scanner;
 
       await startScanWithConstraints(scanner, config);
+    })();
+    pendingTransitionRef.current = run;
+    try {
+      await run;
     } catch (err: any) {
-      handleStartError(err);
+      if (isTransitionRaceError(err)) {
+        console.warn('[QrScanner] transition race ignored:', err);
+      } else {
+        handleStartError(err);
+      }
       onToggleScanning(false);
       await cleanupScanner();
     } finally {
       if (isMountedRef.current) setIsInitializing(false);
+      endTransition();
     }
   };
 
   const startScanning = async (overrideFacing?: FacingMode) => {
-    if (isInitializing || isCleaningUpRef.current) return;
+    if (isInitializing || isCleaningUpRef.current || isTransitioningRef.current) {
+      if (pendingTransitionRef.current) {
+        try { await pendingTransitionRef.current; } catch {}
+      }
+      return;
+    }
 
     setError(null);
     const chosen: FacingMode = overrideFacing ?? facingMode;
@@ -205,11 +250,12 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       console.warn('[QrScanner] getCameras() failed:', String(enumErr));
     }
 
+    beginTransition();
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
 
-    try {
+    const run = (async () => {
       await cleanupScanner();
       await new Promise(resolve => setTimeout(resolve, 150));
       if (!isMountedRef.current) return;
@@ -242,12 +288,21 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         }
       }
       if (!started) throw lastErr ?? new Error('Could not start camera');
+    })();
+    pendingTransitionRef.current = run;
+    try {
+      await run;
     } catch (err: any) {
-      handleStartError(err);
+      if (isTransitionRaceError(err)) {
+        console.warn('[QrScanner] transition race ignored:', err);
+      } else {
+        handleStartError(err);
+      }
       onToggleScanning(false);
       await cleanupScanner();
     } finally {
       if (isMountedRef.current) setIsInitializing(false);
+      endTransition();
     }
   };
 
@@ -256,25 +311,36 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   };
 
   const handleFacingChange = async (next: FacingMode) => {
-    if (next === facingMode && (isScanning || isInitializing)) return;
+    // Always reflect choice immediately
     setFacingMode(next);
     try { localStorage.setItem(FACING_KEY, next); } catch {}
-    if (isScanning || isInitializing) {
-      await stopScanning();
-      await new Promise((r) => setTimeout(r, 150));
-      await startScanning(next);
+    // Only hot-swap if running and no transition in flight
+    if (!isScanning || isInitializing || isTransitioningRef.current) {
+      if (pendingTransitionRef.current) {
+        try { await pendingTransitionRef.current; } catch {}
+      }
+      if (!isScanning) return;
     }
+    await stopScanning();
+    if (pendingTransitionRef.current) {
+      try { await pendingTransitionRef.current; } catch {}
+    }
+    await startScanning(next);
   };
 
   const stopScanning = async () => {
+    if (pendingTransitionRef.current && isTransitioningRef.current) {
+      try { await pendingTransitionRef.current; } catch {}
+    }
     try {
       if (scannerRef.current?.isScanning) {
         await scannerRef.current.stop();
       }
     } catch (err) {
-      console.error('Stop scanning error:', err);
+      if (!isTransitionRaceError(err)) console.error('Stop scanning error:', err);
     }
 
+    hasHandledScanRef.current = false;
     if (isMountedRef.current) {
       onToggleScanning(false);
     }
@@ -287,7 +353,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         <button
           type="button"
           onClick={() => handleFacingChange('environment')}
-          disabled={isInitializing}
+          disabled={isInitializing || isTransitioning}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'environment'
@@ -301,7 +367,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         <button
           type="button"
           onClick={() => handleFacingChange('user')}
-          disabled={isInitializing}
+          disabled={isInitializing || isTransitioning}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'user'
@@ -388,7 +454,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
           </Button>
         </div>
       ) : (
-        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing}>
+        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing || isTransitioning}>
           <Camera className="h-4 w-4" />
           {isInitializing ? 'Starting...' : 'Start Scanning'}
         </Button>
