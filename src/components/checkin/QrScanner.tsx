@@ -187,12 +187,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   };
 
   const startWithConfig = async (config: any) => {
+    if (pendingTransitionRef.current) {
+      try { await pendingTransitionRef.current; } catch {}
+    }
+    if (isTransitioningRef.current) return;
+    beginTransition();
     setError(null);
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
 
-    try {
+    const run = (async () => {
       await cleanupScanner();
       await new Promise(resolve => setTimeout(resolve, 150));
       if (!isMountedRef.current) return;
@@ -205,17 +210,31 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       scannerRef.current = scanner;
 
       await startScanWithConstraints(scanner, config);
+    })();
+    pendingTransitionRef.current = run;
+    try {
+      await run;
     } catch (err: any) {
-      handleStartError(err);
+      if (isTransitionRaceError(err)) {
+        console.warn('[QrScanner] transition race ignored:', err);
+      } else {
+        handleStartError(err);
+      }
       onToggleScanning(false);
       await cleanupScanner();
     } finally {
       if (isMountedRef.current) setIsInitializing(false);
+      endTransition();
     }
   };
 
   const startScanning = async (overrideFacing?: FacingMode) => {
-    if (isInitializing || isCleaningUpRef.current) return;
+    if (isInitializing || isCleaningUpRef.current || isTransitioningRef.current) {
+      if (pendingTransitionRef.current) {
+        try { await pendingTransitionRef.current; } catch {}
+      }
+      return;
+    }
 
     setError(null);
     const chosen: FacingMode = overrideFacing ?? facingMode;
@@ -231,11 +250,12 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       console.warn('[QrScanner] getCameras() failed:', String(enumErr));
     }
 
+    beginTransition();
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
 
-    try {
+    const run = (async () => {
       await cleanupScanner();
       await new Promise(resolve => setTimeout(resolve, 150));
       if (!isMountedRef.current) return;
@@ -268,12 +288,21 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         }
       }
       if (!started) throw lastErr ?? new Error('Could not start camera');
+    })();
+    pendingTransitionRef.current = run;
+    try {
+      await run;
     } catch (err: any) {
-      handleStartError(err);
+      if (isTransitionRaceError(err)) {
+        console.warn('[QrScanner] transition race ignored:', err);
+      } else {
+        handleStartError(err);
+      }
       onToggleScanning(false);
       await cleanupScanner();
     } finally {
       if (isMountedRef.current) setIsInitializing(false);
+      endTransition();
     }
   };
 
@@ -282,25 +311,36 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   };
 
   const handleFacingChange = async (next: FacingMode) => {
-    if (next === facingMode && (isScanning || isInitializing)) return;
+    // Always reflect choice immediately
     setFacingMode(next);
     try { localStorage.setItem(FACING_KEY, next); } catch {}
-    if (isScanning || isInitializing) {
-      await stopScanning();
-      await new Promise((r) => setTimeout(r, 150));
-      await startScanning(next);
+    // Only hot-swap if running and no transition in flight
+    if (!isScanning || isInitializing || isTransitioningRef.current) {
+      if (pendingTransitionRef.current) {
+        try { await pendingTransitionRef.current; } catch {}
+      }
+      if (!isScanning) return;
     }
+    await stopScanning();
+    if (pendingTransitionRef.current) {
+      try { await pendingTransitionRef.current; } catch {}
+    }
+    await startScanning(next);
   };
 
   const stopScanning = async () => {
+    if (pendingTransitionRef.current && isTransitioningRef.current) {
+      try { await pendingTransitionRef.current; } catch {}
+    }
     try {
       if (scannerRef.current?.isScanning) {
         await scannerRef.current.stop();
       }
     } catch (err) {
-      console.error('Stop scanning error:', err);
+      if (!isTransitionRaceError(err)) console.error('Stop scanning error:', err);
     }
 
+    hasHandledScanRef.current = false;
     if (isMountedRef.current) {
       onToggleScanning(false);
     }
