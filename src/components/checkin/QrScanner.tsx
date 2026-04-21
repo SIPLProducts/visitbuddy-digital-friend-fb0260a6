@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { Button } from '@/components/ui/button';
-import { Camera, StopCircle, AlertCircle, SwitchCamera } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Camera, StopCircle, AlertCircle, SwitchCamera, ChevronDown, Copy, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -14,12 +15,88 @@ interface QrScannerProps {
 const FACING_KEY = 'qr-scanner-facing-mode';
 type FacingMode = 'environment' | 'user';
 
+type DiagnosticKind =
+  | 'insecure'
+  | 'unsupported'
+  | 'permission_denied'
+  | 'no_camera'
+  | 'single_camera'
+  | 'in_use'
+  | 'rear_unavailable'
+  | 'iframe_blocked'
+  | null;
+
+type DiagnosticSeverity = 'error' | 'warning';
+
+interface DiagnosticInfo {
+  kind: Exclude<DiagnosticKind, null>;
+  severity: DiagnosticSeverity;
+  title: string;
+  message: string;
+}
+
+const DIAGNOSTICS: Record<Exclude<DiagnosticKind, null>, Omit<DiagnosticInfo, 'kind'>> = {
+  insecure: {
+    severity: 'error',
+    title: 'Camera blocked — insecure connection',
+    message:
+      'Cameras only work over HTTPS. Open this app from https://… (not http:// or an IP address) and try again.',
+  },
+  unsupported: {
+    severity: 'error',
+    title: 'This browser does not support camera access',
+    message:
+      'Use Chrome, Edge, Safari, or Firefox (latest version). In-app browsers (Instagram, LinkedIn, Gmail) often block cameras — open this link in your real browser.',
+  },
+  permission_denied: {
+    severity: 'error',
+    title: 'Camera permission was denied',
+    message:
+      'Tap the lock/camera icon in your browser address bar → set Camera to Allow → reload this page. On iOS: Settings → Safari → Camera → Allow.',
+  },
+  no_camera: {
+    severity: 'error',
+    title: 'No camera detected on this device',
+    message: 'Connect a webcam or use a phone/tablet with a built-in camera.',
+  },
+  single_camera: {
+    severity: 'warning',
+    title: 'Only one camera detected',
+    message:
+      'This device has a single lens, so both Back and Front pills will open the same camera. The toggle is only useful on phones with two cameras.',
+  },
+  in_use: {
+    severity: 'error',
+    title: 'Camera is in use by another app',
+    message:
+      'Close Zoom, Teams, WhatsApp Web, or any other tab using the camera, then tap Start Scanning again.',
+  },
+  rear_unavailable: {
+    severity: 'warning',
+    title: 'Rear camera unavailable',
+    message: 'Falling back to the front lens. (Common on laptops and tablets.)',
+  },
+  iframe_blocked: {
+    severity: 'error',
+    title: 'Embedded view is blocking the camera',
+    message: 'Open the app in its own browser tab and try again.',
+  },
+};
+
 function readStoredFacing(): FacingMode {
   try {
     const v = localStorage.getItem(FACING_KEY);
     if (v === 'user' || v === 'environment') return v;
   } catch {}
   return 'environment';
+}
+
+function isInIframe(): boolean {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
 }
 
 export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerProps) {
@@ -35,6 +112,67 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const [isInitializing, setIsInitializing] = useState(false);
   const [facingMode, setFacingMode] = useState<FacingMode>(readStoredFacing);
 
+  const [diagnostic, setDiagnostic] = useState<DiagnosticInfo | null>(null);
+  const [showDiagPanel, setShowDiagPanel] = useState(false);
+  const [videoInputCount, setVideoInputCount] = useState<number | null>(null);
+  const [permissionState, setPermissionState] = useState<string>('unknown');
+  const [secureContext, setSecureContext] = useState<boolean>(true);
+  const [getUserMediaAvailable, setGetUserMediaAvailable] = useState<boolean>(true);
+
+  const setDiag = (kind: DiagnosticKind) => {
+    if (kind === null) {
+      setDiagnostic(null);
+      return;
+    }
+    setDiagnostic({ kind, ...DIAGNOSTICS[kind] });
+  };
+
+  const probeEnvironment = useCallback(async (): Promise<DiagnosticKind> => {
+    const secure = typeof window !== 'undefined' ? window.isSecureContext : true;
+    setSecureContext(secure);
+
+    const hasGUM = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    setGetUserMediaAvailable(hasGUM);
+
+    if (!secure) return 'insecure';
+    if (!hasGUM) return 'unsupported';
+
+    // Permissions API (best-effort; not supported on Safari for camera)
+    let permState = 'unknown';
+    try {
+      // @ts-expect-error - "camera" is a valid permission name in supported browsers
+      const status = await navigator.permissions?.query({ name: 'camera' });
+      if (status?.state) permState = status.state;
+    } catch {}
+    setPermissionState(permState);
+    if (permState === 'denied') return 'permission_denied';
+
+    // Enumerate devices (labels may be empty until permission is granted)
+    let count: number | null = null;
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      count = devices.filter((d) => d.kind === 'videoinput').length;
+    } catch {}
+    setVideoInputCount(count);
+
+    if (count === 0) return 'no_camera';
+    if (count === 1) return 'single_camera';
+
+    return null;
+  }, []);
+
+  // Initial probe on mount
+  useEffect(() => {
+    isMountedRef.current = true;
+    probeEnvironment().then((kind) => {
+      if (!isMountedRef.current) return;
+      setDiag(kind);
+    });
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, [probeEnvironment]);
+
   const stopStream = useCallback(() => {
     try { controlsRef.current?.stop(); } catch {}
     controlsRef.current = null;
@@ -48,27 +186,35 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   }, []);
 
   useEffect(() => {
-    isMountedRef.current = true;
     return () => {
-      isMountedRef.current = false;
       stopStream();
     };
   }, [stopStream]);
 
-  const handleStartError = (err: any) => {
+  const handleStartError = (err: any): DiagnosticKind => {
     const errStr = String(err?.message ?? err);
     console.error('[QrScanner] camera error:', errStr, err);
     let message = errStr || 'Could not start camera';
+    let diagKind: DiagnosticKind = null;
+
     if (err?.name === 'NotAllowedError' || /permission|denied|notallowed/i.test(errStr)) {
       message = 'Camera permission denied. Please allow camera access in your browser settings.';
+      diagKind = 'permission_denied';
     } else if (err?.name === 'NotFoundError' || /not\s*found|no camera|devices? found/i.test(errStr)) {
       message = 'No camera found on this device.';
+      diagKind = 'no_camera';
     } else if (err?.name === 'NotReadableError' || /in use|notreadable|could not start video/i.test(errStr)) {
       message = 'Camera is in use by another app. Close other apps and retry.';
+      diagKind = 'in_use';
     } else if (err?.name === 'SecurityError' || /https|secure/i.test(errStr)) {
       message = 'Camera blocked. The page must be served over HTTPS.';
+      diagKind = isInIframe() ? 'iframe_blocked' : 'insecure';
     }
-    if (isMountedRef.current) setError(message);
+    if (isMountedRef.current) {
+      setError(message);
+      if (diagKind) setDiag(diagKind);
+    }
+    return diagKind;
   };
 
   const startScanning = async (overrideFacing?: FacingMode) => {
@@ -81,34 +227,41 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     const chosen: FacingMode = overrideFacing ?? facingMode;
 
     try {
-      // Tear down any prior stream
       stopStream();
 
-      // Wait a frame so the <video> element is mounted
+      // Re-probe so we surface the latest state
+      const probeKind = await probeEnvironment();
+      if (probeKind === 'insecure' || probeKind === 'unsupported' ||
+          probeKind === 'permission_denied' || probeKind === 'no_camera') {
+        setDiag(probeKind);
+        throw new Error(DIAGNOSTICS[probeKind].title);
+      }
+
       await new Promise<void>((r) => requestAnimationFrame(() => r()));
       const video = videoRef.current;
       if (!video) throw new Error('Video element not ready');
 
       let stream: MediaStream;
+      let usedFallback = false;
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { exact: chosen } },
           audio: false,
         });
-      } catch (firstErr) {
-        // Stricter exact match failed (often: requested lens not present).
-        // Try the relaxed "ideal" form on the same side first.
+      } catch (firstErr: any) {
+        if (firstErr?.name === 'NotReadableError') throw firstErr;
         try {
           stream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: { ideal: chosen } },
             audio: false,
           });
           if (chosen === 'environment') {
-            toast.message('Rear camera unavailable on this device — using available lens.');
+            usedFallback = true;
           }
-        } catch {
-          // Final fallback: any video input.
+        } catch (secondErr: any) {
+          if (secondErr?.name === 'NotReadableError') throw secondErr;
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          if (chosen === 'environment') usedFallback = true;
         }
       }
 
@@ -131,6 +284,22 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       });
 
       await video.play();
+
+      // Re-enumerate after permission grant for accurate count
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const count = devices.filter((d) => d.kind === 'videoinput').length;
+        setVideoInputCount(count);
+        if (count === 1 && diagnostic?.kind !== 'rear_unavailable') {
+          setDiag('single_camera');
+        } else if (usedFallback) {
+          setDiag('rear_unavailable');
+        } else if (count > 1 && (diagnostic?.kind === 'single_camera' || diagnostic?.kind === 'no_camera')) {
+          setDiag(null);
+        }
+      } catch {
+        if (usedFallback) setDiag('rear_unavailable');
+      }
 
       if (!readerRef.current) readerRef.current = new BrowserMultiFormatReader();
       controlsRef.current = await readerRef.current.decodeFromVideoElement(video, (result, _err, controls) => {
@@ -182,35 +351,60 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     await startScanning(next);
   };
 
-  const checkAvailableCameras = async () => {
+  const copyDiagnostics = async () => {
+    const lines = [
+      `Secure context: ${secureContext ? 'yes' : 'no'}`,
+      `getUserMedia available: ${getUserMediaAvailable ? 'yes' : 'no'}`,
+      `Permission state: ${permissionState}`,
+      `Video inputs detected: ${videoInputCount ?? 'unknown'}`,
+      `In iframe: ${isInIframe() ? 'yes' : 'no'}`,
+      `User-Agent: ${navigator.userAgent}`,
+    ];
+    const text = lines.join('\n');
     try {
-      // Some browsers hide labels (and even devices) until permission is granted.
-      // Request a quick permission probe first so the count is accurate.
-      try {
-        const probe = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        probe.getTracks().forEach((t) => t.stop());
-      } catch {}
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const cams = devices.filter((d) => d.kind === 'videoinput');
-      if (cams.length === 0) {
-        toast.error('No video input devices detected. Check camera permissions.');
-      } else if (cams.length === 1) {
-        toast.message('Detected 1 video input — this device has only one camera, so both pills open the same lens.');
-      } else {
-        toast.success(`Detected ${cams.length} video inputs — front/back toggle should work.`);
-      }
-    } catch (e: any) {
-      toast.error('Unable to list cameras: ' + (e?.message ?? 'unknown error'));
+      await navigator.clipboard.writeText(text);
+      toast.success('Diagnostics copied to clipboard');
+    } catch {
+      toast.error('Could not copy. Please screenshot the panel.');
     }
   };
 
+  // Disable controls when the environment fundamentally can't work
+  const hardBlocked =
+    diagnostic?.kind === 'insecure' ||
+    diagnostic?.kind === 'unsupported' ||
+    diagnostic?.kind === 'no_camera' ||
+    diagnostic?.kind === 'iframe_blocked';
+  const onlyOneCamera = videoInputCount === 1;
+  const inactivePillTitle = onlyOneCamera ? 'Only one camera on this device.' : undefined;
+  const startBlockedTitle = hardBlocked ? diagnostic?.title : undefined;
+
   return (
     <div className="bg-card rounded-xl border border-border p-6 text-center">
+      {/* Diagnostic Banner */}
+      {diagnostic && (
+        <Alert
+          className={cn(
+            'mb-4 text-left',
+            diagnostic.severity === 'error'
+              ? 'border-destructive/50 text-destructive [&>svg]:text-destructive'
+              : 'border-amber-500/50 text-amber-700 dark:text-amber-400 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400'
+          )}
+        >
+          {diagnostic.severity === 'error' ? <AlertCircle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
+          <AlertTitle>{diagnostic.title}</AlertTitle>
+          <AlertDescription className="text-foreground/80">{diagnostic.message}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Camera toggle pills */}
       <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full mb-4">
         <button
           type="button"
           onClick={() => handleFacingChange('environment')}
-          disabled={isInitializing}
+          disabled={isInitializing || hardBlocked}
+          aria-disabled={onlyOneCamera && facingMode !== 'environment'}
+          title={facingMode !== 'environment' ? inactivePillTitle : undefined}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'environment'
@@ -224,7 +418,9 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         <button
           type="button"
           onClick={() => handleFacingChange('user')}
-          disabled={isInitializing}
+          disabled={isInitializing || hardBlocked}
+          aria-disabled={onlyOneCamera && facingMode !== 'user'}
+          title={facingMode !== 'user' ? inactivePillTitle : undefined}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'user'
@@ -237,16 +433,36 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         </button>
       </div>
 
-      <p className="text-xs text-muted-foreground -mt-2 mb-3">
-        If only one camera is available, both options open the same lens.{' '}
+      <div className="mb-3">
         <button
           type="button"
-          onClick={checkAvailableCameras}
-          className="underline underline-offset-2 hover:text-foreground"
+          onClick={() => setShowDiagPanel((v) => !v)}
+          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground inline-flex items-center gap-1"
         >
           Camera not switching?
+          <ChevronDown className={cn('h-3 w-3 transition-transform', showDiagPanel && 'rotate-180')} />
         </button>
-      </p>
+      </div>
+
+      {showDiagPanel && (
+        <div className="mb-4 rounded-lg border border-border bg-muted/40 p-3 text-left text-xs space-y-1">
+          <div className="flex justify-between"><span className="text-muted-foreground">Secure context</span><span>{secureContext ? '✅' : '❌'}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">getUserMedia available</span><span>{getUserMediaAvailable ? '✅' : '❌'}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Permission state</span><span>{permissionState}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">Video inputs detected</span><span>{videoInputCount ?? '—'}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">In iframe</span><span>{isInIframe() ? 'yes' : 'no'}</span></div>
+          <div className="text-muted-foreground break-all pt-1 border-t border-border/50">
+            <span className="block">User-Agent:</span>
+            <span className="text-foreground/80">{navigator.userAgent.slice(0, 140)}{navigator.userAgent.length > 140 ? '…' : ''}</span>
+          </div>
+          <div className="pt-2">
+            <Button size="sm" variant="outline" className="gap-2 h-8" onClick={copyDiagnostics}>
+              <Copy className="h-3 w-3" />
+              Copy diagnostics
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="mx-auto mb-4 overflow-hidden rounded-lg relative w-72 h-72 bg-muted">
         <video
@@ -272,7 +488,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         )}
       </div>
 
-      {error && (
+      {error && !diagnostic && (
         <div className="flex items-center justify-center gap-2 text-destructive mb-4">
           <AlertCircle className="h-4 w-4" />
           <span className="text-sm">{error}</span>
@@ -297,7 +513,12 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
           </Button>
         </div>
       ) : (
-        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing}>
+        <Button
+          className="gap-2"
+          onClick={() => startScanning()}
+          disabled={isInitializing || hardBlocked}
+          title={startBlockedTitle}
+        >
           <Camera className="h-4 w-4" />
           {isInitializing ? 'Starting...' : 'Start Scanning'}
         </Button>
