@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
-import { Camera, StopCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Camera, StopCircle, AlertCircle, RefreshCw, SwitchCamera } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface QrScannerProps {
   onScan: (data: { visitorId: string; name: string; timestamp: string; action?: string }) => void;
@@ -15,7 +16,18 @@ interface CameraDevice {
   label: string;
 }
 
-const STORAGE_KEY = 'qr-scanner-camera-id';
+const FACING_KEY = 'qr-scanner-facing-mode';
+const LEGACY_DEVICE_KEY = 'qr-scanner-camera-id';
+
+type FacingMode = 'environment' | 'user';
+
+function readStoredFacing(): FacingMode {
+  try {
+    const v = localStorage.getItem(FACING_KEY);
+    if (v === 'user' || v === 'environment') return v;
+  } catch {}
+  return 'environment';
+}
 
 function describeCamera(label: string, index: number): string {
   if (!label) return `Camera ${index + 1}`;
@@ -34,7 +46,12 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
-  const [showPicker, setShowPicker] = useState(false);
+  const [facingMode, setFacingMode] = useState<FacingMode>(readStoredFacing);
+
+  // Clear legacy storage key on mount
+  useEffect(() => {
+    try { localStorage.removeItem(LEGACY_DEVICE_KEY); } catch {}
+  }, []);
 
   // Safe cleanup function
   const cleanupScanner = useCallback(async () => {
@@ -148,7 +165,6 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
-    setShowPicker(false);
 
     try {
       await cleanupScanner();
@@ -172,40 +188,23 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     }
   };
 
-  const startScanning = async () => {
+  const startScanning = async (overrideFacing?: FacingMode) => {
     if (isInitializing || isCleaningUpRef.current) return;
 
     setError(null);
+    const chosen: FacingMode = overrideFacing ?? facingMode;
 
-    // 1. Try to enumerate cameras so user can choose.
+    // Best-effort enumeration so we can populate the secondary picker
+    // and fall back to a deviceId if facingMode constraints fail.
     let cams: Array<{ id: string; label: string }> = [];
     try {
       const result = await Html5Qrcode.getCameras();
       cams = (result || []).map((c) => ({ id: c.id, label: c.label || '' }));
+      setCameras(cams);
     } catch (enumErr) {
       console.warn('[QrScanner] getCameras() failed:', String(enumErr));
     }
 
-    if (cams.length > 1) {
-      setCameras(cams);
-      // Auto-pick remembered camera if it's still present.
-      const remembered = localStorage.getItem(STORAGE_KEY);
-      if (remembered && cams.some((c) => c.id === remembered)) {
-        await startWithConfig(remembered);
-        return;
-      }
-      // Otherwise show the picker.
-      setShowPicker(true);
-      return;
-    }
-
-    // 2. Single camera — start it directly.
-    if (cams.length === 1) {
-      await startWithConfig(cams[0].id);
-      return;
-    }
-
-    // 3. Enumeration failed — fall back to facingMode attempts.
     setIsInitializing(true);
     hasHandledScanRef.current = false;
     onToggleScanning(true);
@@ -222,10 +221,14 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       const scanner = new Html5Qrcode('qr-reader', { verbose: false } as any);
       scannerRef.current = scanner;
 
-      const attempts = [
-        { label: 'environment (back)', config: { facingMode: 'environment' } },
-        { label: 'user (front)', config: { facingMode: 'user' } },
+      const opposite: FacingMode = chosen === 'environment' ? 'user' : 'environment';
+      const attempts: Array<{ label: string; config: any }> = [
+        { label: `${chosen} (preferred)`, config: { facingMode: { ideal: chosen } } },
+        { label: `${opposite} (fallback)`, config: { facingMode: { ideal: opposite } } },
       ];
+      for (const c of cams) {
+        attempts.push({ label: `deviceId ${c.label || c.id}`, config: c.id });
+      }
       let lastErr: unknown = null;
       let started = false;
       for (const attempt of attempts) {
@@ -234,6 +237,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
           started = true;
           break;
         } catch (attemptErr) {
+          console.warn('[QrScanner] attempt failed:', attempt.label, String(attemptErr));
           lastErr = attemptErr;
         }
       }
@@ -248,22 +252,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   };
 
   const selectCamera = async (deviceId: string) => {
-    localStorage.setItem(STORAGE_KEY, deviceId);
     await startWithConfig(deviceId);
   };
 
-  const handleSwitchCamera = async () => {
-    // Stop current scanner and show the picker again.
-    await stopScanning();
-    try {
-      const result = await Html5Qrcode.getCameras();
-      const cams = (result || []).map((c) => ({ id: c.id, label: c.label || '' }));
-      if (cams.length > 1) {
-        setCameras(cams);
-        setShowPicker(true);
-      }
-    } catch (enumErr) {
-      console.warn('[QrScanner] getCameras() failed:', String(enumErr));
+  const handleFacingChange = async (next: FacingMode) => {
+    if (next === facingMode && (isScanning || isInitializing)) return;
+    setFacingMode(next);
+    try { localStorage.setItem(FACING_KEY, next); } catch {}
+    if (isScanning || isInitializing) {
+      await stopScanning();
+      await new Promise((r) => setTimeout(r, 150));
+      await startScanning(next);
     }
   };
 
@@ -283,6 +282,38 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
 
   return (
     <div className="bg-card rounded-xl border border-border p-6 text-center">
+      {/* Always-visible Front/Back camera toggle */}
+      <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full mb-4">
+        <button
+          type="button"
+          onClick={() => handleFacingChange('environment')}
+          disabled={isInitializing}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+            facingMode === 'environment'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <Camera className="h-3.5 w-3.5" />
+          Back camera
+        </button>
+        <button
+          type="button"
+          onClick={() => handleFacingChange('user')}
+          disabled={isInitializing}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+            facingMode === 'user'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <SwitchCamera className="h-3.5 w-3.5" />
+          Front camera
+        </button>
+      </div>
+
       {/* Stable scanner container - never changes size or visibility to keep video painting */}
       <div
         ref={containerRef}
@@ -319,9 +350,9 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         </div>
       )}
 
-      {showPicker && cameras.length > 1 && (
+      {cameras.length > 2 && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-foreground mb-2">Choose a camera</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">Specific camera (optional)</p>
           <div className="flex flex-wrap justify-center gap-2">
             {cameras.map((cam, idx) => (
               <Button
@@ -340,13 +371,11 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       )}
 
       <h3 className="font-semibold text-foreground mb-2">
-        {isScanning ? 'Scanning...' : isInitializing ? 'Initializing...' : showPicker ? 'Select Camera' : 'Ready to Scan'}
+        {isScanning ? 'Scanning...' : isInitializing ? 'Initializing...' : 'Ready to Scan'}
       </h3>
       <p className="text-sm text-muted-foreground mb-4">
         {isScanning
           ? "Point the camera at a visitor's WhatsApp badge QR code"
-          : showPicker
-          ? "Pick which camera to use for scanning"
           : "Click the button below to activate the camera and scan a visitor's QR code"
         }
       </p>
@@ -357,19 +386,9 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
             <StopCircle className="h-4 w-4" />
             Stop Scanning
           </Button>
-          {cameras.length > 1 && (
-            <button
-              type="button"
-              onClick={handleSwitchCamera}
-              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Switch camera
-            </button>
-          )}
         </div>
       ) : (
-        <Button className="gap-2" onClick={startScanning} disabled={isInitializing}>
+        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing}>
           <Camera className="h-4 w-4" />
           {isInitializing ? 'Starting...' : 'Start Scanning'}
         </Button>
