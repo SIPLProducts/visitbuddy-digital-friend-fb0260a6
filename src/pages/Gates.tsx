@@ -375,12 +375,15 @@ export default function Gates() {
           />
         </div>
         <div className="space-y-2">
-          <Label>Building</Label>
+          <Label>Building / Area</Label>
           <Input
-            placeholder="e.g., Building A"
+            placeholder="e.g., Workshop, Admin Block, Warehouse"
             value={formData.building}
             onChange={(e) => setFormData({ ...formData, building: e.target.value })}
           />
+          <p className="text-[10px] text-muted-foreground">
+            Shown next to the gate name in dropdowns. Use this to distinguish gates within the same location, e.g. Workshop, Admin Block, Warehouse.
+          </p>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
