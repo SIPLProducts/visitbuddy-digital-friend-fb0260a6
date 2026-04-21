@@ -43,8 +43,11 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   const isMountedRef = useRef(true);
   const isCleaningUpRef = useRef(false);
   const hasHandledScanRef = useRef(false);
+  const isTransitioningRef = useRef(false);
+  const pendingTransitionRef = useRef<Promise<void> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [cameras, setCameras] = useState<CameraDevice[]>([]);
   const [facingMode, setFacingMode] = useState<FacingMode>(readStoredFacing);
 
@@ -52,6 +55,21 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   useEffect(() => {
     try { localStorage.removeItem(LEGACY_DEVICE_KEY); } catch {}
   }, []);
+
+  const beginTransition = () => {
+    isTransitioningRef.current = true;
+    if (isMountedRef.current) setIsTransitioning(true);
+  };
+  const endTransition = () => {
+    isTransitioningRef.current = false;
+    pendingTransitionRef.current = null;
+    if (isMountedRef.current) setIsTransitioning(false);
+  };
+
+  const isTransitionRaceError = (err: any) => {
+    const msg = String(err?.message ?? err ?? '').toLowerCase();
+    return msg.includes('transition');
+  };
 
   // Safe cleanup function
   const cleanupScanner = useCallback(async () => {
@@ -61,9 +79,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     try {
       if (scannerRef.current) {
         if (scannerRef.current.isScanning) {
-          await scannerRef.current.stop();
+          try {
+            await scannerRef.current.stop();
+          } catch (e) {
+            if (!isTransitionRaceError(e)) console.warn('[QrScanner] stop during cleanup:', e);
+          }
         }
-        scannerRef.current.clear();
+        try {
+          scannerRef.current.clear();
+        } catch (e) {
+          if (!isTransitionRaceError(e)) console.warn('[QrScanner] clear during cleanup:', e);
+        }
         scannerRef.current = null;
       }
     } catch (err) {
