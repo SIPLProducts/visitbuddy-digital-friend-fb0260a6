@@ -353,7 +353,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         <button
           type="button"
           onClick={() => handleFacingChange('environment')}
-          disabled={isInitializing}
+          disabled={isInitializing || isTransitioning}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'environment'
@@ -367,7 +367,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         <button
           type="button"
           onClick={() => handleFacingChange('user')}
-          disabled={isInitializing}
+          disabled={isInitializing || isTransitioning}
           className={cn(
             'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
             facingMode === 'user'
@@ -454,7 +454,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
           </Button>
         </div>
       ) : (
-        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing}>
+        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing || isTransitioning}>
           <Camera className="h-4 w-4" />
           {isInitializing ? 'Starting...' : 'Start Scanning'}
         </Button>
