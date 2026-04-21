@@ -350,9 +350,9 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         </div>
       )}
 
-      {showPicker && cameras.length > 1 && (
+      {cameras.length > 2 && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-foreground mb-2">Choose a camera</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">Specific camera (optional)</p>
           <div className="flex flex-wrap justify-center gap-2">
             {cameras.map((cam, idx) => (
               <Button
@@ -371,13 +371,11 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
       )}
 
       <h3 className="font-semibold text-foreground mb-2">
-        {isScanning ? 'Scanning...' : isInitializing ? 'Initializing...' : showPicker ? 'Select Camera' : 'Ready to Scan'}
+        {isScanning ? 'Scanning...' : isInitializing ? 'Initializing...' : 'Ready to Scan'}
       </h3>
       <p className="text-sm text-muted-foreground mb-4">
         {isScanning
           ? "Point the camera at a visitor's WhatsApp badge QR code"
-          : showPicker
-          ? "Pick which camera to use for scanning"
           : "Click the button below to activate the camera and scan a visitor's QR code"
         }
       </p>
@@ -388,19 +386,9 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
             <StopCircle className="h-4 w-4" />
             Stop Scanning
           </Button>
-          {cameras.length > 1 && (
-            <button
-              type="button"
-              onClick={handleSwitchCamera}
-              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
-            >
-              <RefreshCw className="h-3 w-3" />
-              Switch camera
-            </button>
-          )}
         </div>
       ) : (
-        <Button className="gap-2" onClick={startScanning} disabled={isInitializing}>
+        <Button className="gap-2" onClick={() => startScanning()} disabled={isInitializing}>
           <Camera className="h-4 w-4" />
           {isInitializing ? 'Starting...' : 'Start Scanning'}
         </Button>
