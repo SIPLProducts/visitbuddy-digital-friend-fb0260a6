@@ -282,6 +282,38 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
 
   return (
     <div className="bg-card rounded-xl border border-border p-6 text-center">
+      {/* Always-visible Front/Back camera toggle */}
+      <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-full mb-4">
+        <button
+          type="button"
+          onClick={() => handleFacingChange('environment')}
+          disabled={isInitializing}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+            facingMode === 'environment'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <Camera className="h-3.5 w-3.5" />
+          Back camera
+        </button>
+        <button
+          type="button"
+          onClick={() => handleFacingChange('user')}
+          disabled={isInitializing}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
+            facingMode === 'user'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <SwitchCamera className="h-3.5 w-3.5" />
+          Front camera
+        </button>
+      </div>
+
       {/* Stable scanner container - never changes size or visibility to keep video painting */}
       <div
         ref={containerRef}
