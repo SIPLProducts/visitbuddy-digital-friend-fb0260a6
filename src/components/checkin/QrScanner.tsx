@@ -252,22 +252,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
   };
 
   const selectCamera = async (deviceId: string) => {
-    localStorage.setItem(STORAGE_KEY, deviceId);
     await startWithConfig(deviceId);
   };
 
-  const handleSwitchCamera = async () => {
-    // Stop current scanner and show the picker again.
-    await stopScanning();
-    try {
-      const result = await Html5Qrcode.getCameras();
-      const cams = (result || []).map((c) => ({ id: c.id, label: c.label || '' }));
-      if (cams.length > 1) {
-        setCameras(cams);
-        setShowPicker(true);
-      }
-    } catch (enumErr) {
-      console.warn('[QrScanner] getCameras() failed:', String(enumErr));
+  const handleFacingChange = async (next: FacingMode) => {
+    if (next === facingMode && (isScanning || isInitializing)) return;
+    setFacingMode(next);
+    try { localStorage.setItem(FACING_KEY, next); } catch {}
+    if (isScanning || isInitializing) {
+      await stopScanning();
+      await new Promise((r) => setTimeout(r, 150));
+      await startScanning(next);
     }
   };
 
