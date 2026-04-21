@@ -1,58 +1,51 @@
 
 
-## Distinguish gates by their building/area, not by location
+## Always-visible Front/Back camera toggle on the QR scanner
 
-You want the gate dropdown to show what makes each gate unique within a location — the building or area it serves (e.g. "Main Entry — Workshop", "Main Entry — Admin Block") — not the location name. The location is already implied by the location filter on the same form.
+`CameraCapture` (used by visitor check-in/out photo) already shows a Front/Back toggle that always works. The QR scanner doesn't — it only shows a camera picker when `Html5Qrcode.getCameras()` returns 2+ devices, and on many phones/PWAs that returns just one entry until a stream is opened, so users never see the back-camera option.
 
-### 1. Gate label format
+This change brings the QR scanner to parity with the photo capture component: a Front/Back pill is always visible, and the user picks before (and during) scanning.
 
-New label rule, applied everywhere a gate is selected:
+### Changes
 
-- If `gate.building` is set → `"{gate.name} — {gate.building}"`  e.g. `Main Entry — Workshop`
-- If `gate.building` is empty → `"{gate.name}"` (plain)
+**`src/components/checkin/QrScanner.tsx`**
 
-No location name, no city. The dropdown stays scoped to the chosen location so there's no ambiguity across sites.
+1. Add `facingMode` state (`'environment' | 'user'`), defaulting to `environment` (back), persisted to `localStorage` under `qr-scanner-facing-mode`.
+2. Render a two-button Front/Back toggle (same visual style as `CameraCapture`) above the `#qr-reader` viewport, visible whenever the scanner is idle or running.
+3. Rework `startScanning`:
+   - Skip the "only show picker if 2+ devices" gate.
+   - Start directly with `{ facingMode: { ideal: <chosen> } }`.
+   - On failure, fall back to the opposite facingMode, then to enumerated `deviceId`, then surface the existing error messages.
+4. Tapping the other facing pill while scanning → stop, persist the new mode, restart with the new constraint (no page reload).
+5. Keep the existing fine-grained device picker as a secondary row only when `getCameras()` returns 3+ entries (covers tablets with multi-rear lenses); never block on it for the basic Front/Back choice.
+6. Drop the `qr-scanner-camera-id` storage key (replaced by `qr-scanner-facing-mode`); clear stale value on first run.
+7. Keep all current behaviour: `ensureVideoPlaying`, cleanup, scan-once guard, error toasts.
 
-### 2. Filter gates by selected location
+**No changes needed for photo capture.**
+`CameraCapture.tsx` (used by `CheckInCaptureDialog` for check-in and by check-out flows) already shows the Front/Back toggle plus Retake. Verified — no edits required.
 
-On every form that has both a Location and a Gate field, the gate list is filtered to gates whose `location_id` matches the currently selected location. If the location changes after a gate was picked, the gate field is cleared so a stale cross-location gate can't be submitted.
-
-Files updated:
-
-- **`src/pages/NewVisitor.tsx`** — visitor registration form
-- **`src/pages/NewVehicle.tsx`** — vehicle registration form
-- **`src/pages/Visitors.tsx`** — Gate filter on the visitors list
-- **`src/pages/SelfService.tsx`** — public self-service portal (gate is pre-filled from URL; label still uses the new rule)
-
-For each: fetch gates with `select('id, name, building, location_id')`, render `gate.building ? \`${gate.name} — ${gate.building}\` : gate.name`, and (where applicable) `.filter(g => !selectedLocationId || g.location_id === selectedLocationId)`.
-
-### 3. Encourage filling `building` on gates
-
-So the disambiguation actually works, the **Gates** management page (`src/pages/Gates.tsx`) gets a small UX nudge on the create/edit form:
-
-- Re-label the existing `building` field to **"Building / Area"**.
-- Add helper text: *"Shown next to the gate name in dropdowns. Use this to distinguish gates within the same location, e.g. Workshop, Admin Block, Warehouse."*
-- No schema changes — the `building` column already exists.
+**No changes to the rest of the stack.**
+`CheckInOut.tsx`, `CheckInCaptureDialog.tsx`, and `CameraFeed.tsx` consume these two components unchanged.
 
 ### Verification
 
 ```text
-1. Gates page → edit a gate → set Building/Area to "Workshop". Save.
-2. New Visitor → pick "Hyderabad HQ" as Location.
-   → Gate dropdown lists only Hyderabad HQ gates.
-   → Gates with a building show as "Main Entry — Workshop".
-   → Gates without one show as plain "Main Entry".
-3. Change Location to another site.
-   → Selected gate clears.
-   → New gate list reflects the new location.
-4. Visitors page → set the Location filter, then the Gate filter.
-   → Same scoped behaviour, same labels.
-5. Self-service portal opened via a gate QR.
-   → Gate stays pre-filled; label uses the new format.
+1. Open Check-In/Out → Scan tab on a phone (back camera works in
+   browser).
+   → Two pills "Back camera" / "Front camera" visible before tapping
+     Start Scanning. Back is highlighted by default.
+2. Tap Start Scanning → rear camera opens.
+3. Tap "Front camera" pill → preview switches to selfie cam without
+   reloading the page.
+4. Reload the page → last chosen facing is remembered.
+5. Open visitor check-in → photo capture dialog already shows the same
+   toggle (no regression).
+6. On a desktop with a single webcam, tapping "Back camera" still works
+   (browser falls back to the available lens).
 ```
 
 ### Out of scope
-- Gate-level scoping in user roles (still location-level).
-- Renaming gates in the database (you keep "Main Entry"; building disambiguates).
-- ANPR camera dropdown.
+- Changing the QR payload format or the `handleQrScan` lookup logic.
+- Adding zoom / torch controls.
+- Touching `CameraFeed.tsx` (live monitoring) — it has its own controls.
 
