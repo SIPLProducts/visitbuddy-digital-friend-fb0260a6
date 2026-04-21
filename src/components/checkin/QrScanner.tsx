@@ -140,8 +140,7 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
     // Permissions API (best-effort; not supported on Safari for camera)
     let permState = 'unknown';
     try {
-      // @ts-expect-error - "camera" is a valid permission name in supported browsers
-      const status = await navigator.permissions?.query({ name: 'camera' });
+      const status = await navigator.permissions?.query({ name: 'camera' as PermissionName });
       if (status?.state) permState = status.state;
     } catch {}
     setPermissionState(permState);
