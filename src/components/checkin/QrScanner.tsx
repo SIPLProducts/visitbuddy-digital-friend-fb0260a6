@@ -237,6 +237,17 @@ export function QrScanner({ onScan, isScanning, onToggleScanning }: QrScannerPro
         </button>
       </div>
 
+      <p className="text-xs text-muted-foreground -mt-2 mb-3">
+        If only one camera is available, both options open the same lens.{' '}
+        <button
+          type="button"
+          onClick={checkAvailableCameras}
+          className="underline underline-offset-2 hover:text-foreground"
+        >
+          Camera not switching?
+        </button>
+      </p>
+
       <div className="mx-auto mb-4 overflow-hidden rounded-lg relative w-72 h-72 bg-muted">
         <video
           ref={videoRef}
