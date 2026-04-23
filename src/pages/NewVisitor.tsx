@@ -610,24 +610,17 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Host</Label>
-                  <Select onValueChange={(value) => {
-                    form.setValue('host_id', value);
-                    const selectedEmployee = employees.find(e => e.id === value);
-                    if (selectedEmployee?.department?.id) {
-                      form.setValue('department_id', selectedEmployee.department.id);
-                    }
-                  }}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select host" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employees.map((emp) => (
-                        <SelectItem key={emp.id} value={emp.id}>
-                          {emp.name} - {emp.department?.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <HostCombobox
+                    value={form.watch('host_id') || ''}
+                    options={employees as any}
+                    onChange={(id, opt) => {
+                      form.setValue('host_id', id);
+                      if (opt?.department?.id) {
+                        form.setValue('department_id', opt.department.id);
+                      }
+                    }}
+                    onClear={() => form.setValue('host_id', '')}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Department</Label>
