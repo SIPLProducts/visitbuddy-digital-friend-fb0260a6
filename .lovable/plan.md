@@ -1,25 +1,33 @@
 
 
-## Update WhatsApp bridge URL
+## Add searchable Host dropdown to visitor forms
 
-The `WHATSAPP_BRIDGE_URL` runtime secret (used by the `whatsapp-bridge` edge function to reach your self-hosted whatsapp-web.js bridge) will be updated to:
-
-```
-https://392a-2401-4900-97a1-115f-ac1c-dfdb-498f-2444.ngrok-free.app
-```
+The current Host selector on visitor registration/edit is a plain `<Select>` — when a location has dozens/hundreds of employees the user must scroll. We'll swap it for a searchable combobox so typing filters the host list in real-time and the user can pick directly.
 
 ### What changes
-- Overwrite the existing `WHATSAPP_BRIDGE_URL` secret with the new ngrok tunnel URL.
-- No code or database changes — the edge function reads this secret at runtime, so the next QR/status/send/logout call will use the new tunnel automatically.
-- `WHATSAPP_BRIDGE_API_KEY` is left untouched and must still match the `BRIDGE_API_KEY` configured in your local `whatsapp-bridge/.env`.
 
-### Verification
-```text
-1. Open Settings → WhatsApp panel and tap "Get QR / Check status".
-2. Edge function logs should show host "392a-…ngrok-free.app" and a 200 response.
-3. Send a test WhatsApp badge — message should arrive via the new bridge.
-```
+**Inline registration form** (`src/pages/Visitors.tsx` — the "New Visitor" inline panel)
+- Replace the Host `Select` with a `Popover + Command` combobox (shadcn pattern, already available via `@/components/ui/popover` and `@/components/ui/command`).
+- Trigger is a `Button` showing the selected host's name (or "Select host…").
+- Opening reveals a `CommandInput` (search box) + scrollable `CommandList` of employees filtered by name / email / employee_id.
+- Selecting an item closes the popover, sets `host_id`, and keeps the existing auto-fill of department from host.
+- "No host found" empty state when search yields nothing.
+
+**Edit dialog** (`src/components/visitors/VisitorEditDialog.tsx`)
+- Same combobox replacement for the Host field, preserving the existing locked-when-checked-out behaviour.
+
+**Self-service portal** (`src/pages/SelfService.tsx`)
+- Apply the same searchable combobox to the host step so external visitors can search by name too.
+
+### Behaviour details
+- Search is case-insensitive substring match across `name`, `email`, `employee_id`.
+- List is virtualised by `Command`'s built-in filtering (no extra deps).
+- Keyboard: ↑/↓ to navigate, Enter to select, Esc to close.
+- Mobile: popover renders full-width under the trigger; input is auto-focused on open.
+- Existing host fetch query (filtered by selected location + `is_host = true`) is unchanged — only the UI swaps.
 
 ### Out of scope
-- No changes to bridge server code, Twilio settings, or other secrets.
-- Reminder: free ngrok URLs rotate on restart — update this same secret again when the tunnel changes.
+- Server-side host search / pagination (current dataset is small enough for client-side filter).
+- Adding new hosts from the dropdown.
+- Changes to appointment / vehicle host pickers.
+
