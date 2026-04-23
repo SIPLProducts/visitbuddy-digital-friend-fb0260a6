@@ -14,6 +14,7 @@ import reslLogo from '@/assets/resl-logo.png';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { HostCombobox } from '@/components/visitors/HostCombobox';
 
 interface Department {
   id: string;
