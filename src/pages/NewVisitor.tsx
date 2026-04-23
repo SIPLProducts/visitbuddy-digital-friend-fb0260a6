@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { HostCombobox } from '@/components/visitors/HostCombobox';
 
 const visitorSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
