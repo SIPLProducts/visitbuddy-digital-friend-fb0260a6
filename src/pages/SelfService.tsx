@@ -14,6 +14,7 @@ import reslLogo from '@/assets/resl-logo.png';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { HostCombobox } from '@/components/visitors/HostCombobox';
 
 interface Department {
   id: string;
@@ -386,16 +387,14 @@ export default function SelfService() {
               {formData.departmentId && (
                 <div className="space-y-2">
                   <Label>Host / Person to Meet</Label>
-                  <Select value={formData.hostId} onValueChange={(v) => updateField('hostId', v)}>
-                    <SelectTrigger className="h-12">
-                      <SelectValue placeholder="Select host" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employees.map((e) => (
-                        <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <HostCombobox
+                    value={formData.hostId}
+                    options={employees as any}
+                    onChange={(id) => updateField('hostId', id)}
+                    onClear={() => updateField('hostId', '')}
+                    triggerClassName="h-12"
+                    showDepartment={false}
+                  />
                 </div>
               )}
 

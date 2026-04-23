@@ -26,6 +26,7 @@ import { format, parseISO } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { HostCombobox } from '@/components/visitors/HostCombobox';
 
 interface VisitorEditDialogProps {
   visitor: Visitor | null;
@@ -268,42 +269,18 @@ export function VisitorEditDialog({ visitor, open, onOpenChange, onSave }: Visit
             
             <div>
               <Label htmlFor="host">Host</Label>
-              <div className="flex gap-2">
-                <Select
-                  value={formData.host_id || undefined}
-                  onValueChange={(value) => {
-                    const selectedEmployee = employees.find(e => e.id === value);
-                    setFormData({
-                      ...formData,
-                      host_id: value,
-                      department_id: selectedEmployee?.department?.id || formData.department_id,
-                    });
-                  }}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Select host" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {employees.map((emp) => (
-                      <SelectItem key={emp.id} value={emp.id}>
-                        {emp.name} {emp.department ? `(${emp.department.name})` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {formData.host_id && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 shrink-0 text-muted-foreground hover:text-destructive"
-                    onClick={() => setFormData({ ...formData, host_id: '' })}
-                    title="Clear host"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+              <HostCombobox
+                value={formData.host_id || ''}
+                options={employees as any}
+                onChange={(id, opt) =>
+                  setFormData({
+                    ...formData,
+                    host_id: id,
+                    department_id: opt?.department?.id || formData.department_id,
+                  })
+                }
+                onClear={() => setFormData({ ...formData, host_id: '' })}
+              />
             </div>
             
             <div>
