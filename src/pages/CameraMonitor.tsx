@@ -6,7 +6,7 @@ import { CameraFeed } from '@/components/camera/CameraFeed';
 import { Video, AlertTriangle, CheckCircle2, Clock, RefreshCw, Scan, Power, PowerOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface GateWithCamera {
@@ -51,7 +51,7 @@ export default function CameraMonitor() {
     fetchData();
 
     const channel = supabase
-      .channel(`anpr-monitor-${crypto.randomUUID()}`)
+      .channel(`anpr-monitor-${safeRandomId()}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
