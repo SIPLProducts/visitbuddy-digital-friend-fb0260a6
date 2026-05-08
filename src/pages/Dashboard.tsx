@@ -35,7 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 import { subDays, startOfDay, isToday, isThisWeek, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 
@@ -93,21 +93,21 @@ export default function Dashboard() {
 
     // Real-time subscriptions for live updates
     const visitorChannel = supabase
-      .channel(`dashboard-visitors-${crypto.randomUUID()}`)
+      .channel(`dashboard-visitors-${safeRandomId()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
         fetchDashboardData();
       })
       .subscribe();
 
     const vehicleChannel = supabase
-      .channel(`dashboard-vehicles-${crypto.randomUUID()}`)
+      .channel(`dashboard-vehicles-${safeRandomId()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
         fetchDashboardData();
       })
       .subscribe();
 
     const appointmentChannel = supabase
-      .channel(`dashboard-appointments-${crypto.randomUUID()}`)
+      .channel(`dashboard-appointments-${safeRandomId()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
         fetchDashboardData();
       })
