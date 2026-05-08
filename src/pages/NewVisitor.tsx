@@ -19,7 +19,7 @@ import { ArrowLeft, User, Building2, Laptop, Phone, Mail, MessageCircle, Users, 
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
@@ -138,8 +138,8 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
 
   // Generate visitor ID client-side (matches the DB trigger pattern)
   const generateVisitorId = () => {
-    const uuid1 = crypto.randomUUID().replace(/-/g, '');
-    const uuid2 = crypto.randomUUID().replace(/-/g, '');
+    const uuid1 = safeRandomId().replace(/-/g, '');
+    const uuid2 = safeRandomId().replace(/-/g, '');
     return `VIS-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
   };
 
