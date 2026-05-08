@@ -100,20 +100,31 @@ pg_restore --clean --if-exists --no-owner \
   /home/vmsadm/resl/vvms/backups/db-YYYYMMDD-HHMMSS.dump
 ```
 
-## Migrating data from Lovable Cloud (one-time)
+## Migrating data + credentials from Lovable Cloud (one-time)
+
+The deploy script already prompts for **every credential** the app uses
+(Gemini, Twilio, SMTP, Resend, WhatsApp bridge key). To also bring across
+**existing data** (auth users, profiles, visitors, vehicles, photos, branding)
+use the helper scripts:
 
 ```bash
-# On a machine with Lovable Cloud DB access:
-pg_dump --data-only --no-owner --schema=public "$LOVABLE_CLOUD_DB_URL" > visiguard-data.sql
+# 1) On any machine with internet access (needs psql client + jq + curl):
+export SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres'
+export SUPABASE_URL='https://<ref>.supabase.co'
+export SUPABASE_SERVICE_ROLE_KEY='eyJ...'      # service role, NOT anon
+bash deploy/export-from-cloud.sh
+# Produces: cloud-export.dump  +  storage-export.tgz
 
-# Storage objects
-supabase storage cp -r ss://visitor-photos ./visitor-photos --project-ref <ref>
-supabase storage cp -r ss://branding       ./branding       --project-ref <ref>
-
-# Then on the new server:
-psql "postgresql://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/postgres" -f visiguard-data.sql
-# Re-upload storage via Studio or REST API.
+# 2) Copy both files to the on-prem server, then:
+scp cloud-export.dump storage-export.tgz vmsadm@<server>:/tmp/
+ssh root@<server>
+sudo bash /tmp/visiguard-src/deploy/import-to-onprem.sh \
+  /tmp/cloud-export.dump /tmp/storage-export.tgz
 ```
+
+Existing user passwords keep working (auth schema is included in the dump).
+Photos and branding files are re-served from
+`/home/vmsadm/resl/vvms/backend/supabase/docker/volumes/storage`.
 
 ## What's different vs Lovable Cloud
 
