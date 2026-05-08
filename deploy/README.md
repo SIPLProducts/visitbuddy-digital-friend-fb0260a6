@@ -126,6 +126,25 @@ Existing user passwords keep working (auth schema is included in the dump).
 Photos and branding files are re-served from
 `/home/vmsadm/resl/vvms/backend/supabase/docker/volumes/storage`.
 
+> **Important:** the import script now **truncates the on-prem `auth.users`,
+> `public.profiles`, and `public.user_location_roles` tables before
+> `pg_restore`** so the cloud UUIDs become the source of truth. If anyone
+> signed up locally before the import (e.g. `bala@sharviinfotech.com`), that
+> local account is removed and replaced with the cloud row — the original
+> cloud password works, and the HO Admin role mapping in
+> `user_location_roles` lines up correctly. After the import finishes,
+> verify with:
+>
+> ```sql
+> SELECT u.email, r.role, r.is_ho_admin
+> FROM auth.users u
+> LEFT JOIN public.user_location_roles r ON r.user_id = u.id
+> WHERE u.email = 'bala@sharviinfotech.com';
+> ```
+>
+> Expected: one row with `is_ho_admin = true`. The header in the app should
+> then show **HO Admin** and User Management opens.
+
 ## What's different vs Lovable Cloud
 
 - **AI/ANPR**: Lovable AI Gateway is unavailable. `anpr-scan` falls back to Google Gemini directly using `GEMINI_API_KEY`.
