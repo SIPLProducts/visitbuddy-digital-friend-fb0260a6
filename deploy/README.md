@@ -149,3 +149,22 @@ systemctl status visiguard-backend.service
 # Re-run the installer at any time — it's idempotent
 sudo bash /tmp/visiguard-src/deploy/deploy.sh
 ```
+
+### Blank page after login / `503` `PGRST002` errors
+
+If, right after importing a Lovable Cloud dump, the browser console shows:
+
+```
+GET http://<server>:8000/rest/v1/... 503 (Service Unavailable)
+{"code":"PGRST002","message":"Could not query the database for the schema cache. Retrying."}
+```
+
+`pg_restore` stripped the GRANTs that Supabase's `anon` / `authenticated` roles
+need. Run the one-shot repair script — it re-applies the grants, reloads the
+PostgREST schema cache, and restarts the affected containers:
+
+```bash
+sudo bash /home/vmsadm/resl/vvms/frontend/deploy/repair-postgrest.sh
+```
+
+Reload the browser tab afterwards. The script is idempotent and safe to re-run.

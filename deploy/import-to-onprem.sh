@@ -32,6 +32,53 @@ echo "==> Restoring database from $DUMP"
 pg_restore --clean --if-exists --no-owner --no-privileges \
   --dbname="$PGCONN" --jobs=2 --verbose "$DUMP" 2>&1 | tail -n 40 || true
 
+echo "==> Re-applying Supabase role grants (pg_restore stripped them)..."
+psql "$PGCONN" -v ON_ERROR_STOP=0 <<'SQL'
+DO $$
+DECLARE r text;
+BEGIN
+  FOREACH r IN ARRAY ARRAY['anon','authenticated','service_role','authenticator',
+                           'supabase_admin','supabase_auth_admin','supabase_storage_admin']
+  LOOP
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
+      EXECUTE format('GRANT USAGE ON SCHEMA public, auth, storage TO %I', r);
+    END IF;
+  END LOOP;
+END $$;
+
+GRANT ALL    ON ALL TABLES    IN SCHEMA public TO postgres, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE
+              ON ALL TABLES    IN SCHEMA public TO anon, authenticated;
+GRANT ALL    ON ALL SEQUENCES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES    TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT ALL                            ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT EXECUTE                        ON FUNCTIONS TO anon, authenticated, service_role;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_auth_admin') THEN
+    EXECUTE 'GRANT ALL ON ALL TABLES    IN SCHEMA auth TO supabase_auth_admin';
+    EXECUTE 'GRANT ALL ON ALL SEQUENCES IN SCHEMA auth TO supabase_auth_admin';
+    EXECUTE 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA auth TO supabase_auth_admin';
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_storage_admin') THEN
+    EXECUTE 'GRANT ALL ON ALL TABLES    IN SCHEMA storage TO supabase_storage_admin';
+    EXECUTE 'GRANT ALL ON ALL SEQUENCES IN SCHEMA storage TO supabase_storage_admin';
+    EXECUTE 'GRANT ALL ON ALL FUNCTIONS IN SCHEMA storage TO supabase_storage_admin';
+  END IF;
+END $$;
+
+GRANT SELECT ON auth.users TO anon, authenticated, service_role;
+
+NOTIFY pgrst, 'reload schema';
+NOTIFY pgrst, 'reload config';
+SQL
+
 echo "==> Re-creating storage buckets locally (idempotent)..."
 psql "$PGCONN" <<'SQL'
 INSERT INTO storage.buckets (id, name, public)
@@ -59,9 +106,24 @@ rm -rf "$TMP_EXTRACT"
 
 echo "==> Restarting all containers..."
 docker compose -f "$SUPA_DOCKER/docker-compose.yml" up -d
+# Force PostgREST to rebuild its schema cache from clean grants
+docker compose -f "$SUPA_DOCKER/docker-compose.yml" restart rest auth storage realtime meta || true
 
 echo "==> Verification"
 psql "$PGCONN" -c "ANALYZE;" >/dev/null
+
+ANON_KEY=$(grep -E '^ANON_KEY=' "$SUPA_DOCKER/.env" | cut -d= -f2-)
+for i in $(seq 1 30); do
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+    -H "apikey: $ANON_KEY" \
+    "http://127.0.0.1:8000/rest/v1/locations?select=id&limit=1" || true)
+  [[ "$CODE" == "200" ]] && { echo "    PostgREST OK (200)"; break; }
+  sleep 2
+done
+if [[ "$CODE" != "200" ]]; then
+  echo "    WARNING: PostgREST still returns $CODE. Run: sudo bash $(dirname "$0")/repair-postgrest.sh"
+fi
+
 psql "$PGCONN" <<'SQL'
 \echo Row counts:
 SELECT 'auth.users'                AS t, count(*) FROM auth.users
@@ -80,4 +142,6 @@ Import complete.
   - Existing logins (incl. $ADMIN_EMAIL) keep working with their cloud passwords.
   - Visitor photos / branding files restored to: $STORAGE_VOL
   - If a sign-in fails, run deploy.sh again to re-assert the admin account.
+  - If the app shows a blank page or 503 / PGRST002 errors, run:
+      sudo bash $(dirname "$0")/repair-postgrest.sh
 EOF
