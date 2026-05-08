@@ -7,7 +7,7 @@ import { Video, Scan, Power, PowerOff, CheckCircle2, AlertTriangle, Clock, Chevr
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface GateWithCamera {
@@ -51,7 +51,7 @@ export function AnprPanel({ onVehicleAction }: { onVehicleAction?: () => void })
     fetchRecentEvents();
 
     const channel = supabase
-      .channel(`anpr-panel-events-${crypto.randomUUID()}`)
+      .channel(`anpr-panel-events-${safeRandomId()}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'anpr_events' }, () => {
         fetchRecentEvents();
       })
