@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { format, formatDistanceToNow } from 'date-fns';
 import { QrScanner } from '@/components/checkin/QrScanner';
 import { CameraFeed } from '@/components/camera/CameraFeed';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 
 export default function VehicleGate() {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export default function VehicleGate() {
 
     // Subscribe to ANPR events
     const channel = supabase
-      .channel(`anpr-vehicle-gate-${crypto.randomUUID()}`)
+      .channel(`anpr-vehicle-gate-${safeRandomId()}`)
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
