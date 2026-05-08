@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { safeRandomId } from '@/lib/utils';
 
 interface Notification {
   id: string;
@@ -33,7 +34,7 @@ export function NotificationDropdown() {
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel(`notifications-realtime-${crypto.randomUUID()}`)
+      .channel(`notifications-realtime-${safeRandomId()}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload) => {
         setNotifications(prev => [payload.new as Notification, ...prev].slice(0, 10));
       })
