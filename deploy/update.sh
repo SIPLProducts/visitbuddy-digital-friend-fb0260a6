@@ -4,7 +4,7 @@ set -euo pipefail
 if [[ $EUID -ne 0 ]]; then echo "Run as root"; exit 1; fi
 
 SERVICE_USER="${SERVICE_USER:-vmsadm}"
-BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl}"
+BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
 ENV_FILE="$BASE_DIR/config.env"
 # shellcheck disable=SC1090
 source "$ENV_FILE"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # VisiGuard self-hosted deployment for Ubuntu 22.04 / 24.04
-# Layout (all under one base dir, default /home/vmsadm/resl):
+# Layout (all under one base dir, default /home/vmsadm/resl/vvms):
 #   <BASE>/frontend     -> Vite app source + built dist
 #   <BASE>/backend      -> Self-hosted Supabase (docker compose stack)
 #   <BASE>/middleware   -> WhatsApp bridge + future integration services
@@ -22,7 +22,7 @@ fi
 # Layout
 # ---------------------------------------------------------------
 SERVICE_USER="${SERVICE_USER:-vmsadm}"
-BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl}"
+BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
 FRONTEND_DIR="$BASE_DIR/frontend"
 BACKEND_DIR="$BASE_DIR/backend"
 MIDDLEWARE_DIR="$BASE_DIR/middleware"

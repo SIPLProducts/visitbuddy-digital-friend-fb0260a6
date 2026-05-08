@@ -1,9 +1,9 @@
 # VisiGuard — Self-Hosted Deployment
 
-One-shot installer for Ubuntu 22.04 / 24.04. Everything lives under a single base directory (default `/home/vmsadm/resl`):
+One-shot installer for Ubuntu 22.04 / 24.04. Everything lives under a single base directory (default `/home/vmsadm/resl/vvms`):
 
 ```
-/home/vmsadm/resl/
+/home/vmsadm/resl/vvms/
 ├── frontend/      # Vite app source + built dist (Nginx serves dist/)
 ├── backend/       # Self-hosted Supabase (docker compose stack + edge functions)
 │   └── supabase/
@@ -38,14 +38,14 @@ The script creates the `vmsadm` user (if missing), installs Docker / Node 20 / N
 To deploy under a different path or user, set env vars before running:
 
 ```bash
-sudo SERVICE_USER=vmsadm BASE_DIR=/home/vmsadm/resl bash deploy/deploy.sh
+sudo SERVICE_USER=vmsadm BASE_DIR=/home/vmsadm/resl/vvms bash deploy/deploy.sh
 ```
 
 ## After install
 
 1. Open `https://wa.<domain>` and scan the WhatsApp QR (first run only).
 2. Open `https://visiguard.<domain>` and log in as the admin email/password you provided.
-3. Open `https://api.<domain>` for Supabase Studio (basic-auth credentials in `/home/vmsadm/resl/config.env`).
+3. Open `https://api.<domain>` for Supabase Studio (basic-auth credentials in `/home/vmsadm/resl/vvms/config.env`).
 
 ## Updates
 
@@ -58,13 +58,13 @@ This rsyncs source into `frontend/`, rebuilds, redeploys edge functions, and reb
 
 ## Backups
 
-Cron runs `/usr/local/bin/visiguard-backup` nightly at 02:00 → `/home/vmsadm/resl/backups/`.
+Cron runs `/usr/local/bin/visiguard-backup` nightly at 02:00 → `/home/vmsadm/resl/vvms/backups/`.
 
 ```bash
 # Manual restore
 pg_restore --clean --if-exists --no-owner \
   -d "postgresql://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/postgres" \
-  /home/vmsadm/resl/backups/db-YYYYMMDD-HHMMSS.dump
+  /home/vmsadm/resl/vvms/backups/db-YYYYMMDD-HHMMSS.dump
 ```
 
 ## Migrating data from Lovable Cloud (one-time)
@@ -85,15 +85,15 @@ psql "postgresql://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/postgres" -f visig
 ## What's different vs Lovable Cloud
 
 - **AI/ANPR**: Lovable AI Gateway is unavailable. `anpr-scan` falls back to Google Gemini directly using `GEMINI_API_KEY`.
-- **Secrets**: managed via `/home/vmsadm/resl/config.env` and `backend/supabase/docker/volumes/functions/.env`. Edit either, then `update.sh` (or restart the `functions` service).
+- **Secrets**: managed via `/home/vmsadm/resl/vvms/config.env` and `backend/supabase/docker/volumes/functions/.env`. Edit either, then `update.sh` (or restart the `functions` service).
 - **Auth providers** (Google OAuth, etc.): configure in Supabase Studio → Authentication.
 
 ## Troubleshooting
 
 ```bash
 # Backend stack
-docker compose -f /home/vmsadm/resl/backend/supabase/docker/docker-compose.yml ps
-docker compose -f /home/vmsadm/resl/backend/supabase/docker/docker-compose.yml logs -f
+docker compose -f /home/vmsadm/resl/vvms/backend/supabase/docker/docker-compose.yml ps
+docker compose -f /home/vmsadm/resl/vvms/backend/supabase/docker/docker-compose.yml logs -f
 
 # Middleware
 docker logs -f wa-bridge
