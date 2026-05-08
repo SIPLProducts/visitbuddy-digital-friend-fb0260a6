@@ -236,11 +236,12 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    if (!lovableApiKey) {
+    if (!lovableApiKey && !geminiApiKey) {
       return new Response(
-        JSON.stringify({ error: "AI service not configured" }),
+        JSON.stringify({ error: "AI service not configured (set LOVABLE_API_KEY or GEMINI_API_KEY)" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -300,14 +301,19 @@ Deno.serve(async (req) => {
 
     console.log(`Snapshot fetched, size: ${imageBuffer.byteLength} bytes. Sending to AI for plate detection...`);
 
-    // Send to Gemini Vision for plate detection
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    // Send to Gemini Vision for plate detection.
+    // Prefer Lovable AI Gateway when available (Lovable Cloud); otherwise call
+    // Google Generative Language API directly using GEMINI_API_KEY (self-hosted).
+    let plateData: { plates?: Array<{ plate_number: string; confidence: string }>; no_plate_detected?: boolean };
+
+    if (lovableApiKey) {
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${lovableApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
           {
@@ -367,36 +373,58 @@ Rules:
           }
         ],
         tool_choice: { type: "function", function: { name: "report_plates" } }
-      }),
-    });
+        }),
+      });
 
-    if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error(`AI error: ${aiResponse.status}`, errText);
-      if (aiResponse.status === 429) {
+      if (!aiResponse.ok) {
+        const errText = await aiResponse.text();
+        console.error(`Lovable AI error: ${aiResponse.status}`, errText);
+        const status = aiResponse.status === 429 ? 429 : 500;
         return new Response(
-          JSON.stringify({ error: "AI rate limited, try again shortly" }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: aiResponse.status === 429 ? "AI rate limited, try again shortly" : "AI plate detection failed" }),
+          { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      return new Response(
-        JSON.stringify({ error: "AI plate detection failed" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      const aiResult = await aiResponse.json();
+      const toolCall = aiResult.choices?.[0]?.message?.tool_calls?.[0];
+      if (!toolCall) {
+        return new Response(
+          JSON.stringify({ success: true, plates: [], message: "No plate detected" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      plateData = JSON.parse(toolCall.function.arguments);
+    } else {
+      // Direct Google Gemini API (self-hosted deployments)
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`;
+      const geminiResp = await fetch(geminiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            role: "user",
+            parts: [
+              { text: "Read vehicle license plate numbers in this CCTV image. Respond ONLY with valid JSON: {\"plates\":[{\"plate_number\":\"ABC123\",\"confidence\":\"high|medium|low\"}],\"no_plate_detected\":false}. If no plate, set no_plate_detected:true and plates:[]. Strip spaces/dashes, uppercase." },
+              { inline_data: { mime_type: "image/jpeg", data: base64Image } }
+            ]
+          }],
+          generationConfig: { responseMimeType: "application/json", temperature: 0 }
+        }),
+      });
+      if (!geminiResp.ok) {
+        const errText = await geminiResp.text();
+        console.error(`Gemini error: ${geminiResp.status}`, errText);
+        const status = geminiResp.status === 429 ? 429 : 500;
+        return new Response(
+          JSON.stringify({ error: geminiResp.status === 429 ? "AI rate limited, try again shortly" : "AI plate detection failed" }),
+          { status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const gj = await geminiResp.json();
+      const text = gj.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+      try { plateData = JSON.parse(text); } catch { plateData = { plates: [], no_plate_detected: true }; }
     }
 
-    const aiResult = await aiResponse.json();
-    const toolCall = aiResult.choices?.[0]?.message?.tool_calls?.[0];
-    
-    if (!toolCall) {
-      console.log("AI returned no tool call, no plate detected");
-      return new Response(
-        JSON.stringify({ success: true, plates: [], message: "No plate detected" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const plateData = JSON.parse(toolCall.function.arguments);
     console.log("AI plate detection result:", JSON.stringify(plateData));
 
     if (plateData.no_plate_detected || !plateData.plates || plateData.plates.length === 0) {
