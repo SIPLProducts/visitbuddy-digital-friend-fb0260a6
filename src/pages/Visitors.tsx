@@ -36,7 +36,7 @@ import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, Ch
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Visitor } from '@/types/database';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { VisitorDetailsDialog } from '@/components/visitors/VisitorDetailsDialog';
@@ -123,7 +123,7 @@ export default function Visitors() {
 
     // Realtime subscription for auto-refresh when visitors are updated
     const channel = supabase
-      .channel(`visitors-page-realtime-${crypto.randomUUID()}`)
+      .channel(`visitors-page-realtime-${safeRandomId()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'visitors' }, () => {
         fetchVisitors();
       })
