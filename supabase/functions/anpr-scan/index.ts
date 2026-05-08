@@ -236,11 +236,12 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    if (!lovableApiKey) {
+    if (!lovableApiKey && !geminiApiKey) {
       return new Response(
-        JSON.stringify({ error: "AI service not configured" }),
+        JSON.stringify({ error: "AI service not configured (set LOVABLE_API_KEY or GEMINI_API_KEY)" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
