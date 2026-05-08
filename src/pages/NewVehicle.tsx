@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { safeRandomId } from '@/lib/utils';
 
 const vehicleSchema = z.object({
   vehicle_number: z.string().min(4, 'Vehicle number must be at least 4 characters'),
@@ -94,8 +95,8 @@ export default function NewVehicle({ inline = false, onClose }: NewVehicleProps)
   };
 
   const generateVehicleId = () => {
-    const uuid1 = crypto.randomUUID().replace(/-/g, '');
-    const uuid2 = crypto.randomUUID().replace(/-/g, '');
+    const uuid1 = safeRandomId().replace(/-/g, '');
+    const uuid2 = safeRandomId().replace(/-/g, '');
     return `VEH-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
   };
 

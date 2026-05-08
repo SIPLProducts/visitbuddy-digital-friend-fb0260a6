@@ -34,6 +34,7 @@ import { useUserRoles } from '@/hooks/useUserRoles';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { toast } from 'sonner';
 import { format, formatDistanceToNow } from 'date-fns';
+import { safeRandomId } from '@/lib/utils';
 
 export default function Vehicles() {
   const navigate = useNavigate();
@@ -57,14 +58,14 @@ export default function Vehicles() {
 
     // Real-time subscriptions for live updates
     const vehicleChannel = supabase
-      .channel(`vehicles-page-vehicles-${crypto.randomUUID()}`)
+      .channel(`vehicles-page-vehicles-${safeRandomId()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
         fetchVehicles();
       })
       .subscribe();
 
     const entryChannel = supabase
-      .channel(`vehicles-page-entries-${crypto.randomUUID()}`)
+      .channel(`vehicles-page-entries-${safeRandomId()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicle_entries' }, () => {
         fetchVehicles();
       })
