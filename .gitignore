@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Sensitive seed files (contain password hashes / large transactional data)
+deploy/seed/00_auth_users.sql

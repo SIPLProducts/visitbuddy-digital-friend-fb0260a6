@@ -1,0 +1,7 @@
+-- Seed: public.vehicle_entries (transactional, regenerate before import)
+BEGIN;
+TRUNCATE public.vehicle_entries CASCADE;
+INSERT INTO public.vehicle_entries (id, vehicle_id, gate_id, location_id, entry_time, exit_time, purpose, remarks, created_at, updated_at) VALUES ('6a1f99ad-4260-4da0-84b3-ee9481c7b0d9', 'd41b80ab-a5c0-4790-89b7-a5e96b3a4723', '7932f688-fde0-4c7d-8359-78a33a183177', '013e5f3f-0fee-45a8-a1a8-c625ef9e53bb', '2026-04-14 09:19:03.616+00', '2026-04-14 10:05:50.664+00', 'Delivery laptop', NULL, '2026-04-14 09:19:03.774207+00', '2026-04-14 10:05:30.914807+00');
+INSERT INTO public.vehicle_entries (id, vehicle_id, gate_id, location_id, entry_time, exit_time, purpose, remarks, created_at, updated_at) VALUES ('f5f595f2-8d90-44d3-b05f-be8553f09019', 'd41b80ab-a5c0-4790-89b7-a5e96b3a4723', '7932f688-fde0-4c7d-8359-78a33a183177', '013e5f3f-0fee-45a8-a1a8-c625ef9e53bb', '2026-04-14 10:05:54.825+00', '2026-04-24 06:43:39.075+00', 'Delivery laptop', NULL, '2026-04-14 10:05:35.104621+00', '2026-04-24 06:43:38.374463+00');
+INSERT INTO public.vehicle_entries (id, vehicle_id, gate_id, location_id, entry_time, exit_time, purpose, remarks, created_at, updated_at) VALUES ('16a8e1ec-6c38-4cfc-a987-48d2e0bea376', 'd41b80ab-a5c0-4790-89b7-a5e96b3a4723', '7932f688-fde0-4c7d-8359-78a33a183177', '013e5f3f-0fee-45a8-a1a8-c625ef9e53bb', '2026-04-24 06:43:48.201+00', '2026-05-08 10:39:40.426+00', 'Delivery laptop', NULL, '2026-04-24 06:43:47.47413+00', '2026-05-08 10:37:23.601377+00');
+COMMIT;
