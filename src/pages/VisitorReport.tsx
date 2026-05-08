@@ -35,7 +35,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Visitor, Location, Department } from '@/types/database';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 import { format, subDays, eachDayOfInterval, startOfDay, differenceInMinutes, isToday, isThisWeek, startOfMonth } from 'date-fns';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
@@ -361,8 +361,8 @@ export default function VisitorReport() {
   };
 
   const generateVisitorId = () => {
-    const uuid1 = crypto.randomUUID().replace(/-/g, '');
-    const uuid2 = crypto.randomUUID().replace(/-/g, '');
+    const uuid1 = safeRandomId().replace(/-/g, '');
+    const uuid2 = safeRandomId().replace(/-/g, '');
     return `VIS-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
   };
 
