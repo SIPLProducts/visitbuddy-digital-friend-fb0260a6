@@ -19,18 +19,51 @@ One-shot installer for Ubuntu 22.04 / 24.04. Everything lives under a single bas
 
 - Ubuntu 22.04 or 24.04 LTS, root/sudo access
 - 4 vCPU / 8 GB RAM / 80 GB SSD (minimum)
-- DNS A records pointing to the server:
-  - `visiguard.example.com`     → frontend
-  - `api.visiguard.example.com` → Supabase API + Studio
-  - `wa.visiguard.example.com`  → WhatsApp bridge
+- Either:
+  - a **static public IP** with TCP ports 80 + 8000 open (and 3001 if you want remote QR scanning), **or**
+  - **DNS A records** pointing to the server (recommended for production):
+    - `visiguard.example.com`     → frontend
+    - `api.visiguard.example.com` → Supabase API + Studio
+    - `wa.visiguard.example.com`  → WhatsApp bridge
 
-## Install
+## Install — IP-only mode (no domain)
+
+Use this when you don't yet have a domain and want to access the app over the
+server's public IP. Plain HTTP, no Let's Encrypt.
 
 ```bash
 ssh root@your-server
 git clone <YOUR_REPO_URL> /tmp/visiguard-src
 cd /tmp/visiguard-src
-sudo bash deploy/deploy.sh
+sudo DEPLOY_MODE=ip PUBLIC_IP=203.0.113.10 bash deploy/deploy.sh
+```
+
+After install:
+
+| Service             | URL                              |
+|---------------------|----------------------------------|
+| App                 | `http://<PUBLIC_IP>`             |
+| Supabase API/Studio | `http://<PUBLIC_IP>:8000`        |
+| WhatsApp bridge     | `http://<PUBLIC_IP>:3001` (only if WA_PORT≠0) |
+
+**HTTP-only caveats** — modern browsers disable a few capabilities on plain
+HTTP from non-`localhost` origins:
+
+- Camera capture (visitor photo, QR scanner) — blocked by `getUserMedia`.
+- PWA install / service worker / push notifications — disabled.
+- Clipboard write API — restricted.
+
+Workarounds: (1) point a domain at the server and re-run with
+`DEPLOY_MODE=domain` for free Let's Encrypt TLS, or (2) install a self-signed
+cert manually in Nginx.
+
+## Install — Domain mode (recommended for production)
+
+```bash
+ssh root@your-server
+git clone <YOUR_REPO_URL> /tmp/visiguard-src
+cd /tmp/visiguard-src
+sudo DEPLOY_MODE=domain bash deploy/deploy.sh
 ```
 
 The script creates the `vmsadm` user (if missing), installs Docker / Node 20 / Nginx / Certbot, brings up self-hosted Supabase, deploys edge functions, builds the WhatsApp bridge container, builds the frontend, configures Nginx + TLS, enables systemd auto-start, and schedules nightly backups.
@@ -38,7 +71,7 @@ The script creates the `vmsadm` user (if missing), installs Docker / Node 20 / N
 To deploy under a different path or user, set env vars before running:
 
 ```bash
-sudo SERVICE_USER=vmsadm BASE_DIR=/home/vmsadm/resl/vvms bash deploy/deploy.sh
+sudo SERVICE_USER=vmsadm BASE_DIR=/home/vmsadm/resl/vvms DEPLOY_MODE=domain bash deploy/deploy.sh
 ```
 
 ## After install
