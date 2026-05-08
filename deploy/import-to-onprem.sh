@@ -28,6 +28,17 @@ export PGPASSWORD="$POSTGRES_PASSWORD"
 echo "==> Pausing edge functions during restore..."
 docker compose -f "$SUPA_DOCKER/docker-compose.yml" stop functions || true
 
+echo "==> Wiping stale on-prem auth/profile/role rows so cloud UUIDs become source of truth..."
+psql "$PGCONN" -v ON_ERROR_STOP=0 <<'SQL'
+-- Any users that were created locally on the on-prem stack (e.g. a fresh
+-- bala@sharviinfotech.com signup) get removed here, so pg_restore can
+-- repopulate auth.users with the original cloud UUIDs + password hashes.
+-- CASCADE clears identities/sessions/refresh_tokens that reference auth.users.
+TRUNCATE auth.users CASCADE;
+TRUNCATE public.user_location_roles CASCADE;
+TRUNCATE public.profiles CASCADE;
+SQL
+
 echo "==> Restoring database from $DUMP"
 pg_restore --clean --if-exists --no-owner --no-privileges \
   --dbname="$PGCONN" --jobs=2 --verbose "$DUMP" 2>&1 | tail -n 40 || true
