@@ -2,6 +2,82 @@
 
 One-shot installer for Ubuntu 22.04 / 24.04. Everything lives under a single base directory (default `/home/vmsadm/resl/vvms`):
 
+## Cloud → On-Prem migration via seed files (preferred)
+
+Plain SQL files committed in `deploy/seed/` reproduce the cloud database on
+any on-prem install. No binary `pg_dump` artifact required — just `git pull`
+and re-run the importer.
+
+### Refresh seed files (run on a machine with cloud DB access)
+
+```bash
+# Option A: pass full connection string (works for any superuser/service-role URL)
+SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres' \
+  bash deploy/generate-seed-files.sh
+
+# Option B: rely on PG* env vars already exported in your shell
+bash deploy/generate-seed-files.sh
+
+git add deploy/seed && git commit -m "Refresh seed data"
+git push
+```
+
+Output (numeric prefix = import order):
+
+| File range | Contents | Commit to git? |
+|---|---|---|
+| `00_auth_users.sql`           | `auth.users` + `auth.identities` (password hashes) | **No** — `.gitignored`, ship via `scp` |
+| `10_*` … `21_*` (reference)   | locations, screens, tenant_settings, email_templates, email_config, vehicle_types, profiles, user_location_roles, role_screen_permissions, departments, employees, gates | **Yes** |
+| `40_*` … `49_*` (transactional) | visitors, accompanying_visitors, agreements, watchlist, vehicles, vehicle_entries, appointments, audit_logs, email_logs, notifications | Optional — large/sensitive |
+
+The generator runs `pg_dump --data-only --inserts --column-inserts` per table,
+wraps each file in `BEGIN; TRUNCATE …; … COMMIT;` so re-imports are idempotent.
+
+If `00_auth_users.sql` comes out empty, the DB user lacks `auth` schema access —
+re-run with the postgres / service-role connection string.
+
+### Import on the on-prem server
+
+```bash
+# 1. Get the latest seed files
+cd /home/vmsadm/resl/vvms/frontend && git pull
+
+# 2. (If you generated 00_auth_users.sql separately) copy it in
+scp 00_auth_users.sql vmsadm@10.100.4.36:/home/vmsadm/resl/vvms/frontend/deploy/seed/
+
+# 3. (Optional) copy the storage tarball too if you want visitor photos
+scp storage-export.tgz vmsadm@10.100.4.36:/home/vmsadm/
+
+# 4. Run the importer
+sudo bash deploy/import-seed.sh /home/vmsadm/storage-export.tgz
+# (omit the second arg if you don't have a storage tarball)
+```
+
+The importer:
+
+1. Stops `supabase-functions` to prevent mid-import calls.
+2. Runs every `deploy/seed/*.sql` in lexical (numeric) order.
+3. Re-applies `anon` / `authenticated` / `service_role` grants.
+4. Restores storage files from tarball if provided.
+5. `NOTIFY pgrst, 'reload schema'` and restarts REST/Auth/Storage/Realtime/Meta/Functions.
+6. Verifies `GET /rest/v1/locations` returns 200.
+
+### Verify the bala HO-Admin role
+
+```bash
+docker exec -it supabase-db psql -U postgres -d postgres -c "
+  SELECT u.email, r.role, r.is_ho_admin
+  FROM auth.users u
+  LEFT JOIN public.user_location_roles r ON r.user_id = u.id
+  WHERE u.email = 'bala@sharviinfotech.com';"
+```
+
+Expected: one row with `is_ho_admin = true`. If `r.role` is `NULL`, the cloud
+UUID didn't make it in — check that `00_auth_users.sql` is present and re-run
+`deploy/import-seed.sh`.
+
+---
+
 ```
 /home/vmsadm/resl/vvms/
 ├── frontend/      # Vite app source + built dist (Nginx serves dist/)
