@@ -89,6 +89,7 @@ prompt TWILIO_AUTH_TOKEN       "Twilio Auth Token (optional)"                   
 prompt TWILIO_WHATSAPP_NUMBER  "Twilio WhatsApp number (whatsapp:+1...)"         ""
 prompt TWILIO_SMS_NUMBER       "Twilio SMS number (optional)"                    ""
 prompt WHATSAPP_BRIDGE_API_KEY "WhatsApp bridge API key (auto if empty)"         ""
+prompt WHATSAPP_BRIDGE_URL     "WhatsApp bridge URL reachable from edge functions" "http://host.docker.internal:3001"
 prompt GEMINI_API_KEY          "Google Gemini API key (for ANPR, optional)"      ""
 prompt RESEND_API_KEY          "Resend API key (optional)"                       ""
 
@@ -120,6 +121,7 @@ TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN
 TWILIO_WHATSAPP_NUMBER=$TWILIO_WHATSAPP_NUMBER
 TWILIO_SMS_NUMBER=$TWILIO_SMS_NUMBER
 WHATSAPP_BRIDGE_API_KEY=$WHATSAPP_BRIDGE_API_KEY
+WHATSAPP_BRIDGE_URL=$WHATSAPP_BRIDGE_URL
 GEMINI_API_KEY=$GEMINI_API_KEY
 RESEND_API_KEY=$RESEND_API_KEY
 EOF
@@ -280,7 +282,7 @@ TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN
 TWILIO_WHATSAPP_NUMBER=$TWILIO_WHATSAPP_NUMBER
 TWILIO_SMS_NUMBER=$TWILIO_SMS_NUMBER
-WHATSAPP_BRIDGE_URL=http://host.docker.internal:3001
+WHATSAPP_BRIDGE_URL=$WHATSAPP_BRIDGE_URL
 WHATSAPP_BRIDGE_API_KEY=$WHATSAPP_BRIDGE_API_KEY
 GEMINI_API_KEY=$GEMINI_API_KEY
 RESEND_API_KEY=$RESEND_API_KEY
