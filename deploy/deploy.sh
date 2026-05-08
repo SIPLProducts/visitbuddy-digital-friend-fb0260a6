@@ -70,9 +70,26 @@ prompt() {
   printf -v "$var" '%s' "$input"
 }
 
-prompt APP_DOMAIN              "App domain (e.g. visiguard.example.com)"
-prompt API_DOMAIN              "Supabase API domain (e.g. api.visiguard.example.com)"
-prompt WA_DOMAIN               "WhatsApp bridge domain"                        "wa.${APP_DOMAIN}"
+prompt DEPLOY_MODE             "Deploy mode: 'ip' (public IP + ports, no TLS) or 'domain'" "ip"
+if [[ "$DEPLOY_MODE" == "domain" ]]; then
+  prompt APP_DOMAIN            "App domain (e.g. visiguard.example.com)"
+  prompt API_DOMAIN            "Supabase API domain (e.g. api.visiguard.example.com)"
+  prompt WA_DOMAIN             "WhatsApp bridge domain"                        "wa.${APP_DOMAIN}"
+  APP_URL="https://$APP_DOMAIN"
+  API_URL="https://$API_DOMAIN"
+  WA_URL="https://$WA_DOMAIN"
+else
+  DETECTED_IP="$(curl -fsS --max-time 4 https://api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}')"
+  prompt PUBLIC_IP             "Public IP address of this server"               "$DETECTED_IP"
+  prompt API_PORT              "Port to expose Supabase API (Studio + REST)"    "8000"
+  prompt WA_PORT               "Port to expose WhatsApp bridge (0 = keep private)" "0"
+  APP_DOMAIN="$PUBLIC_IP"
+  API_DOMAIN="$PUBLIC_IP"
+  WA_DOMAIN="$PUBLIC_IP"
+  APP_URL="http://$PUBLIC_IP"
+  API_URL="http://$PUBLIC_IP:$API_PORT"
+  if [[ "$WA_PORT" != "0" ]]; then WA_URL="http://$PUBLIC_IP:$WA_PORT"; else WA_URL="(internal only)"; fi
+fi
 prompt ADMIN_EMAIL             "Primary admin email"                            "bala@sharviinfotech.com"
 prompt ADMIN_PASSWORD          "Initial admin password"                         "Sharvi@123"
 prompt POSTGRES_PASSWORD       "Postgres password (auto if empty)"              ""
@@ -102,6 +119,10 @@ WHATSAPP_BRIDGE_API_KEY="${WHATSAPP_BRIDGE_API_KEY:-$(gen)}"
 cat > "$ENV_FILE" <<EOF
 SERVICE_USER=$SERVICE_USER
 BASE_DIR=$BASE_DIR
+DEPLOY_MODE=$DEPLOY_MODE
+PUBLIC_IP=${PUBLIC_IP:-}
+API_PORT=${API_PORT:-8000}
+WA_PORT=${WA_PORT:-0}
 APP_DOMAIN=$APP_DOMAIN
 API_DOMAIN=$API_DOMAIN
 WA_DOMAIN=$WA_DOMAIN
@@ -163,6 +184,10 @@ ufw default deny incoming
 ufw default allow outgoing
 ufw allow OpenSSH
 ufw allow 'Nginx Full'
+if [[ "$DEPLOY_MODE" == "ip" ]]; then
+  ufw allow ${API_PORT}/tcp
+  [[ "$WA_PORT" != "0" ]] && ufw allow ${WA_PORT}/tcp || true
+fi
 ufw --force enable
 
 # ---------------------------------------------------------------
@@ -183,7 +208,7 @@ rsync -a --delete \
   "$APP_REPO_DIR"/ "$FRONTEND_DIR"/
 
 cat > "$FRONTEND_DIR/.env.production" <<EOF
-VITE_SUPABASE_URL=https://$API_DOMAIN
+VITE_SUPABASE_URL=$API_URL
 VITE_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY
 VITE_SUPABASE_PROJECT_ID=self-hosted
 EOF
@@ -210,10 +235,10 @@ sed -i \
   -e "s|^SERVICE_ROLE_KEY=.*|SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY|" \
   -e "s|^DASHBOARD_USERNAME=.*|DASHBOARD_USERNAME=$DASHBOARD_USERNAME|" \
   -e "s|^DASHBOARD_PASSWORD=.*|DASHBOARD_PASSWORD=$DASHBOARD_PASSWORD|" \
-  -e "s|^SITE_URL=.*|SITE_URL=https://$APP_DOMAIN|" \
-  -e "s|^API_EXTERNAL_URL=.*|API_EXTERNAL_URL=https://$API_DOMAIN|" \
-  -e "s|^SUPABASE_PUBLIC_URL=.*|SUPABASE_PUBLIC_URL=https://$API_DOMAIN|" \
-  -e "s|^ADDITIONAL_REDIRECT_URLS=.*|ADDITIONAL_REDIRECT_URLS=https://$APP_DOMAIN|" \
+  -e "s|^SITE_URL=.*|SITE_URL=$APP_URL|" \
+  -e "s|^API_EXTERNAL_URL=.*|API_EXTERNAL_URL=$API_URL|" \
+  -e "s|^SUPABASE_PUBLIC_URL=.*|SUPABASE_PUBLIC_URL=$API_URL|" \
+  -e "s|^ADDITIONAL_REDIRECT_URLS=.*|ADDITIONAL_REDIRECT_URLS=$APP_URL|" \
   -e "s|^SMTP_ADMIN_EMAIL=.*|SMTP_ADMIN_EMAIL=$ADMIN_EMAIL|" \
   -e "s|^SMTP_HOST=.*|SMTP_HOST=$SMTP_HOST|" \
   -e "s|^SMTP_PORT=.*|SMTP_PORT=$SMTP_PORT|" \
@@ -223,6 +248,12 @@ sed -i \
   -e "s|^ENABLE_EMAIL_AUTOCONFIRM=.*|ENABLE_EMAIL_AUTOCONFIRM=true|" \
   -e "s|^DISABLE_SIGNUP=.*|DISABLE_SIGNUP=false|" \
   "$SUPA_DOCKER/.env"
+
+# In IP mode, expose Kong API gateway on the public interface (default binds to 127.0.0.1)
+if [[ "$DEPLOY_MODE" == "ip" ]]; then
+  COMPOSE_FILE="$SUPA_DOCKER/docker-compose.yml"
+  sed -i -E "s|127\.0\.0\.1:8000:8000|0.0.0.0:${API_PORT}:8000|g; s|127\.0\.0\.1:8443:8443|0.0.0.0:8443:8443|g" "$COMPOSE_FILE" || true
+fi
 
 echo ">>> Starting Supabase stack..."
 cd "$SUPA_DOCKER"
@@ -324,17 +355,26 @@ install_site() {
 }
 
 rm -f /etc/nginx/sites-enabled/default
-install_site visiguard-app  "$SCRIPT_DIR/nginx/frontend.conf.tpl"     "$APP_DOMAIN" APP_DOMAIN
-install_site visiguard-api  "$SCRIPT_DIR/nginx/supabase-api.conf.tpl" "$API_DOMAIN" API_DOMAIN
-install_site visiguard-wa   "$SCRIPT_DIR/nginx/whatsapp.conf.tpl"     "$WA_DOMAIN"  WA_DOMAIN
+if [[ "$DEPLOY_MODE" == "ip" ]]; then
+  install_site visiguard-app "$SCRIPT_DIR/nginx/frontend-ip.conf.tpl" "_" APP_DOMAIN
+  rm -f /etc/nginx/sites-enabled/visiguard-api /etc/nginx/sites-enabled/visiguard-wa
+else
+  install_site visiguard-app  "$SCRIPT_DIR/nginx/frontend.conf.tpl"     "$APP_DOMAIN" APP_DOMAIN
+  install_site visiguard-api  "$SCRIPT_DIR/nginx/supabase-api.conf.tpl" "$API_DOMAIN" API_DOMAIN
+  install_site visiguard-wa   "$SCRIPT_DIR/nginx/whatsapp.conf.tpl"     "$WA_DOMAIN"  WA_DOMAIN
+fi
 
 nginx -t
 systemctl reload nginx
 
-echo ">>> Requesting Let's Encrypt certificates..."
-certbot --nginx --non-interactive --agree-tos -m "$ADMIN_EMAIL" --redirect \
-  -d "$APP_DOMAIN" -d "$API_DOMAIN" -d "$WA_DOMAIN" || \
-  echo "WARNING: certbot failed — ensure DNS A records point to this server, then re-run deploy.sh."
+if [[ "$DEPLOY_MODE" == "domain" ]]; then
+  echo ">>> Requesting Let's Encrypt certificates..."
+  certbot --nginx --non-interactive --agree-tos -m "$ADMIN_EMAIL" --redirect \
+    -d "$APP_DOMAIN" -d "$API_DOMAIN" -d "$WA_DOMAIN" || \
+    echo "WARNING: certbot failed — ensure DNS A records point to this server, then re-run deploy.sh."
+else
+  echo ">>> Skipping TLS (IP mode). Access via plain HTTP."
+fi
 
 # ---------------------------------------------------------------
 # 9) systemd: auto-start backend + nightly backup
@@ -368,22 +408,26 @@ chown -R "$SERVICE_USER:$SERVICE_USER" "$BASE_DIR"
 cat <<EOF
 
 ============================================================
- DEPLOYMENT COMPLETE
+ DEPLOYMENT COMPLETE  (mode: $DEPLOY_MODE)
 ============================================================
  Base:              $BASE_DIR
-   frontend  ->     $FRONTEND_DIR  (built dist served by Nginx)
+   frontend  ->     $FRONTEND_DIR
    backend   ->     $BACKEND_DIR/supabase
    middleware->     $MIDDLEWARE_DIR/whatsapp-bridge
    backups   ->     $BACKUP_DIR
 
  URLs:
-   App:             https://$APP_DOMAIN
-   Supabase API:    https://$API_DOMAIN
-   Studio:          https://$API_DOMAIN  ($DASHBOARD_USERNAME / $DASHBOARD_PASSWORD)
-   WhatsApp:        https://$WA_DOMAIN
+   App:             $APP_URL
+   Supabase API:    $API_URL
+   Studio:          $API_URL  ($DASHBOARD_USERNAME / $DASHBOARD_PASSWORD)
+   WhatsApp:        $WA_URL
 
  Admin login:       $ADMIN_EMAIL / $ADMIN_PASSWORD
  Saved config:      $ENV_FILE
+
+ NOTE (IP mode): Browsers block camera/QR scanner & PWA install on plain
+ HTTP from non-localhost origins. For production, point a domain at this
+ server and re-run with DEPLOY_MODE=domain.
 
  Useful commands:
    docker compose -f $SUPA_DOCKER/docker-compose.yml ps
