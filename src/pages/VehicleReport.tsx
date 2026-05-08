@@ -33,7 +33,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 import { Vehicle } from '@/types/vehicle';
 import { Location } from '@/types/database';
-import { cn } from '@/lib/utils';
+import { cn, safeRandomId } from '@/lib/utils';
 import { format, differenceInMinutes, subDays, eachDayOfInterval, startOfDay } from 'date-fns';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
@@ -309,8 +309,8 @@ export default function VehicleReport() {
   };
 
   const generateVehicleId = () => {
-    const uuid1 = crypto.randomUUID().replace(/-/g, '');
-    const uuid2 = crypto.randomUUID().replace(/-/g, '');
+    const uuid1 = safeRandomId().replace(/-/g, '');
+    const uuid2 = safeRandomId().replace(/-/g, '');
     return `VEH-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
   };
 
