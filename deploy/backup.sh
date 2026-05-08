@@ -2,7 +2,7 @@
 # Nightly backup: pg_dump + WhatsApp session + storage volumes
 set -euo pipefail
 SERVICE_USER="${SERVICE_USER:-vmsadm}"
-BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl}"
+BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
 source "$BASE_DIR/config.env"
 
 BACKUP_DIR="$BASE_DIR/backups"
