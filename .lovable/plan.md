@@ -1,106 +1,154 @@
 ## Goal
 
-Copy **everything** that exists in the Lovable Cloud Supabase project (`bzyvykyuiuihzvhdpxsi`) into the on-prem Supabase running at `10.100.4.36`, including:
+Replace the binary `pg_dump` workflow with a **plain-SQL seed-files workflow**: generate human-readable `.sql` files that contain all rows from the cloud DB (auth users + every `public.*` table), commit them under `deploy/seed/`, and have `deploy.sh` / `import-to-onprem.sh` simply `psql -f` them. No `cloud-export.dump` binary required.
 
-- All `public.*` tables (locations, user_location_roles, visitors, vehicles, employees, screens, …)
-- The `auth.users` table — so the same emails, UUIDs, and password hashes work on-prem
-- The `storage.objects` metadata + the actual files in the `visitor-photos` and `branding` buckets
+This makes the on-prem install fully reproducible from the git repo alone — you just `git pull` and re-run a single command.
 
-After this, `bala@sharviinfotech.com` will log in on-prem with the **same** UUID stored in `public.user_location_roles.is_ho_admin = true`, so the header shows **HO Admin** and User Management opens.
+## Design
 
-## Why bala currently shows "No role"
+```
+deploy/
+├── init-schema.sql        (already exists — DDL for public.*)
+├── seed.sql               (already exists — buckets + tenant_settings stub)
+└── seed/                  (NEW)
+    ├── 00_auth_users.sql       (auth.users + auth.identities, password hashes intact)
+    ├── 10_locations.sql
+    ├── 11_screens.sql
+    ├── 12_tenant_settings.sql
+    ├── 13_email_templates.sql
+    ├── 14_vehicle_types.sql
+    ├── 20_profiles.sql
+    ├── 21_user_location_roles.sql
+    ├── 22_role_screen_permissions.sql
+    ├── 30_departments.sql
+    ├── 31_employees.sql
+    ├── 32_gates.sql
+    ├── 40_visitors.sql
+    ├── 41_accompanying_visitors.sql
+    ├── 42_visitor_agreements.sql
+    ├── 43_visitor_watchlist.sql
+    ├── 50_vehicles.sql
+    ├── 51_vehicle_entries.sql
+    ├── 60_appointments.sql
+    ├── 70_audit_logs.sql
+    ├── 71_email_logs.sql
+    ├── 72_notifications.sql
+    └── 99_storage_objects.sql  (storage.objects metadata only — files come via tarball)
+```
 
-When the on-prem stack came up, bala signed up fresh in the on-prem `auth.users` and got a **new UUID**. The `public.user_location_roles` row that says `is_ho_admin = true` was either:
-- Not yet imported from cloud, or
-- Imported but pointing to the **cloud** UUID (which doesn't exist in the on-prem `auth.users`).
-
-So `select * from user_location_roles where user_id = auth.uid()` returns 0 rows → header shows "No role" → User Management is hidden.
-
-The fix is to do a real cloud → on-prem migration so the auth UUIDs and the role rows match.
+Files are numbered so dependency order is enforced (parents before children).
 
 ## Plan
 
-### Step 1 — Run the export from the cloud project
+### Step 1 — Create `deploy/generate-seed-files.sh`
 
-On any machine with `pg_dump` (≥15), `curl`, `jq`, `tar`:
+Runs against the cloud DB and produces every `deploy/seed/*.sql` file in one shot using `pg_dump --data-only --inserts --column-inserts` per table. Why per-table? It guarantees ordering, lets us skip volatile tables (`audit_logs` / `email_logs` are optional), and produces clean diffs in git.
+
+Skeleton:
+```bash
+SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres'
+OUT=deploy/seed
+mkdir -p "$OUT"
+
+# Auth users (custom — INSERT ... ON CONFLICT so re-runs are safe)
+pg_dump "$SUPABASE_DB_URL" --data-only --inserts \
+  -t auth.users -t auth.identities \
+  > "$OUT/00_auth_users.sql"
+
+# Public tables — strict order
+TABLES=(
+  locations screens tenant_settings email_templates vehicle_types
+  profiles user_location_roles role_screen_permissions
+  departments employees gates
+  visitors accompanying_visitors visitor_agreements visitor_watchlist
+  vehicles vehicle_entries
+  appointments
+  audit_logs email_logs notifications
+)
+i=10
+for t in "${TABLES[@]}"; do
+  pg_dump "$SUPABASE_DB_URL" --data-only --inserts --column-inserts \
+    -t "public.$t" > "$OUT/$(printf '%02d' $i)_$t.sql"
+  i=$((i+1))
+done
+
+# storage.objects metadata
+pg_dump "$SUPABASE_DB_URL" --data-only --inserts \
+  -t storage.objects > "$OUT/99_storage_objects.sql"
+```
+
+Each file gets a `BEGIN;` / `COMMIT;` wrapper and a `TRUNCATE ... CASCADE;` at the top so re-running the import is idempotent.
+
+### Step 2 — Create `deploy/import-seed.sh`
+
+Replaces `import-to-onprem.sh` for the seed-data path. Runs on the on-prem box:
 
 ```bash
-export SUPABASE_DB_URL='postgresql://postgres.bzyvykyuiuihzvhdpxsi:<DB_PASSWORD>@aws-0-<region>.pooler.supabase.com:5432/postgres'
-export SUPABASE_URL='https://bzyvykyuiuihzvhdpxsi.supabase.co'
-export SUPABASE_SERVICE_ROLE_KEY='<service role key>'
-
-bash deploy/export-from-cloud.sh
+sudo bash deploy/import-seed.sh [optional storage-export.tgz]
 ```
 
-Produces:
-- `cloud-export.dump` — pg_dump of `public + auth + storage` schemas (custom format)
-- `storage-export.tgz` — files from `visitor-photos` + `branding` buckets
+What it does:
+1. Source `config.env` to get `POSTGRES_PASSWORD` + `STORAGE_VOL`.
+2. Stop the `functions` container.
+3. `psql -f deploy/seed/00_auth_users.sql` … through `99_storage_objects.sql` in numeric order.
+4. Re-apply Supabase role grants (same block as the existing repair script).
+5. If a `storage-export.tgz` is passed, rsync it into `$STORAGE_VOL`.
+6. `NOTIFY pgrst, 'reload schema'` and restart `rest auth storage realtime meta`.
+7. Verify `/rest/v1/locations` returns 200.
 
-The DB password is the Postgres password from **Lovable Cloud → Connect → Database**.
-I will tell you exactly where to copy it from before you run this.
+### Step 3 — Wire it into the existing scripts
 
-### Step 2 — Copy both files to the on-prem server
+- **`deploy/deploy.sh`**: after `init-schema.sql` runs, if `deploy/seed/` exists, automatically run `import-seed.sh` (no flags). New installs come up pre-populated with cloud data.
+- **`deploy/update.sh`**: add an optional `--reseed` flag that runs `import-seed.sh` (handy when you push new seed files).
+- **`deploy/README.md`**: add a new section **"Seed-data workflow (preferred)"** explaining the two-step flow:
+  ```bash
+  # On dev/cloud-connected machine:
+  SUPABASE_DB_URL='...' bash deploy/generate-seed-files.sh
+  git add deploy/seed && git commit -m "Refresh seed data"
+  
+  # On on-prem server:
+  git pull && sudo bash deploy/import-seed.sh
+  ```
 
-```bash
-scp cloud-export.dump storage-export.tgz vmsadm@10.100.4.36:/home/vmsadm/
-```
+### Step 4 — Storage files
 
-### Step 3 — Wipe the stale on-prem rows so the cloud UUIDs win
+`storage.objects` rows alone don't include the actual JPEG/PNG bytes. Two options:
 
-The current on-prem DB has a fresh `bala` row in `auth.users` with a different UUID. We need to remove that fresh row before restore so `pg_restore --clean` doesn't get confused. Add a small pre-restore SQL block in `deploy/import-to-onprem.sh` that runs **before** `pg_restore`:
+- **(a)** Keep using `export-from-cloud.sh` for the `storage-export.tgz` (storage files only — DB no longer needed there). `import-seed.sh` accepts it as an optional second arg.
+- **(b)** Skip storage entirely and let users re-upload visitor photos / branding from the on-prem UI.
 
-```sql
--- Drop any locally-created auth.users so the cloud rows are the source of truth
-TRUNCATE auth.users CASCADE;
-TRUNCATE public.user_location_roles CASCADE;
-TRUNCATE public.profiles CASCADE;
-```
+Recommended: **(a)** — storage tarball is small, and visitor photos are useful historical data.
 
-### Step 4 — Run the import on the on-prem server
+## Trade-offs (be aware)
 
-```bash
-sudo bash /home/vmsadm/resl/vvms/frontend/deploy/import-to-onprem.sh \
-  /home/vmsadm/cloud-export.dump \
-  /home/vmsadm/storage-export.tgz
-```
+- **Seed files will be large.** If cloud has 10k visitors, `40_visitors.sql` could be 5–20 MB. Git can handle this, but diffs are noisy. We can `.gitignore deploy/seed/40_visitors.sql 41_*.sql 70_*.sql 71_*.sql` and treat those as "regenerated each time, never committed", while still committing the small reference tables (locations, screens, tenant_settings, employees, gates, departments, vehicle_types, role mappings).
+- **`auth.users` contains password hashes.** Committing them to git effectively snapshots passwords for everyone. Safer: keep `00_auth_users.sql` out of git (`.gitignore`) and ship it via `scp` to the on-prem server, like the binary dump today.
+- **No CDC / live sync.** The seed is a snapshot at generation time. Re-run `generate-seed-files.sh` whenever you want a fresh snapshot.
 
-The script already:
-- Stops `functions`, runs `pg_restore --clean --if-exists`
-- Re-applies all role grants (the PGRST002 fix from earlier)
-- Re-creates buckets and rsyncs files
-- Restarts `rest / auth / storage / realtime / meta`
-- Verifies `/rest/v1/locations` returns 200
+## Recommended split
 
-### Step 5 — Verify
+| Committed to git | Generated each run, NOT in git |
+|---|---|
+| `10_locations.sql` | `00_auth_users.sql` |
+| `11_screens.sql` | `40_visitors.sql` |
+| `12_tenant_settings.sql` | `41_accompanying_visitors.sql` |
+| `13_email_templates.sql` | `42_visitor_agreements.sql` |
+| `14_vehicle_types.sql` | `50_vehicles.sql` |
+| `20_profiles.sql` | `51_vehicle_entries.sql` |
+| `21_user_location_roles.sql` | `60_appointments.sql` |
+| `22_role_screen_permissions.sql` | `70_audit_logs.sql` |
+| `30_departments.sql` | `71_email_logs.sql` |
+| `31_employees.sql` | `72_notifications.sql` |
+| `32_gates.sql` | `99_storage_objects.sql` |
 
-On the on-prem DB (one-liner):
+Reference data is committed (small, useful for fresh installs), transactional data is regenerated (large, sensitive, time-sensitive).
 
-```sql
-SELECT u.email, r.role, r.is_ho_admin
-FROM auth.users u
-LEFT JOIN public.user_location_roles r ON r.user_id = u.id
-WHERE u.email = 'bala@sharviinfotech.com';
-```
+## Question before I implement
 
-Expected: one row with `is_ho_admin = true`. Then refresh the browser — header shows **HO Admin**, User Management opens, all visitors/vehicles/employees from cloud are visible.
+Three things to confirm:
 
-## Edits needed in this loop
+1. **Auth users**: keep `00_auth_users.sql` out of git and ship via scp (recommended), or commit it too? Committing it puts password hashes in git history.
+2. **Visitor / vehicle history**: include in seed files or fresh start on-prem? If you want history, we generate large `.sql` per import; if not, the on-prem starts empty and grows organically.
+3. **Storage files (photos)**: keep using the `storage-export.tgz` tarball helper from `export-from-cloud.sh`, or skip and let users re-upload?
 
-1. **`deploy/import-to-onprem.sh`** — add the pre-restore TRUNCATE block from Step 3.
-2. **`deploy/README.md`** — add a new section **"Full data migration from Lovable Cloud"** that walks through Steps 1–5 above with the exact commands.
-3. **`deploy/export-from-cloud.sh`** — already correct; no change needed.
-
-## Things you (the user) need to provide once
-
-- The **Postgres connection string** for the cloud project (from Lovable Cloud → Connect → Database).
-- The **service role key** for the cloud project (from Lovable Cloud → Connect → API).
-
-Both are pasted as env vars when running `export-from-cloud.sh` — they never get stored in code or committed.
-
-## Confirm before I implement
-
-Do you want me to:
-- (a) Make the script edits in Steps 1–3 above and update the README, then walk you through running the export/import; **or**
-- (b) Just write a one-shot SQL repair (faster, but you'd have to re-do it every time cloud changes) that re-points the existing on-prem `bala` UUID to the HO‑Admin row without doing a full data migration?
-
-I recommend **(a)** because you said "whatever data is present in cloud we have to migrate" — that's a one-time full sync and gives you all visitors/vehicles/employees too, not just the admin role.
+Once you answer, I'll implement Steps 1–3 and update the README in one go.
