@@ -1,99 +1,87 @@
-## Goals
+## Root cause of "no data in tables"
 
-1. **Stop building the WhatsApp bridge Docker image** on the server (the apt fetch from `deb.debian.org` keeps timing out behind your corporate firewall).
-2. **Reuse the existing "external bridge URL" pattern** (same as ngrok today) — the edge function already reads `WHATSAPP_BRIDGE_URL` from env. We just point it at `http://<SERVER_IP>:<PORT>` (or any reachable URL) instead of `host.docker.internal`.
-3. **Confirm `redeploy.sh --with-seed` pushes the committed cloud snapshot** into the self-hosted Postgres — yes it does, via `deploy/seed/*.sql`.
+`redeploy.sh` runs in 5 phases:
 
-## Answer to your second question (no code needed)
-
-**Yes.** Running:
-
-```bash
-sudo bash deploy/redeploy.sh --with-seed --keep-config
+```
+[3/5] deploy.sh        ← failed here
+[4/5] apply-migrations.sh   ← never ran
+[4b/5] import-seed.sh       ← never ran  (this is what populates tables)
+[4c/5] repair-postgrest.sh
+[5/5] health check
 ```
 
-executes this exact pipeline:
+`deploy.sh` aborted at the Nginx step because two templates are missing in `deploy/nginx/`:
 
-```text
-[1] docker compose down -v          → wipes old self-hosted DB + storage
-[2] deploy.sh (SKIP_SCHEMA=1)        → boots empty Supabase stack
-[3] apply-migrations.sh              → runs every supabase/migrations/*.sql
-[4] import-seed.sh                   → loads deploy/seed/*.sql in order:
-       00_auth_users → 10_locations → 11_screens → 12_tenant_settings →
-       13_email_templates → 14_email_config → 15_vehicle_types →
-       16_profiles → 17_user_location_roles → 18_role_screen_permissions →
-       19_departments → 20_employees → 21_gates →
-       41_accompanying_visitors → 42_visitor_agreements → 43_visitor_watchlist →
-       44_vehicles → 45_vehicle_entries → 46_appointments → 47_audit_logs
-[5] repair-postgrest.sh + REST 200 health check
+- `supabase-api.conf.tpl` ← missing (domain mode only)
+- `whatsapp.conf.tpl` ← missing (domain mode only)
+- `frontend-ip.conf.tpl` ✓
+- `frontend.conf.tpl` ✓
+
+Your saved `config.env` has `DEPLOY_MODE=domain`, so `install_site` tried to read `supabase-api.conf.tpl`, `sed` errored, and `set -euo pipefail` killed the script before migrations + seed could run. **That is why Studio shows empty tables.**
+
+A second issue visible in the log: `WHATSAPP_BRIDGE_URL = http://host.docker.internal:3001`. Edge functions inside the docker-compose network can't reach `host.docker.internal` reliably — and `supabase-edge-functions` is currently `Restarting`. It should point at the host's public IP.
+
+## Plan
+
+### 1. Add the two missing Nginx templates
+
+**`deploy/nginx/supabase-api.conf.tpl`** — vhost for `api.<domain>` proxying to Kong on `127.0.0.1:${API_PORT}`. Includes WebSocket upgrade headers for Realtime, `client_max_body_size 25M` for uploads, no buffering for edge-function streams.
+
+**`deploy/nginx/whatsapp.conf.tpl`** — vhost for `wa.<domain>` proxying to the WhatsApp bridge on `127.0.0.1:${WA_HOST_PORT}` with WS upgrade headers for the QR pairing stream.
+
+Both use `__API_DOMAIN__` / `__WA_DOMAIN__` / `__ROOT__` placeholders to match the existing `install_site` sed substitutions.
+
+### 2. Harden `install_site` in `deploy.sh`
+
+Wrap the `sed` call in an existence check. If the template is missing, log a clear warning and continue instead of killing the whole deploy. This guarantees a partially-broken nginx setup never blocks the migration + seed phases again.
+
+### 3. Auto-detect `PUBLIC_IP` in both modes + fix stale WA URL
+
+In `deploy.sh`:
+- Move the `DETECTED_IP=$(curl … ipify)` block out of the `ip`-mode branch so it runs for `domain` mode too.
+- Persist `PUBLIC_IP` to `config.env`.
+- When the cached `WHATSAPP_BRIDGE_URL` still equals `http://host.docker.internal:<port>`, replace the prompt default with `http://<PUBLIC_IP>:<WA_HOST_PORT>` so a single Enter fixes it.
+
+### 4. Document edge-function restart troubleshooting
+
+After redeploy, if `supabase-edge-functions` keeps restarting, check:
 ```
+docker compose -f $BASE_DIR/backend/supabase/docker/docker-compose.yml logs --tail=80 functions
+```
+Likely cause: a function importing a module not available in `edge-runtime` or referring to an env var with a value the runtime rejects. Not blocking for the data-import problem — REST/Auth/Realtime work without it.
 
-Cloud data lands in self-hosted Postgres. Visitor photos come over only if you pass `--storage <storage-export.tgz>`.
+## Files to add / change
 
-The one caveat already in `import-seed.sh`: if `deploy/seed/00_auth_users.sql` is empty, profiles + roles get skipped (auth.users FK would fail). That file is generated from cloud and should already be committed.
+- **add** `deploy/nginx/supabase-api.conf.tpl`
+- **add** `deploy/nginx/whatsapp.conf.tpl`
+- **edit** `deploy/deploy.sh`:
+  - Detect & persist `PUBLIC_IP` in both modes
+  - Override stale `host.docker.internal` default for `WHATSAPP_BRIDGE_URL`
+  - Make `install_site` resilient to missing templates
 
-## Plan for the WhatsApp bridge — adopt the ngrok pattern
+No DB migrations, no edge-function code changes, no frontend changes.
 
-### Current behaviour (broken)
-`deploy.sh` always tries to `docker build` the bridge image locally → fails on apt because the docker build network can't reach Debian mirrors.
-
-### New behaviour
-Treat the bridge **exactly like the ngrok setup**: it lives outside the deploy pipeline, exposed via a URL, and the edge function calls it. Default that URL to **`http://<PUBLIC_IP>:3001`** (the current server's IP and the WA bridge port we already auto-pick) so it works out of the box without changing anything else.
-
-### Files to change
-
-**1. `deploy/deploy.sh`** — make the bridge build optional and pluggable:
-- Add a new prompt during config: `WhatsApp bridge URL [http://<PUBLIC_IP>:3001]:` (replaces today's `http://host.docker.internal:3001`).
-- Add `BUILD_WA_BRIDGE` flag (default `0` now). Skip the entire `docker build` + `docker run wa-bridge` section unless explicitly enabled with `BUILD_WA_BRIDGE=1`.
-- Always write the chosen URL into the Supabase `.env` as `WHATSAPP_BRIDGE_URL=` so the `whatsapp-bridge` edge function picks it up.
-- Print a clear post-install hint:
-  ```
-  WhatsApp bridge: external mode
-    URL configured: http://10.100.4.36:3001
-    To run a bridge: bash deploy/run-wa-bridge.sh   (host network, no Docker apt)
-    Or point WHATSAPP_BRIDGE_URL at any reachable endpoint (ngrok, another VM, etc.)
-  ```
-
-**2. `deploy/redeploy.sh`** — surface the same flag:
-- New flag `--build-wa` → exports `BUILD_WA_BRIDGE=1`.
-- Default behaviour: skip the bridge build, deploy completes cleanly even with no internet to deb.debian.org.
-
-**3. `deploy/run-wa-bridge.sh` (new)** — one-shot helper for when you DO want a local bridge:
-- Uses `docker build --network=host` (bypasses the broken bridge network that caused tonight's failure).
-- Runs container with `-p 0.0.0.0:3001:3000` so it's reachable at `http://<SERVER_IP>:3001`.
-- Reads `WHATSAPP_BRIDGE_API_KEY` from `config.env`.
-- Idempotent: `docker rm -f wa-bridge` first.
-
-**4. `whatsapp-bridge/Dockerfile`** — make it actually build when you do run it:
-- `FROM node:20-bullseye-slim` → `FROM node:20-bookworm-slim` (bookworm mirrors are alive; bullseye is being EOLed).
-- `libasound2` → `libasound2t64` (renamed in bookworm).
-- Everything else identical.
-
-**5. `deploy/README.md`** — short section explaining the new model:
-- Default = external bridge URL (same as ngrok today, just pointing at server IP).
-- Optional = `bash deploy/run-wa-bridge.sh` to spin one up locally.
-- Optional = full Docker-built bridge inside the stack via `--build-wa` (only if your network can reach deb.debian.org).
-
-### Why this matches your request
-- Same mental model as ngrok: a URL configured once, edge function calls it.
-- The URL defaults to **the current server IP** (auto-detected by `deploy.sh`'s existing `PUBLIC_IP` prompt), exactly as you asked.
-- Tonight's apt-mirror failure can never block a redeploy again — bridge build is now opt-in.
-
-## On-server unblock right now (no waiting for these patches)
+## What you'll do on the server after the patch
 
 ```bash
 cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
-# Tell deploy.sh there is no bridge to build — it'll just write the URL into env.
-sudo SKIP_WA_BRIDGE=1 bash deploy/redeploy.sh --with-seed --keep-config
+# pull the new files (git pull or re-copy)
+
+# Run again — keep saved answers, re-import seed
+sudo bash deploy/redeploy.sh --with-seed --keep-config
 ```
 
-(`SKIP_WA_BRIDGE=1` will be honoured once the patch in step 1 above lands; until then the manual workaround is to comment out the `docker build` block in `deploy.sh` lines around the wa-bridge section, or pre-build the image with `docker build --network=host` from `whatsapp-bridge/`.)
+When it gets to the prompt:
+```
+WhatsApp bridge URL reachable from edge functions [http://<your-public-ip>:3001]:
+```
+just press Enter.
 
-## Summary of what gets created/edited
+Expected result on completion:
+- All 4 nginx vhosts written, `nginx -t` passes
+- `apply-migrations.sh` runs every file in `supabase/migrations/`
+- `import-seed.sh` loads all `deploy/seed/*.sql` files (locations, screens, employees, vehicles, etc.)
+- Health check: `REST returned 200 on port 8000`
+- Studio shows all seeded rows
 
-- **edited** `deploy/deploy.sh` — prompt for bridge URL defaulting to server IP, skip docker build by default, always write `WHATSAPP_BRIDGE_URL` into Supabase `.env`
-- **edited** `deploy/redeploy.sh` — `--build-wa` flag wiring
-- **new**    `deploy/run-wa-bridge.sh` — opt-in local bridge runner using `--network=host`
-- **edited** `whatsapp-bridge/Dockerfile` — bookworm + libasound2t64 fix
-- **edited** `deploy/README.md` — document the three modes (external URL / local helper / full Docker build)
-- No changes to migrations, seed files, or the edge function — they already work with whatever URL you set.
+Then point DNS A records for `<APP_DOMAIN>`, `api.<APP_DOMAIN>`, `wa.<APP_DOMAIN>` at this server's public IP and run `sudo certbot --nginx` for TLS.

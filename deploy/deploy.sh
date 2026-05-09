@@ -80,6 +80,9 @@ pick_port() {
 }
 
 prompt DEPLOY_MODE             "Deploy mode: 'ip' (public IP + ports, no TLS) or 'domain'" "ip"
+# Always detect a public IP — needed for the WhatsApp bridge URL default in
+# both 'ip' and 'domain' modes.
+DETECTED_IP="$(curl -fsS --max-time 4 https://api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}')"
 if [[ "$DEPLOY_MODE" == "domain" ]]; then
   prompt APP_DOMAIN            "App domain (e.g. visiguard.example.com)"
   prompt API_DOMAIN            "Supabase API domain (e.g. api.visiguard.example.com)"
@@ -87,8 +90,8 @@ if [[ "$DEPLOY_MODE" == "domain" ]]; then
   APP_URL="https://$APP_DOMAIN"
   API_URL="https://$API_DOMAIN"
   WA_URL="https://$WA_DOMAIN"
+  PUBLIC_IP="${PUBLIC_IP:-$DETECTED_IP}"
 else
-  DETECTED_IP="$(curl -fsS --max-time 4 https://api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}')"
   prompt PUBLIC_IP             "Public IP address of this server"               "$DETECTED_IP"
   AUTO_API_PORT="$(pick_port "${API_PORT:-8000}")"
   AUTO_WA_PORT="$(pick_port "${WA_PORT:-3001}")"
@@ -121,7 +124,12 @@ AUTO_WA_HOST_PORT="$(pick_port "${WA_HOST_PORT:-3001}")"
 WA_HOST_PORT="$AUTO_WA_HOST_PORT"
 # Default to the server's own IP so the bridge URL works exactly like the ngrok
 # pattern (an external URL the edge function calls). Override with any reachable
-# endpoint (ngrok, another VM, etc.).
+# endpoint (ngrok, another VM, etc.). If the saved value still points at
+# host.docker.internal (cached from an older run), replace the default with the
+# detected public IP so a single Enter fixes it.
+if [[ -z "${WHATSAPP_BRIDGE_URL:-}" || "$WHATSAPP_BRIDGE_URL" == *host.docker.internal* ]]; then
+  WHATSAPP_BRIDGE_URL="http://${PUBLIC_IP:-host.docker.internal}:${WA_HOST_PORT}"
+fi
 prompt WHATSAPP_BRIDGE_URL     "WhatsApp bridge URL reachable from edge functions" "http://${PUBLIC_IP:-host.docker.internal}:${WA_HOST_PORT}"
 prompt GEMINI_API_KEY          "Google Gemini API key (for ANPR, optional)"      ""
 prompt RESEND_API_KEY          "Resend API key (optional)"                       ""
@@ -405,6 +413,10 @@ fi
 echo ">>> Configuring Nginx..."
 install_site() {
   local name="$1" tpl="$2" domain="$3" var="$4" extra="${5:-}"
+  if [[ ! -f "$tpl" ]]; then
+    echo "WARN: nginx template not found: $tpl — skipping $name vhost." >&2
+    return 0
+  fi
   sed -e "s|__${var}__|$domain|g" -e "s|__ROOT__|$WWW_DIR|g" "$tpl" > "/etc/nginx/sites-available/$name"
   ln -sf "/etc/nginx/sites-available/$name" "/etc/nginx/sites-enabled/$name"
 }
