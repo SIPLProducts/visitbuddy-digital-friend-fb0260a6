@@ -1,61 +1,48 @@
-## Root cause (confirmed)
+## Plan
 
-`deploy.sh` runs:
+The current repair script only fixes `/var/lib/postgresql/data` from inside the container, but the smoke test still fails. I will make the deployment repair path more robust and diagnostic so it can resolve both common causes: wrong host bind-mount ownership and wrong container Postgres UID.
 
-```bash
-chown -R "$SERVICE_USER:$SERVICE_USER" "$BASE_DIR"
-```
+## Changes to implement
 
-at **line 41** AND **line 559** (after compose is up). `$BASE_DIR` is `/home/vmsadm/resl/vvms`, which contains `backend/supabase/docker/volumes/db/data` — the live PostgreSQL data directory bind-mounted into `supabase-db`.
+1. **Harden `deploy/repair-pg-perms.sh`**
+   - Load `config.env` before running the smoke test so `POSTGRES_PASSWORD` is always available.
+   - Detect the actual Postgres UID/GID inside `supabase-db` instead of assuming `70:70`.
+   - Fix ownership on both:
+     - container path: `/var/lib/postgresql/data`
+     - host bind mount: `backend/supabase/docker/volumes/db/data`
+   - Apply safe directory/file permissions for the PG data directory.
+   - If the smoke test still fails, print the real `psql` error and recent DB logs instead of only saying “Inspect docker logs”.
 
-That recursive chown silently rewrites every PG data file from `postgres:postgres` (uid 70 inside the container) to `vmsadm:vmsadm`. The already-running postmaster keeps its open file descriptors, so `pg_isready` still answers "yes". But the moment apply-migrations.sh asks for a **new** psql session, the freshly-forked backend tries to re-open `global/pg_filenode.map` and gets:
+2. **Fix `deploy/lib/common.sh` smoke-test output**
+   - Make `pg_smoke_test()` show the captured failure reliably.
+   - Add a helper that runs the same fresh-backend test with useful output.
+   - Keep all DB access through `docker exec`, not host socket/host TCP.
 
-```
-FATAL: could not open file "global/pg_filenode.map": Permission denied
-```
+3. **Patch risky direct `docker exec ... PGPASSWORD=$POSTGRES_PASSWORD` usage**
+   - Replace unquoted command-string usage in `deploy/deploy.sh` with the shared `psql_exec` helper or a safer inline invocation.
+   - This avoids password/shell parsing issues that can masquerade as database failures.
 
-That is exactly the error you keep seeing, and it happens 100% of the time because it's baked into deploy.sh — wiping and reinstalling will not fix it on its own.
+4. **Update troubleshooting docs**
+   - Add the exact next commands for this state:
+     - run repair
+     - if it still fails, capture ownership/log diagnostics
+   - Clarify that a still-failing smoke test means either the host bind mount is still incorrectly owned, the DB container user differs from `70`, or the database volume is corrupted and must be recreated.
 
-The earlier "port 5432 already allocated" and "ports already defined" rounds were real, but they were masking this third bug. With those fixed, the install gets far enough that the chown finally executes, and you hit this.
+## Technical details
 
-## Fix plan
+The likely reason your repair still fails is one of these:
 
-### 1. Stop chowning the Postgres data directory (the actual fix)
-- In `deploy/deploy.sh`, replace both `chown -R "$SERVICE_USER:$SERVICE_USER" "$BASE_DIR"` calls (lines 41 and 559) with a scoped variant that explicitly **excludes** `backend/supabase/docker/volumes` (db data, storage data, functions cache, analytics).
-- Implement using `find ... -path .../backend/supabase/docker/volumes -prune -o -exec chown ...` so the PG/storage/functions volumes keep whatever ownership their containers assigned.
-- Apply the same exclusion in `deploy/update.sh` (it has its own `chown -R`) and any other script that touches `$BASE_DIR` recursively.
+- `repair-pg-perms.sh` does not load `config.env`, so `POSTGRES_PASSWORD` may be missing during `psql_exec`.
+- The script assumes UID `70:70`, but the active Supabase Postgres image may use a different `postgres` UID/GID.
+- The host bind mount directory may still have ownership/permission problems that need fixing from the host side as well as from inside the container.
+- The current smoke-test helper hides the real error, so we need to print the exact failure before deciding whether a wipe is necessary.
 
-### 2. Self-heal an already-broken install
-The user's current server is in the bad state. Add a one-time repair so they don't have to wipe again:
-- New `deploy/repair-pg-perms.sh`:
-  ```bash
-  docker exec -u 0 supabase-db chown -R postgres:postgres /var/lib/postgresql/data
-  docker restart supabase-db
-  ```
-- `install.sh` runs this automatically right before `apply-migrations.sh` whenever a `psql_exec` smoke test fails with `Permission denied`.
-
-### 3. Detect this earlier so it's never silent again
-- In `deploy/lib/common.sh`, after `wait_for_pg`, add a `psql_exec -c 'SELECT 1'` smoke test. If it returns `Permission denied`, print a clear error pointing at `repair-pg-perms.sh`, instead of letting apply-migrations.sh fall over with a cryptic line.
-
-### 4. Update troubleshooting doc
-- Add section `0c.` to `deploy/README-troubleshooting.md` covering this exact symptom, the cause (recursive chown over the PG bind mount), and the one-line recovery:
-  ```bash
-  sudo bash deploy/repair-pg-perms.sh && sudo bash deploy/apply-migrations.sh
-  ```
-
-## Recovery commands the user runs right now (after the patch lands)
+After implementation, your recovery command should remain simple:
 
 ```bash
 cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
-git pull
 sudo bash deploy/repair-pg-perms.sh
 sudo bash deploy/apply-migrations.sh
 sudo bash deploy/import-seed.sh
 sudo bash deploy/health-check.sh
 ```
-
-No more wiping, no more reinstalling — the data dir ownership gets restored inside the container and migrations resume cleanly.
-
-## Why previous attempts didn't catch this
-- `pg_isready` (used by `wait_for_pg`) talks to the already-running postmaster, which has its file handles open from before the chown. It returns OK even though new backends can't start.
-- The `chown` at line 559 runs **after** "DEPLOYMENT COMPLETE" banner is printed but **before** install.sh's step 2 (apply-migrations). That timing is why the failure looks like "migrations broke" instead of "deploy broke".
