@@ -34,6 +34,14 @@ fi
 TOTAL_DROPPED=0
 for f in "$SEED_DIR"/*.sql; do
   [ -f "$f" ] || continue
+  # Self-heal: an even older buggy sanitizer wrote bare '[sanitize-seed] ...'
+  # marker lines (no leading '--'). psql treats them as SQL and aborts.
+  # Strip them in-place before running the structural sanitizer below.
+  if grep -q '^\[sanitize-seed\]' "$f"; then
+    bare=$(grep -c '^\[sanitize-seed\]' "$f")
+    sed -i '/^\[sanitize-seed\]/d' "$f"
+    printf '  %-40s removed %s bare marker line(s)\n' "$(basename "$f")" "$bare"
+  fi
   dropped=$(python3 - "$f" <<'PY'
 import sys
 path = sys.argv[1]

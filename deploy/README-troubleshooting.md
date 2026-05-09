@@ -76,6 +76,22 @@ SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres'
   bash deploy/generate-seed-files.sh
 ```
 
+### `syntax error at or near "["` with `LINE 1: [sanitize-seed] dropped malformed row:`
+
+**Cause:** an even older buggy run of `sanitize-seed.sh` wrote bare
+`[sanitize-seed] dropped malformed row:` lines (no `--` prefix) into the
+seed files, and those broken files were committed to git. Two files are
+known to be affected: `deploy/seed/00_auth_users_bootstrap.sql` and
+`deploy/seed/48_email_logs.sql`.
+
+**Fix:** pull the latest repo (the corrupted lines have been stripped)
+and re-run the import. `sanitize-seed.sh` now also self-heals these bare
+marker lines automatically:
+```bash
+git pull
+sudo bash deploy/import-seed.sh
+```
+
 **Symptom:** `deploy.sh` finishes ("DEPLOYMENT COMPLETE"), then
 `apply-migrations.sh` immediately fails with:
 ```
