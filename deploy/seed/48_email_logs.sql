@@ -1,3387 +1,5079 @@
 -- Seed: public.email_logs (transactional, regenerate before import)
 BEGIN;
 TRUNCATE public.email_logs CASCADE;
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('68ed961d-367a-4289-9a25-50260a712f89', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('00b55eb5-57ca-4e3a-b87a-0964c8a99786', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f0702223-4510-4878-9506-13d623df2129', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf320cfa-6967-434b-b910-157a1039c26c', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2b8c0b91-0110-4eb3-b797-ff99c16b1750', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53d03fa7-b16f-471f-8846-60db8f07ee5d', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f30d9389-79ce-4f59-9f54-49b2f165ae50', 'Visitor Approval Required — AGIREDDY', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('de6ab0f9-3e64-4dc8-8214-ba49462d7fe7', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('803584ef-a454-47eb-8e79-8ead13d74ca6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8d69434-76af-4003-a067-1cc55ef2003e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ae06c2e-f1b8-419f-bcaf-668f3c15af4b', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('074fbce3-5b43-47ba-9cf5-dafa49030d1c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e186e96-be80-4429-a429-e5ab667349ea', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a4b3cd9-4c11-4204-8c1e-df2fa152d242', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4cf7ad27-df90-4432-a6dc-5f22f841a2b1', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0b10127-a4c0-44cb-aa1c-5288cafa7279', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ccc2939-1292-4e67-a989-465a72e1c1d9', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bff30ce9-0ef5-4b52-9fd9-2895b6ae9076', 'Visitor Approval Required — bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a2aa81b-658e-47bd-8322-5fe2515fe32c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cac58e89-c71e-4a45-b357-0f86852195b0', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2fd5f7b8-d057-4ba9-8b64-ad953caf523d', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dcc925c7-c961-4ac4-a8fa-069728e18f6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3d38959d-2362-4100-9c0a-666cda64dceb', 'Visitor Approval Required — balakrishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7454ce0a-f839-4f39-a9a1-0edb28334c28', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3db11943-f220-426d-9036-1fe86fb1a343', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9913106a-70cd-4483-9d3b-f1c17ece9e40', 'Visitor Approval Required — chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('906dabb6-2c79-4f5c-bfbf-3c49e81ca193', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45e6c723-82c2-4937-ba5e-271d687516f3', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3bca2a5a-5d0c-47a9-9295-f41e4f1da46e', 'Visitor Approval Required — Suresh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b43ef6fa-59ad-4001-b14a-4d771b824faf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('580dd7d6-9a15-49bd-9290-5aacb322bc76', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d32eba8-c521-402c-b3cc-3130b4794fad', 'Visitor Approval Required — sunil', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4273281a-242b-4f65-a175-48a44fe110d9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d428ff0-195f-4752-bbd2-cc73a91383c7', 'Visitor Approval Required — suresh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f103536-3e8c-442c-ba88-510a0868716c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a192d92a-b577-4112-b48d-863cff9d9b25', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44034b28-aad7-463a-9b09-2c601e523c77', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cb1a541f-fd8f-4495-a9ab-ca59292052ef', 'Visitor Approval Required — bala krishna 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e6118c7b-27f4-45d2-8f40-2110c1d514f9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('889f8b9e-c785-4993-89ef-60d5e7d52787', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ef00d53-1ddb-4b2f-9579-3726413807ce', 'Visitor Approval Required — Poorna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35942015-de39-458b-b5a7-3456f6c2e075', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6b8f3f7-8e5a-491e-83f7-9c6663088bc4', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2800dae1-bb0a-4a1f-ba51-9ce8892f855a', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db186643-2e64-4914-881f-b7b093ab5a23', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bae8fcce-697b-4a9f-b61d-f227b0c2eadf', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c5ff032-4f6a-4e33-aba6-eda6a4b736e7', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c56150bb-a75d-4a3f-b64e-f24070168caa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91a9eda9-47d4-405d-a5de-c09a1a1574e2', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40dbab05-a2f1-4f8b-977b-fdd0e6096394', 'Visitor Approval Required — Chandra ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f81c38eb-9016-4094-89f5-7b5b24e18197', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe7d2b95-b333-4dcd-acaa-5b8ff560d3c8', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('edaedf8f-eca4-45ae-8475-facdaf3bb797', 'Visitor Approval Required — Ashish', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('386e6e3e-cf8d-4c86-b076-aa555c80877f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db9f3e9c-71f8-4c3b-b2fe-0f7c5c8eac0f', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e03d746d-d1e3-4a73-b4db-c895c4305991', 'Visitor Approval Required — Shyama sundar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39ea23a8-b635-4582-9f96-14916decd46a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7cc9d4aa-6ee8-49c6-a59d-bbcdc2549cd5', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdd61b5c-0a18-4154-b1f8-ba7b6b9d0323', 'Visitor Approval Required — syambabu g', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d3c2f10-19f0-43b1-9b6e-78f39e66b70f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b51a70c-1aa0-4a4a-a7fd-29ad9c132084', 'Visitor Approval Required — syambabu g', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65e233d1-2af4-482c-bfcd-570395bf7029', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ac681fb1-b983-41f6-af62-87293219e168', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3aff08a7-58ef-403e-9840-39558e2b3f12', 'Visitor Approval Required — Poorna ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a2e0e5c1-8270-488f-a80d-416e2aa755fb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e6614e2-06f9-4eaf-a435-c11933a939d1', 'Visitor Approval Required — Girra Syam babu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd82cce9-0da3-41cf-a3ac-364275257ec1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e28a6e2-6f2b-40e4-b1ef-01aace9718b4', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a340b0b4-8cbb-42b7-b267-647ff4765058', 'Visitor Approval Required — Akula sunil kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74addcc8-cded-48c7-8df2-fb8ed6137b87', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4d70005d-11c8-487a-9974-587f01f073fc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('de928ae3-8132-4fc8-91db-04f988109ca3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6c22de18-d0b9-45e3-af57-eb20c78d30d2', 'Visitor Approval Required — Saradhi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4afadf98-80ef-4a2a-9726-9e4badd37622', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43fc198f-3f86-4d25-ad48-f9e7712c1cf2', 'Visitor Approval Required — DR. Sudheer kumar yamsani', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c1cea0c-97cb-4a1a-bd92-fca6b2ac279d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24cd1492-6f99-4331-920e-5724db53ea36', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af22bbe8-b8a2-40f3-b4f6-adcb09cdce10', 'Visitor Approval Required — Venkata raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab56aa89-3605-47b8-bbfe-805565e9a477', 'Visitor Approval Required — CH VENKATESH', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f58bfda7-4b5c-498f-a3bc-e147f766fa95', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27b029a2-70db-4528-aeaf-89bcbe377117', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b55efc6-e10f-4155-8c0f-e14fbab0fc8f', 'Visitor Approval Required — shankar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('552b3344-4b96-422b-8e95-ed222eb75874', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07fc0a68-006a-4fff-a81c-4714abab0464', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c3b2e5b5-5668-4de3-911e-0a3d6e3aef21', 'Visitor Approval Required — vishnu vardhan reddy & kamalakar reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16c02c5a-a296-487e-9d6c-a4a87bd3f2c8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b1f51e04-b022-4283-b4b9-ccd464a69939', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f821720a-1067-41cc-9559-e3051467ee1a', 'Visitor Approval Required — sunil', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa362f04-1c97-4a47-b332-abbdebcb2871', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cfbb4699-0b4c-45be-b680-0359865b0d51', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14bc9f3d-2b07-4f89-a527-7974a59d81de', 'Visitor Approval Required — deelip', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2f2a162-a634-41f3-b642-b585e3801c2d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e801c30-1563-4260-92ef-b7388cac933c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('475c4266-0f49-4403-b0fc-9a8319eb0d28', 'Visitor Approval Required — mahash', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9589f6bf-bf21-401d-a632-a00b9f3fe569', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b02052e-63ca-42dc-b78b-c6bc8001a1af', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49006696-b175-4c5f-bacc-2cde236be4fd', 'Visitor Approval Required — asif', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b81d771-013b-47cd-a336-b09b27629843', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a22a7748-4cb0-4456-92f4-9fb8bd73517c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d08bb4dc-10bd-4180-88bd-e3f58f6a028a', 'Visitor Approval Required — vinay kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('249df337-86db-4866-a597-5ab3a240a910', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b11ac08b-86a3-46a0-a99a-a2845b4de79d', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e69319f5-69c5-4e60-b1f3-19e4a67d3224', 'Visitor Approval Required — md khalid', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2fb072ed-9ac4-4413-b7cc-dac3289f7506', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4de3840-e97a-4430-9a53-519dc27db0b6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd88e19a-31aa-4333-bac7-ea0d1af90791', 'Visitor Approval Required — k raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf968b23-878a-4a1f-8fd7-990eb713bb4c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f594101-d759-4f5d-9d50-d2df98de29fa', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('103821a5-43c6-4375-b155-437f3fcabbf7', 'Visitor Approval Required — KIRAN', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ec447f48-2328-4b53-a8b2-1e9557170b83', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('afe10aec-4b06-4192-b5d0-ac9c67adfbe3', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2bec8d9-4524-46f7-bd0a-1b6f8b432ebb', 'Visitor Approval Required — Suresh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bd695b9-9a7a-48a7-9be2-500ac3aa27cc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c597694f-22d4-4968-b8c9-c497a9ce62a6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a362ce3-0d43-4d52-8918-c726e3bfd1b1', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b910d2e4-ae67-4694-adcf-cb75f0fb968c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92902cb9-7b2f-44cf-bcaf-40aeb1326821', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('96eac805-4460-4a79-b7bf-876b08753141', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a292fb9-ea6e-4716-a739-df8f59d8cabe', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23c07949-4ed3-43ac-9569-96bd41cc4901', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c873319-0286-40e1-81d4-e7ded6f2cb14', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8769a0eb-199e-4558-a34d-b62fc84883ed', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('854e3869-72fc-4d70-8e7e-0f11215bd301', 'Visitor Approval Required — Prakash', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('241937ae-5fde-4ebb-a280-6aeba2c85415', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('963c7257-e526-4057-a5ad-33c0dfe38d1e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('805a683b-68b4-42e8-b9d6-3f98658e9286', 'Visitor Approval Required — s. mahendra kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('69e2542e-77e2-4840-9648-7b1b30f37fb8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d028e858-2319-49ad-a4f6-0e8b9478c0d6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6331e4da-2064-4cda-a8ea-13282b2fd2fd', 'Visitor Approval Required — amar lal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b5aed0ef-c128-416c-be49-c31801386f38', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e146629-a3ad-4ed4-8c5a-4b9a644799c8', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16a771ac-093b-4f10-86b2-8117ea3cfc87', 'Visitor Approval Required — kiran kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9852accd-d690-4655-8b87-f33e8392504f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89931d82-86b9-4f00-8fa4-979b6de52471', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5db1ae20-4820-4e14-b933-c1ae6df471dd', 'Visitor Approval Required — ramsh bitra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e3857669-d946-468c-a66b-b3be92e26f81', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6677f61-bc5c-4188-88e1-0967bb25bcd1', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1aa2a85a-0e58-46d5-bc06-8a8af2f305a2', 'Visitor Approval Required — balakrishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c354b9e4-c801-455a-a6fa-7a1b4f644e93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('13838199-4c02-489c-ab65-e3aa128fe5db', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bbbe0c67-d406-4f8c-a494-210fce41296f', 'Visitor Approval Required — Siri Yadav', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('242f58ae-6919-422f-8c6e-4a548770c3fa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('197ebaa0-ba31-4540-82cf-8a4283fc0596', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a3778b0-7cc2-4ed3-a369-606bb64419a0', 'Visitor Approval Required — DEEPAK', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c056657-208d-4946-8d06-014613fe0ec9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be9ff8a5-fd98-4123-930e-127f6c774207', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fd51249f-e280-4eef-8b77-14f7a6bbcd5d', 'Visitor Approval Required — ibrahim', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('70abc358-1d20-4822-83f4-747a40678148', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9451250d-6a83-437c-88ab-86be4725cffb', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0763d817-4926-4576-8081-46351d5c0083', 'Visitor Approval Required — Abhishek', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a5c4066d-9ab5-4dc6-a289-1fc2a8f398b6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5315e03a-57bc-464d-b29f-220a7468e2d5', 'Visitor Approval Required — Lateef', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('11f7fa8d-bbc8-4e60-9af1-c0a3c8ace44a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7615bd63-9542-4d6e-a79d-6cf14d1f7862', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2169854-4646-4cd3-8464-724dc3a83b47', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3ff9cba-46ad-421a-aa28-27685241c3e5', 'Visitor Approval Required — p venkata raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('592a075b-4f63-4163-bf56-f700d427486a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f666cd97-0f77-45ce-883f-06a6b7dc4304', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('406271c2-8b34-4488-b0de-2de458c30485', 'Visitor Approval Required — k anil', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('804a0944-8a0e-4c57-a330-c91443b27252', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('86acf452-65b4-4224-8ddb-ba633dd511aa', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e300d78-00b3-4706-8c3b-c40ab461ab48', 'Visitor Approval Required — naga raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('beeb1c2e-beed-48ef-b1ff-678860e49b86', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d3801f4b-3136-4a27-b8ec-a90c22ec4715', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf9dfa5b-9ca2-4a5e-9bbc-6f9a2c55f761', 'Visitor Approval Required — g pullaiah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c5d73e2-0e59-4f6b-a4a9-ba2314add283', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e03a0da7-531c-4aa1-9c8b-8d97ed1fa867', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8825460a-6ff0-4b67-8c01-a6949ac575dd', 'Visitor Approval Required — meher kiran', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9b7c6ce9-72f1-4208-9c3c-893746d87770', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('031b766f-fc11-4e96-a8c1-f679ee8ec103', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('61e0e6b2-40c7-4df7-9214-ba4856ab52a9', 'Visitor Approval Required — ravi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0244b33-e0ff-4a1d-a8ff-79dd068eb1a4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('85775b5e-48df-4b1b-82dd-01a2082418cc', 'Visitor Approval Required — hari krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27e8c850-4a13-4356-9280-0e898f8cd309', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4b5da56-8981-454a-9b18-1615d9904f07', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('393329e0-9201-419b-9530-e3f7e536dfa3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df479c45-c307-4525-bda8-e0bf8332c460', 'Visitor Approval Required — manish kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b9f4c35-a29f-47c6-89e5-d3be46e87177', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('978d14ce-a6eb-4efc-a5af-8ca4f0e821d0', 'Visitor Approval Required — mahesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c0536f2-b3cd-4dc7-aec8-58e2f4fbb4b3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('258b88c4-937a-45ad-abbb-1887099fbe0c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2388d3e9-6f2a-4569-bf21-49e292f219be', 'Visitor Approval Required — Shyama', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9e843cb-8351-48e7-9a19-45f318f5746d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('efe17bf4-380c-4e9d-a74c-db800723221f', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('54d0453f-fb0f-48a3-b84e-babe5b5dd409', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27c897a1-6a58-4948-9385-b689516fc21e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56bdd887-cf5e-4db1-8bf1-0390822bb8dc', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4b75f7f8-3871-43e2-8104-b2ba49442468', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ced0e99-49e8-42ab-b7b3-08b40e6bdd20', 'Visitor Approval Required — Abdul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f62b3440-f614-46bc-aa64-5a74a1c3f2a0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17137cea-726f-4fb1-9f4b-47e557ef81c6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3b6ebc7-a20e-449e-899b-0a8663a4943d', 'Visitor Approval Required — SHYAMA', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eaf16cbe-c536-49be-a691-a4ac550509ae', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('171959e4-501a-4b59-8388-43307ec41bd0', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eae56c2d-6f20-4795-8893-5bb161552570', 'Visitor Approval Required — ratnakar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05356380-538d-490b-bb01-86bbe22af940', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e1d1b6a-9757-4f4a-a4a7-f1df99fff652', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2bf67f7-57c9-4d30-8dd2-1c3976d9de81', 'Visitor Approval Required — agi reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2b65e623-fe48-4b7f-adf2-f3a7fa89b24f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('026e301e-be66-488b-b5e0-87e41997c341', 'Visitor Approval Required — DEEPAK', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8a8c0cd-be1d-4ded-910e-087c04aaffbe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f9f4da3-756e-4687-ae8d-9c43f9072e83', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb7c0a46-7108-4096-8395-aa58d4835363', 'Visitor Approval Required — karuna sri', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c81d83b7-db55-4506-a3d6-d5e7170d3de2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('679d6ffa-8216-4717-be0b-3fac423e9676', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c9080c73-04f0-40f1-b3eb-36ca7e14c2ed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('219c8c68-2cf5-452d-a30a-7c72c9555223', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('854193b6-f089-42b0-89c3-acd3094c1b60', 'Visitor Approval Required — Bala Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('20ccd28c-b64e-45b9-98f0-b74202460212', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09fce886-b127-4d29-b7cd-476f2859663e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('485481c4-39a1-43c3-80e9-a5ed72438c9c', 'Visitor Approval Required — syambabu g', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b5c1ea9e-f0f5-428d-b95f-5790afaf8afe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c809128-a56a-4a75-b957-370d766be104', 'Visitor Approval Required — VenuMadhava', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43eabd47-959f-4b66-a622-f32763d448e8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('adc8a299-8e40-425a-b86a-c36ae7d49a97', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4f08ecf-95a9-4261-bf4f-7ed4a9263045', 'Visitor Approval Required — Shyama', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f72feb3-d5a9-47c1-9552-29048d14db59', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b5813fc-1af8-4329-bf58-59ed226facb5', 'Visitor Approval Required — syam', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d1dfb226-03bc-4844-97bf-d13e418d5df1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb9d9633-63c3-4190-b080-bf0c9421a34f', 'Visitor Approval Required — shyama', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ef486769-ec18-4066-a80b-e62023894596', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('76ee4dc0-f602-49db-af06-2d9e290f069b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74335c75-45d9-47b5-999c-f5c4477fc298', 'Visitor Approval Required — Shiva', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12d2803f-8a27-408f-bab3-b517ad1d4c37', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a7ed7f1-da26-4f84-b926-6915d079b6b7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f443f220-3785-4b0d-9f51-15c742e5054a', 'Visitor Approval Required — Ramesh Bitra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55c40b06-0aaf-41bf-9e2b-ea8e31396b74', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5864b816-510e-457d-b569-17f6b9cb8179', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('22804195-8eff-45bc-b89b-4fdd440512c1', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bcb77d82-f70b-41a9-a83d-6f4b4004d449', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8596d9cd-62e3-4d41-9a7c-9b2e0605cb0e', 'Visitor Approval Required — Sunil Kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3554b4e-eead-41ef-9af6-d015339f65f4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d716a4d5-8f65-42ca-9f17-9b3e3956002e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9174f6a0-da60-4411-904a-289e3dc77afd', 'Visitor Approval Required — Bala Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3d9a584-e817-4237-b28e-67ce9f6299b6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e8a0d63-b828-4995-87c3-edd2c4bde7df', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14422f7f-def1-4ca8-a88c-d431332aa290', 'Visitor Approval Required — Ramesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d862a348-51c0-4bdc-b82b-512dded0a106', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24c425e6-a0ac-42f4-b0cc-3592b1b602a1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4c64a53c-2f75-406e-9ba9-745814174abf', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('10dfc1a7-a513-468c-8885-a620dc100302', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14322ff6-be21-49ba-af5f-78ab057c41f2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('657d4ac2-687a-4133-9c1c-4dc6744dd4f6', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23d15630-b77f-4023-b5dc-6c18674a14f1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67ddc8c1-9a60-4d6e-8811-41319e12d2f5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('017f3050-726e-4949-b3d3-f5157e0b3034', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e430b47-ae53-4eff-95d6-cff8a7f5f479', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('460e39d6-51b3-4f3e-98d5-2312413be005', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5c42bc85-fad2-4f72-8fd9-211facff8199', 'Visitor Approval Required — Prasad', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('004ac0e5-4818-42e8-b0ea-98eaa1c30bc1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fd1b1016-78f1-4664-8838-332911ca1702', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('006b4f53-40e4-4211-a033-219852bc7589', 'Visitor Approval Required — Tarun', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a93fba9-7d15-4fa7-9316-8850e1409e43', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b85f90ed-0902-4a22-9cbd-83ff264ef049', 'Visitor Approval Required — Venu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c9624d6-d021-4377-bb5f-5b516c9ce80f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75b2926e-dd0d-46ca-aea7-8458d83f8c80', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3129083f-4258-4db2-8140-a0575fc07375', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('34f51250-31d4-49df-889b-91ce689a7532', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('500341ad-e233-4f79-a252-5e0751fcda8b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2c88739-b2d3-4cdb-8ae3-191928c3740d', 'Visitor Approval Required — surendra kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d056006c-7a66-4a09-bc09-3dc9d5babfd0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b3edc02-4d82-4987-bbaf-38a6b438d6f8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ade3407-6c86-40a7-8d82-3eb9a75acc70', 'Visitor Approval Required — Mallikarjuna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ddcb0c15-f257-4038-abf3-8ff0c38bd4c9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14c9e7b5-4f55-4811-aa07-c27f54ca115c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('809b7f52-1a9d-43c3-a6e6-9b8e0ab9225e', 'Visitor Approval Required — Tarun', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0652462c-2fea-43e3-8d63-092ec9fb0d62', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81b648b5-8636-4f3b-974c-a76096ed715a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4999d578-7db1-4bcc-862a-9b85d88368d0', 'Visitor Approval Required — vijay krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8635abd0-60a7-40fc-85c6-1e4b01867689', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95a481b5-aba6-45da-84bb-e7e5f0f3d227', 'Visitor Approval Required — Muralimohan H', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ed143518-9f42-49fc-b5ea-a60eb4d71656', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d1a5fef3-988a-4042-a9bf-1f885813e818', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('529411cd-e6f4-455f-b77a-5400f19974bf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('118b7026-3cec-4845-a18f-e7c4bc5c322b', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29dcd313-5860-4d02-9431-9fd37e3fe679', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16a4cd1e-58d5-4dd5-847b-58ff841bab01', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df8bee82-50e6-40fc-a196-4c57670b60fa', 'Visitor Approval Required — Satya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9b4c95f9-698a-4ef9-92eb-8b68ee6a87b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5732bb9-c042-4498-a6fc-58ce3c03ae8f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ea87b0c-1394-4555-a285-efe407c75c18', 'Visitor Approval Required — karunasri', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d519642d-639d-40c8-80c3-9655f1ad83c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a81813ff-6ea5-44fd-b0f3-81a2536513f4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4eacec32-0542-4b91-b2e4-c5b13fd8fc55', 'Visitor Approval Required — lakshman', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e0dc3b1-d968-4b18-9b99-02c7fb80dc89', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6be1215e-1848-4189-8e8c-1868fc23a924', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0045467d-b78e-40c7-939a-3d23e6c93b07', 'Visitor Approval Required — rajamouli', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a77a10f-64d1-45bf-a200-d69ec6ae51ca', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e141da07-f61c-4497-9cdf-9d55b6e5c99b', 'Visitor Approval Required — Bhatia Saahil', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dddce8bb-56b9-4004-94d4-d924c23b5d7f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c680af0-0896-4796-bd2f-f25711c40d36', 'Visitor Approval Required — Surana Vikram', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45587fe9-7900-4d1c-963d-51971a419c79', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa5cc3ce-a9f3-4e20-b820-deffdb509b0f', 'Visitor Approval Required — Maitreya Ishan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('635de0fe-3aa8-45ee-a10c-b1c414167f48', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2ab8b57-e4c1-441b-9e70-a9330cfb6a29', 'Visitor Approval Required — Desai Jeet', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('145ba303-7c5c-428e-a2f7-a1a39ee09426', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea14e96e-f5e3-4970-8643-e737e5b154f3', 'Visitor Approval Required — JP Morgan Birmohit', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7f6d57c-e310-473e-b48c-01422af5d7b6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6f82f3bb-d77f-481e-9acb-7bbf0d79593f', 'Visitor Approval Required — Barclays Amber Chawla', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a744b25-dff7-4a4a-9de6-44bcb459f1aa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('37e4888b-bc3e-4fc9-b9b9-3b799ed3a7a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0694e8e3-ef47-4eb6-8744-6ffc8863444b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e7153f2-556b-4e24-bba2-4d46d6796de5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c36ba4ad-3917-4e96-b4bb-6607bcc7e3bd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92e79d3b-fabd-4053-b78b-f44e0046ccaa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53990398-fc6c-4b04-93e9-ece0e9a4cb33', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09fc6bef-eee7-43c1-a664-7230b1e01fd5', 'Visitor Approval Required — Masood Alam Mallick', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f81510e9-2199-42d3-b098-34dedfb278b5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('59d26d6f-a312-4afb-a8f4-182a27be8d42', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ea5c948-a5c2-4c74-a0bc-cd530b2deff8', 'Visitor Approval Required — Vidit Jain', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a4db959-b45d-437f-9482-2e0704b481e6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d22650d8-2f60-4984-8a20-40749d8aef49', 'Visitor Approval Required — Divyansh Shukla', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8278b44f-e0ab-45eb-b16d-f0483b7daee7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56b86eac-a25d-44c7-b17a-b41dfbaaf0ce', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8412c1b1-0980-4da3-9757-852c44bf3caa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('62df9e15-a7d7-4d53-b906-a8ba6ddd2378', 'Visitor Approval Required — Krishnarao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fde17fae-2c0b-4242-977c-e2673c63f310', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32a99115-f00b-4e28-9d52-82b0f403a03b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40a8384f-16f5-4a39-ab40-6fcc18d6af2b', 'Visitor Approval Required —  VINAY', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2acc3c99-96b6-4374-b5d6-cc57139e6fc6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a7e74e4-0d26-4941-be28-4819166a77c3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('128206b8-7773-4dda-aa8f-05a41d68674a', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cdc1a31-00fc-4c77-9608-461ff9cc2e20', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('de01f555-f970-4c1d-81b1-cd71e1cdefe8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('008df961-3735-4dc9-ae09-9c54f5d571f1', 'Visitor Approval Required — chakri', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d62f830-13d2-4883-bcaa-5e74d342fb93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17d19bcd-a72f-498f-bde1-33596f1a5260', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('953c13d9-2e88-455b-a69c-1dfdfaa48aae', 'Visitor Approval Required — Srinu A', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ee4f56f7-8c1f-4104-97f6-ec02dd3a7d22', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b6e1d61-ce61-44e5-8b68-90a70204c3b7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e1947b6-6842-4b52-b697-dc4cb3fcdfbd', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cc111ec-852a-4f92-9ae3-950613cf016e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51c47991-49ca-4cb8-b0f3-4c06892e08e9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a5908e8f-b48d-427e-98f1-7eb30500034a', 'Visitor Approval Required — Venkat Sai', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7e5d069-f34c-41e7-8595-8315a55b026a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('759c3622-c78d-4b05-aa82-2486017b04fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65529006-74ac-4c81-83ba-361e5c9d5184', 'Visitor Approval Required — Venkat Sai', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7c37771-076e-4724-93cd-dd034552774a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf911722-f149-475e-a5dc-791d13115b8b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('703c419e-c071-4f95-aef2-9fb1010da5ae', 'Visitor Approval Required — Srekanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('da3c8687-935c-405b-be60-7d20e38f044f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5aae1903-6237-4684-a25c-26d51407e644', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e09284fc-e634-4c7b-9041-b671237c6b85', 'Visitor Approval Required — Vinay', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d676d65b-2cc7-4beb-b0ff-3062ed548393', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24b31529-6c17-4fef-a900-0923411512ba', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ced6cfbc-10b3-4a61-b35f-90cd89e5e44c', 'Visitor Approval Required — jayathi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1d8e84b-8d43-453c-8ece-8784ad0b4de3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f084b2f9-c3f7-417c-99ef-dfd0e0c5b540', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('270009b0-d578-4a20-a58e-30e21899852d', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99e59fc4-2ecc-4ee4-9171-842bcda7af5f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f38e5a7-61a2-411b-b221-55d9cde11513', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a2c13cb5-d528-447e-bf3a-cbd6bcabbc99', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01fb0443-a542-4b0b-bb89-62fa4e2514ff', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95ecc25f-82c4-484b-a0fa-eb6ab9dabdb0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d741b262-d1eb-47f8-989f-5c9c2564b516', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('15d3680c-bf5a-4923-9f5e-ae29175ded72', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e27de026-877b-46db-89a3-6e1930a7a48d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64adaa30-97a0-4064-a7c5-9e3c8c499754', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8a013453-eda7-4dd5-a091-b854b0c8829f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7909df56-2ae2-459e-9473-7f07aec8edbd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('456b4630-95e2-41e1-814f-dc734301e7a6', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('61c5f329-6da0-43b2-8b1f-26612fed978b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b7d26548-0543-4ac3-be4e-155da72359a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9857c7ea-8252-476e-8430-d3c60a757ab9', 'Visitor Approval Required — Srikanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('392030b4-4206-413b-8179-243d7efc744c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9062ed61-cdfe-46aa-8453-e032ab8e2f3b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64cd44dc-54a7-49a1-aad2-2a0a77c22966', 'Visitor Approval Required — Srikanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a994f34-21fc-400b-b74d-730afa57a1ec', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa463548-685a-4470-ba76-5e238a89dfdb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a752ce3-c85e-4681-b47f-1367fc283bb6', 'Visitor Approval Required — Snehal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('442559ff-11e8-4deb-b85e-5ef7499c1251', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d57d3bb6-58df-4f07-a1ea-a1cbd7b09422', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a603f64b-fa05-46fd-b271-5d4e6d6b995a', 'Visitor Approval Required — surendhar kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d287dd0-1e39-4fb8-9867-dd2cc601b643', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ab6acfe-302a-40d6-b7ae-8fa661a724fa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12a2c3de-7f3b-4db6-89ba-2aaf3e25b80e', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f81ca54d-0b7e-4141-846d-fa1c576d8a7c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c8516cb5-ee86-4923-bb58-8254bb3d20db', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ea63628-2eb8-4635-b79a-51ef3895a7a8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f5d97bed-e635-4464-beab-c8b74987e8c5', 'Visitor Approval Required — pullaiah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7d6d7d8-6ad9-41a2-9973-4e81fdacdac6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24849ff1-b184-4757-94a7-3dca5d953319', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('216435a0-019b-4b6b-9769-64fdeeec323c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67609a5e-29d6-444d-ba2c-7be81be16a4a', 'Visitor Approval Required — Nikitha', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b899e08a-415a-4006-98b6-7d715a0d8d12', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f9ae3a8-3550-4292-80c7-c007c09091da', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1551f4e0-f276-4306-8d6a-70e81d88054f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a770602f-6963-4f1c-bd28-393ca40b2b3e', 'Visitor Approval Required — avinash varma', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c695803-32de-4f6d-925f-64c157b971d0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('84495b7c-8809-410b-b9fb-314bf333823b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2fcb4f3f-f9dd-4c53-998b-89d38fb72678', 'Visitor Approval Required — Prateek Jhawar ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94c48c8d-9c1f-4995-a450-320f4e8d42bb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95176210-1491-48f7-9d92-af3aaadb59e8', 'Visitor Approval Required — Abhimanyu Diwan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32b644db-7701-4b53-a348-e378fb4116c3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0774d94-dd05-4ff0-8c81-3e33220ef4db', 'Visitor Approval Required — Samhitha Reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40669eeb-85d3-41af-9f40-150d6d1d1b5e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3646bb8d-45c5-4179-90ce-a596a696cd8c', 'Visitor Approval Required — Akhil Dokania ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0c3f3b0-6094-4edf-b39a-3f5bbbd0c783', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ba97590-0395-4b4c-8a00-43d57bbb3dd8', 'Visitor Approval Required — raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ee62219-d0a1-4815-b2e8-2b65d98805b0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ab63a57-c60a-40fc-a24b-75183a88c978', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2dc2a89b-c02d-427b-adcf-f381d9c99c86', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05880aae-e566-4734-9b4f-777aa5c15768', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bebfb3c-b7d8-462e-bc6f-824479a25312', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3431ae3d-61d1-4dda-8917-4ff81130d4e8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('596eb5e3-2aaa-4b09-a05f-370ee0b618bd', 'Visitor Approval Required — Divyansh Shukla', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bfa6d1b7-aeb2-439f-9f18-7a07401fba5e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d8efae4-c171-48ea-85ee-36a29a689cc4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e391ab8-f53c-4c39-8aaa-b60281eb524d', 'Visitor Approval Required — Amber Chawla', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eff1a2dd-82d5-4fec-bca0-880b91eeded4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6deb95d2-f56a-4656-bcc6-0bd00f396784', 'Visitor Approval Required — Vidit', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8a837de-8b21-45bf-a2ec-e978e8588d8d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdea43c8-4635-4ba5-81b5-e8d828eab264', 'Visitor Approval Required — Birmohit', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a1975786-f1e5-481c-943e-0bcf0b21aca4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d4b79c8b-88a8-4a63-ace5-0d8b15453535', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6207a752-6d5d-443c-83a7-c06b61b463a1', 'Visitor Approval Required — laxman', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78dc804f-6c13-4e14-9ac4-bea4fa38e2f7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9ddb22e9-19aa-4346-b7db-815471d84145', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('354cd1df-ac57-4f6b-876b-34e40dee95d5', 'Visitor Approval Required — T Suresh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6942ba8-f84e-4616-8466-243bb8ee776f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('132ee64a-df5c-48fd-b078-82dded82613b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4a227443-c269-4f82-8a9f-3f9bd480f413', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('149fac48-eb7e-48f8-a404-6d9bf16843f2', 'Visitor Approval Required — Kushwanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41bdb2d9-0d0e-4342-b836-010314638758', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('788c1fe3-8297-4687-ba3d-6af62361e660', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e989169c-e609-47de-bb5d-111fb96b7968', 'Visitor Approval Required — yusuf', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('079d629d-6c7b-4540-b246-d076276e5e02', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9dedccd-aa2d-481a-a1d5-e8195a0a90d8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db5de4c0-4c90-44a2-b7f0-54a6ad9713a4', 'Visitor Approval Required — Ujwal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('84277cfd-4888-4b2b-b891-c2ea291879af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b9e87740-58a3-4a38-b2a3-26bb1949ebb0', 'Visitor Approval Required — atmaram', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('961f06e9-e46e-4051-9aa7-ab44049571b4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ffc2ce9-9c22-4485-9541-6affb1c91235', 'Visitor Approval Required — Punit', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5cb96f65-e8f5-436d-9f33-1948a1903df8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('98121d05-cf63-4fdb-8552-053e3014e976', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b861275a-353c-49f7-b8c4-1b08fe9a17e9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb56c466-e9c8-43e0-9b8a-f16767b5ea0d', 'Visitor Approval Required — chakri', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c98b150c-11e9-43ef-8d88-f0a2ee8b5870', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('25b691e8-8010-4fbc-a470-1f5d5c6ce2fc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b77d588d-23d6-4f78-b987-9af753747c77', 'Visitor Approval Required — Sarvi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14d08e8c-7e56-4fe1-aadb-3c2109a2420f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd5540a8-c543-4b4f-8044-6b8579159364', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e3ae54fb-ea3b-4637-8842-de0e422b4ba3', 'Visitor Approval Required — y v rama rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bedf0c98-45ba-4667-9622-d856af8ae8af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26a68491-ab16-49cc-bf40-3c823a32ec93', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89f480d1-3412-4fad-90ac-97f809b68e2e', 'Visitor Approval Required — Mr Kiran', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ed6e85b2-8916-4e88-a917-d7c56c840a11', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d6916c0-e5db-4371-9685-c397e0e8ad0d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1e4daa6-50db-4229-9bc1-1de69c73b0ce', 'Visitor Approval Required — bheemesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('201f255e-3840-4fc0-8eb4-1dfbb06b12e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0971b76-1338-4715-aa74-0b06c5aee918', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7aed8f5-c18b-48a9-8d7d-f88d522fb44e', 'Visitor Approval Required — N Shyam', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a0979db-44d4-4116-8a61-ed0f7cac34b8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88986465-f908-468f-b2da-728e6ad0b28a', 'Visitor Approval Required — Nagi Reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4823b6f4-4607-4bd4-bda2-62c38524e083', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('04364416-57e7-4704-86fc-1c8b5dfd4117', 'Visitor Approval Required — Jaya krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1b5b8e05-5c95-441d-96e3-6c2f4c6e5b4c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4b603518-9716-4ff5-a239-d9d7501a0288', 'Visitor Approval Required — rajat', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e6d7d05-792c-4cac-b51a-fb479c3bcbdf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c64e778a-89f6-4976-8bdc-4a1e920e72b3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c67fffc-8c36-4968-bbfc-2abc6f189d87', 'Visitor Approval Required — Sri Lasya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8db260b-87e0-44ad-b89b-6aeed20d5e47', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a6e9238-8ccb-42af-a805-0f2d640f0967', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dd6fb5b7-262f-49e9-b820-19fffe6ce26d', 'Visitor Approval Required — s.shrieesha', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6c4568e-ce68-4967-9036-c8171331cc6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0d2056c-990e-42ab-a396-bbd55d0f663f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('612a40f1-2673-486e-a947-6a8a0127e95e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0f4fe1c-b5b8-4b3f-acd4-b2d76d9fa71f', 'Visitor Approval Required — Priyadarshan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48ee04ae-b2bf-40af-97eb-6b233bde7f45', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dfa68792-2b5d-47ed-bb0c-53550b6ceb1a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d506532e-6f7c-4483-a294-5ec8d658a9bf', 'Visitor Approval Required — Rajini', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('219a8be6-fcc2-4bee-b3b1-abce5077b936', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53102f9f-85ca-4a39-82c8-7d811ffc9a2a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc1cd189-2611-47e3-ab5c-0238ff877d6e', 'Visitor Approval Required — Vikhyath', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74a2d1df-7e2e-423f-a989-fa97f7286b3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a762808-55c9-4647-9e74-2596f5cfbc50', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c6dda28-9792-43c6-a0a1-f8e9c8e81599', 'Visitor Approval Required — Sandeep Lakhanpal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8ff0f48f-91bd-4995-9aee-9dc609568daa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('404fcb59-2cbc-49c7-ae78-87c389324154', 'Visitor Approval Required — Guillaume Dourdin', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9398fe7a-2c69-40bd-a375-8b5549ecea11', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e4b9d64-923c-4411-98ef-529c0b59a91c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ff29bf93-3329-4402-89dd-4acfb84db103', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03720cc6-a6f8-458a-bab1-32a827e68438', 'Visitor Approval Required — Divyansh Shukla', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28fcf599-9663-459a-82ee-69386b12e49c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a60de61-2a3b-4b85-8f3b-efe35074b977', 'Visitor Approval Required — Birmohit', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e413eeed-0036-4999-ad6a-742c5fa7fa5a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3fea741-f4a6-4ee9-9b20-44c04865a465', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0eab7559-e84e-4d03-9f8e-0bf16e515587', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ce5ff65-bcaf-454e-9a08-aac8355a3761', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f5573c1-2e8f-42f3-9b7e-5fbe987d8470', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('00d99883-cf22-45ef-9889-cef4d50a3823', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f8691cfc-c825-4c0b-8302-958a30daec69', 'Visitor Approval Required — surendhar kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dbfe76b3-ef50-48a8-a6f5-709cc56dd090', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f2ea595-29e2-4aa7-8865-6ff5e90099bf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53024391-7fd5-43a8-93e6-70b7d496beb9', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('693ce7ad-9b7b-4e2c-9d93-ff7ee8da8084', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65536411-8689-4974-a7c3-0deb1b4c37ff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d6f57bd-f451-4673-9655-8b1c7abf9265', 'Visitor Approval Required — pullaiah g', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('77a38d3c-5e90-4b6d-a2da-7540f2739802', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e51bba7-8d72-44fa-8d13-820dd305339e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49030b8f-7808-4655-9859-2b6d0d7050e2', 'Visitor Approval Required — lakshman', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9834ce9b-173e-4955-bf52-d6c7c90dd9a1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('445c66ea-3517-4e16-b7e3-91d4f12ad007', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ced2be8-6eb6-486c-bb6a-7356b7336932', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('87391238-5c87-474a-86d6-2f4bf85ece4c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a26cff4f-db2a-457a-85fb-1f1e66d17153', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('da85e3a7-9f4f-4a0a-9783-0eebf7642b31', 'Visitor Approval Required — Sanketh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6565919c-fb4e-4bfe-9423-109f44e4eff2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d34ef606-310d-4213-89cf-77cf2e02eecf', 'Visitor Approval Required — yusuf', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('15d4c083-96b9-4219-9380-8e3e5af31d2b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e953b57-b5e9-4d1d-843e-decad7f801a5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('264d78db-1ee2-4eaa-bee5-325bf45ebd3b', 'Visitor Approval Required — shiva kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4af86683-dcf7-41f1-af07-d75757ed623c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e25ebd5-aba3-493c-9ec1-465cd668e001', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d14759ff-ccec-41ca-9c23-02f9179f1fd2', 'Visitor Approval Required — Zorawar Singh Sidhu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab27ce2a-62e2-425f-afab-b5a29a9d6a53', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a8bf7b1-585d-444e-af6f-3815940c10cc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('768d4e64-13ee-4e9b-ac9c-ff1932af5b7c', 'Visitor Approval Required — Masood Alam Mallick', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e32bb06-b761-4ed4-917f-819ba9712012', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64313a4e-effa-4a63-b2bf-3f3c663c4078', 'Visitor Approval Required — Satya A', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aabe2e13-b103-4254-adae-539112f7cf1f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75c086c1-5c7b-42b5-b1d5-5723f0a3db5f', 'Visitor Approval Required — Lokesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('310953fc-2b0b-4cfa-802d-953188ef96ea', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ff77b44-c49f-44aa-b684-72ef22cc8930', 'Visitor Approval Required — Swamy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f58e121c-a91c-4f0d-a5c7-da7eef131831', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('943c0c7b-a922-4041-8b17-220336852cc8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fec297d6-68cc-4bfd-b02e-f2f454fb826e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2cfe30df-535a-45c6-991b-9c47021fb554', 'Visitor Approval Required — sandeepreddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d8155e7b-8362-45b9-88d8-8925e4114300', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('671ab452-5b15-4fc9-8096-0e2d688d5266', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2b59468a-62c9-4c40-a1c9-568acd415ca9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f10570be-c045-4a6a-9e3b-437c7a870fdd', 'Visitor Approval Required — Murali ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cd46c7ac-2457-4267-80a5-ec5063a5c584', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e77753f-2aa0-4c2a-91fc-955d4bef3dd8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6a666f7-272c-4573-ac52-2df7da8ae8bd', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e6803ba-61d4-4df9-abaa-dbb8dc51d694', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('30abe1f3-39d4-49d2-97d6-cfe969563510', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca568a08-b9f6-4f10-b12a-58861129cf61', 'Visitor Approval Required — Ravinder khobre', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2995ddc-ba67-45f0-90a8-7c7e05d22a19', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c9028d9a-29a2-4ce5-afe9-7245ff5d5d0a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2d2d2c5-a59f-4552-9a7c-6df3a619ff7c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b073296-cf44-480c-8d71-9573bf6ac228', 'Visitor Approval Required — javeed', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0574b18e-b028-4f91-a77f-056163b0cae6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f0416247-c6f8-4d46-9548-0cb167b799d8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f163899f-7e4b-4330-b8eb-f9c340dc1bed', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a81703be-a10d-4022-b7ab-69e35f7395f2', 'Visitor Approval Required — Sudhakar Ramaraju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2212898f-6212-4a29-a627-8b7e4f8d9266', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e7d9ebf-9c8b-432f-a9ee-fdedc4fc6818', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c155b243-c622-4d4b-b28f-3ec37fcf663e', 'Visitor Approval Required — Varun mewada', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('831c23af-f610-4d71-997b-120a617cecdf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1651ce1-a38e-4a84-ab86-40bab44469bd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1dcdbe1-2939-4f6e-b375-0fabab84e56f', 'Visitor Approval Required — Nithin', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('54b19801-d794-44c0-8bb6-395d534e0fad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('efc1c83c-0328-4cad-aaf2-4b221fb06e29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('62f51163-bfba-4cb2-b880-cbbd1810b2b8', 'Visitor Approval Required — Gyan ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af99aa7e-d981-4f5c-8890-8c1b39c6a9f3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eaa1cb55-982c-4007-a767-09c5e32287b1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e0720ef-be95-4cfa-9311-f5cd27c861f8', 'Visitor Approval Required — Mr Topiwala ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('458610bc-15d7-4771-833a-f93c1977a983', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('815950f3-fc4d-4ddb-a5c1-d46e5ca2ff93', 'Visitor Approval Required — Akshay +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2076c4b9-60c0-4de8-aa89-d9c58dba850b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c91d862-fc77-4639-b6b3-c5108f5286c2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bae5c994-fad4-4286-a5e1-58fe53af6e3b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f81e33d-7e1d-40cb-9b44-6bcc25ded488', 'Visitor Approval Required — Shankar +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26bfa1b5-49dc-43ea-90c1-a60898de7efb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91d6b651-4ae7-47b3-ac69-64de8901a939', 'Visitor Approval Required — Karunsri', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf8fb0f5-11ff-4057-a4f2-e5356f0e9a30', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c57794c7-0d0e-42c5-b79d-8620629b993f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4f56119-c95b-457f-bca5-c25353e04560', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a099a53-e644-4ea6-b984-b77e08be7ea1', 'Visitor Approval Required — sudheer ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2eb92e15-b60f-4e20-a047-3ac268211153', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('527675ef-543d-4704-b82a-6388f23e3eca', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a424bf1f-109d-405b-adf0-3b6084cac7a7', 'Visitor Approval Required — Santosh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('259a3fa3-71d0-4b18-8913-04bb62d82556', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c18448d-8f68-431b-be6e-a9eed8c8eedf', 'Visitor Approval Required — Sanjeev', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd4e1bee-9de6-4b23-abf9-a31034b87f43', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('790292f1-c50d-4c84-ae37-716e439c1dff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e51b9f9-1e4f-46a1-8fc5-383b78348715', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9ff70e06-e764-44ba-8e5c-3878fa104a0f', 'Visitor Approval Required — Sarag pote', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fd5beca-eb2a-4d1d-83a6-d7a0bc03e0cf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2099e8dd-a958-46df-bb0f-e49019a2c374', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f766ce34-cb17-446c-a158-bc3375779e63', 'Visitor Approval Required — D H Pawar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('385fd616-cf0f-4eea-8dad-c2873dfe2c2b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c560dc55-c823-4b55-995a-a854a87ed323', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4bccecb-f901-464d-9c6c-6ca14d51ec41', 'Visitor Approval Required — Veeraf ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dccacb16-10c5-4025-9248-26b0697b7830', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40ec1377-713c-4a2e-a80d-4ab868cbfdbc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('173bddbc-5039-46c2-b567-fff1cb3b4768', 'Visitor Approval Required — Sandeep', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29f125dc-6412-4e75-abb2-5ed5a8d21555', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16859272-c5c8-4211-864e-fe59e42edbee', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8a1ac259-df5e-46b3-9d10-84ba3d994eeb', 'Visitor Approval Required — prasanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24690d5a-4515-412a-b1cb-bffbe3128cdb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c14fe757-4085-4e9d-9499-3d21adc69f15', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb215550-6546-40c6-ad4f-e287b553350e', 'Visitor Approval Required — N SHYAM RAO', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ad995156-bce7-4a5a-b764-06a88d1d6d91', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a35541a8-0853-42bc-b6a6-024bec0b1ce7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5cf5ac54-d9b8-406a-b726-ed87aef0d9ee', 'Visitor Approval Required — N SHYAM RAO', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ff9b714b-9269-4c08-a502-df471c10f746', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b89ce75f-5c4f-4030-9e77-941567d18cb6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ace7da7d-8862-4919-9994-4e9cfe148905', 'Visitor Approval Required — pullaiah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89690661-e5af-4d1d-a1c4-fe2ec8633272', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8ad691d3-296b-410b-bfeb-06f37dc9f542', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e08b70ea-ba4a-4e72-9fb3-15b0fa91f85c', 'Visitor Approval Required — surendra kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46773c78-bf21-4d6c-a478-2140d078d481', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('63d262d0-1a0e-4fe1-9897-947cc936d4de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b3f0504-3c75-488b-95b3-e11a13001122', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29e6c5c4-6155-4e06-adc1-67d26c3dc8df', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('884c09b0-a7d6-4474-a98a-18544417e9f0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7be5c720-24cf-4b8f-9efa-1c89b0a67607', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e9cc8ed-053a-45dd-bcd7-9775d7475ffb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b6a1495-865a-4a39-9ce4-7d5948a2251f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce6b6dd4-6bbc-4876-a420-6d579741a81a', 'Visitor Approval Required — raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb0f4c37-6e4d-4009-a939-ee72a95e9875', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cc8101f-c933-483a-8d9f-a25190891f31', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bb40449-c7c2-405d-84b9-0775c3b21f31', 'Visitor Approval Required — avinash varma', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab70d436-abf1-4275-b023-55967dcfb7ba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4a02a9de-d067-4818-8c70-605c1a0c7f0d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab8851f9-a9b2-452e-b978-833668c637f0', 'Visitor Approval Required — SHIVA KUMAR', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('228ba603-f5ff-47d7-a5e4-694ac13f66df', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7275d7bb-ab2d-4472-b446-278961425c0d', 'Visitor Approval Required — Sandeep', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e2b4dc09-469e-4653-82e9-d95b2212515e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1bbf0d5c-88d6-4dbe-bc0b-52aac142f5e6', 'Visitor Approval Required — CH RAMBABU', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('678441d9-e450-483b-8cd8-173f81155188', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('573e19b2-f496-44ea-86ec-7ea2c6f7321a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23b3eb8a-1360-4038-b644-0e9f217e1003', 'Visitor Approval Required — Manpreet Davar +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fadb679c-9729-426d-8537-9c5b0327ff12', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('15e7047b-7297-491c-9578-55415018dadf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b553af04-1a66-469d-a610-79c16e2faf24', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('497bfbcc-2893-457a-84a9-5ebe396808d0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf6e4250-2f66-44ce-8713-8eac0d85b04c', 'Visitor Approval Required — Nithya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2336f7eb-22a7-40f3-9d05-382dc7ec689d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b5a70e1-1e16-49ad-9dbf-6208b9b550a9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fca7aef-5db5-4280-a8fd-81b631808cf7', 'Visitor Approval Required — Vinay Subramanian', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8c30a465-20d4-4535-ba30-348cb300a1bc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ec0a2cc-3ec4-4910-9383-6fd7658c8637', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('345669c0-b737-41c7-9ecd-e8f73055046a', 'Visitor Approval Required — Saumya Mohapatra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae71840b-4a9e-430b-9d66-2784fe77e359', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('366cd73a-6231-452f-b40d-b1862eb9a58f', 'Visitor Approval Required — Karunasri Divi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f48cb6be-6c0f-42e4-bf79-5b6e232b802a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('57228194-8f56-422b-8035-4955633709d0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3baedbad-10bc-44b9-bdf6-1f0887ad1843', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8a0b7a8-d42e-43c8-9462-d34b2a6db26e', 'Visitor Approval Required — Satya A', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b248329e-61f5-4786-b6ec-9f1e98c45811', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7ffbc254-085c-4dd8-bde3-011a28fc0be0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b8d446d-968c-48d3-a835-87d50e01e95a', 'Visitor Approval Required — Murali Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('afee067f-2f27-49c6-a0ad-9f05ace47e79', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1125d427-b6d8-465a-a458-485e8b771f29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ff725688-57ba-4424-81bc-cf74c1f7a5bf', 'Visitor Approval Required — Mahesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('201babdd-676e-419a-9ecd-293d38a4d712', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f763327-7e16-4e8a-8368-2d2d377115d5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d79d5f4e-7b0c-4e48-bbad-75bc2b2eaf8e', 'Visitor Approval Required — Prasad rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a9490a03-3052-4851-83b1-15697e30769e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('864aaaf6-09f6-4ac5-ab9c-802dff102480', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca0afbab-8a75-4db3-8725-44e370dad1bc', 'Visitor Approval Required — Murali krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2bae08d2-9675-4810-a4da-72b53a7a8ba2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b1e25942-21cc-4ccf-af3d-a294a646c89d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7353f458-5bbe-4bb5-afbf-9d5b61433e1a', 'Visitor Approval Required — mangi reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4b304a5-3f4d-4d96-99b5-aed86cf9f3cf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('768fe11e-afc0-42bb-9fc0-3f944205b998', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b7610547-3b56-4dfa-905a-b6582d8b6474', 'Visitor Approval Required — Shiva kumar reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3d712ae5-a8f7-45a9-9674-0f19e0547302', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c71d8dde-7c4a-4add-b9cb-f96a9c8262ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05e391b1-a060-4006-8175-48b5d526f450', 'Visitor Approval Required — Hari krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9e20c59-c2d4-48af-a0c9-e5643e847517', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e5623d05-d294-4cd5-9320-e979f6ab4661', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('619e58b7-9173-45e2-a5d1-072ea467fe3c', 'Visitor Approval Required — Harjab', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bd885b2-9d62-4fc7-be35-4229afaf1b27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2fa2d90-bcf5-45cf-8f4a-436e300ef5ef', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05a411a6-c5a7-46bc-9be8-fe5706d5a0c0', 'Visitor Approval Required — Harish plus 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6c204110-e9f4-4289-bd14-dd6f4c40eed0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c45cce77-6d69-4c79-bd52-a986825392ab', 'Visitor Approval Required — Harish plus 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f97a5cc-2aeb-4972-ad74-6b3abd0b0603', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8dde7718-b46d-43f0-b252-5f9fb123544e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46dd2a72-b983-4c23-9aca-fe9ea6432ff0', 'Visitor Approval Required — Harish + 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29da3610-f332-4ad3-a210-3ff109f8e241', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0651915-693f-4bcb-9a09-28107ea125a4', 'Visitor Approval Required — Rajesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a59ef2f4-670b-4d29-b16c-2c9fcf14342f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('534081d6-d438-404a-980d-2b4b59841924', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('027bec5b-2965-4b03-ac71-92a52a01881d', 'Visitor Approval Required — Harish', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72a54371-0c97-4b55-b1c3-fccc500f81c0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74516faf-6b26-41cd-a726-75da3c57724a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c85457f-ff94-4226-b917-e7d30674e91a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e176999d-48ee-4e78-9623-ecea8fd083b1', 'Visitor Approval Required — Yasodu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7070986-bf62-4996-bc3c-c87c18c9f718', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea0e0bb1-4661-4627-829f-c27dc2151651', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a91c5299-92ad-4ab6-9271-2a7d87e32e6a', 'Visitor Approval Required — Madhu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('906a1e24-c9b1-4b99-a42f-de7623486670', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8447c23f-f29b-4c33-9401-014552bc5036', 'Visitor Approval Required — Shiva k', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4460d12-cfef-4d0d-b080-feb1856de5ea', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('13f32246-a90c-46e4-8f52-0946860f0483', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88213822-d735-4d41-adab-b1ab937cf807', 'Visitor Approval Required — Ramya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29425d69-93c4-4b4f-a2df-c00028dd262c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a6eef1f-da01-4e39-a4c8-c26c3901178a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c98780a0-55ce-4a10-90dd-03d1eaa21879', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f266396-c1ee-443c-95ac-bf8516e464aa', 'Visitor Approval Required — Ramkrishna ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4523cdc2-4a2e-4aac-8e3e-361396265b98', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e241a81-50d5-4f2e-a0c5-641fbb3c353b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1061abf-1e87-4ff6-be21-e8722bfbdd5c', 'Visitor Approval Required — Prabhakar reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c16aaf4f-15fd-4212-b0b3-2494790e2c16', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df40be79-e480-4720-9301-efcbf3d0799a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af069bd4-bca0-4c78-b9e4-9c163d6eb31e', 'Visitor Approval Required — Gopal sharma', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('924dac88-7e39-436e-9e1e-156ae49b6832', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6762f42e-85a0-4c62-bf34-0c89dacd89de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7b97f5a-f528-49ce-9d77-5fc13f7c0098', 'Visitor Approval Required — Amey pathak', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a8239c7-fa51-42af-be4a-2eacc38a382a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e65e2412-8d3a-4e1c-aebf-779b56ad7761', 'Visitor Approval Required — Haritha rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('278e1bf0-78c9-4eb1-bc46-beeeb5385280', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d83d6e51-dc2c-474f-9093-722c9f658ac6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('229cef58-452e-498b-9c25-e08e2c6b3dd7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('578a8bf5-d15e-4889-9a93-6fd52888526e', 'Visitor Approval Required — Abhishek chauhan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39f9a5b0-2637-4214-973c-a5ffc822e745', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f7f28c6e-a4e6-4b70-953d-ca8942119e0a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3850d332-387c-4f0a-b012-115683ea0740', 'Visitor Approval Required — Snehal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88899147-4074-4200-9b1d-6b533f8bed3b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78f44051-5397-49c7-a49c-e3c573d6d825', 'Visitor Approval Required — GG Reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1757e39d-63ac-4039-8faa-9500d2827f54', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01a1a780-7016-4ef5-989f-35450acd43e1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1b120060-3fed-4244-a742-49a5a09d9361', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23de3e89-a849-4def-870f-3882db6db57a', 'Visitor Approval Required — Vinay', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('895ac8e7-103e-49cd-9e51-bcc14e6fdd20', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('756e3eeb-d235-406c-8fde-a32ca5e809f9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9306fce6-5602-4012-af8b-9e2da5ebc634', 'Visitor Approval Required — Mahesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94981269-5169-45fd-a1d0-fc3bcc8658b7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4e003c0-4e3a-459d-9a8d-2755dbcfe15c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40336c01-9cee-481f-b186-92954f5ea213', 'Visitor Approval Required — Tejas', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6bda7d42-ea2c-4fec-919e-6f827db0bb45', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f56012a7-bb37-4b57-81cc-3768f80522ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73729974-3f0f-4ac6-b432-06afb6eba5d1', 'Visitor Approval Required — E Haribabu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d78ca452-151b-410d-a4b5-d07415e57cca', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c528af5-95c6-4bb8-af72-4c125426a1c9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14c4d9ab-dd6b-46e4-85f8-054c34fbddd5', 'Visitor Approval Required — Mahesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4245c21-ae82-458f-afee-9f9ab546e5d6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8ebeb8c5-dadf-4856-ac6b-10dc14c62efe', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f07bac23-b608-4093-8323-60cb7766567a', 'Visitor Approval Required — Sanjay', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3bc9c5e-8e8a-4d27-b639-0ef83a7bed3c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c1e3aed-6897-432d-a65a-ff927e0625de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('57a00aff-6234-4313-9c37-101359e9a891', 'Visitor Approval Required — Radha krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('690e18c9-7fcc-4efe-9417-92be20ee78e3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f12ff30a-5271-4fa7-944d-97ec2f542727', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eb96492c-1bd7-4257-a667-3e65de1706fa', 'Visitor Approval Required — bharath', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7abb3d71-da48-454c-9a87-3d42e88e48e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1c0b88e-d913-45a8-8e27-b7c35c8720ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27935125-3ee5-4a5e-8852-fc97a956625c', 'Visitor Approval Required — Pullaiah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6cf892b-defd-4ef7-9fe5-438b87b57843', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e70aad87-9da4-4839-ac7e-34924391c77a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b22aeda-4ffb-4c07-b500-66cf2dc5da18', 'Visitor Approval Required — surandhar kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9b5c9e9-a2a3-4671-a2c8-97eb629429fb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dbae77e0-70ca-4b48-8983-93210759ef2d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f481c866-0942-40d8-9458-26e0db26411e', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('988a6d39-e7c5-4b09-8ec0-5c8ee6ec11c5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5bf86911-344a-4ea9-b333-d8fcba45658f', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73807625-c98e-463d-bf2a-83186d89a31e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('11506ec0-dfb8-4795-9c81-47a0719c1fef', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e41209d-8a66-44e8-8cea-70320b7a79e4', 'Visitor Approval Required — adharsh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cc81e44c-fe60-4dc3-8de2-1e757d45022c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('714b7471-4567-4c29-bc5b-db518679f871', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('527a43d7-5a04-44f4-8e93-48e02dbdcc3d', 'Visitor Approval Required — bala krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('efbf2ba0-9bc1-4aa6-9d82-9db38a946a0e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6a0db5e-50ed-4367-8736-fbf36f988ac1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94cf4c6b-d868-4897-8ea6-9eaeca5f802d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2f1ef3a-54e4-4634-8557-d290c28bb25a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6f207e63-bc64-40f0-958e-4952d59db0f5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('046c59f4-9a54-4c0a-a6bc-29a3331a65c5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f1dcf92-0911-4bea-9b51-527cc5209f73', 'Visitor Approval Required — siva kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a30526d4-fc4c-43ef-b490-0d922fe696da', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17c56590-368b-423c-af35-584574783c02', 'Visitor Approval Required — raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8368273f-432c-4a68-abe8-6135dd5ab1b0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e73470f6-c50c-490e-987d-fe3173fda949', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d46d538a-d35b-4147-895a-59ce29cf9aa0', 'Visitor Approval Required — bheemesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('444d811c-6693-4b63-be6e-bdf9d7b199af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e2b4d7b3-0c82-4f59-9e0e-a718d93522cd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cd1826b1-65d8-4025-b46c-7ffba6f5bafd', 'Visitor Approval Required — lakshman', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01a1ad3c-bd08-4f7f-bb52-24e5f1ed34ef', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92a583ee-220d-4bbb-b992-42fc57637c8e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('112f905b-ea39-469a-8af9-e5410bb0b86f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf1dff7d-6005-4ed1-b5f3-d8e398ff3f5c', 'Visitor Approval Required — POOL SINGH', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c4bb6e2-9184-4721-b732-c83bc595133a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('acdc2d07-872c-4ae2-ae4b-1c32ca6fdea6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f4dc7e1-c4fe-4d7f-8da4-e44d1c565030', 'Visitor Approval Required — sai prakash', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('567e6b5a-0cc1-4a19-936e-ce274f091587', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8139d694-dfce-4b67-a7a6-dcab80ed7015', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7027dfaf-5205-474c-b689-6362c0c11277', 'Visitor Approval Required — nikhil', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f938fa3-0849-4d56-beaf-ac2f49392fac', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f7beda0-c1eb-43ad-ae84-94c01230c360', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0be85878-fc45-4f90-b694-9905fa175e4b', 'Visitor Approval Required — Sridhar Pilli', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c676d335-3af6-40dc-aceb-4905b655fb32', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d237ee1-8c3a-4129-b01d-7fe87ae93de7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a549e0d4-c658-42dd-b3dd-d4eca3767303', 'Visitor Approval Required — chakri', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8df6383c-2b81-4d9f-9841-37136735810d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c35fd268-5aa9-44fc-a41c-e8927be0318e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d13e14d-1940-44d9-9d33-c49632d0b04c', 'Visitor Approval Required — surandhar kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d248e886-5c4d-481b-85b7-16c6199fbd49', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7011858f-8543-45ca-9728-c44ce86f4eff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4b216fd-9654-4042-956c-53be6e9c744e', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('121b2a82-0b3e-484e-b0db-bb4b9a316374', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78a2c1be-e63f-438f-bbaf-5857ae3240a4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('425041e4-37f8-4afb-b201-59c54d8eba80', 'Visitor Approval Required — yusuf', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d1cbf61-780e-4d79-b3aa-407a1e168a1d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03d31b35-b355-4465-8c52-237902dfae8c', 'Visitor Approval Required — md chootu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8336392f-8039-4a63-9d57-0715f26456ed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e670473d-acff-4d1f-adbe-2270c5903790', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97458279-2804-49c4-9637-33aae08414a7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7afe5c2d-61c9-4adc-b795-c072695a2d1b', 'Visitor Approval Required — Pullaiah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e8ab0003-2bc7-45ea-915c-aa75dc60a967', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f02f48a-eea3-461e-beac-3d9c461bc29c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7580f39-ca95-41bf-a1bd-0c64876a562a', 'Visitor Approval Required — bhaskar raddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ff9b241-7af1-41aa-b8f1-175b26b284a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa0dca59-ce3a-4208-8020-da257a45f5a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a6026ee8-eedc-44ca-86c6-995fb808d0e4', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('acd8fb99-9375-4211-957e-58c1799e7565', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9648064b-8493-4d7d-bd79-abed3a757fdc', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4fc849b-2dc5-4680-9ac2-fe79fcc5b74e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('111237a8-1502-457f-a148-ea4e282dba28', 'Visitor Approval Required — Mohan ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f543f23-6088-4a4c-a64b-cd9a48428234', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0480c1d8-bc1c-4ec6-9b64-bd6722bd8913', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5c32b938-3b0e-4f0f-a777-54f8837f7c92', 'Visitor Approval Required — Rohan ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('adcb7c5f-e477-455f-9981-c7a6a313a919', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b66d7f3-9b18-4fb0-8074-842409e3622b', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('268cbf30-0fa4-4765-8b27-fb6d82591fec', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c639bf2-438d-4e50-966b-92e27385ca7d', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c369cf3-865e-4e51-99fa-efe5609bf351', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a2f278ce-8942-4e03-a291-9ae2170202d0', 'Visitor Approval Required — surendra kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8cd0d2ee-d131-4161-a28e-7f8fef744ebf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eaaeb28f-c16d-4fdd-a543-c2604315ae47', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f5466d50-2893-4b7c-927f-1ab53ce2c918', 'Visitor Approval Required — 	Koustav Mandal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26175352-2a8e-42a8-823d-83a361dd19b7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0e7ef97-93f5-4c3d-8716-8e0f95d76073', 'Visitor Approval Required — 	Saransh Mody', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db24b116-f577-4a46-8ccf-ff7c664292b5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('595370fa-abde-4fc6-8b6e-9a6e2b16bd56', 'Visitor Approval Required — Lateef', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8247cf8c-2f70-40b1-a23a-3316ceb0d32e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29b98af0-1421-46a9-96e4-2cb658b76f4e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ee6c6b30-ab80-41c7-a3b9-b62175b6a6d6', 'Visitor Approval Required — 	Soham Chakraborty', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1d64ae33-7744-4d9a-8fb3-f17ba6b8c3b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ccec76f-3e5e-47cf-b694-8bb6270d378d', 'Visitor Approval Required — 	Ronak Shah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('593d6cbf-658d-4263-a6ec-a2894474ee2c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b348981f-09c4-4b93-8678-e59c353b4386', 'Visitor Approval Required — Satya Adamala plus 10', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53ff3dec-a563-4b4b-9d97-52f6b18c4d0f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b8dbc72-e176-45fb-845c-81ae36081ceb', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('355da9f3-3743-4013-9907-c4d4345d3bb8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d046ef74-f1de-4d57-9ca3-af516204f2fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4350b1d-9977-4215-ac87-26638c97a81a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ace11004-c23e-425a-8022-66f66201ea5a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('725f5072-3672-4bf1-abb9-777a51ad0c9d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a49e750-31ad-4d0b-8a32-e3671f9109e2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3706518d-116b-4f7d-9de4-a3e62f7c9cfb', 'Visitor Approval Required — Ronak Shah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae1548bb-bb1d-4fc2-aafe-4b65b8641f6e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a09f201-4107-45ef-b8b7-f97e9de90e6b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6bf15052-4dfc-4f7b-acf1-44c3d0a6825f', 'Visitor Approval Required — Koustav Mandal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b66269bf-4c85-41ab-a5ee-f8b5d20283c4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c72a6e16-5cc0-4b68-8c0a-e0755e2deaa5', 'Visitor Approval Required — Saransh Mody', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81814925-f972-421c-af28-f5a0a816dfed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('539c3107-e169-4865-9d0a-669f6db06796', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e875b3df-b5a2-401d-a1a4-22f347d2648d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6596a260-2985-4be0-9123-1959547f696b', 'Visitor Approval Required — Soham Chakraborty', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3e1ed30-306b-4ae2-bdfc-03d23ceb38aa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('adf10c85-d250-448b-b2bf-d3db05a87726', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbe93a84-db42-441b-811a-aa6dcfeab111', 'Visitor Approval Required — Satya A', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b250044-e6da-4473-924d-df714d222c7d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35a73777-4d20-4038-a22a-38bbb1c15e90', 'Visitor Approval Required — Zorawar Singh Sidhu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6b156bc-6cbc-4907-bcf5-db5300455b78', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e7ed0b9-2da6-4c3f-bab6-128ad494d0c0', 'Visitor Approval Required — Karuna Sri Divi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('52b4e940-b7a0-4a2d-a677-c48cf1610a99', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c3d05697-7026-4268-843a-157a8e24f7cb', 'Visitor Approval Required — Parak', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce69ce58-7c3d-4756-86c8-3c61d608df6b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1eba8862-659f-4166-ae67-092a9d56fc55', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f7437b00-cdac-4878-b97a-afe2dbebf12d', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('853f6edb-d161-4c53-82e3-a0cc7b70c012', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44ef1a28-0415-4aaa-b088-3267fcab3c96', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c9fdc3f-e048-43f8-a7b8-2c7cc98bed0a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f29b7ada-c61e-46db-9241-a0d8c1d217da', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('caf8bb2e-b3be-448b-986e-26a837a93042', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f87d638f-ca50-41bf-9f11-dc1e7fbad733', 'Visitor Approval Required — avinash varma', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b111889-553c-4c90-9a22-7568b2e08f92', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99226d77-d41f-4ec9-a644-93dec9d712a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a487801-e299-4e41-adda-2837804023e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c9eb429e-a32d-4d02-9018-66a6cc5aab91', 'Visitor Approval Required — Topi Suresh,', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c263557-d2db-40ab-931d-e86bfd24c4cb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af298064-f4b7-4817-8789-2a2e3ab652ec', 'Visitor Approval Required — Manvi +4', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a23b1cae-0b3b-4be4-8adf-a340f5a6e91a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a92bffeb-b602-4d3b-83dc-e4a069c9b0c8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2cca0c54-ab0e-4167-be98-f716576c4598', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('80be3ccf-972d-46d0-8429-96a632257f50', 'Visitor Approval Required — Shadman ahemmed', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0824ccbb-4be3-436c-90d1-d4ab64ce7c34', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc222477-268f-45bc-861a-52be1fd1f2f7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('36f92a0b-0bb3-48c6-bd38-ff3ae5ddb66d', 'Visitor Approval Required — Laeequiddin plus 3', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51d4b358-f509-48a1-92e9-6169c27c0a3f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f2ec76c-0d1e-4612-bda2-7f29a1efa0b6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9abd5994-a28b-420b-89f7-83e454b176f3', 'Visitor Approval Required — prabhakar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0c512a6-dcdb-4143-8224-e172dfdee82b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('83538f8d-e109-42f2-bf9f-91aacd133fa3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28996555-f80d-41ea-9eaf-9cf550de14b5', 'Visitor Approval Required — Johnson', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e25fcc60-a651-4254-ae89-1cade128eaf9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('258d4beb-aed0-418d-a573-19bd4f02e1cd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a266073-1ca9-4656-bdfd-cf6d6d8cf8dd', 'Visitor Approval Required — n v s prakash', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('749f5d63-4b0c-4211-b6f3-42d0487d9695', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5bf58239-0c42-4596-9820-3c90075cd012', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c932b492-9b5d-49f0-82e7-cabfcca050c5', 'Visitor Approval Required — Ashwini Shukla', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a48c32d-0f9d-41ad-a87d-88c09478f06d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f1eeb057-4289-4d88-acbd-a49f199ce53d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1646dde2-9552-4577-8619-3c119bbad446', 'Visitor Approval Required — Major Shiv Kiran ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b3c209d8-6ed3-4244-915c-4b7bdc5b5176', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9ea1545e-891d-4bea-bee2-7a6d254184f5', 'Visitor Approval Required — vijay kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4eda6cc9-bec9-4b6c-912c-57a56470c41e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23d64b82-f4bb-4768-a788-2373ecb5213b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e780a5e-6549-401f-a588-3b24cf34d57d', 'Visitor Approval Required — bhaskar raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65a3f348-436b-4f03-93c8-1cd2a07bd981', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea6f6f73-a6af-48bd-a6f3-e0bfa2a0fe88', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d8a4eaba-38ad-4ae8-8654-520aeb345056', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a9ba545-5a8f-45d5-83df-08b80163bc3c', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1865dc0c-4416-4b55-aa9c-20acea42670d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cdb3cdab-913c-44b5-8c16-88651d5feaf1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ee7f73ca-b0c6-4dd1-8ca1-995837489ba3', 'Visitor Approval Required — Chidvilas', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('60e2446f-efbe-45b9-84ff-7ef8731d0397', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be20802c-8ed0-40a6-9cab-e7625e4cc496', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28f8928c-7929-4f35-a625-259df1255711', 'Visitor Approval Required — ramesh babu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('568bf52d-9d7f-4802-abcf-cd4a9ef50e40', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('772a201b-69df-495c-83d2-0be2ef8ed0f7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('254ffa3c-2764-465c-a604-335174077592', 'Visitor Approval Required — Saravana kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e7cdc990-6799-4f0b-a03c-3f750b7bdbbe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7298f07-1493-4bd2-a022-d266956268f8', 'Visitor Approval Required — Sharan k', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d66b433e-7b47-4ae1-ac83-fca2d8984d7e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12d367c6-89f1-4754-bf81-64295bd4d9f5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97d78075-9cce-4583-ac1b-144ec845c288', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e32e5ea8-7b98-4818-891b-277cc55add40', 'Visitor Approval Required — Gulshan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('131fcb35-c728-4df0-8430-c1bc5268546f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('62a1edb4-7801-4964-bd75-a834714c251d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('598c3382-8521-47a5-8f70-9eb16b2135b5', 'Visitor Approval Required — Gulshan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a360f757-e26a-444d-94e8-f78934e5cc00', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d6b98c8-e927-4f9f-816f-506721f5395e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a16d20c6-05b3-4311-b654-d59176a9a2cc', 'Visitor Approval Required — subramanyam', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bfa363ea-f563-4789-b7df-bb2bd34ffd6c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e693a5ed-0209-4bf4-bbea-d0f6af94d86d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('38f0fd00-243d-4714-a813-8b40d523731e', 'Visitor Approval Required — imran', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('18389af9-6168-4967-835e-50090ca0d474', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0826dc9-7f33-4d54-8a74-577c5910827c', 'Visitor Approval Required — Pullaiah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('446bbff4-532a-4ee6-aca1-7210e5becdbd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c8a2d89-0222-4e68-a500-6025ba672209', 'Visitor Approval Required — Surendra kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c661d2e0-5133-4800-8958-92a8e17c3a4b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1bdbfdf5-3a88-4052-a342-dd6913a1f815', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f24a11f1-4e19-4025-97dc-9069fd4b88e9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('254b0262-08d9-49b5-8017-fd65edd458a7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d001cca5-8228-4eb3-8204-e5e4fcd47323', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe72d354-8c05-4ad1-8796-299d59e371d2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23c53baa-195f-4330-a915-661b3c58bba3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7e44d80-db79-41e5-a6da-27e0cce4778b', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a7bc709-119c-428d-9bae-f51cfcc20787', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7dcf331-b4cc-45ef-bfaf-40889f041bd2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fd76d192-3382-482d-9941-fd428ce4dd60', 'Visitor Approval Required — Shiva kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29e5d0cd-ed38-4d29-968b-c7d2266de2ba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3a60dc9-f294-4a01-944a-ba38e36e8cc9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('06c11e2c-d478-4608-851c-43e213e396f2', 'Visitor Approval Required — Johnson', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('495c20d6-631a-4c70-ade3-3bdcfcde58eb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('469472b8-1921-41a9-9ab3-e53257470d2f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6fdbeb54-cc1e-4534-8caf-4b32fd2c5e15', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('13b60dfd-1a40-4a5e-b11c-fd083a1e7ae3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('277ea687-6ee5-4197-9a2b-3e98f8ba2c94', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b66f752-a68e-41e4-8e41-ced04f297995', 'Visitor Approval Required — Ritu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('015484e4-705b-4849-ae01-a923d7a0fa2b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b7f9697-112f-4f6f-ac51-16705dd35269', 'Visitor Approval Required — Parth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e44526a-3748-4a31-8194-4bb8e800e822', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08ebc109-bb7e-4369-ba3a-7965c6a2d750', 'Visitor Approval Required — Amber Chawla', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d1b51a7-0502-4c86-80b0-ec128289127f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46f8faf9-3e10-40a8-ba02-31a5ffe33bd9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d48c6726-8228-4aa3-beb5-958f8e5704bf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f66870de-f022-4b8c-bca2-357993ea4bf3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08fecc69-fe25-4897-b55e-34cd0607a8d2', 'Visitor Approval Required — Laeequiddin plus 3', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e2318d9-1006-4149-8350-4b4d2f5a8f23', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('814a3d23-b72d-4eb4-ad70-ed1c01d22d06', 'Visitor Approval Required — Joythi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c2089e3-6305-4a0d-b95a-14d97c60500d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('989989e2-0d69-4451-9c42-e7199eb734df', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4281aec-f009-4d0f-8d80-e8f19c3395ee', 'Visitor Approval Required — ramesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cd6d20fa-62bd-4a57-88b5-80671aa86c6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3f470dd-c655-4b58-9a33-975b16c725fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65c87d70-6840-4ba3-a6f4-11d4a6729f33', 'Visitor Approval Required — Kishor', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c52a0ecb-2085-4d6c-aec1-7498ce3493ab', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('190d17cd-6c1b-468b-8991-684bc06f82df', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('38f0a98a-1c3f-4e80-909d-a521c5f44cd3', 'Visitor Approval Required — Gopi krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e344ce98-005e-4063-a382-b1f6b4ea2145', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89a46037-bc07-4967-9a4b-3524e9b23270', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7800a398-b4c6-4dd2-9def-e1f913be6f47', 'Visitor Approval Required — shiva', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('656e5e65-4202-419c-9c9f-d085e067ecab', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('00a3df01-ef57-45df-b798-5d8697049532', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbe19b14-2e20-4f7a-a430-c3a32fc2041a', 'Visitor Approval Required — Anand Kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('da9972ee-0c80-4ee1-b4a4-b2a44ff12d3c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('66b2b1cf-8d5d-4d04-ae91-f9e4880a3fff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb9f7498-b3f7-4304-988f-922944680fd9', 'Visitor Approval Required — rathnakar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df08fac2-1ff0-4d9c-877d-94a88b4f1aba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f73aad4-49e1-4f3d-af46-dc2be1f38af2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('939b8359-0c1b-4be3-baa5-2c71f592599f', 'Visitor Approval Required — Parahuram', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a12ec598-8e99-4001-9e63-1943ded41700', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2451566-8e78-43b4-a364-c9865e0f2fff', 'Visitor Approval Required — Rama Rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('19ff9d92-c344-4c3e-a9cc-3dd3b0ca09c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b7ff77c-e1b7-4296-8b3e-8fad3e409f04', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4399b131-e13f-4b34-8e9c-32dc76467cfb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e48229d7-835b-4f7b-b248-cd7262e396cc', 'Visitor Approval Required — Bhaskar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5bab0446-632a-42f0-88e7-a8a87ad0033f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a45808bf-9b28-4277-ba71-116a6701fb8d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39858525-ef34-4c7e-8323-02ec39fc6a17', 'Visitor Approval Required — Sandhya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9b0adabf-5428-44f7-80be-aef2dbed37d6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4da83f3d-ffca-473f-8567-cad1dc9ef80e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6e0c75e-992d-4bcf-8dc3-f2e074633f03', 'Visitor Approval Required — Harish plus 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('355b5ed1-29f7-4d50-980c-aeb9c495d2c6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a58626c6-2122-4200-82ce-33dd59163bb2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a9c51916-4d5d-4033-abc8-801d02fd8573', 'Visitor Approval Required — Shankar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5572997f-33dc-494a-bea4-8d3be292a6ef', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91e34361-a379-44a4-9c7b-c477df2b3dfb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79cc37ad-8409-45d3-a92b-8bc1b256f553', 'Visitor Approval Required — balu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('70364a32-087f-45aa-8cca-9db049bf8e96', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9a6cc72-34b7-4d03-9db8-4486f21fdcb8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1578a687-4a23-44c3-b8e0-74c3eb80a80f', 'Visitor Approval Required — Anil', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('36b10808-4677-45ab-909a-2ee8676bba04', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d55d50f0-6efc-42f8-8c41-df040ddb2bc1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a8a79a4-2cf8-448e-98a6-b7f7687e310f', 'Visitor Approval Required — Arun ravi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e87c5ef-d38b-438c-b52a-5df6628793d3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('42546aac-8015-4cba-bb70-f800f079186b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('58134186-c536-4ccf-9631-a3b191f01b0a', 'Visitor Approval Required — Rashi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('77653596-aa81-4306-b6eb-9e33d08055fd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ca10fee-9830-4a4d-82f1-71535d83d73f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4beea8a3-16f5-49ce-a1d6-298c47eef427', 'Visitor Approval Required — Vishawa plus 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa40582b-685e-42b4-ab7c-48784760a5f5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3588226f-18d2-4d63-8b08-7cc56dc634fc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e2f4283c-ef79-4442-a51b-d551d2a210e1', 'Visitor Approval Required — Phani', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9219d76b-0452-4615-9332-02991c9c6e98', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d37b833-2084-462d-b037-f8da937dc820', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ada4ee1f-4cd0-409b-b311-2eeec9be6c10', 'Visitor Approval Required — Mihir Shah and Tejaswi Prabhu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a71e8308-60da-44bf-8962-567cbeda3768', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6589a6a5-9d23-4c6c-8d64-fe30d1d38902', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4ee78ca-37c0-4f9a-96d6-4a24567b0735', 'Visitor Approval Required — Azar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56fe8b5e-5835-42e1-8400-3658df8243f9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e0023ab-806a-41e8-b39b-1697fc19f1ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2dab062-2875-4208-bf06-d2b3ee49cc2e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48d457d7-5fb0-471e-8b37-a1072e0d0454', 'Visitor Approval Required — Abbas +1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bdd1ac6-a8dc-454b-ab74-6e990ae5e5a2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('825b4305-35bc-4d2c-8fe8-12f46c2e492a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cb83290-ef4b-43e0-912b-29dde6e04256', 'Visitor Approval Required — Aparna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03d8812a-2cd1-4e4b-a3fb-4f33953f6bae', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('743e63af-e917-4703-927b-454f58cb8fcb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f956b05-a0e8-4c2f-88b6-4a2182b2089f', 'Visitor Approval Required — Suresh kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6084b787-dcc4-4258-a132-654f910e7d8d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b11b958-2c69-4ec6-8903-250fcbb62840', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('625f2986-4165-46aa-9cbf-3e1f2673d269', 'Visitor Approval Required — laxman', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a322819-1c34-4c30-b1a4-e750c1a9bf45', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7cd5df0-d1ba-43e7-af2c-6617ab5f7e5e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('911fbf11-f3da-4b68-8077-16dd591c2986', 'Visitor Approval Required — suredhar kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2288bf20-fe7f-4090-85e4-b090ac593113', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('518e609e-9580-4618-aab7-9b5c7999b571', 'Visitor Approval Required — pullayya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14272bc2-c6e6-4725-bc5c-27b7fb4ec730', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64d56ec2-e43d-4a7f-8b0c-0c69f636c888', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72501a99-f14a-45ea-b500-de3168568c29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f7cc0000-da5f-4361-8cef-e048a85a637d', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fc31ca7-4732-459d-b976-7988fdc200c2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bcd81d2-a0b0-4dab-8451-07382e2040ff', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd03b593-4ae0-44f6-8356-1b8867315250', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e95ea26e-6912-4b64-b2e6-d29c97b970e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c40d0fc0-2bd5-4b3d-9261-602070e566ae', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a6d540c7-3569-4952-9575-da8636df2e28', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72b8bad6-2e48-4877-8e76-c6c1e78788d2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('218fc449-780f-432a-9dc4-5bf977897c9f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5d1a190d-13f4-45d2-b67e-35ab99e4e418', 'Visitor Approval Required — Natraj Singh plus 5', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4c89890e-8d6d-47ec-982c-b6d44f70ebf4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('300a4cb1-9184-4f2a-b9bf-efca79b2f015', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('598ddee7-95e3-4de2-bfaa-b86e098296d4', 'Visitor Approval Required — Satish PLUS2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32914e7d-67e1-4ad9-a491-afec503eb9d1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72083250-f0e1-4e52-8f83-7203a3a63f5d', 'Visitor Approval Required — Suryaprakash  + 4', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8eb71d1c-5ebb-4ad7-9b9e-7a7e7cd978a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9046af2d-ab63-4553-bcfd-43ac45ff3773', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3514b431-c91f-4d4d-8720-519edfb24779', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73192c12-4483-4f2f-8f29-1f72c5278095', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae99aa6c-e003-4965-af87-4f67af597523', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97b9adbd-cbe8-4596-9b79-8e6052fba20f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ba2e0e09-4054-49bf-9e2a-f43165bacbca', 'Visitor Approval Required — Keerthi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('982573a7-7899-4fbe-af2b-5f06760707e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('691852c8-6ff6-4bd4-8651-fc63f201e178', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('265d8544-9b25-42b4-85f6-0148612ae2ae', 'Visitor Approval Required — Sreeleka', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd617e37-a2b9-407f-975a-af5d329c026c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89313bee-a390-4e76-89de-71907f6f0776', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16f90b7e-3f82-4fca-945f-36c7052e79a5', 'Visitor Approval Required — Durga prasad plus 2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('523b585c-64de-411d-868c-3623e69a15de', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6a58f45-190f-422a-ad5e-c2886758d1e5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f59a851-7bb3-42ae-93a2-8626965bde35', 'Visitor Approval Required — bhaskar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e6f8e476-af83-4deb-8b6d-293b8af4fa2e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2d6790c7-9843-4040-bb5e-897e70225195', 'Visitor Approval Required — Satish PLUS2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0da5bef-fa8c-4f91-9ce7-536abd991bc5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7478798-70aa-4bfa-8fe9-4457e09caf4e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4305acbe-a0de-4e9a-a854-3605569e3bd5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b67fab4-2ed0-4aad-81b5-c40efc674705', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3386e2c1-c62a-47cc-b818-8f51d4e964a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('923bc1b4-1791-49d9-84d9-98b7fe2ca1cc', 'Visitor Approval Required — KARTIK +8', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4edac86d-8784-48ad-87ce-474471527b8b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29c5d582-9a3d-4e3a-920c-fee86726bd53', 'Visitor Approval Required — Ritu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dab4a7ce-18a5-4858-a280-a3242be203e6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('54b9d996-6cbd-4ebe-8566-2dcf57f5ef35', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fcb4be7-c9c3-462d-9c15-a30c76554485', 'Visitor Approval Required — Amber', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf189dd0-aa49-4606-8afd-0aa7ba92cd47', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03ff29b6-2e54-4273-ad22-81477c9ad88a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6b5330b-ef9f-4a51-91eb-441dde1610b3', 'Visitor Approval Required — Sundaram murthy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e5d5f11e-4a38-4de2-a4e6-50d658fdb2a8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f95ec6f0-34c9-49dc-b1a6-fa255f617bb5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b4830638-c669-472a-a643-cc189a6421df', 'Visitor Approval Required — Ramesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55a28fcc-ae3d-4a07-a239-ffc0274680d2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('63a41044-9d32-4eec-9a0f-9e4d3c79177f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f17d12b-bbe3-444a-ae35-55d93c5a6239', 'Visitor Approval Required — ramesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78636702-b35e-41aa-ab25-43b042a3323a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fff9f9c1-40a1-472d-af99-71b124a5519b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d21550e8-d5f4-40a0-9e63-77181859e72a', 'Visitor Approval Required — asif', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('786c8ff6-fdee-4e90-9f9e-282f541d5662', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('182ba99a-2b1e-4bcf-94ee-9c32ebec3be3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('33e006ed-adcc-410d-ad11-18d652be4ac1', 'Visitor Approval Required — Akashraj', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ed24cd44-9baa-4e08-9a7d-60d9cb54971d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccf45f04-3ade-4531-9fcf-f42efa2c4d1b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45bed370-1927-47ef-8f4d-29a9b1f56e97', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ede20287-1b89-42e8-b597-38673fc3b7bc', 'Visitor Approval Required — Stalin sahayaraj', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa62d012-fff6-463f-933a-ed3d4776ef62', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('21ebed9b-b927-423c-8d0e-6aff65fda8fa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('999869e6-745c-4a27-93dc-c34c9fd55455', 'Visitor Approval Required — Prakash rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('800e23e4-2c01-48f8-a2e2-d45b8c0b7db2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ce01b4b-0d51-4443-8693-9131949f0ba5', 'Visitor Approval Required — Mysura reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a597378d-9579-42d5-835a-c2b4022fb788', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('390062fa-8df7-4005-aa3f-6bfb202c4228', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('868cfdac-06ac-43c3-9dd6-97c9fb21788a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c13ccd7-846f-4cbe-b468-3929abba4108', 'Visitor Approval Required — venkat', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('700be2f5-723a-4497-b83d-9846e4238339', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c38f23e9-5396-4d4a-a5f0-a9e321b2b7a4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('59553a88-5df1-4558-b863-8cde42a9d394', 'Visitor Approval Required — Vaibhav', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a5af6821-2c2b-4794-b722-b6450fd308e5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3be7e948-6065-4cac-87fb-dacc38644028', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a891d48e-8204-409d-8fc8-a1b3ee78459a', 'Visitor Approval Required — Narayana', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e2dea6a-8216-403a-be39-6891147e25ce', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8bc98579-f4c8-4878-a748-42d6f42d9f3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea0dfcbe-e7fe-4ab5-9561-9f91e617a437', 'Visitor Approval Required — Sudheer kumar yamsani', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9face87b-d65d-4843-8561-c5440c9eb70f', 'Visitor Approval Required — T Ramesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4f3a00e-e9fb-47c8-a8dc-b36bb2961d18', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bbed1a63-2ff0-4a06-9c27-9444c57befb2', 'Visitor Approval Required — suredhar kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1dd47a4e-d79d-4395-a589-9b5af3a447e4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('541cd970-2f35-48e9-a9c9-fff7a23a62b4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4268aac8-9bd2-4e9c-8204-39547680383a', 'Visitor Approval Required — gouse', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f181fae0-32ab-4106-b09c-5c0e4f809de8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dd90cba4-47dc-4b7c-a83e-79b9ecda1d88', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('152ced2e-7e31-43c4-8b80-85c6a7bd38b8', 'Visitor Approval Required — jayanthu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('487a8827-d350-45b4-8536-b7b435dacc27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8dc8088-4ea3-4192-a940-edd6e9411f4c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8553bedd-1df5-4478-a0ff-7a065261bb36', 'Visitor Approval Required — P BHASKAR REDDY', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('11bcc026-f476-48f6-baab-53cada375741', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('065d6677-f848-412d-9e13-9a6711d2953c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('47f7aac6-da22-4f32-be31-13ad41b39b14', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('767db9f7-e830-412b-b449-7826aa148929', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7657df19-2e06-4ef6-bc61-f1d2deeeaae7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49e6d8b2-134d-4682-aff0-32334fd7f003', 'Visitor Approval Required — Ghousuddin', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f92b391-21d4-4c78-b4f5-f0034320545f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4d8a360a-9c96-475d-9f33-3e763062bf09', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09e202ad-46e4-4150-bcea-07b1922b0378', 'Visitor Approval Required — Shabman Ahmed', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7a1ebf0-5f0c-48e9-9e30-1f8c86223aec', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56b01f14-5384-4160-8240-a9c0530c6127', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46387db4-cdcb-44e6-8ae0-022a418d27f2', 'Visitor Approval Required — yusub', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5f05c7e-009f-4abc-8545-1d3b0804fa91', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b96ff445-845c-4807-bf47-41c361785407', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('acb33674-0bde-4bc6-a52b-c6a76d155ff2', 'Visitor Approval Required — Vishwanathan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d26f86e-25a3-4e2a-a01b-28fb7d7e3fad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('032a607a-677e-4642-b825-dc69beb5a44f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e666696d-411b-424a-bd22-e3bcaf3ae0d4', 'Visitor Approval Required — Ramesh babu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24c94c5b-eae6-409d-bb2f-3f6eb2662f12', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b1bef26-1b56-4139-ae72-c2f2a72d3bc2', 'Visitor Approval Required — pullaiiah', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2efc2a9-35c4-49d0-96f1-b50002ce2fe9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f9eaead-5ead-4f32-abf9-6068a9bfda21', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f01457fd-29ae-4bcf-b691-fec82e80050f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95fd6eff-be87-4348-8574-e985e8c49d71', 'Visitor Approval Required — laxman', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d91304a-c88b-4d3e-ad8d-4abac02c58e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4386574b-5a40-4b7d-85ba-663a70ce7440', 'Visitor Approval Required — srikanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccdd6b37-14b9-4281-94bd-c851c8ad6bc4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('76ecbb0e-2e0a-4c8f-ac01-f42d0873068b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4882286f-43c2-40a8-bc0e-756b67286bc4', 'Visitor Approval Required — hariprathap', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d01e8afa-64b5-4412-a268-8ded265faf43', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d0e253a-80ba-499f-b47b-9ea721b757da', 'Visitor Approval Required — krishanakanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09d620fd-880c-4ed0-8f9f-371a2e2b1800', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67e73226-3058-45d3-9b36-e7d163ff1f73', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b198a3f-1c93-4b56-82a0-c92cce1bd717', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0afe203a-9680-4c46-ba5f-337a4608f666', 'Visitor Approval Required — amresh kumar ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40581fcf-dd99-402e-9b1e-cd4edf224a92', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b52fa5c6-bd8c-44c9-b96e-721f1d445c35', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1745b894-3226-4176-aa8f-a10d410da326', 'Visitor Approval Required — gaffar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ec3e1ea-cd5f-44e6-8e93-ff088d735c8d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f75dc000-216a-42d2-bf85-8d3b1ff69971', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1661408-e4b0-4182-8f09-cab309d7c34e', 'Visitor Approval Required — Rutu raj', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45b34585-2b5e-4315-85c9-517b2c37c665', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28ca60b2-8e99-49e2-a205-7fa341f6972a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('110eb8c1-3a03-4f1b-a735-2014f9fb3181', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a7e70d4-65f8-486d-ae83-82f4e8980532', 'Visitor Approval Required — Dr Rajkumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8914b131-c7a3-46be-87d4-39b48c4999b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45315475-6dfb-4cc1-af15-ced52e4b5753', 'Visitor Approval Required — Satyam plus 2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43eb46ee-b1d3-4790-9991-f7458b36225b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bfafb6f-36c7-49d0-89b1-b043aa9ccf8b', 'Visitor Approval Required — radhika', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1453843-0a50-4564-920e-ab468d56702f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7bb65dfe-8f9b-4dab-9689-bff64e4f6069', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a94c763d-6d75-49bc-98b6-4e6487937e23', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe19e14c-efb7-4b52-a5e0-36cd519f9bdc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f06aeee8-a6c2-449f-aa10-4343b13b1642', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0413a3a9-7acf-4be2-bd93-90729d779d7d', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e526f80e-9053-44d8-8605-fad3b909ff41', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65c31364-e950-4939-9b2b-77adfad388de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3755b578-6d67-491b-a2bd-8be80db466ce', 'Visitor Approval Required — PLN VRao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1b7cbb34-0235-4c1a-b973-1e41a5cb42d3', 'Visitor Approval Required — Nagesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e9fa675-2ec8-46e0-baa7-35d2810a8d3e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48e36c3e-12c3-41fa-ad3e-d34077637301', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bcc75d2d-5ed0-49be-9085-b1803f79feb4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17968074-80f8-4df9-a7f1-669fd8350ab2', 'Visitor Approval Required — Devender reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79c76ec8-52ef-40b4-a966-7a92a2e15913', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d4643c3-72ff-4893-be76-76b03b61da67', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fc0940e5-83fa-4fc2-aed6-26a0f5a04cd2', 'Visitor Approval Required — Muralidhar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7ac64ca1-13fb-4cf3-9099-b839c7a79d04', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('554d41ae-913e-460c-8af9-d5c8a0f49846', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5fc01b80-ac71-4ad4-9da2-de219d98759b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32817a3b-0587-4d53-9dee-b573e9ebfa30', 'Visitor Approval Required — Dr Raj kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('501c8a17-1e62-421e-bd0c-5d0fdeaaab9e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cecb897-cc64-4dbd-89b8-b23eb275d532', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4be95a1-6427-49f1-b538-29506ebaec52', 'Visitor Approval Required — bulli babu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf48ae02-b57c-4ce1-88d3-6ed0aa7be641', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cfe730db-f77b-4ae3-b14a-d4013ef43cb1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('055ded7e-d188-4ac7-8d71-ff15e89852fa', 'Visitor Approval Required — Rajini', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea817a7d-2c8b-4e90-8a94-855b4a7f95e4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7b85ade-a8b4-48f9-8d34-7a37487654da', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cfee223-29eb-4603-915f-b05fbf1a2353', 'Visitor Approval Required — Gourav', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a4f1bb3-53ac-471a-b461-efc60c2474fd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f0e073a9-2660-4a13-9259-404f36af575f', 'Visitor Approval Required — Ram gopal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67ac4166-1fd1-4597-8136-823affc94724', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c425d201-86a2-4dc5-ae16-0a506b13a5b8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17e45821-2a6f-4f58-9696-c177ebcfef5f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81d07cb4-443f-484e-990e-2f7583038201', 'Visitor Approval Required — naresh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4492529-5911-4023-967a-ddad41cd84f6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94d8f56b-39f3-4171-a633-905e4f77a63e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f92931e-5de8-4cc5-bbcd-8c1a412be413', 'Visitor Approval Required — Dinesh plus1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ade76957-d3a5-4e33-b4e7-8ecb4e35f0e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5510350f-979a-44d3-b408-8e950835a88a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce52afd1-cf88-43eb-a224-f15cec1fc6d9', 'Visitor Approval Required — Laeequddin', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67819bde-ee3d-42f4-a836-ed9314a6cd3e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f630b8c-c2cc-41a5-bb5f-fee377828fcd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e6c48dd-afd8-4356-9357-71d5c2bec696', 'Visitor Approval Required — Srinivasa rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('299d5acb-3003-4396-81ef-c59757c15473', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81becc5d-9e3a-4b80-982f-f65fe8815f2d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbcad898-7185-4c18-a031-c2ec329d6eab', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cc3ee28a-8774-4368-9f64-8efbeb6a7bda', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a484103a-44a0-491b-8606-fc1bc92e76e7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e3e86bb-7e46-4238-91bc-3a8780e604d5', 'Visitor Approval Required — ratnakar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c60cdec-2120-4f46-9ac3-7c15fc3aec5f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('77f596f1-3711-4f78-ae17-ca6911a8b3e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('537e671b-000c-4047-a38a-007a9083ceaf', 'Visitor Approval Required — Bhanu prakash', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f634fdd5-6535-4889-abf1-a0842e01da4d', 'Visitor Approval Required — Parvesh alam', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e55f1d8-bd66-4aea-8c45-f0c1628dc71f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('caa13ba9-9ec9-47e9-a9ca-731a02e2adad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e78bf94-a673-4ba7-9f59-6f19d5df8053', 'Visitor Approval Required — Saida reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae472e6c-f87a-40a1-8153-c109de977919', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97e0af44-3b8b-4210-bac6-59a5db51bbf1', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e96ad131-191a-4805-a082-b2c1e47226ba', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88220702-f494-4e95-ad57-024a98a8a4bf', 'Visitor Approval Required — Him Vardhan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f398a812-5b8b-4615-aae6-caf072ca4dce', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('50737085-24f2-4fc1-82b9-bdd11746369a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('36b8d107-93fa-49d0-ab58-7c9a1af2474a', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('abdc8d49-318e-4c12-85f9-0edd366b3648', 'Visitor Approval Required — Him Vardhan plus 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('04c4daf9-fe21-45b3-9d8c-5e9b30293c63', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dec96bb4-8b66-4a46-92ad-2cbeb46a6219', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b549b98-2321-4a28-907b-299b6b0c4d89', 'Visitor Approval Required — V Subramanian +1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a27ccc51-39a7-4631-ba5a-c7f4256e1ec0', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e67ca71-be53-400d-8c6f-6d9584f10707', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7483bb5b-31f6-47a1-af5f-7717dd2472ac', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55b324f4-59d2-4a85-a327-1bbc13e59007', 'Visitor Approval Required — Gomathi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eb90c538-e921-428c-a221-7fe3fbba1ee4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('90393e3b-f471-4dab-a032-846bcc702143', 'Visitor Approval Required — vidushi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53b64bfc-f614-4d30-92fb-808cf323d5b8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('afe10039-f7b6-421a-ab10-a8041551a98a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56f7f8f8-e4f7-4df2-8783-57f4f1ec911f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72b73a93-0888-42fd-96fb-01d6feac77cd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3114862-6810-4c4e-aad6-dbf3594755aa', 'Visitor Approval Required — balaji', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c76bac4d-7ed3-420d-bf46-0cebd5d63719', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('034d6a0b-6691-4cc3-9ed0-7c9712a27cc2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92920ba5-91f1-47ac-938e-0ceacb393910', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8c23a4e2-1cfa-4eaa-a0ce-111cb8046523', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94056107-5536-4cf3-a2c8-68f35daa1787', 'Visitor Approval Required — suman', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('587c0a88-4b70-4a59-b24d-d6a608e95d0c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cd5342c-64ad-4c67-a1e5-b64817f17147', 'Visitor Approval Required — ravi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73040df8-0332-4fdf-9722-68b4b382b383', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cce858c-558b-4459-b174-80f56a96615a', 'Visitor Approval Required — Shravya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('18cfd879-d2d7-4a04-a93e-1920eeb0033c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d85ec756-328a-4407-b663-8ef872d51d29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4f5a19f-19f6-4950-8af0-449b366929a1', 'Visitor Approval Required — pulsing', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b9dbf1e7-d7ba-482e-9a97-0bb6e93a5aa0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7bd3d088-7f36-4fe7-a3f1-33e04f170518', 'Visitor Approval Required — Shravya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2897c63c-5ec1-4f43-87aa-b4904d1d5ada', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3312137f-7090-4600-8ad9-445c4c31b63a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('309528e0-8614-4673-9fc6-daa9b49c1802', 'Visitor Approval Required — suguvendhar ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a585dbf0-2b3f-4754-9c88-6f5e0b4d130a', 'Visitor Approval Required — ramannamurthi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af0db707-f526-4cc2-afff-07dc685cfa46', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3115d17-77d8-4102-9c2d-7f2e7bb297fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75a877f8-2161-44c9-ae7d-2f956082bfed', 'Visitor Approval Required —  Chiranjeevi K', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8a7810b6-d770-40ef-91c6-0f495958cc75', 'Visitor Approval Required — ramakrishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('10f5b807-ce52-4803-869b-302239c18fe6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2798fbe-9c7f-4367-b859-0f2da2dd5992', 'Visitor Approval Required — Sunil Tulasidas Patel', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d896a0e-3226-4568-9b71-50307428adc6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f8fef130-a367-4bfc-8a56-e70bb80720c4', 'Visitor Approval Required — Kiran ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45fb1b6b-c53d-4e0e-a176-e653f7ec1d9d', 'Visitor Approval Required — vara prathap sunchu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75c67632-8c97-495d-aa9f-03ab89b8cb2f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0faff0a4-5cbf-4130-9bba-a59995eb50eb', 'Visitor Approval Required — Raja', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03ffc721-5634-4f8a-8f37-b728bffc6ee2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6d554ac-93db-4cb9-95dc-df010ef2f6d8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8cb2106d-4bbe-47f1-9e7d-75fac428ce26', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5530db1-7a93-4a3c-9799-3869d2a0995a', 'Visitor Approval Required — nageshwar rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c9e543b-6b8d-41a6-8dfd-866c5f9e043a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a7e1fec-cb70-4f1a-99f9-3a29afa4cf80', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d2c374a-025d-4833-8064-83baa136854d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b09c87db-4e81-4046-9f24-8372977db9ee', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e8f8e923-bfec-421d-bedc-a811907ad6e3', 'Visitor Approval Required — Sai krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94ae39eb-033b-4f6f-a63e-a57a6c6c72b3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('081a457d-5f1b-4a46-b528-ad594d75c858', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('664f951e-c04e-42bb-9693-626d1d3b22fa', 'Visitor Approval Required — Kiran+1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('181240a7-4062-481d-9dae-3dc91bdb0ba8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39a05b81-39cd-443b-8479-08c5e2d88238', 'Visitor Approval Required — N Srikanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('904d623f-26bf-4265-a37b-fa132e2c065d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d5b5f78-cda2-4098-9aae-2126e32fd8f7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9393e47-65cf-42cc-a3bd-bea18cee8f7b', 'Visitor Approval Required — Suma', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1c1b74a-a2ed-4606-af9b-11dc768bfc3f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cdfaa18d-d75e-4ca4-be8b-9daf3ed3a3e5', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5d532726-9b8e-43e2-b330-4c137fcfbcc2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('86240996-aa2e-4bfb-9ddc-428138023ecf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f96e62d4-4ee6-4a93-9f62-4585a112b3be', 'Visitor Approval Required — deelip', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44265544-50cf-4573-9805-db8c2c5b9541', 'Visitor Approval Required — Musharf', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41fd2167-f570-4cae-ba62-d9f395611e5d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0defff1-d55c-4878-bb9f-7806a195cc86', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72857cd4-4339-4f04-837d-7f2534605b94', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d18047ff-8d52-4442-bd7c-d98605c521d2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca5d0547-b212-437b-b6bf-218ad2f00712', 'Visitor Approval Required — chandan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('831b79ee-afd3-4d78-917e-122e6390b202', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('30aa939b-c657-473c-92f0-f201091a3e43', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f66a6fa0-d49b-4f65-85ff-6dc686266671', 'Visitor Approval Required — Vishnu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8fd3c85d-12a8-4a34-8148-6881f769f40a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5c309117-5e15-40ff-ba02-be0523917e5a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('434100dd-4a98-4a7d-a557-5918d118960c', 'Visitor Approval Required — pullayya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6121f37-959e-4e2d-951d-86031074ec3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1d992679-38c9-441c-aad5-0fe64bedf3a8', 'Visitor Approval Required — Parvez + 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('153c7fa4-20da-4dc9-b70a-617034cab455', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fddf8731-bfe9-4efe-8a52-62edf3f36ea3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c00fc69-1dbf-4e86-9226-bbc89744c444', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('584143ae-bb0a-4b34-b049-e93e3f645562', 'Visitor Approval Required — Rakesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32220a94-2ed6-4587-b5fa-f4d2d0aecc9b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7ef035a-41f5-4261-936b-664d4e6be021', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d3a896b6-e6aa-4b8a-9fc4-71f03c18e6f0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('742a2a65-5725-4f0c-b291-700973a53cb2', 'Visitor Approval Required — Ahmed', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d187ca98-ecf0-47ab-a64f-241211bc3e25', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2a3b008-0371-4ffd-8083-d320d3d295cf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a37b4b6-a9ad-466f-b150-ab2bb2946ce0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf39baff-b100-4bb1-99d3-80f80bd84bc1', 'Visitor Approval Required — Harish D ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf45dc53-5786-4600-9cea-fa995bcf39c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43a086a1-e4a2-4eb9-a415-13d4333474bb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5d5d4f63-ba9e-46c4-a502-c48a2acef8f7', 'Visitor Approval Required — Rama Krishna', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0a32e6e-b3f2-4202-892a-28802b439bf5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41de2e4a-f63c-4a1c-b271-b9c9a4495bc5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a46a710f-f357-44bd-bbdc-a14034bb6165', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ac15656b-a297-42b7-9af0-a7344df75ee2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6261f2f-52b2-423c-9bcc-714fd3750ee2', 'Visitor Approval Required — Adharsh +1 ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d63d7282-a160-4dd7-b2e2-9c57d449bfdb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('897f8ad0-d2fa-438f-83ca-45937808052f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a86a431-4cd5-44c5-b9c0-ee18c405ee86', 'Visitor Approval Required — devendhar reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2086d48-99cb-4d41-bf49-942d3e754539', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64fc647d-1078-4a39-9225-e907d402de11', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d4af6341-c95c-44c8-bdfa-31267be9c8ca', 'Visitor Approval Required — Pradeep +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6541eaae-cab4-43a1-a7fb-0800a356fe17', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9405141f-dbdd-4950-b34c-8c63368f1fcc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9300d384-5e40-452e-a61b-5d3fa3e8ab23', 'Visitor Approval Required — varun + 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9edf7b1b-2003-42a3-99cc-6573582c406a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3eb6103-e7bb-4181-88cc-176436c2eddc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46c2c30e-be45-46d3-87e2-06f8e8dddb22', 'Visitor Approval Required — kalyan  +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e7874a8-688e-4870-a8d1-dfa2a5a32184', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99c79c97-e5b2-409b-8805-5e5ade11ebb4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79233c07-71dd-4738-8fab-721889de826e', 'Visitor Approval Required — Shabman Ahmed', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6926aea1-6c58-4f7e-bf2a-04bdc7d4a88e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24ed03f8-74d7-4f1d-b926-0d1f8b176ee2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d14fd302-d5e5-43c6-8042-1fb410a22635', 'Visitor Approval Required — Vishwanathan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b580195-e4c5-401f-ba84-6ae36d1be885', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c238748-c558-4f06-a3e8-f029c1fd4113', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e86fa6cd-dcee-4e23-b4e0-aee22659b367', 'Visitor Approval Required — manikanta', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa2febab-5da1-4a61-adc6-603f535e0346', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('426d0d14-10c9-40f9-8dce-fe2e9b8676ec', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f10106e-60ac-44f5-94c7-f436ffc59da5', 'Visitor Approval Required — Bueti', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae9873c9-17fd-4c92-9c97-012873b41ab1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8ce7ab0-808f-4bae-bb09-86d14d1e8679', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3d8a6695-63cb-412e-9c00-d2f406157584', 'Visitor Approval Required — Pradeep', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cffb57f-7a6c-4c74-9375-e6fac9e29e3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('266574c7-7ba7-4b3a-9ea7-78a0023bb08b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bc9cbb3-8467-4898-9c35-298c9c074cb9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d388903-49e2-4db0-a710-44e3bcfbc287', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7553880a-fbf5-42c0-bd5e-a51eceec4583', 'Visitor Approval Required — Prabhakar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdd70e7e-0b43-4091-91c8-bc12fa9491d7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3954c0c5-1e18-43c9-927a-b4b86ff73346', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbb08d83-af0f-4c22-822d-0f1f8d47108e', 'Visitor Approval Required — Hema malini', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ab78256-e344-498a-bdc3-a4b4fbaf7482', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08a7baf8-f82c-4f5f-af56-d9d929f1224e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('22f5faa2-56c2-4c9a-bd50-4e532e749278', 'Visitor Approval Required — Krishnaveni', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab062b9b-c500-433c-ab7f-c1faa0dd5731', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ddfb0ed7-6fec-460c-927a-2d1241c268c5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ffa33fc-a477-471f-b6e9-31b08d819a0d', 'Visitor Approval Required — Laeequddin', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca48b4ca-f20f-44e1-bdeb-5dbaa519e7a3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e3814dd-98ed-4784-98b0-fc308424c74f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a905167-9f44-4935-a6d8-4dbf41967949', 'Visitor Approval Required — Mr. Shailesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('690f7249-efa2-4c63-b68a-b50d3013e23a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35dd8c08-e81e-44cc-b9d5-ddacaeabc28d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('179fc5cb-1627-476b-b466-c2650d16dbe1', 'Visitor Approval Required — Krupakar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('52863913-7107-4689-b913-feb9523bad68', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c54973dd-4331-416f-b378-a7b859ef0934', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c499dff-ea25-4e85-8e3e-a7c6287af02b', 'Visitor Approval Required — Nitin + 1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e2594a4-b215-42eb-a080-696b0eeb4560', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('407ad7d3-82cc-458a-86eb-bc77cfd02d41', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29652e80-1bcb-46e0-aa30-7f6a9e85093e', 'Visitor Approval Required — Sudharshan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb6b9765-5a5f-4e99-a1d6-66d3b2baf4c5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81350dd7-7b8b-4270-a517-9c28483ffdf6', 'Visitor Approval Required — Sudharshan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce373e59-092b-4c8e-892a-347d01f7986c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cc32367-839b-4945-b2d3-37523cadeb86', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc6573a8-c56f-4aa3-9196-02ab453be61f', 'Visitor Approval Required — Lavanya', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bda89b5e-db92-47e4-998b-d985c9364831', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b2cdf15-104b-44e6-bf5a-9e6c702ccd0a', 'Visitor Approval Required — Deepthi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('25283eeb-f51e-4206-97d4-50054f381dda', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b1531ee-002d-4ec3-bad2-d13e12e01f18', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32d791c8-f66b-4e6f-8df0-cad3a47733d3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e205953b-2298-4690-a724-048976d799a1', 'Visitor Approval Required — Akshath mahajan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('31ad6727-89d6-44af-a30c-87df65e83569', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08f614ea-0ea8-4774-aed4-2718c9b9e336', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14ece5b9-1269-4abc-bdce-90da4c69cfe6', 'Visitor Approval Required — Ram bopal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e97aedb5-f79e-485a-a0c6-201fc04aaa85', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01973c6e-b47e-4ab0-9dc8-6fed7d6e3119', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a975177b-ec69-4bee-a5a3-a99c848a113b', 'Visitor Approval Required — Abbas', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('985cb7a5-3843-403c-acec-f964ff701279', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('66baf44b-2db4-4df7-b454-ea31331745fd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9daaf1a9-1910-40ea-afda-0dbe8fbdb611', 'Visitor Approval Required — mahesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4221b60c-978a-41dc-8cb4-7502fc367435', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8347ced5-df26-4310-a166-19c935702941', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa8873bb-0424-47d4-b64c-9dfa235896fb', 'Visitor Approval Required — Syed shameer', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6dae41f-1b80-4c38-b35c-ee4e5d55deba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24da661b-0dfe-4ef3-98a2-5cf815a543f7', 'Visitor Approval Required — Charishma', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56818cd1-0f1f-43d2-9c92-8373cfe5403a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4695eece-b251-4142-8e2a-bbd2d1f53061', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a28c2d8-5443-425b-bd67-5103dc7fbd7f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf8715e2-835a-4ed5-b569-9907a72e6feb', 'Visitor Approval Required — Durga prasad plus 2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f08c766-46cd-4b65-b0c4-c0754708c581', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a059f17-660c-40c1-8d73-808d170f71bc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a15957b5-e417-4df6-93a0-1bf1f2b45406', 'Visitor Approval Required — naresh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2ff43a9-41c7-4d03-871b-57574f0ff94c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('21441326-fcb5-4cc5-859b-d0223ceca87a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa6f1293-1725-45fb-9285-35b854d7c9c7', 'Visitor Approval Required — Chandu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d269dd19-4a88-4b92-970e-fc433f0316fd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2460b34-8fb7-4233-abba-6730a0331efa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4002fc4a-e89e-4ef4-85a4-15fbe27ff567', 'Visitor Approval Required — Swamy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c98fa8f7-ed11-46ff-bcdf-429b97d50d9b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6b4f792-9ef1-4423-a31a-eca7ac44f238', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('61d30d28-1bc8-498a-b89c-031033db86cc', 'Visitor Approval Required — Durga prasad plus 2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b90a6d8c-ae1b-4b24-ace7-9c34ab16044c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c3668d34-6108-4a39-9a06-1d05c48467ea', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12fa50fc-0bd9-4404-96fe-4307ede55ee0', 'Visitor Approval Required — Rahul', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dd8c568c-c6b3-4ce3-98ed-703c81a3f8ad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b5d80495-c360-4bf5-86ba-266c3e954485', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8812e3db-ef10-4c90-9fbb-cfbc6a907ca8', 'Visitor Approval Required — Prashanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79863d0e-c716-4bc0-bbb7-804405ed3d2f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45ad868c-94ee-4888-93d2-630de2a77430', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e21c8e3b-58ac-4749-9aae-ab0a9ddf3fb9', 'Visitor Approval Required — Arun gupta', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44cfaf4d-1013-436c-b201-1e410300f756', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3345785b-8a71-4001-ad13-d48ebd168726', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a80125b-34be-4344-b7e2-b90d85d48a48', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5944ec60-9302-4496-9635-b6a29047717c', 'Visitor Approval Required — Jonson', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d608ad1a-8973-4db2-87a0-fe18a5a18c69', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3852d278-c7cf-430b-adb7-8ebd79b422cf', 'Visitor Approval Required — Suresh raj', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('805a315f-6e75-4663-a015-54502bf86200', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fadfc3e5-e754-464e-bb2b-3027421f5414', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('82a708b8-ef28-4b88-a23e-830d8698f5d9', 'Visitor Approval Required — Varun', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cabe5a82-70c1-405c-9810-1761fe197d75', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e6646a8-74fd-400a-9fdd-bbb491ddb1d6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cb09a04f-8c79-4ba3-a25c-43ba2820b57b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c1973d0-21f5-4233-8f16-3fc2549dcfbf', 'Visitor Approval Required — Harshavardhan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28c44622-129b-47fc-8c8c-a2bc8be1ec30', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('283a3abd-562c-488f-b1aa-3b7a3add8320', 'Visitor Approval Required — Aravindh reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('949846dc-58aa-407c-9017-e6e666c45e5e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa78b571-da61-4445-8d3c-fca34759a224', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2d9a3df7-a60f-4041-b853-7e8cae069485', 'Visitor Approval Required — Bhaskar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5931b15-76e5-4b7d-9fc0-656b23a4d243', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2768c7df-486b-458a-a7db-0ffcbbc09514', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07844888-37d6-4c4c-85ff-8756b7d38fde', 'Visitor Approval Required — Arun kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb0d47fa-fb58-4342-b7ec-c8a5271b828d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4902fb77-61b9-4ba0-b0c6-48b8d7b5138c', 'Visitor Approval Required — Vinay', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d5052b3-a1f3-4e44-a844-e8b931d1e706', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('770022f0-de17-4180-88e8-d0b6fbf79840', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35afce2e-21e0-47f9-9999-c146e419caf2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e5d97c3-af55-4503-896c-06d8d02a2855', 'Visitor Approval Required — Kiran', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f82d61ea-80b9-417d-9540-09b9832bbc7a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('abff6ae6-b812-4bcb-b8d7-5538e9552832', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6d576f4-f56f-400b-b294-c9119b2a45f6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c36bc51-fa66-45d0-ae4f-17860c7e12c1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb271cef-3791-45e8-89ab-6ac02abcdbc8', 'Visitor Approval Required — Rupaak jain', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1d57fc04-6317-46f7-a08d-16a992603385', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48cefd1d-9a8e-479f-914e-cf5ac840ee00', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c31caec3-cc59-4649-89ff-448dbb5dda0c', 'Visitor Approval Required — yamsani sudheer kumar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4b538b23-abf2-43c0-8745-a57edbb91fb0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b952e85a-d7cc-42c3-ad7a-d3044992a255', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f26c7483-498f-49c4-8f61-ce733feb89ba', 'Visitor Approval Required — Jamit', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdd2cfa8-decb-4c8c-9738-1754da3eae7c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d44c0e92-023e-4356-a811-d708e8bfbae4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ba705c3-8b85-4b2d-b7a4-8d9aa0fecf4a', 'Visitor Approval Required — narender', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ce87df5-b1b2-4dc7-8a12-06a50d3b1cf8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ad6643b7-5d57-4077-a676-2cda23fdd44e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f4c93c4-77ca-492d-b715-dda849781d5a', 'Visitor Approval Required — Jyothi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a88b2270-e88e-45ed-ad77-e84cec6213f3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf71fa4a-b8ad-4fae-a640-bea36077ac5d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e25cd0d-3968-4062-a51b-b077f9f7720b', 'Visitor Approval Required — Pravesh +5', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('20ae5c48-a44b-4af3-8e1a-4b1dc3683be4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09b3baca-9aba-4f73-82d2-0caa1f18880b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c4ed7dd-27bd-4455-9616-c13121636a7f', 'Visitor Approval Required — Akshith', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('015d4ef9-eac3-4980-98f3-eb0264684f33', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b818f4b-81c5-4b18-9ce0-b6c035c49521', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c8ee7a03-5f0d-44ac-a509-b88b3f03c166', 'Visitor Approval Required — Devendra babu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('766ba1d3-5df0-496f-88c8-56d1125045b7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('164866de-e09a-4f95-aa05-2b8349b7ebb3', 'Visitor Approval Required — bhaskar raddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3885e97e-fdfb-419c-a9d1-52a05c59d6ed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e150567f-f6e6-4c6b-94cb-db8e5e2a71ea', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09b4f4a2-c8ca-45bf-88e8-14fa88dd84c5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6f5a06b-05e3-4ad0-a041-680ce6cab518', 'Visitor Approval Required — agireddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('452943d2-219a-4ed1-9f3c-eee0e65f4b79', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f4f4a89-3458-4d07-ab91-ed30ae9b938d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb22a5f7-1dd4-421c-81b7-404967011eb3', 'Visitor Approval Required — Nikki Abbas', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ed92545-1bd2-44e6-8ec4-81ac7bd10aad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7edec23a-8a29-4361-a7b8-446e751a3e62', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb62e957-2801-4bf0-b60e-346991763007', 'Visitor Approval Required — MD ABBDUL', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4fc31f3b-2ff4-4730-ac5b-73357a90ae6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6fc46ea-7ce8-4bf3-afcc-3fd9518d0f4a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bac5cff-bc1e-453b-9691-ca190901f5dc', 'Visitor Approval Required — Raj Gopal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c8e2b70-671f-4145-afff-61fb3e53b262', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1807beca-0d2f-4b12-a24f-127818a1e9c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5cf9aade-41fc-475d-be3c-b7e68b868c5d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e86d618-5805-49a2-af4d-7463ede14a0a', 'Visitor Approval Required — Sravanthi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('381a2cee-5f79-4946-a39c-7805e22584d6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4bc91c2-5872-4860-aea1-07e71f9fc7db', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40f18551-c8f1-4336-9fc1-4d0ee7841ba9', 'Visitor Approval Required — Prakash rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('30767cce-095e-477f-9b0a-232eb728b50c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('04c51018-adb0-47e1-a3ed-f8e9b4428e7b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2d2f4ee-eaf6-45ff-b384-a474e621952a', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fed56fae-d986-43bd-9955-a40b6748ca4a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe54e89d-7422-4437-9a93-bfd50cf06c63', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b858fcb0-0ae1-4e1d-8a0a-4d58bcdb8bf2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f741f51a-6bfc-4658-9bb0-bf47a35185a5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ba6c4506-2965-4710-ba78-4e7e233cd9bb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1d0b07b-5a5b-45cc-8359-6fe5c659f491', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('387032af-0e59-440a-b8e6-6b30928ec47d', 'Visitor Approval Required — Harshavardhan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c02060b2-0b50-45b4-9c96-254535af18a1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f262a0ba-5f89-4e2b-bff3-846798bcd419', 'Visitor Approval Required — Aleem +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46eb14a8-3a42-4cd7-819d-15e7c7fc32b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05ce1d21-17a1-4242-b77d-b6c00fff3ad9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0552b273-df8b-4efd-a72d-b3460e9c307f', 'Visitor Approval Required — Devendra babu', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d914dd4-1df4-40f1-a093-b2973c997be9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bbf832cb-a752-4e4f-ba55-8b575c4f4ce9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('359b62cf-53a9-461d-b955-aaf91b60788c', 'Visitor Approval Required — Suchithra', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73320950-b0d9-4d76-8166-530846cb01fa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0f28ce4-bfc9-49c1-9ee0-660e06c195f6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b131487-ca75-472c-b857-b2e9719d5ba7', 'Visitor Approval Required — Devi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('095520f2-b868-483e-ba39-90514bf4b82b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('37019fbf-d6e9-410b-8a92-15a6f42b56fa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0c99055-8ec0-4201-b521-66f8fc1a4617', 'Visitor Approval Required — Rama rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('58912b86-ae26-49da-982d-b5b3d9f3ad8e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2f6d92c2-51f7-450c-be1c-0ead83182ae8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0a36bd4-6107-4cbd-a02d-e098518604b1', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('766964e8-e1d2-4d9b-86ac-5df02f3a8786', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('657d3e47-a655-4352-9e1e-367894f6fffd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('727894a7-5f46-40ee-900e-94937844ad2b', 'Visitor Approval Required — Ashok', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dadc0f54-0819-43eb-8296-2b01a512fa2c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1df29649-279b-4842-9ffc-f6bfcf3c13af', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64c933b3-1b42-4d9a-ae31-aedf8b9b3530', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17f53ab1-2464-4efe-979b-c7cc4d052f5b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99b04e1d-a015-4dc0-9b26-f959daf1a3ad', 'Visitor Approval Required — Satish +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64cd6f0e-d77b-4fc1-903e-87c646867115', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0eebbfa9-e22d-4f24-92f8-bdab625c9b3f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7264e801-1eed-47ad-9798-9178f6bb8a2d', 'Visitor Approval Required — Manish +2', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07364d20-9c5c-42c5-ac10-3664a109e177', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('34494326-9aff-403d-8af2-3dd14577b03f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0a5c956-2556-42e4-9a43-56e755ae348c', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2056de97-ebe8-43cb-9d28-ef14aa4121ce', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a84c53cf-6567-499f-8771-1d235b1cb1e1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e203600-9556-4fd6-a31b-838e04ed8a16', 'Visitor Approval Required — Arvind +5', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26806f21-b8ca-42f8-8d00-5c1121578367', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b552796-4e40-40e3-8db1-2bc4fac5e94f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('10b78766-dbd2-4674-b1cc-cf36374e3a44', 'Visitor Approval Required — Nagesh S', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('183f070b-9a93-4a2f-a684-a9ee0736f5fe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc7ee03b-a8d0-4147-9593-0695ca6a8f91', 'Visitor Approval Required — Venkatesan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7503bd65-0b59-463c-9bab-a1f99040ee93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b0b83e9-0093-41bc-874b-33acd5ffc32f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('372dd51f-2870-4d52-8cb4-cc28e5ef91b2', 'Visitor Approval Required — Tushar', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f5f317b-1bb9-4983-bb7d-93cc2f06fa25', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3fc73d75-bd2d-454c-b4ec-8419617e3cbc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db5b646d-c313-4e4c-a537-2de662b3f76f', 'Visitor Approval Required — Devid macias', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca02443c-6b9a-4d46-9a88-ceabcf056c59', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b33a2158-5daa-4ab6-aa2e-b8908e866237', 'Visitor Approval Required — Srinivas M', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9835c64a-5a28-4e71-9975-f55cefb8787a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('21d81b0f-368c-439a-86fb-53f3fe1874f5', 'Visitor Approval Required — Bharat', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f0dd482-a5c2-44e9-9044-fb90fc291ae1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('077cda8c-ce4e-49b1-ab4a-79752764b09c', 'Visitor Approval Required — Sivarami Reddy ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a43d2ea8-747e-408a-8240-84b0e3cc028b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9451ce38-75c1-4e4e-a71e-c48337a5eae5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdba0b8b-1b7c-4e52-a723-9dee565072c1', 'Visitor Approval Required — Chiranjeevi ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2c94036-806d-453f-9e43-043fbfc219e5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41c34dbb-ade1-4c52-88fc-47dd0c429f7e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ceb252f-2b87-4a1c-bec3-bfe6b2689aa2', 'Visitor Approval Required — Akshat Mahajan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b18c7dc-836f-45e4-86f5-0229e38b653b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7092dd34-52ac-4728-a18f-4c0f92058315', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e3877a7-1a88-4a3d-897a-faeda1f3e28c', 'Visitor Approval Required — Uma maheshwar rao', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9625e51-8955-41b9-aff7-ba020ba5b6a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8a80e1b-c8de-4af8-b051-d2657bb055e8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51baf8ae-d6ee-44b2-89ba-931a052959de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a65c87d-8c77-4d9b-a235-b50c52f4c8e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8a0fe85-1979-4d73-af95-07d021941330', 'Visitor Approval Required — Sreekanth', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('099b945e-5f07-4237-a5c9-555953dd4886', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07b4aa6f-5360-41ea-a517-cd52a6cb955b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9ee74ad-4c46-43b7-8ea6-8bb47cea182e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9623286b-b5dd-40b1-872f-e5c8aec08d08', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e599f961-8889-4c7a-97ec-f941d2c3526b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('76153f88-ffe9-45e4-a9fd-2077265dd62f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0fa1e0e4-5650-44cb-941c-97666d81b681', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d66662f4-659b-47b3-8662-a4e6cb9b038c', 'Visitor Approval Required — Rajamouli', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40f05811-020b-430d-af54-5824c34f04fa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7ff0c7b-f814-48c1-ba71-a5f75e55ff92', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf7e8c45-2311-453d-bb40-91c2c8cdd519', 'Visitor Approval Required — Anandh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccf51051-f46e-41f8-b77f-8f184ff75673', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3916eaa7-0ea1-4ffd-a942-a9e17a08cc7e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e8d0aeb-e72f-4e70-816c-5e8e81df4336', 'Visitor Approval Required — Zuber', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa31f0e3-057f-4fcb-96c9-29cdda00b78d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45f9300f-74fb-4ab4-8424-dd6001ceffc3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f8f0e75-cb45-4ecc-9f9d-ef20af70df5f', 'Visitor Approval Required — Hemnath', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccef00ef-7872-4285-b144-a638a62dd52f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e8a56236-9669-49e0-86e3-389fcd3442e4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ab98cce-7d7e-4a05-b518-eef0050f8660', 'Visitor Approval Required — Vinay+1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be641cfd-22c9-4bab-8bb0-9cf830f3c061', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cf6f14e-9d8c-4f3c-b9e0-b1c6c806cdba', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('33448804-fa73-4d05-ab2b-095ccd0d8132', 'Visitor Approval Required — Laxmi', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('884c97ab-8b97-4970-8649-0ec1231fce8f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16d6a863-0a1f-4ab8-824f-0a166ac8c020', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2babd41a-af99-4626-a5a5-98aba0f0677d', 'Visitor Approval Required — Mukesh', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('83e73e3e-8d63-42b6-9faa-fa2bf3bf49b2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb49698a-ebc6-4436-8656-c45e168cff4c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bf81247-d157-42e3-937c-528007f2d988', 'Visitor Approval Required — Sathish', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8017452c-b794-4351-b162-cfbd83423c7f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49fc8ea9-cbfa-4a86-960c-b76d9e043b76', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b36e73bf-eb0a-4f05-ba3b-8dd1f855fd7b', 'Visitor Approval Required — Pavan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b41cdf6-4462-4b14-9c05-47add9566d88', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c0aeeaa-50ed-411e-afc6-d54b8aa1e3a8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('98760013-8d9a-4797-9fb7-abc00776936f', 'Visitor Approval Required — RAFIUDDIN', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99100c2d-9121-4e56-b94d-ffa92186e3be', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a6edd36-bf09-46dd-bd7b-c5186efc1d54', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5ee1224c-d2ce-47fa-9903-06ad07644a39', 'Visitor Approval Required — Laeequddin', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('050d29e6-f65a-4ad6-8320-741ad24a2c93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af65ad57-025f-4586-b1c5-41a0f18baf74', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f8870b3-b25d-43eb-bb43-1c3509069e7c', 'Visitor Approval Required — Naveen+1', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('855b0bfd-34b0-4435-bf49-940303fef398', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b3babcf4-1a1d-43e4-a517-22c84693ed3e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5baa9487-a480-4de4-a2f4-66734c51a830', 'Visitor Approval Required — krishna mohan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be45362e-b030-458f-b91e-a9482cdaab3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('96d83bfe-d8b7-4628-9bfb-72c3bf2630a9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91df431d-e235-43db-a44f-af396294b6c6', 'Visitor Approval Required — Sujiv Reddy ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eb93984d-8963-46ae-ae32-f5e61a0380c5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b9516709-1548-4497-a9ea-9015af0d56bd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3390a95d-e9a4-4dbb-9553-9707fa1c1628', 'Visitor Approval Required — Balakrishna ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f838b19a-a4e7-4ddd-8f7c-9c97dc4b9c27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9fdc1626-a659-4146-820f-48aa9cfd59bb', 'Visitor Approval Required — Samuel ', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2f70eca-25b5-4971-9019-64929d25bf27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf88338c-9c71-4074-8369-8abf44f42cbb', 'Visitor Approval Required — Pavan', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fed4bf07-48d6-4d29-9815-06acce2bbada', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b9803a2-3efc-4e5e-8b41-e20a1d517f65', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aac66c79-29ca-4e6d-a3fe-67cf158de82c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f861cd1b-5a26-42b0-a2a2-feef489530dc', 'Visitor Approval Required — Seetharam', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e26f296b-9ad3-4e41-a23d-c9313cfdcbf5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fc149256-b09f-4d17-957f-3312c2017e48', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b19fc5f0-7ede-459c-be11-0b1b36f8d0c0', 'Visitor Approval Required — K Rajaram', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e1ccbe9-cf25-4cc2-9131-e09546d0e318', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('171d001c-18d7-41b0-b9b7-ba1cd6d84602', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4dcaf480-773a-4187-a335-9fe20fa23371', 'Visitor Approval Required — Dheeraj reddy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8d9c99d-f7e0-4345-a50f-0565c97c20f1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f4b50f9-8204-4b43-afc3-68c1cb7869d5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbc2fa62-3f44-4497-878d-7b05fac9e6fe', 'Visitor Approval Required — swamy', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('58f853cc-1cec-4885-9208-4db0f2da7a1b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('47a216fa-df5f-4566-9ce3-502000657d6c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55b99ebc-1e9b-43ec-ac9d-1422602bd345', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65eb356e-3620-471d-9c1f-dde0f12a5834', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('101133ec-f24e-4acb-a99e-69b3b99715d9', 'Visitor Approval Required — Myank', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d8bce2c-b9ca-497c-b3f9-2000ac0d9996', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d15baaa-1050-44c4-9a05-f6658fef3162', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a4b1a68-33b8-40b0-8289-1204b1aa8590', 'Visitor Approval Required — Vinay choudhary', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('19280b8e-847f-4892-b15a-57bb0847b722', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b3558525-1c89-454c-b051-342b8b5e8488', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51a4fb97-225c-4647-82aa-4841bcf49804', 'Visitor Approval Required — Snehal', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cd6375a-464c-4682-ac29-27658d0cc5af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fff233cc-c788-4eb7-8228-bff6c0ba904f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('561059c8-c02f-4f56-9262-6fa9ebd74fdb', 'Visitor Approval Required — N.N Lakhani', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1fdb1d6d-7fc4-4475-af70-78d1b220ca79', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
-[sanitize-seed] dropped malformed row:
-INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aded8be6-85e8-49b8-a095-b281b18d9061', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('68ed961d-367a-4289-9a25-50260a712f89', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('00b55eb5-57ca-4e3a-b87a-0964c8a99786', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f0702223-4510-4878-9506-13d623df2129', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf320cfa-6967-434b-b910-157a1039c26c', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2b8c0b91-0110-4eb3-b797-ff99c16b1750', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53d03fa7-b16f-471f-8846-60db8f07ee5d', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f30d9389-79ce-4f59-9f54-49b2f165ae50', 'Visitor Approval Required — AGIREDDY', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('de6ab0f9-3e64-4dc8-8214-ba49462d7fe7', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('803584ef-a454-47eb-8e79-8ead13d74ca6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8d69434-76af-4003-a067-1cc55ef2003e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ae06c2e-f1b8-419f-bcaf-668f3c15af4b', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('074fbce3-5b43-47ba-9cf5-dafa49030d1c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e186e96-be80-4429-a429-e5ab667349ea', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a4b3cd9-4c11-4204-8c1e-df2fa152d242', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4cf7ad27-df90-4432-a6dc-5f22f841a2b1', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0b10127-a4c0-44cb-aa1c-5288cafa7279', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ccc2939-1292-4e67-a989-465a72e1c1d9', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bff30ce9-0ef5-4b52-9fd9-2895b6ae9076', 'Visitor Approval Required — bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a2aa81b-658e-47bd-8322-5fe2515fe32c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cac58e89-c71e-4a45-b357-0f86852195b0', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2fd5f7b8-d057-4ba9-8b64-ad953caf523d', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dcc925c7-c961-4ac4-a8fa-069728e18f6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3d38959d-2362-4100-9c0a-666cda64dceb', 'Visitor Approval Required — balakrishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7454ce0a-f839-4f39-a9a1-0edb28334c28', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3db11943-f220-426d-9036-1fe86fb1a343', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9913106a-70cd-4483-9d3b-f1c17ece9e40', 'Visitor Approval Required — chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('906dabb6-2c79-4f5c-bfbf-3c49e81ca193', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45e6c723-82c2-4937-ba5e-271d687516f3', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3bca2a5a-5d0c-47a9-9295-f41e4f1da46e', 'Visitor Approval Required — Suresh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b43ef6fa-59ad-4001-b14a-4d771b824faf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('580dd7d6-9a15-49bd-9290-5aacb322bc76', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d32eba8-c521-402c-b3cc-3130b4794fad', 'Visitor Approval Required — sunil', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4273281a-242b-4f65-a175-48a44fe110d9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d428ff0-195f-4752-bbd2-cc73a91383c7', 'Visitor Approval Required — suresh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f103536-3e8c-442c-ba88-510a0868716c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a192d92a-b577-4112-b48d-863cff9d9b25', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44034b28-aad7-463a-9b09-2c601e523c77', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cb1a541f-fd8f-4495-a9ab-ca59292052ef', 'Visitor Approval Required — bala krishna 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e6118c7b-27f4-45d2-8f40-2110c1d514f9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('889f8b9e-c785-4993-89ef-60d5e7d52787', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ef00d53-1ddb-4b2f-9579-3726413807ce', 'Visitor Approval Required — Poorna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35942015-de39-458b-b5a7-3456f6c2e075', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6b8f3f7-8e5a-491e-83f7-9c6663088bc4', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2800dae1-bb0a-4a1f-ba51-9ce8892f855a', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db186643-2e64-4914-881f-b7b093ab5a23', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bae8fcce-697b-4a9f-b61d-f227b0c2eadf', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c5ff032-4f6a-4e33-aba6-eda6a4b736e7', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c56150bb-a75d-4a3f-b64e-f24070168caa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91a9eda9-47d4-405d-a5de-c09a1a1574e2', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40dbab05-a2f1-4f8b-977b-fdd0e6096394', 'Visitor Approval Required — Chandra ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f81c38eb-9016-4094-89f5-7b5b24e18197', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe7d2b95-b333-4dcd-acaa-5b8ff560d3c8', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('edaedf8f-eca4-45ae-8475-facdaf3bb797', 'Visitor Approval Required — Ashish', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('386e6e3e-cf8d-4c86-b076-aa555c80877f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db9f3e9c-71f8-4c3b-b2fe-0f7c5c8eac0f', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e03d746d-d1e3-4a73-b4db-c895c4305991', 'Visitor Approval Required — Shyama sundar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39ea23a8-b635-4582-9f96-14916decd46a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7cc9d4aa-6ee8-49c6-a59d-bbcdc2549cd5', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdd61b5c-0a18-4154-b1f8-ba7b6b9d0323', 'Visitor Approval Required — syambabu g', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d3c2f10-19f0-43b1-9b6e-78f39e66b70f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b51a70c-1aa0-4a4a-a7fd-29ad9c132084', 'Visitor Approval Required — syambabu g', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65e233d1-2af4-482c-bfcd-570395bf7029', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ac681fb1-b983-41f6-af62-87293219e168', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3aff08a7-58ef-403e-9840-39558e2b3f12', 'Visitor Approval Required — Poorna ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a2e0e5c1-8270-488f-a80d-416e2aa755fb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e6614e2-06f9-4eaf-a435-c11933a939d1', 'Visitor Approval Required — Girra Syam babu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd82cce9-0da3-41cf-a3ac-364275257ec1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e28a6e2-6f2b-40e4-b1ef-01aace9718b4', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a340b0b4-8cbb-42b7-b267-647ff4765058', 'Visitor Approval Required — Akula sunil kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74addcc8-cded-48c7-8df2-fb8ed6137b87', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4d70005d-11c8-487a-9974-587f01f073fc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('de928ae3-8132-4fc8-91db-04f988109ca3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6c22de18-d0b9-45e3-af57-eb20c78d30d2', 'Visitor Approval Required — Saradhi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4afadf98-80ef-4a2a-9726-9e4badd37622', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43fc198f-3f86-4d25-ad48-f9e7712c1cf2', 'Visitor Approval Required — DR. Sudheer kumar yamsani', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c1cea0c-97cb-4a1a-bd92-fca6b2ac279d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24cd1492-6f99-4331-920e-5724db53ea36', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af22bbe8-b8a2-40f3-b4f6-adcb09cdce10', 'Visitor Approval Required — Venkata raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab56aa89-3605-47b8-bbfe-805565e9a477', 'Visitor Approval Required — CH VENKATESH', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f58bfda7-4b5c-498f-a3bc-e147f766fa95', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27b029a2-70db-4528-aeaf-89bcbe377117', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b55efc6-e10f-4155-8c0f-e14fbab0fc8f', 'Visitor Approval Required — shankar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('552b3344-4b96-422b-8e95-ed222eb75874', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07fc0a68-006a-4fff-a81c-4714abab0464', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c3b2e5b5-5668-4de3-911e-0a3d6e3aef21', 'Visitor Approval Required — vishnu vardhan reddy & kamalakar reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16c02c5a-a296-487e-9d6c-a4a87bd3f2c8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b1f51e04-b022-4283-b4b9-ccd464a69939', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f821720a-1067-41cc-9559-e3051467ee1a', 'Visitor Approval Required — sunil', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa362f04-1c97-4a47-b332-abbdebcb2871', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cfbb4699-0b4c-45be-b680-0359865b0d51', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14bc9f3d-2b07-4f89-a527-7974a59d81de', 'Visitor Approval Required — deelip', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2f2a162-a634-41f3-b642-b585e3801c2d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e801c30-1563-4260-92ef-b7388cac933c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('475c4266-0f49-4403-b0fc-9a8319eb0d28', 'Visitor Approval Required — mahash', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9589f6bf-bf21-401d-a632-a00b9f3fe569', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b02052e-63ca-42dc-b78b-c6bc8001a1af', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49006696-b175-4c5f-bacc-2cde236be4fd', 'Visitor Approval Required — asif', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b81d771-013b-47cd-a336-b09b27629843', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a22a7748-4cb0-4456-92f4-9fb8bd73517c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d08bb4dc-10bd-4180-88bd-e3f58f6a028a', 'Visitor Approval Required — vinay kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('249df337-86db-4866-a597-5ab3a240a910', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b11ac08b-86a3-46a0-a99a-a2845b4de79d', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e69319f5-69c5-4e60-b1f3-19e4a67d3224', 'Visitor Approval Required — md khalid', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2fb072ed-9ac4-4413-b7cc-dac3289f7506', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4de3840-e97a-4430-9a53-519dc27db0b6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd88e19a-31aa-4333-bac7-ea0d1af90791', 'Visitor Approval Required — k raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf968b23-878a-4a1f-8fd7-990eb713bb4c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f594101-d759-4f5d-9d50-d2df98de29fa', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('103821a5-43c6-4375-b155-437f3fcabbf7', 'Visitor Approval Required — KIRAN', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ec447f48-2328-4b53-a8b2-1e9557170b83', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('afe10aec-4b06-4192-b5d0-ac9c67adfbe3', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2bec8d9-4524-46f7-bd0a-1b6f8b432ebb', 'Visitor Approval Required — Suresh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bd695b9-9a7a-48a7-9be2-500ac3aa27cc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c597694f-22d4-4968-b8c9-c497a9ce62a6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a362ce3-0d43-4d52-8918-c726e3bfd1b1', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b910d2e4-ae67-4694-adcf-cb75f0fb968c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92902cb9-7b2f-44cf-bcaf-40aeb1326821', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('96eac805-4460-4a79-b7bf-876b08753141', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a292fb9-ea6e-4716-a739-df8f59d8cabe', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23c07949-4ed3-43ac-9569-96bd41cc4901', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c873319-0286-40e1-81d4-e7ded6f2cb14', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8769a0eb-199e-4558-a34d-b62fc84883ed', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('854e3869-72fc-4d70-8e7e-0f11215bd301', 'Visitor Approval Required — Prakash', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('241937ae-5fde-4ebb-a280-6aeba2c85415', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('963c7257-e526-4057-a5ad-33c0dfe38d1e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('805a683b-68b4-42e8-b9d6-3f98658e9286', 'Visitor Approval Required — s. mahendra kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('69e2542e-77e2-4840-9648-7b1b30f37fb8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d028e858-2319-49ad-a4f6-0e8b9478c0d6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6331e4da-2064-4cda-a8ea-13282b2fd2fd', 'Visitor Approval Required — amar lal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b5aed0ef-c128-416c-be49-c31801386f38', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e146629-a3ad-4ed4-8c5a-4b9a644799c8', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16a771ac-093b-4f10-86b2-8117ea3cfc87', 'Visitor Approval Required — kiran kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9852accd-d690-4655-8b87-f33e8392504f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89931d82-86b9-4f00-8fa4-979b6de52471', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5db1ae20-4820-4e14-b933-c1ae6df471dd', 'Visitor Approval Required — ramsh bitra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e3857669-d946-468c-a66b-b3be92e26f81', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6677f61-bc5c-4188-88e1-0967bb25bcd1', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1aa2a85a-0e58-46d5-bc06-8a8af2f305a2', 'Visitor Approval Required — balakrishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c354b9e4-c801-455a-a6fa-7a1b4f644e93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('13838199-4c02-489c-ab65-e3aa128fe5db', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bbbe0c67-d406-4f8c-a494-210fce41296f', 'Visitor Approval Required — Siri Yadav', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('242f58ae-6919-422f-8c6e-4a548770c3fa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('197ebaa0-ba31-4540-82cf-8a4283fc0596', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a3778b0-7cc2-4ed3-a369-606bb64419a0', 'Visitor Approval Required — DEEPAK', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c056657-208d-4946-8d06-014613fe0ec9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be9ff8a5-fd98-4123-930e-127f6c774207', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fd51249f-e280-4eef-8b77-14f7a6bbcd5d', 'Visitor Approval Required — ibrahim', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('70abc358-1d20-4822-83f4-747a40678148', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9451250d-6a83-437c-88ab-86be4725cffb', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0763d817-4926-4576-8081-46351d5c0083', 'Visitor Approval Required — Abhishek', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a5c4066d-9ab5-4dc6-a289-1fc2a8f398b6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5315e03a-57bc-464d-b29f-220a7468e2d5', 'Visitor Approval Required — Lateef', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('11f7fa8d-bbc8-4e60-9af1-c0a3c8ace44a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7615bd63-9542-4d6e-a79d-6cf14d1f7862', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2169854-4646-4cd3-8464-724dc3a83b47', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3ff9cba-46ad-421a-aa28-27685241c3e5', 'Visitor Approval Required — p venkata raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('592a075b-4f63-4163-bf56-f700d427486a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f666cd97-0f77-45ce-883f-06a6b7dc4304', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('406271c2-8b34-4488-b0de-2de458c30485', 'Visitor Approval Required — k anil', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('804a0944-8a0e-4c57-a330-c91443b27252', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('86acf452-65b4-4224-8ddb-ba633dd511aa', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e300d78-00b3-4706-8c3b-c40ab461ab48', 'Visitor Approval Required — naga raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('beeb1c2e-beed-48ef-b1ff-678860e49b86', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d3801f4b-3136-4a27-b8ec-a90c22ec4715', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf9dfa5b-9ca2-4a5e-9bbc-6f9a2c55f761', 'Visitor Approval Required — g pullaiah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c5d73e2-0e59-4f6b-a4a9-ba2314add283', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e03a0da7-531c-4aa1-9c8b-8d97ed1fa867', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8825460a-6ff0-4b67-8c01-a6949ac575dd', 'Visitor Approval Required — meher kiran', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9b7c6ce9-72f1-4208-9c3c-893746d87770', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('031b766f-fc11-4e96-a8c1-f679ee8ec103', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('61e0e6b2-40c7-4df7-9214-ba4856ab52a9', 'Visitor Approval Required — ravi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0244b33-e0ff-4a1d-a8ff-79dd068eb1a4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('85775b5e-48df-4b1b-82dd-01a2082418cc', 'Visitor Approval Required — hari krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27e8c850-4a13-4356-9280-0e898f8cd309', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4b5da56-8981-454a-9b18-1615d9904f07', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('393329e0-9201-419b-9530-e3f7e536dfa3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df479c45-c307-4525-bda8-e0bf8332c460', 'Visitor Approval Required — manish kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b9f4c35-a29f-47c6-89e5-d3be46e87177', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('978d14ce-a6eb-4efc-a5af-8ca4f0e821d0', 'Visitor Approval Required — mahesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c0536f2-b3cd-4dc7-aec8-58e2f4fbb4b3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('258b88c4-937a-45ad-abbb-1887099fbe0c', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2388d3e9-6f2a-4569-bf21-49e292f219be', 'Visitor Approval Required — Shyama', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9e843cb-8351-48e7-9a19-45f318f5746d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('efe17bf4-380c-4e9d-a74c-db800723221f', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('54d0453f-fb0f-48a3-b84e-babe5b5dd409', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27c897a1-6a58-4948-9385-b689516fc21e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56bdd887-cf5e-4db1-8bf1-0390822bb8dc', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4b75f7f8-3871-43e2-8104-b2ba49442468', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ced0e99-49e8-42ab-b7b3-08b40e6bdd20', 'Visitor Approval Required — Abdul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f62b3440-f614-46bc-aa64-5a74a1c3f2a0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17137cea-726f-4fb1-9f4b-47e557ef81c6', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3b6ebc7-a20e-449e-899b-0a8663a4943d', 'Visitor Approval Required — SHYAMA', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eaf16cbe-c536-49be-a691-a4ac550509ae', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('171959e4-501a-4b59-8388-43307ec41bd0', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eae56c2d-6f20-4795-8893-5bb161552570', 'Visitor Approval Required — ratnakar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05356380-538d-490b-bb01-86bbe22af940', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e1d1b6a-9757-4f4a-a4a7-f1df99fff652', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2bf67f7-57c9-4d30-8dd2-1c3976d9de81', 'Visitor Approval Required — agi reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2b65e623-fe48-4b7f-adf2-f3a7fa89b24f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('026e301e-be66-488b-b5e0-87e41997c341', 'Visitor Approval Required — DEEPAK', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8a8c0cd-be1d-4ded-910e-087c04aaffbe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f9f4da3-756e-4687-ae8d-9c43f9072e83', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb7c0a46-7108-4096-8395-aa58d4835363', 'Visitor Approval Required — karuna sri', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c81d83b7-db55-4506-a3d6-d5e7170d3de2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('679d6ffa-8216-4717-be0b-3fac423e9676', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c9080c73-04f0-40f1-b3eb-36ca7e14c2ed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('219c8c68-2cf5-452d-a30a-7c72c9555223', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('854193b6-f089-42b0-89c3-acd3094c1b60', 'Visitor Approval Required — Bala Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('20ccd28c-b64e-45b9-98f0-b74202460212', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09fce886-b127-4d29-b7cd-476f2859663e', 'Visit Approved — Please Show This to Security', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('485481c4-39a1-43c3-80e9-a5ed72438c9c', 'Visitor Approval Required — syambabu g', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b5c1ea9e-f0f5-428d-b95f-5790afaf8afe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c809128-a56a-4a75-b957-370d766be104', 'Visitor Approval Required — VenuMadhava', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43eabd47-959f-4b66-a622-f32763d448e8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('adc8a299-8e40-425a-b86a-c36ae7d49a97', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4f08ecf-95a9-4261-bf4f-7ed4a9263045', 'Visitor Approval Required — Shyama', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f72feb3-d5a9-47c1-9552-29048d14db59', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b5813fc-1af8-4329-bf58-59ed226facb5', 'Visitor Approval Required — syam', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d1dfb226-03bc-4844-97bf-d13e418d5df1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb9d9633-63c3-4190-b080-bf0c9421a34f', 'Visitor Approval Required — shyama', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ef486769-ec18-4066-a80b-e62023894596', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('76ee4dc0-f602-49db-af06-2d9e290f069b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74335c75-45d9-47b5-999c-f5c4477fc298', 'Visitor Approval Required — Shiva', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12d2803f-8a27-408f-bab3-b517ad1d4c37', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a7ed7f1-da26-4f84-b926-6915d079b6b7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f443f220-3785-4b0d-9f51-15c742e5054a', 'Visitor Approval Required — Ramesh Bitra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55c40b06-0aaf-41bf-9e2b-ea8e31396b74', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5864b816-510e-457d-b569-17f6b9cb8179', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('22804195-8eff-45bc-b89b-4fdd440512c1', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bcb77d82-f70b-41a9-a83d-6f4b4004d449', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8596d9cd-62e3-4d41-9a7c-9b2e0605cb0e', 'Visitor Approval Required — Sunil Kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3554b4e-eead-41ef-9af6-d015339f65f4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d716a4d5-8f65-42ca-9f17-9b3e3956002e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9174f6a0-da60-4411-904a-289e3dc77afd', 'Visitor Approval Required — Bala Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3d9a584-e817-4237-b28e-67ce9f6299b6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e8a0d63-b828-4995-87c3-edd2c4bde7df', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14422f7f-def1-4ca8-a88c-d431332aa290', 'Visitor Approval Required — Ramesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d862a348-51c0-4bdc-b82b-512dded0a106', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24c425e6-a0ac-42f4-b0cc-3592b1b602a1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4c64a53c-2f75-406e-9ba9-745814174abf', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('10dfc1a7-a513-468c-8885-a620dc100302', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14322ff6-be21-49ba-af5f-78ab057c41f2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('657d4ac2-687a-4133-9c1c-4dc6744dd4f6', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23d15630-b77f-4023-b5dc-6c18674a14f1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67ddc8c1-9a60-4d6e-8811-41319e12d2f5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('017f3050-726e-4949-b3d3-f5157e0b3034', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e430b47-ae53-4eff-95d6-cff8a7f5f479', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('460e39d6-51b3-4f3e-98d5-2312413be005', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5c42bc85-fad2-4f72-8fd9-211facff8199', 'Visitor Approval Required — Prasad', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('004ac0e5-4818-42e8-b0ea-98eaa1c30bc1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fd1b1016-78f1-4664-8838-332911ca1702', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('006b4f53-40e4-4211-a033-219852bc7589', 'Visitor Approval Required — Tarun', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a93fba9-7d15-4fa7-9316-8850e1409e43', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b85f90ed-0902-4a22-9cbd-83ff264ef049', 'Visitor Approval Required — Venu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c9624d6-d021-4377-bb5f-5b516c9ce80f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75b2926e-dd0d-46ca-aea7-8458d83f8c80', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3129083f-4258-4db2-8140-a0575fc07375', 'Visitor Approval Required — Bala', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('34f51250-31d4-49df-889b-91ce689a7532', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('500341ad-e233-4f79-a252-5e0751fcda8b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2c88739-b2d3-4cdb-8ae3-191928c3740d', 'Visitor Approval Required — surendra kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d056006c-7a66-4a09-bc09-3dc9d5babfd0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b3edc02-4d82-4987-bbaf-38a6b438d6f8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ade3407-6c86-40a7-8d82-3eb9a75acc70', 'Visitor Approval Required — Mallikarjuna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ddcb0c15-f257-4038-abf3-8ff0c38bd4c9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14c9e7b5-4f55-4811-aa07-c27f54ca115c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('809b7f52-1a9d-43c3-a6e6-9b8e0ab9225e', 'Visitor Approval Required — Tarun', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0652462c-2fea-43e3-8d63-092ec9fb0d62', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81b648b5-8636-4f3b-974c-a76096ed715a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4999d578-7db1-4bcc-862a-9b85d88368d0', 'Visitor Approval Required — vijay krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8635abd0-60a7-40fc-85c6-1e4b01867689', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95a481b5-aba6-45da-84bb-e7e5f0f3d227', 'Visitor Approval Required — Muralimohan H', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ed143518-9f42-49fc-b5ea-a60eb4d71656', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d1a5fef3-988a-4042-a9bf-1f885813e818', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('529411cd-e6f4-455f-b77a-5400f19974bf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('118b7026-3cec-4845-a18f-e7c4bc5c322b', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29dcd313-5860-4d02-9431-9fd37e3fe679', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16a4cd1e-58d5-4dd5-847b-58ff841bab01', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df8bee82-50e6-40fc-a196-4c57670b60fa', 'Visitor Approval Required — Satya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9b4c95f9-698a-4ef9-92eb-8b68ee6a87b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5732bb9-c042-4498-a6fc-58ce3c03ae8f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ea87b0c-1394-4555-a285-efe407c75c18', 'Visitor Approval Required — karunasri', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d519642d-639d-40c8-80c3-9655f1ad83c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a81813ff-6ea5-44fd-b0f3-81a2536513f4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4eacec32-0542-4b91-b2e4-c5b13fd8fc55', 'Visitor Approval Required — lakshman', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e0dc3b1-d968-4b18-9b99-02c7fb80dc89', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6be1215e-1848-4189-8e8c-1868fc23a924', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0045467d-b78e-40c7-939a-3d23e6c93b07', 'Visitor Approval Required — rajamouli', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a77a10f-64d1-45bf-a200-d69ec6ae51ca', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e141da07-f61c-4497-9cdf-9d55b6e5c99b', 'Visitor Approval Required — Bhatia Saahil', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dddce8bb-56b9-4004-94d4-d924c23b5d7f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c680af0-0896-4796-bd2f-f25711c40d36', 'Visitor Approval Required — Surana Vikram', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45587fe9-7900-4d1c-963d-51971a419c79', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa5cc3ce-a9f3-4e20-b820-deffdb509b0f', 'Visitor Approval Required — Maitreya Ishan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('635de0fe-3aa8-45ee-a10c-b1c414167f48', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2ab8b57-e4c1-441b-9e70-a9330cfb6a29', 'Visitor Approval Required — Desai Jeet', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('145ba303-7c5c-428e-a2f7-a1a39ee09426', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea14e96e-f5e3-4970-8643-e737e5b154f3', 'Visitor Approval Required — JP Morgan Birmohit', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7f6d57c-e310-473e-b48c-01422af5d7b6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6f82f3bb-d77f-481e-9acb-7bbf0d79593f', 'Visitor Approval Required — Barclays Amber Chawla', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a744b25-dff7-4a4a-9de6-44bcb459f1aa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('37e4888b-bc3e-4fc9-b9b9-3b799ed3a7a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0694e8e3-ef47-4eb6-8744-6ffc8863444b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e7153f2-556b-4e24-bba2-4d46d6796de5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c36ba4ad-3917-4e96-b4bb-6607bcc7e3bd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92e79d3b-fabd-4053-b78b-f44e0046ccaa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53990398-fc6c-4b04-93e9-ece0e9a4cb33', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09fc6bef-eee7-43c1-a664-7230b1e01fd5', 'Visitor Approval Required — Masood Alam Mallick', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f81510e9-2199-42d3-b098-34dedfb278b5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('59d26d6f-a312-4afb-a8f4-182a27be8d42', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ea5c948-a5c2-4c74-a0bc-cd530b2deff8', 'Visitor Approval Required — Vidit Jain', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a4db959-b45d-437f-9482-2e0704b481e6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d22650d8-2f60-4984-8a20-40749d8aef49', 'Visitor Approval Required — Divyansh Shukla', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8278b44f-e0ab-45eb-b16d-f0483b7daee7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56b86eac-a25d-44c7-b17a-b41dfbaaf0ce', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8412c1b1-0980-4da3-9757-852c44bf3caa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('62df9e15-a7d7-4d53-b906-a8ba6ddd2378', 'Visitor Approval Required — Krishnarao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fde17fae-2c0b-4242-977c-e2673c63f310', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32a99115-f00b-4e28-9d52-82b0f403a03b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40a8384f-16f5-4a39-ab40-6fcc18d6af2b', 'Visitor Approval Required —  VINAY', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2acc3c99-96b6-4374-b5d6-cc57139e6fc6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a7e74e4-0d26-4941-be28-4819166a77c3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('128206b8-7773-4dda-aa8f-05a41d68674a', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cdc1a31-00fc-4c77-9608-461ff9cc2e20', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('de01f555-f970-4c1d-81b1-cd71e1cdefe8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('008df961-3735-4dc9-ae09-9c54f5d571f1', 'Visitor Approval Required — chakri', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d62f830-13d2-4883-bcaa-5e74d342fb93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17d19bcd-a72f-498f-bde1-33596f1a5260', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('953c13d9-2e88-455b-a69c-1dfdfaa48aae', 'Visitor Approval Required — Srinu A', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ee4f56f7-8c1f-4104-97f6-ec02dd3a7d22', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b6e1d61-ce61-44e5-8b68-90a70204c3b7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e1947b6-6842-4b52-b697-dc4cb3fcdfbd', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cc111ec-852a-4f92-9ae3-950613cf016e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51c47991-49ca-4cb8-b0f3-4c06892e08e9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a5908e8f-b48d-427e-98f1-7eb30500034a', 'Visitor Approval Required — Venkat Sai', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7e5d069-f34c-41e7-8595-8315a55b026a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('759c3622-c78d-4b05-aa82-2486017b04fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65529006-74ac-4c81-83ba-361e5c9d5184', 'Visitor Approval Required — Venkat Sai', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7c37771-076e-4724-93cd-dd034552774a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf911722-f149-475e-a5dc-791d13115b8b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('703c419e-c071-4f95-aef2-9fb1010da5ae', 'Visitor Approval Required — Srekanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('da3c8687-935c-405b-be60-7d20e38f044f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5aae1903-6237-4684-a25c-26d51407e644', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e09284fc-e634-4c7b-9041-b671237c6b85', 'Visitor Approval Required — Vinay', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d676d65b-2cc7-4beb-b0ff-3062ed548393', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24b31529-6c17-4fef-a900-0923411512ba', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ced6cfbc-10b3-4a61-b35f-90cd89e5e44c', 'Visitor Approval Required — jayathi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1d8e84b-8d43-453c-8ece-8784ad0b4de3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f084b2f9-c3f7-417c-99ef-dfd0e0c5b540', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('270009b0-d578-4a20-a58e-30e21899852d', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99e59fc4-2ecc-4ee4-9171-842bcda7af5f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f38e5a7-61a2-411b-b221-55d9cde11513', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a2c13cb5-d528-447e-bf3a-cbd6bcabbc99', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01fb0443-a542-4b0b-bb89-62fa4e2514ff', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95ecc25f-82c4-484b-a0fa-eb6ab9dabdb0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d741b262-d1eb-47f8-989f-5c9c2564b516', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('15d3680c-bf5a-4923-9f5e-ae29175ded72', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e27de026-877b-46db-89a3-6e1930a7a48d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64adaa30-97a0-4064-a7c5-9e3c8c499754', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8a013453-eda7-4dd5-a091-b854b0c8829f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7909df56-2ae2-459e-9473-7f07aec8edbd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('456b4630-95e2-41e1-814f-dc734301e7a6', 'Visitor Approval Required — Sneha', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('61c5f329-6da0-43b2-8b1f-26612fed978b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b7d26548-0543-4ac3-be4e-155da72359a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9857c7ea-8252-476e-8430-d3c60a757ab9', 'Visitor Approval Required — Srikanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('392030b4-4206-413b-8179-243d7efc744c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9062ed61-cdfe-46aa-8453-e032ab8e2f3b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64cd44dc-54a7-49a1-aad2-2a0a77c22966', 'Visitor Approval Required — Srikanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a994f34-21fc-400b-b74d-730afa57a1ec', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa463548-685a-4470-ba76-5e238a89dfdb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a752ce3-c85e-4681-b47f-1367fc283bb6', 'Visitor Approval Required — Snehal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('442559ff-11e8-4deb-b85e-5ef7499c1251', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d57d3bb6-58df-4f07-a1ea-a1cbd7b09422', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a603f64b-fa05-46fd-b271-5d4e6d6b995a', 'Visitor Approval Required — surendhar kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d287dd0-1e39-4fb8-9867-dd2cc601b643', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ab6acfe-302a-40d6-b7ae-8fa661a724fa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12a2c3de-7f3b-4db6-89ba-2aaf3e25b80e', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f81ca54d-0b7e-4141-846d-fa1c576d8a7c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c8516cb5-ee86-4923-bb58-8254bb3d20db', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ea63628-2eb8-4635-b79a-51ef3895a7a8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f5d97bed-e635-4464-beab-c8b74987e8c5', 'Visitor Approval Required — pullaiah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7d6d7d8-6ad9-41a2-9973-4e81fdacdac6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24849ff1-b184-4757-94a7-3dca5d953319', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('216435a0-019b-4b6b-9769-64fdeeec323c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67609a5e-29d6-444d-ba2c-7be81be16a4a', 'Visitor Approval Required — Nikitha', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b899e08a-415a-4006-98b6-7d715a0d8d12', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f9ae3a8-3550-4292-80c7-c007c09091da', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1551f4e0-f276-4306-8d6a-70e81d88054f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a770602f-6963-4f1c-bd28-393ca40b2b3e', 'Visitor Approval Required — avinash varma', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c695803-32de-4f6d-925f-64c157b971d0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('84495b7c-8809-410b-b9fb-314bf333823b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2fcb4f3f-f9dd-4c53-998b-89d38fb72678', 'Visitor Approval Required — Prateek Jhawar ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94c48c8d-9c1f-4995-a450-320f4e8d42bb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95176210-1491-48f7-9d92-af3aaadb59e8', 'Visitor Approval Required — Abhimanyu Diwan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32b644db-7701-4b53-a348-e378fb4116c3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0774d94-dd05-4ff0-8c81-3e33220ef4db', 'Visitor Approval Required — Samhitha Reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40669eeb-85d3-41af-9f40-150d6d1d1b5e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3646bb8d-45c5-4179-90ce-a596a696cd8c', 'Visitor Approval Required — Akhil Dokania ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0c3f3b0-6094-4edf-b39a-3f5bbbd0c783', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ba97590-0395-4b4c-8a00-43d57bbb3dd8', 'Visitor Approval Required — raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ee62219-d0a1-4815-b2e8-2b65d98805b0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ab63a57-c60a-40fc-a24b-75183a88c978', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2dc2a89b-c02d-427b-adcf-f381d9c99c86', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05880aae-e566-4734-9b4f-777aa5c15768', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bebfb3c-b7d8-462e-bc6f-824479a25312', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3431ae3d-61d1-4dda-8917-4ff81130d4e8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('596eb5e3-2aaa-4b09-a05f-370ee0b618bd', 'Visitor Approval Required — Divyansh Shukla', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bfa6d1b7-aeb2-439f-9f18-7a07401fba5e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d8efae4-c171-48ea-85ee-36a29a689cc4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e391ab8-f53c-4c39-8aaa-b60281eb524d', 'Visitor Approval Required — Amber Chawla', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eff1a2dd-82d5-4fec-bca0-880b91eeded4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6deb95d2-f56a-4656-bcc6-0bd00f396784', 'Visitor Approval Required — Vidit', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8a837de-8b21-45bf-a2ec-e978e8588d8d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdea43c8-4635-4ba5-81b5-e8d828eab264', 'Visitor Approval Required — Birmohit', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a1975786-f1e5-481c-943e-0bcf0b21aca4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d4b79c8b-88a8-4a63-ace5-0d8b15453535', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6207a752-6d5d-443c-83a7-c06b61b463a1', 'Visitor Approval Required — laxman', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78dc804f-6c13-4e14-9ac4-bea4fa38e2f7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9ddb22e9-19aa-4346-b7db-815471d84145', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('354cd1df-ac57-4f6b-876b-34e40dee95d5', 'Visitor Approval Required — T Suresh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6942ba8-f84e-4616-8466-243bb8ee776f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('132ee64a-df5c-48fd-b078-82dded82613b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4a227443-c269-4f82-8a9f-3f9bd480f413', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('149fac48-eb7e-48f8-a404-6d9bf16843f2', 'Visitor Approval Required — Kushwanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41bdb2d9-0d0e-4342-b836-010314638758', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('788c1fe3-8297-4687-ba3d-6af62361e660', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e989169c-e609-47de-bb5d-111fb96b7968', 'Visitor Approval Required — yusuf', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('079d629d-6c7b-4540-b246-d076276e5e02', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9dedccd-aa2d-481a-a1d5-e8195a0a90d8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db5de4c0-4c90-44a2-b7f0-54a6ad9713a4', 'Visitor Approval Required — Ujwal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('84277cfd-4888-4b2b-b891-c2ea291879af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b9e87740-58a3-4a38-b2a3-26bb1949ebb0', 'Visitor Approval Required — atmaram', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('961f06e9-e46e-4051-9aa7-ab44049571b4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ffc2ce9-9c22-4485-9541-6affb1c91235', 'Visitor Approval Required — Punit', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5cb96f65-e8f5-436d-9f33-1948a1903df8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('98121d05-cf63-4fdb-8552-053e3014e976', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b861275a-353c-49f7-b8c4-1b08fe9a17e9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb56c466-e9c8-43e0-9b8a-f16767b5ea0d', 'Visitor Approval Required — chakri', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c98b150c-11e9-43ef-8d88-f0a2ee8b5870', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('25b691e8-8010-4fbc-a470-1f5d5c6ce2fc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b77d588d-23d6-4f78-b987-9af753747c77', 'Visitor Approval Required — Sarvi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14d08e8c-7e56-4fe1-aadb-3c2109a2420f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd5540a8-c543-4b4f-8044-6b8579159364', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e3ae54fb-ea3b-4637-8842-de0e422b4ba3', 'Visitor Approval Required — y v rama rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bedf0c98-45ba-4667-9622-d856af8ae8af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26a68491-ab16-49cc-bf40-3c823a32ec93', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89f480d1-3412-4fad-90ac-97f809b68e2e', 'Visitor Approval Required — Mr Kiran', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ed6e85b2-8916-4e88-a917-d7c56c840a11', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d6916c0-e5db-4371-9685-c397e0e8ad0d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1e4daa6-50db-4229-9bc1-1de69c73b0ce', 'Visitor Approval Required — bheemesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('201f255e-3840-4fc0-8eb4-1dfbb06b12e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0971b76-1338-4715-aa74-0b06c5aee918', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7aed8f5-c18b-48a9-8d7d-f88d522fb44e', 'Visitor Approval Required — N Shyam', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a0979db-44d4-4116-8a61-ed0f7cac34b8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88986465-f908-468f-b2da-728e6ad0b28a', 'Visitor Approval Required — Nagi Reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4823b6f4-4607-4bd4-bda2-62c38524e083', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('04364416-57e7-4704-86fc-1c8b5dfd4117', 'Visitor Approval Required — Jaya krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1b5b8e05-5c95-441d-96e3-6c2f4c6e5b4c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4b603518-9716-4ff5-a239-d9d7501a0288', 'Visitor Approval Required — rajat', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e6d7d05-792c-4cac-b51a-fb479c3bcbdf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c64e778a-89f6-4976-8bdc-4a1e920e72b3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c67fffc-8c36-4968-bbfc-2abc6f189d87', 'Visitor Approval Required — Sri Lasya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8db260b-87e0-44ad-b89b-6aeed20d5e47', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a6e9238-8ccb-42af-a805-0f2d640f0967', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dd6fb5b7-262f-49e9-b820-19fffe6ce26d', 'Visitor Approval Required — s.shrieesha', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6c4568e-ce68-4967-9036-c8171331cc6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0d2056c-990e-42ab-a396-bbd55d0f663f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('612a40f1-2673-486e-a947-6a8a0127e95e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0f4fe1c-b5b8-4b3f-acd4-b2d76d9fa71f', 'Visitor Approval Required — Priyadarshan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48ee04ae-b2bf-40af-97eb-6b233bde7f45', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dfa68792-2b5d-47ed-bb0c-53550b6ceb1a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d506532e-6f7c-4483-a294-5ec8d658a9bf', 'Visitor Approval Required — Rajini', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('219a8be6-fcc2-4bee-b3b1-abce5077b936', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53102f9f-85ca-4a39-82c8-7d811ffc9a2a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc1cd189-2611-47e3-ab5c-0238ff877d6e', 'Visitor Approval Required — Vikhyath', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74a2d1df-7e2e-423f-a989-fa97f7286b3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a762808-55c9-4647-9e74-2596f5cfbc50', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c6dda28-9792-43c6-a0a1-f8e9c8e81599', 'Visitor Approval Required — Sandeep Lakhanpal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8ff0f48f-91bd-4995-9aee-9dc609568daa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('404fcb59-2cbc-49c7-ae78-87c389324154', 'Visitor Approval Required — Guillaume Dourdin', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9398fe7a-2c69-40bd-a375-8b5549ecea11', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e4b9d64-923c-4411-98ef-529c0b59a91c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ff29bf93-3329-4402-89dd-4acfb84db103', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03720cc6-a6f8-458a-bab1-32a827e68438', 'Visitor Approval Required — Divyansh Shukla', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28fcf599-9663-459a-82ee-69386b12e49c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a60de61-2a3b-4b85-8f3b-efe35074b977', 'Visitor Approval Required — Birmohit', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e413eeed-0036-4999-ad6a-742c5fa7fa5a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3fea741-f4a6-4ee9-9b20-44c04865a465', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0eab7559-e84e-4d03-9f8e-0bf16e515587', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ce5ff65-bcaf-454e-9a08-aac8355a3761', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f5573c1-2e8f-42f3-9b7e-5fbe987d8470', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('00d99883-cf22-45ef-9889-cef4d50a3823', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f8691cfc-c825-4c0b-8302-958a30daec69', 'Visitor Approval Required — surendhar kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dbfe76b3-ef50-48a8-a6f5-709cc56dd090', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f2ea595-29e2-4aa7-8865-6ff5e90099bf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53024391-7fd5-43a8-93e6-70b7d496beb9', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('693ce7ad-9b7b-4e2c-9d93-ff7ee8da8084', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65536411-8689-4974-a7c3-0deb1b4c37ff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d6f57bd-f451-4673-9655-8b1c7abf9265', 'Visitor Approval Required — pullaiah g', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('77a38d3c-5e90-4b6d-a2da-7540f2739802', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e51bba7-8d72-44fa-8d13-820dd305339e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49030b8f-7808-4655-9859-2b6d0d7050e2', 'Visitor Approval Required — lakshman', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9834ce9b-173e-4955-bf52-d6c7c90dd9a1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('445c66ea-3517-4e16-b7e3-91d4f12ad007', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ced2be8-6eb6-486c-bb6a-7356b7336932', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('87391238-5c87-474a-86d6-2f4bf85ece4c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a26cff4f-db2a-457a-85fb-1f1e66d17153', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('da85e3a7-9f4f-4a0a-9783-0eebf7642b31', 'Visitor Approval Required — Sanketh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6565919c-fb4e-4bfe-9423-109f44e4eff2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d34ef606-310d-4213-89cf-77cf2e02eecf', 'Visitor Approval Required — yusuf', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('15d4c083-96b9-4219-9380-8e3e5af31d2b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e953b57-b5e9-4d1d-843e-decad7f801a5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('264d78db-1ee2-4eaa-bee5-325bf45ebd3b', 'Visitor Approval Required — shiva kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4af86683-dcf7-41f1-af07-d75757ed623c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e25ebd5-aba3-493c-9ec1-465cd668e001', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d14759ff-ccec-41ca-9c23-02f9179f1fd2', 'Visitor Approval Required — Zorawar Singh Sidhu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab27ce2a-62e2-425f-afab-b5a29a9d6a53', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a8bf7b1-585d-444e-af6f-3815940c10cc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('768d4e64-13ee-4e9b-ac9c-ff1932af5b7c', 'Visitor Approval Required — Masood Alam Mallick', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e32bb06-b761-4ed4-917f-819ba9712012', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64313a4e-effa-4a63-b2bf-3f3c663c4078', 'Visitor Approval Required — Satya A', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aabe2e13-b103-4254-adae-539112f7cf1f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75c086c1-5c7b-42b5-b1d5-5723f0a3db5f', 'Visitor Approval Required — Lokesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('310953fc-2b0b-4cfa-802d-953188ef96ea', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ff77b44-c49f-44aa-b684-72ef22cc8930', 'Visitor Approval Required — Swamy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f58e121c-a91c-4f0d-a5c7-da7eef131831', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('943c0c7b-a922-4041-8b17-220336852cc8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fec297d6-68cc-4bfd-b02e-f2f454fb826e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2cfe30df-535a-45c6-991b-9c47021fb554', 'Visitor Approval Required — sandeepreddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d8155e7b-8362-45b9-88d8-8925e4114300', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('671ab452-5b15-4fc9-8096-0e2d688d5266', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2b59468a-62c9-4c40-a1c9-568acd415ca9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f10570be-c045-4a6a-9e3b-437c7a870fdd', 'Visitor Approval Required — Murali ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cd46c7ac-2457-4267-80a5-ec5063a5c584', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e77753f-2aa0-4c2a-91fc-955d4bef3dd8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6a666f7-272c-4573-ac52-2df7da8ae8bd', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e6803ba-61d4-4df9-abaa-dbb8dc51d694', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('30abe1f3-39d4-49d2-97d6-cfe969563510', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca568a08-b9f6-4f10-b12a-58861129cf61', 'Visitor Approval Required — Ravinder khobre', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2995ddc-ba67-45f0-90a8-7c7e05d22a19', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c9028d9a-29a2-4ce5-afe9-7245ff5d5d0a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2d2d2c5-a59f-4552-9a7c-6df3a619ff7c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b073296-cf44-480c-8d71-9573bf6ac228', 'Visitor Approval Required — javeed', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0574b18e-b028-4f91-a77f-056163b0cae6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f0416247-c6f8-4d46-9548-0cb167b799d8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f163899f-7e4b-4330-b8eb-f9c340dc1bed', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a81703be-a10d-4022-b7ab-69e35f7395f2', 'Visitor Approval Required — Sudhakar Ramaraju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2212898f-6212-4a29-a627-8b7e4f8d9266', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e7d9ebf-9c8b-432f-a9ee-fdedc4fc6818', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c155b243-c622-4d4b-b28f-3ec37fcf663e', 'Visitor Approval Required — Varun mewada', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('831c23af-f610-4d71-997b-120a617cecdf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1651ce1-a38e-4a84-ab86-40bab44469bd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1dcdbe1-2939-4f6e-b375-0fabab84e56f', 'Visitor Approval Required — Nithin', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('54b19801-d794-44c0-8bb6-395d534e0fad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('efc1c83c-0328-4cad-aaf2-4b221fb06e29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('62f51163-bfba-4cb2-b880-cbbd1810b2b8', 'Visitor Approval Required — Gyan ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af99aa7e-d981-4f5c-8890-8c1b39c6a9f3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eaa1cb55-982c-4007-a767-09c5e32287b1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e0720ef-be95-4cfa-9311-f5cd27c861f8', 'Visitor Approval Required — Mr Topiwala ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('458610bc-15d7-4771-833a-f93c1977a983', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('815950f3-fc4d-4ddb-a5c1-d46e5ca2ff93', 'Visitor Approval Required — Akshay +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2076c4b9-60c0-4de8-aa89-d9c58dba850b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c91d862-fc77-4639-b6b3-c5108f5286c2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bae5c994-fad4-4286-a5e1-58fe53af6e3b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f81e33d-7e1d-40cb-9b44-6bcc25ded488', 'Visitor Approval Required — Shankar +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26bfa1b5-49dc-43ea-90c1-a60898de7efb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91d6b651-4ae7-47b3-ac69-64de8901a939', 'Visitor Approval Required — Karunsri', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf8fb0f5-11ff-4057-a4f2-e5356f0e9a30', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c57794c7-0d0e-42c5-b79d-8620629b993f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4f56119-c95b-457f-bca5-c25353e04560', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a099a53-e644-4ea6-b984-b77e08be7ea1', 'Visitor Approval Required — sudheer ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2eb92e15-b60f-4e20-a047-3ac268211153', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('527675ef-543d-4704-b82a-6388f23e3eca', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a424bf1f-109d-405b-adf0-3b6084cac7a7', 'Visitor Approval Required — Santosh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('259a3fa3-71d0-4b18-8913-04bb62d82556', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c18448d-8f68-431b-be6e-a9eed8c8eedf', 'Visitor Approval Required — Sanjeev', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd4e1bee-9de6-4b23-abf9-a31034b87f43', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('790292f1-c50d-4c84-ae37-716e439c1dff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e51b9f9-1e4f-46a1-8fc5-383b78348715', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9ff70e06-e764-44ba-8e5c-3878fa104a0f', 'Visitor Approval Required — Sarag pote', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fd5beca-eb2a-4d1d-83a6-d7a0bc03e0cf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2099e8dd-a958-46df-bb0f-e49019a2c374', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f766ce34-cb17-446c-a158-bc3375779e63', 'Visitor Approval Required — D H Pawar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('385fd616-cf0f-4eea-8dad-c2873dfe2c2b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c560dc55-c823-4b55-995a-a854a87ed323', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4bccecb-f901-464d-9c6c-6ca14d51ec41', 'Visitor Approval Required — Veeraf ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dccacb16-10c5-4025-9248-26b0697b7830', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40ec1377-713c-4a2e-a80d-4ab868cbfdbc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('173bddbc-5039-46c2-b567-fff1cb3b4768', 'Visitor Approval Required — Sandeep', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29f125dc-6412-4e75-abb2-5ed5a8d21555', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16859272-c5c8-4211-864e-fe59e42edbee', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8a1ac259-df5e-46b3-9d10-84ba3d994eeb', 'Visitor Approval Required — prasanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24690d5a-4515-412a-b1cb-bffbe3128cdb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c14fe757-4085-4e9d-9499-3d21adc69f15', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb215550-6546-40c6-ad4f-e287b553350e', 'Visitor Approval Required — N SHYAM RAO', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ad995156-bce7-4a5a-b764-06a88d1d6d91', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a35541a8-0853-42bc-b6a6-024bec0b1ce7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5cf5ac54-d9b8-406a-b726-ed87aef0d9ee', 'Visitor Approval Required — N SHYAM RAO', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ff9b714b-9269-4c08-a502-df471c10f746', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b89ce75f-5c4f-4030-9e77-941567d18cb6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ace7da7d-8862-4919-9994-4e9cfe148905', 'Visitor Approval Required — pullaiah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89690661-e5af-4d1d-a1c4-fe2ec8633272', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8ad691d3-296b-410b-bfeb-06f37dc9f542', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e08b70ea-ba4a-4e72-9fb3-15b0fa91f85c', 'Visitor Approval Required — surendra kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46773c78-bf21-4d6c-a478-2140d078d481', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('63d262d0-1a0e-4fe1-9897-947cc936d4de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b3f0504-3c75-488b-95b3-e11a13001122', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29e6c5c4-6155-4e06-adc1-67d26c3dc8df', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('884c09b0-a7d6-4474-a98a-18544417e9f0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7be5c720-24cf-4b8f-9efa-1c89b0a67607', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e9cc8ed-053a-45dd-bcd7-9775d7475ffb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b6a1495-865a-4a39-9ce4-7d5948a2251f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce6b6dd4-6bbc-4876-a420-6d579741a81a', 'Visitor Approval Required — raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb0f4c37-6e4d-4009-a939-ee72a95e9875', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cc8101f-c933-483a-8d9f-a25190891f31', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bb40449-c7c2-405d-84b9-0775c3b21f31', 'Visitor Approval Required — avinash varma', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab70d436-abf1-4275-b023-55967dcfb7ba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4a02a9de-d067-4818-8c70-605c1a0c7f0d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab8851f9-a9b2-452e-b978-833668c637f0', 'Visitor Approval Required — SHIVA KUMAR', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('228ba603-f5ff-47d7-a5e4-694ac13f66df', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7275d7bb-ab2d-4472-b446-278961425c0d', 'Visitor Approval Required — Sandeep', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e2b4dc09-469e-4653-82e9-d95b2212515e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1bbf0d5c-88d6-4dbe-bc0b-52aac142f5e6', 'Visitor Approval Required — CH RAMBABU', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('678441d9-e450-483b-8cd8-173f81155188', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('573e19b2-f496-44ea-86ec-7ea2c6f7321a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23b3eb8a-1360-4038-b644-0e9f217e1003', 'Visitor Approval Required — Manpreet Davar +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fadb679c-9729-426d-8537-9c5b0327ff12', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('15e7047b-7297-491c-9578-55415018dadf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b553af04-1a66-469d-a610-79c16e2faf24', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('497bfbcc-2893-457a-84a9-5ebe396808d0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf6e4250-2f66-44ce-8713-8eac0d85b04c', 'Visitor Approval Required — Nithya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2336f7eb-22a7-40f3-9d05-382dc7ec689d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b5a70e1-1e16-49ad-9dbf-6208b9b550a9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fca7aef-5db5-4280-a8fd-81b631808cf7', 'Visitor Approval Required — Vinay Subramanian', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8c30a465-20d4-4535-ba30-348cb300a1bc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ec0a2cc-3ec4-4910-9383-6fd7658c8637', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('345669c0-b737-41c7-9ecd-e8f73055046a', 'Visitor Approval Required — Saumya Mohapatra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae71840b-4a9e-430b-9d66-2784fe77e359', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('366cd73a-6231-452f-b40d-b1862eb9a58f', 'Visitor Approval Required — Karunasri Divi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f48cb6be-6c0f-42e4-bf79-5b6e232b802a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('57228194-8f56-422b-8035-4955633709d0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3baedbad-10bc-44b9-bdf6-1f0887ad1843', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8a0b7a8-d42e-43c8-9462-d34b2a6db26e', 'Visitor Approval Required — Satya A', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b248329e-61f5-4786-b6ec-9f1e98c45811', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7ffbc254-085c-4dd8-bde3-011a28fc0be0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b8d446d-968c-48d3-a835-87d50e01e95a', 'Visitor Approval Required — Murali Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('afee067f-2f27-49c6-a0ad-9f05ace47e79', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1125d427-b6d8-465a-a458-485e8b771f29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ff725688-57ba-4424-81bc-cf74c1f7a5bf', 'Visitor Approval Required — Mahesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('201babdd-676e-419a-9ecd-293d38a4d712', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f763327-7e16-4e8a-8368-2d2d377115d5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d79d5f4e-7b0c-4e48-bbad-75bc2b2eaf8e', 'Visitor Approval Required — Prasad rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a9490a03-3052-4851-83b1-15697e30769e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('864aaaf6-09f6-4ac5-ab9c-802dff102480', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca0afbab-8a75-4db3-8725-44e370dad1bc', 'Visitor Approval Required — Murali krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2bae08d2-9675-4810-a4da-72b53a7a8ba2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b1e25942-21cc-4ccf-af3d-a294a646c89d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7353f458-5bbe-4bb5-afbf-9d5b61433e1a', 'Visitor Approval Required — mangi reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4b304a5-3f4d-4d96-99b5-aed86cf9f3cf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('768fe11e-afc0-42bb-9fc0-3f944205b998', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b7610547-3b56-4dfa-905a-b6582d8b6474', 'Visitor Approval Required — Shiva kumar reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3d712ae5-a8f7-45a9-9674-0f19e0547302', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c71d8dde-7c4a-4add-b9cb-f96a9c8262ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05e391b1-a060-4006-8175-48b5d526f450', 'Visitor Approval Required — Hari krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9e20c59-c2d4-48af-a0c9-e5643e847517', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e5623d05-d294-4cd5-9320-e979f6ab4661', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('619e58b7-9173-45e2-a5d1-072ea467fe3c', 'Visitor Approval Required — Harjab', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bd885b2-9d62-4fc7-be35-4229afaf1b27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2fa2d90-bcf5-45cf-8f4a-436e300ef5ef', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05a411a6-c5a7-46bc-9be8-fe5706d5a0c0', 'Visitor Approval Required — Harish plus 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6c204110-e9f4-4289-bd14-dd6f4c40eed0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c45cce77-6d69-4c79-bd52-a986825392ab', 'Visitor Approval Required — Harish plus 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f97a5cc-2aeb-4972-ad74-6b3abd0b0603', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8dde7718-b46d-43f0-b252-5f9fb123544e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46dd2a72-b983-4c23-9aca-fe9ea6432ff0', 'Visitor Approval Required — Harish + 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29da3610-f332-4ad3-a210-3ff109f8e241', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0651915-693f-4bcb-9a09-28107ea125a4', 'Visitor Approval Required — Rajesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a59ef2f4-670b-4d29-b16c-2c9fcf14342f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('534081d6-d438-404a-980d-2b4b59841924', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('027bec5b-2965-4b03-ac71-92a52a01881d', 'Visitor Approval Required — Harish', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72a54371-0c97-4b55-b1c3-fccc500f81c0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('74516faf-6b26-41cd-a726-75da3c57724a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3c85457f-ff94-4226-b917-e7d30674e91a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e176999d-48ee-4e78-9623-ecea8fd083b1', 'Visitor Approval Required — Yasodu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7070986-bf62-4996-bc3c-c87c18c9f718', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea0e0bb1-4661-4627-829f-c27dc2151651', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a91c5299-92ad-4ab6-9271-2a7d87e32e6a', 'Visitor Approval Required — Madhu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('906a1e24-c9b1-4b99-a42f-de7623486670', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8447c23f-f29b-4c33-9401-014552bc5036', 'Visitor Approval Required — Shiva k', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4460d12-cfef-4d0d-b080-feb1856de5ea', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('13f32246-a90c-46e4-8f52-0946860f0483', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88213822-d735-4d41-adab-b1ab937cf807', 'Visitor Approval Required — Ramya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29425d69-93c4-4b4f-a2df-c00028dd262c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a6eef1f-da01-4e39-a4c8-c26c3901178a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c98780a0-55ce-4a10-90dd-03d1eaa21879', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f266396-c1ee-443c-95ac-bf8516e464aa', 'Visitor Approval Required — Ramkrishna ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4523cdc2-4a2e-4aac-8e3e-361396265b98', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e241a81-50d5-4f2e-a0c5-641fbb3c353b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1061abf-1e87-4ff6-be21-e8722bfbdd5c', 'Visitor Approval Required — Prabhakar reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c16aaf4f-15fd-4212-b0b3-2494790e2c16', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df40be79-e480-4720-9301-efcbf3d0799a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af069bd4-bca0-4c78-b9e4-9c163d6eb31e', 'Visitor Approval Required — Gopal sharma', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('924dac88-7e39-436e-9e1e-156ae49b6832', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6762f42e-85a0-4c62-bf34-0c89dacd89de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7b97f5a-f528-49ce-9d77-5fc13f7c0098', 'Visitor Approval Required — Amey pathak', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a8239c7-fa51-42af-be4a-2eacc38a382a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e65e2412-8d3a-4e1c-aebf-779b56ad7761', 'Visitor Approval Required — Haritha rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('278e1bf0-78c9-4eb1-bc46-beeeb5385280', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d83d6e51-dc2c-474f-9093-722c9f658ac6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('229cef58-452e-498b-9c25-e08e2c6b3dd7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('578a8bf5-d15e-4889-9a93-6fd52888526e', 'Visitor Approval Required — Abhishek chauhan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39f9a5b0-2637-4214-973c-a5ffc822e745', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f7f28c6e-a4e6-4b70-953d-ca8942119e0a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3850d332-387c-4f0a-b012-115683ea0740', 'Visitor Approval Required — Snehal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88899147-4074-4200-9b1d-6b533f8bed3b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78f44051-5397-49c7-a49c-e3c573d6d825', 'Visitor Approval Required — GG Reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1757e39d-63ac-4039-8faa-9500d2827f54', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01a1a780-7016-4ef5-989f-35450acd43e1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1b120060-3fed-4244-a742-49a5a09d9361', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23de3e89-a849-4def-870f-3882db6db57a', 'Visitor Approval Required — Vinay', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('895ac8e7-103e-49cd-9e51-bcc14e6fdd20', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('756e3eeb-d235-406c-8fde-a32ca5e809f9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9306fce6-5602-4012-af8b-9e2da5ebc634', 'Visitor Approval Required — Mahesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94981269-5169-45fd-a1d0-fc3bcc8658b7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4e003c0-4e3a-459d-9a8d-2755dbcfe15c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40336c01-9cee-481f-b186-92954f5ea213', 'Visitor Approval Required — Tejas', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6bda7d42-ea2c-4fec-919e-6f827db0bb45', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f56012a7-bb37-4b57-81cc-3768f80522ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73729974-3f0f-4ac6-b432-06afb6eba5d1', 'Visitor Approval Required — E Haribabu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d78ca452-151b-410d-a4b5-d07415e57cca', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c528af5-95c6-4bb8-af72-4c125426a1c9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14c4d9ab-dd6b-46e4-85f8-054c34fbddd5', 'Visitor Approval Required — Mahesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a4245c21-ae82-458f-afee-9f9ab546e5d6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8ebeb8c5-dadf-4856-ac6b-10dc14c62efe', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f07bac23-b608-4093-8323-60cb7766567a', 'Visitor Approval Required — Sanjay', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3bc9c5e-8e8a-4d27-b639-0ef83a7bed3c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c1e3aed-6897-432d-a65a-ff927e0625de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('57a00aff-6234-4313-9c37-101359e9a891', 'Visitor Approval Required — Radha krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('690e18c9-7fcc-4efe-9417-92be20ee78e3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f12ff30a-5271-4fa7-944d-97ec2f542727', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eb96492c-1bd7-4257-a667-3e65de1706fa', 'Visitor Approval Required — bharath', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7abb3d71-da48-454c-9a87-3d42e88e48e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1c0b88e-d913-45a8-8e27-b7c35c8720ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('27935125-3ee5-4a5e-8852-fc97a956625c', 'Visitor Approval Required — Pullaiah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6cf892b-defd-4ef7-9fe5-438b87b57843', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e70aad87-9da4-4839-ac7e-34924391c77a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b22aeda-4ffb-4c07-b500-66cf2dc5da18', 'Visitor Approval Required — surandhar kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9b5c9e9-a2a3-4671-a2c8-97eb629429fb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dbae77e0-70ca-4b48-8983-93210759ef2d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f481c866-0942-40d8-9458-26e0db26411e', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('988a6d39-e7c5-4b09-8ec0-5c8ee6ec11c5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5bf86911-344a-4ea9-b333-d8fcba45658f', 'Visitor Approval Required — krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73807625-c98e-463d-bf2a-83186d89a31e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('11506ec0-dfb8-4795-9c81-47a0719c1fef', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4e41209d-8a66-44e8-8cea-70320b7a79e4', 'Visitor Approval Required — adharsh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cc81e44c-fe60-4dc3-8de2-1e757d45022c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('714b7471-4567-4c29-bc5b-db518679f871', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('527a43d7-5a04-44f4-8e93-48e02dbdcc3d', 'Visitor Approval Required — bala krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('efbf2ba0-9bc1-4aa6-9d82-9db38a946a0e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6a0db5e-50ed-4367-8736-fbf36f988ac1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94cf4c6b-d868-4897-8ea6-9eaeca5f802d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2f1ef3a-54e4-4634-8557-d290c28bb25a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6f207e63-bc64-40f0-958e-4952d59db0f5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('046c59f4-9a54-4c0a-a6bc-29a3331a65c5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f1dcf92-0911-4bea-9b51-527cc5209f73', 'Visitor Approval Required — siva kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a30526d4-fc4c-43ef-b490-0d922fe696da', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17c56590-368b-423c-af35-584574783c02', 'Visitor Approval Required — raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8368273f-432c-4a68-abe8-6135dd5ab1b0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e73470f6-c50c-490e-987d-fe3173fda949', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d46d538a-d35b-4147-895a-59ce29cf9aa0', 'Visitor Approval Required — bheemesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('444d811c-6693-4b63-be6e-bdf9d7b199af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e2b4d7b3-0c82-4f59-9e0e-a718d93522cd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cd1826b1-65d8-4025-b46c-7ffba6f5bafd', 'Visitor Approval Required — lakshman', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01a1ad3c-bd08-4f7f-bb52-24e5f1ed34ef', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92a583ee-220d-4bbb-b992-42fc57637c8e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('112f905b-ea39-469a-8af9-e5410bb0b86f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf1dff7d-6005-4ed1-b5f3-d8e398ff3f5c', 'Visitor Approval Required — POOL SINGH', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c4bb6e2-9184-4721-b732-c83bc595133a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('acdc2d07-872c-4ae2-ae4b-1c32ca6fdea6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f4dc7e1-c4fe-4d7f-8da4-e44d1c565030', 'Visitor Approval Required — sai prakash', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('567e6b5a-0cc1-4a19-936e-ce274f091587', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8139d694-dfce-4b67-a7a6-dcab80ed7015', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7027dfaf-5205-474c-b689-6362c0c11277', 'Visitor Approval Required — nikhil', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f938fa3-0849-4d56-beaf-ac2f49392fac', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f7beda0-c1eb-43ad-ae84-94c01230c360', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0be85878-fc45-4f90-b694-9905fa175e4b', 'Visitor Approval Required — Sridhar Pilli', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c676d335-3af6-40dc-aceb-4905b655fb32', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d237ee1-8c3a-4129-b01d-7fe87ae93de7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a549e0d4-c658-42dd-b3dd-d4eca3767303', 'Visitor Approval Required — chakri', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8df6383c-2b81-4d9f-9841-37136735810d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c35fd268-5aa9-44fc-a41c-e8927be0318e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d13e14d-1940-44d9-9d33-c49632d0b04c', 'Visitor Approval Required — surandhar kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d248e886-5c4d-481b-85b7-16c6199fbd49', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7011858f-8543-45ca-9728-c44ce86f4eff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4b216fd-9654-4042-956c-53be6e9c744e', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('121b2a82-0b3e-484e-b0db-bb4b9a316374', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78a2c1be-e63f-438f-bbaf-5857ae3240a4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('425041e4-37f8-4afb-b201-59c54d8eba80', 'Visitor Approval Required — yusuf', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d1cbf61-780e-4d79-b3aa-407a1e168a1d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03d31b35-b355-4465-8c52-237902dfae8c', 'Visitor Approval Required — md chootu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8336392f-8039-4a63-9d57-0715f26456ed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e670473d-acff-4d1f-adbe-2270c5903790', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97458279-2804-49c4-9637-33aae08414a7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7afe5c2d-61c9-4adc-b795-c072695a2d1b', 'Visitor Approval Required — Pullaiah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e8ab0003-2bc7-45ea-915c-aa75dc60a967', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f02f48a-eea3-461e-beac-3d9c461bc29c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7580f39-ca95-41bf-a1bd-0c64876a562a', 'Visitor Approval Required — bhaskar raddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ff9b241-7af1-41aa-b8f1-175b26b284a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa0dca59-ce3a-4208-8020-da257a45f5a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a6026ee8-eedc-44ca-86c6-995fb808d0e4', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('acd8fb99-9375-4211-957e-58c1799e7565', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9648064b-8493-4d7d-bd79-abed3a757fdc', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4fc849b-2dc5-4680-9ac2-fe79fcc5b74e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('111237a8-1502-457f-a148-ea4e282dba28', 'Visitor Approval Required — Mohan ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f543f23-6088-4a4c-a64b-cd9a48428234', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0480c1d8-bc1c-4ec6-9b64-bd6722bd8913', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5c32b938-3b0e-4f0f-a777-54f8837f7c92', 'Visitor Approval Required — Rohan ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('adcb7c5f-e477-455f-9981-c7a6a313a919', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b66d7f3-9b18-4fb0-8074-842409e3622b', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('268cbf30-0fa4-4765-8b27-fb6d82591fec', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c639bf2-438d-4e50-966b-92e27385ca7d', 'Visitor Approval Required — Chandra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c369cf3-865e-4e51-99fa-efe5609bf351', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a2f278ce-8942-4e03-a291-9ae2170202d0', 'Visitor Approval Required — surendra kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8cd0d2ee-d131-4161-a28e-7f8fef744ebf', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eaaeb28f-c16d-4fdd-a543-c2604315ae47', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f5466d50-2893-4b7c-927f-1ab53ce2c918', 'Visitor Approval Required — 	Koustav Mandal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26175352-2a8e-42a8-823d-83a361dd19b7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0e7ef97-93f5-4c3d-8716-8e0f95d76073', 'Visitor Approval Required — 	Saransh Mody', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db24b116-f577-4a46-8ccf-ff7c664292b5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('595370fa-abde-4fc6-8b6e-9a6e2b16bd56', 'Visitor Approval Required — Lateef', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8247cf8c-2f70-40b1-a23a-3316ceb0d32e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29b98af0-1421-46a9-96e4-2cb658b76f4e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ee6c6b30-ab80-41c7-a3b9-b62175b6a6d6', 'Visitor Approval Required — 	Soham Chakraborty', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1d64ae33-7744-4d9a-8fb3-f17ba6b8c3b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6ccec76f-3e5e-47cf-b694-8bb6270d378d', 'Visitor Approval Required — 	Ronak Shah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('593d6cbf-658d-4263-a6ec-a2894474ee2c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b348981f-09c4-4b93-8678-e59c353b4386', 'Visitor Approval Required — Satya Adamala plus 10', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53ff3dec-a563-4b4b-9d97-52f6b18c4d0f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b8dbc72-e176-45fb-845c-81ae36081ceb', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('355da9f3-3743-4013-9907-c4d4345d3bb8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d046ef74-f1de-4d57-9ca3-af516204f2fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4350b1d-9977-4215-ac87-26638c97a81a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ace11004-c23e-425a-8022-66f66201ea5a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('725f5072-3672-4bf1-abb9-777a51ad0c9d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a49e750-31ad-4d0b-8a32-e3671f9109e2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3706518d-116b-4f7d-9de4-a3e62f7c9cfb', 'Visitor Approval Required — Ronak Shah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae1548bb-bb1d-4fc2-aafe-4b65b8641f6e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a09f201-4107-45ef-b8b7-f97e9de90e6b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6bf15052-4dfc-4f7b-acf1-44c3d0a6825f', 'Visitor Approval Required — Koustav Mandal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b66269bf-4c85-41ab-a5ee-f8b5d20283c4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c72a6e16-5cc0-4b68-8c0a-e0755e2deaa5', 'Visitor Approval Required — Saransh Mody', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81814925-f972-421c-af28-f5a0a816dfed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('539c3107-e169-4865-9d0a-669f6db06796', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e875b3df-b5a2-401d-a1a4-22f347d2648d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6596a260-2985-4be0-9123-1959547f696b', 'Visitor Approval Required — Soham Chakraborty', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3e1ed30-306b-4ae2-bdfc-03d23ceb38aa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('adf10c85-d250-448b-b2bf-d3db05a87726', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbe93a84-db42-441b-811a-aa6dcfeab111', 'Visitor Approval Required — Satya A', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b250044-e6da-4473-924d-df714d222c7d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35a73777-4d20-4038-a22a-38bbb1c15e90', 'Visitor Approval Required — Zorawar Singh Sidhu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6b156bc-6cbc-4907-bcf5-db5300455b78', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e7ed0b9-2da6-4c3f-bab6-128ad494d0c0', 'Visitor Approval Required — Karuna Sri Divi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('52b4e940-b7a0-4a2d-a677-c48cf1610a99', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c3d05697-7026-4268-843a-157a8e24f7cb', 'Visitor Approval Required — Parak', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce69ce58-7c3d-4756-86c8-3c61d608df6b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1eba8862-659f-4166-ae67-092a9d56fc55', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f7437b00-cdac-4878-b97a-afe2dbebf12d', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('853f6edb-d161-4c53-82e3-a0cc7b70c012', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44ef1a28-0415-4aaa-b088-3267fcab3c96', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c9fdc3f-e048-43f8-a7b8-2c7cc98bed0a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f29b7ada-c61e-46db-9241-a0d8c1d217da', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('caf8bb2e-b3be-448b-986e-26a837a93042', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f87d638f-ca50-41bf-9f11-dc1e7fbad733', 'Visitor Approval Required — avinash varma', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b111889-553c-4c90-9a22-7568b2e08f92', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99226d77-d41f-4ec9-a644-93dec9d712a2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a487801-e299-4e41-adda-2837804023e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c9eb429e-a32d-4d02-9018-66a6cc5aab91', 'Visitor Approval Required — Topi Suresh,', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c263557-d2db-40ab-931d-e86bfd24c4cb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af298064-f4b7-4817-8789-2a2e3ab652ec', 'Visitor Approval Required — Manvi +4', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a23b1cae-0b3b-4be4-8adf-a340f5a6e91a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a92bffeb-b602-4d3b-83dc-e4a069c9b0c8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2cca0c54-ab0e-4167-be98-f716576c4598', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('80be3ccf-972d-46d0-8429-96a632257f50', 'Visitor Approval Required — Shadman ahemmed', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0824ccbb-4be3-436c-90d1-d4ab64ce7c34', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc222477-268f-45bc-861a-52be1fd1f2f7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('36f92a0b-0bb3-48c6-bd38-ff3ae5ddb66d', 'Visitor Approval Required — Laeequiddin plus 3', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51d4b358-f509-48a1-92e9-6169c27c0a3f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f2ec76c-0d1e-4612-bda2-7f29a1efa0b6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9abd5994-a28b-420b-89f7-83e454b176f3', 'Visitor Approval Required — prabhakar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0c512a6-dcdb-4143-8224-e172dfdee82b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('83538f8d-e109-42f2-bf9f-91aacd133fa3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28996555-f80d-41ea-9eaf-9cf550de14b5', 'Visitor Approval Required — Johnson', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e25fcc60-a651-4254-ae89-1cade128eaf9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('258d4beb-aed0-418d-a573-19bd4f02e1cd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a266073-1ca9-4656-bdfd-cf6d6d8cf8dd', 'Visitor Approval Required — n v s prakash', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('749f5d63-4b0c-4211-b6f3-42d0487d9695', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5bf58239-0c42-4596-9820-3c90075cd012', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c932b492-9b5d-49f0-82e7-cabfcca050c5', 'Visitor Approval Required — Ashwini Shukla', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a48c32d-0f9d-41ad-a87d-88c09478f06d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f1eeb057-4289-4d88-acbd-a49f199ce53d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1646dde2-9552-4577-8619-3c119bbad446', 'Visitor Approval Required — Major Shiv Kiran ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b3c209d8-6ed3-4244-915c-4b7bdc5b5176', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9ea1545e-891d-4bea-bee2-7a6d254184f5', 'Visitor Approval Required — vijay kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4eda6cc9-bec9-4b6c-912c-57a56470c41e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23d64b82-f4bb-4768-a788-2373ecb5213b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e780a5e-6549-401f-a588-3b24cf34d57d', 'Visitor Approval Required — bhaskar raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65a3f348-436b-4f03-93c8-1cd2a07bd981', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea6f6f73-a6af-48bd-a6f3-e0bfa2a0fe88', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d8a4eaba-38ad-4ae8-8654-520aeb345056', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a9ba545-5a8f-45d5-83df-08b80163bc3c', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1865dc0c-4416-4b55-aa9c-20acea42670d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cdb3cdab-913c-44b5-8c16-88651d5feaf1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ee7f73ca-b0c6-4dd1-8ca1-995837489ba3', 'Visitor Approval Required — Chidvilas', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('60e2446f-efbe-45b9-84ff-7ef8731d0397', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be20802c-8ed0-40a6-9cab-e7625e4cc496', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28f8928c-7929-4f35-a625-259df1255711', 'Visitor Approval Required — ramesh babu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('568bf52d-9d7f-4802-abcf-cd4a9ef50e40', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('772a201b-69df-495c-83d2-0be2ef8ed0f7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('254ffa3c-2764-465c-a604-335174077592', 'Visitor Approval Required — Saravana kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e7cdc990-6799-4f0b-a03c-3f750b7bdbbe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7298f07-1493-4bd2-a022-d266956268f8', 'Visitor Approval Required — Sharan k', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d66b433e-7b47-4ae1-ac83-fca2d8984d7e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12d367c6-89f1-4754-bf81-64295bd4d9f5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97d78075-9cce-4583-ac1b-144ec845c288', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e32e5ea8-7b98-4818-891b-277cc55add40', 'Visitor Approval Required — Gulshan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('131fcb35-c728-4df0-8430-c1bc5268546f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('62a1edb4-7801-4964-bd75-a834714c251d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('598c3382-8521-47a5-8f70-9eb16b2135b5', 'Visitor Approval Required — Gulshan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a360f757-e26a-444d-94e8-f78934e5cc00', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d6b98c8-e927-4f9f-816f-506721f5395e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a16d20c6-05b3-4311-b654-d59176a9a2cc', 'Visitor Approval Required — subramanyam', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bfa363ea-f563-4789-b7df-bb2bd34ffd6c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e693a5ed-0209-4bf4-bbea-d0f6af94d86d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('38f0fd00-243d-4714-a813-8b40d523731e', 'Visitor Approval Required — imran', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('18389af9-6168-4967-835e-50090ca0d474', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0826dc9-7f33-4d54-8a74-577c5910827c', 'Visitor Approval Required — Pullaiah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('446bbff4-532a-4ee6-aca1-7210e5becdbd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c8a2d89-0222-4e68-a500-6025ba672209', 'Visitor Approval Required — Surendra kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c661d2e0-5133-4800-8958-92a8e17c3a4b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1bdbfdf5-3a88-4052-a342-dd6913a1f815', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f24a11f1-4e19-4025-97dc-9069fd4b88e9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('254b0262-08d9-49b5-8017-fd65edd458a7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d001cca5-8228-4eb3-8204-e5e4fcd47323', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe72d354-8c05-4ad1-8796-299d59e371d2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('23c53baa-195f-4330-a915-661b3c58bba3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7e44d80-db79-41e5-a6da-27e0cce4778b', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a7bc709-119c-428d-9bae-f51cfcc20787', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7dcf331-b4cc-45ef-bfaf-40889f041bd2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fd76d192-3382-482d-9941-fd428ce4dd60', 'Visitor Approval Required — Shiva kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29e5d0cd-ed38-4d29-968b-c7d2266de2ba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3a60dc9-f294-4a01-944a-ba38e36e8cc9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('06c11e2c-d478-4608-851c-43e213e396f2', 'Visitor Approval Required — Johnson', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('495c20d6-631a-4c70-ade3-3bdcfcde58eb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('469472b8-1921-41a9-9ab3-e53257470d2f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6fdbeb54-cc1e-4534-8caf-4b32fd2c5e15', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('13b60dfd-1a40-4a5e-b11c-fd083a1e7ae3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('277ea687-6ee5-4197-9a2b-3e98f8ba2c94', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b66f752-a68e-41e4-8e41-ced04f297995', 'Visitor Approval Required — Ritu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('015484e4-705b-4849-ae01-a923d7a0fa2b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b7f9697-112f-4f6f-ac51-16705dd35269', 'Visitor Approval Required — Parth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e44526a-3748-4a31-8194-4bb8e800e822', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08ebc109-bb7e-4369-ba3a-7965c6a2d750', 'Visitor Approval Required — Amber Chawla', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d1b51a7-0502-4c86-80b0-ec128289127f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46f8faf9-3e10-40a8-ba02-31a5ffe33bd9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d48c6726-8228-4aa3-beb5-958f8e5704bf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f66870de-f022-4b8c-bca2-357993ea4bf3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08fecc69-fe25-4897-b55e-34cd0607a8d2', 'Visitor Approval Required — Laeequiddin plus 3', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e2318d9-1006-4149-8350-4b4d2f5a8f23', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('814a3d23-b72d-4eb4-ad70-ed1c01d22d06', 'Visitor Approval Required — Joythi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c2089e3-6305-4a0d-b95a-14d97c60500d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('989989e2-0d69-4451-9c42-e7199eb734df', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4281aec-f009-4d0f-8d80-e8f19c3395ee', 'Visitor Approval Required — ramesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cd6d20fa-62bd-4a57-88b5-80671aa86c6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3f470dd-c655-4b58-9a33-975b16c725fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65c87d70-6840-4ba3-a6f4-11d4a6729f33', 'Visitor Approval Required — Kishor', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c52a0ecb-2085-4d6c-aec1-7498ce3493ab', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('190d17cd-6c1b-468b-8991-684bc06f82df', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('38f0a98a-1c3f-4e80-909d-a521c5f44cd3', 'Visitor Approval Required — Gopi krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e344ce98-005e-4063-a382-b1f6b4ea2145', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89a46037-bc07-4967-9a4b-3524e9b23270', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7800a398-b4c6-4dd2-9def-e1f913be6f47', 'Visitor Approval Required — shiva', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('656e5e65-4202-419c-9c9f-d085e067ecab', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('00a3df01-ef57-45df-b798-5d8697049532', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbe19b14-2e20-4f7a-a430-c3a32fc2041a', 'Visitor Approval Required — Anand Kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('da9972ee-0c80-4ee1-b4a4-b2a44ff12d3c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('66b2b1cf-8d5d-4d04-ae91-f9e4880a3fff', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb9f7498-b3f7-4304-988f-922944680fd9', 'Visitor Approval Required — rathnakar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('df08fac2-1ff0-4d9c-877d-94a88b4f1aba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f73aad4-49e1-4f3d-af46-dc2be1f38af2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('939b8359-0c1b-4be3-baa5-2c71f592599f', 'Visitor Approval Required — Parahuram', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a12ec598-8e99-4001-9e63-1943ded41700', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2451566-8e78-43b4-a364-c9865e0f2fff', 'Visitor Approval Required — Rama Rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('19ff9d92-c344-4c3e-a9cc-3dd3b0ca09c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b7ff77c-e1b7-4296-8b3e-8fad3e409f04', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4399b131-e13f-4b34-8e9c-32dc76467cfb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e48229d7-835b-4f7b-b248-cd7262e396cc', 'Visitor Approval Required — Bhaskar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5bab0446-632a-42f0-88e7-a8a87ad0033f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a45808bf-9b28-4277-ba71-116a6701fb8d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39858525-ef34-4c7e-8323-02ec39fc6a17', 'Visitor Approval Required — Sandhya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9b0adabf-5428-44f7-80be-aef2dbed37d6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4da83f3d-ffca-473f-8567-cad1dc9ef80e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6e0c75e-992d-4bcf-8dc3-f2e074633f03', 'Visitor Approval Required — Harish plus 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('355b5ed1-29f7-4d50-980c-aeb9c495d2c6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a58626c6-2122-4200-82ce-33dd59163bb2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a9c51916-4d5d-4033-abc8-801d02fd8573', 'Visitor Approval Required — Shankar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5572997f-33dc-494a-bea4-8d3be292a6ef', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91e34361-a379-44a4-9c7b-c477df2b3dfb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79cc37ad-8409-45d3-a92b-8bc1b256f553', 'Visitor Approval Required — balu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('70364a32-087f-45aa-8cca-9db049bf8e96', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9a6cc72-34b7-4d03-9db8-4486f21fdcb8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1578a687-4a23-44c3-b8e0-74c3eb80a80f', 'Visitor Approval Required — Anil', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('36b10808-4677-45ab-909a-2ee8676bba04', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d55d50f0-6efc-42f8-8c41-df040ddb2bc1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a8a79a4-2cf8-448e-98a6-b7f7687e310f', 'Visitor Approval Required — Arun ravi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6e87c5ef-d38b-438c-b52a-5df6628793d3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('42546aac-8015-4cba-bb70-f800f079186b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('58134186-c536-4ccf-9631-a3b191f01b0a', 'Visitor Approval Required — Rashi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('77653596-aa81-4306-b6eb-9e33d08055fd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ca10fee-9830-4a4d-82f1-71535d83d73f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4beea8a3-16f5-49ce-a1d6-298c47eef427', 'Visitor Approval Required — Vishawa plus 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa40582b-685e-42b4-ab7c-48784760a5f5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3588226f-18d2-4d63-8b08-7cc56dc634fc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e2f4283c-ef79-4442-a51b-d551d2a210e1', 'Visitor Approval Required — Phani', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9219d76b-0452-4615-9332-02991c9c6e98', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d37b833-2084-462d-b037-f8da937dc820', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ada4ee1f-4cd0-409b-b311-2eeec9be6c10', 'Visitor Approval Required — Mihir Shah and Tejaswi Prabhu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a71e8308-60da-44bf-8962-567cbeda3768', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6589a6a5-9d23-4c6c-8d64-fe30d1d38902', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4ee78ca-37c0-4f9a-96d6-4a24567b0735', 'Visitor Approval Required — Azar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56fe8b5e-5835-42e1-8400-3658df8243f9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0e0023ab-806a-41e8-b39b-1697fc19f1ad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d2dab062-2875-4208-bf06-d2b3ee49cc2e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48d457d7-5fb0-471e-8b37-a1072e0d0454', 'Visitor Approval Required — Abbas +1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bdd1ac6-a8dc-454b-ab74-6e990ae5e5a2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('825b4305-35bc-4d2c-8fe8-12f46c2e492a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cb83290-ef4b-43e0-912b-29dde6e04256', 'Visitor Approval Required — Aparna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03d8812a-2cd1-4e4b-a3fb-4f33953f6bae', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('743e63af-e917-4703-927b-454f58cb8fcb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f956b05-a0e8-4c2f-88b6-4a2182b2089f', 'Visitor Approval Required — Suresh kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6084b787-dcc4-4258-a132-654f910e7d8d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b11b958-2c69-4ec6-8903-250fcbb62840', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('625f2986-4165-46aa-9cbf-3e1f2673d269', 'Visitor Approval Required — laxman', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a322819-1c34-4c30-b1a4-e750c1a9bf45', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7cd5df0-d1ba-43e7-af2c-6617ab5f7e5e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('911fbf11-f3da-4b68-8077-16dd591c2986', 'Visitor Approval Required — suredhar kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2288bf20-fe7f-4090-85e4-b090ac593113', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('518e609e-9580-4618-aab7-9b5c7999b571', 'Visitor Approval Required — pullayya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14272bc2-c6e6-4725-bc5c-27b7fb4ec730', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64d56ec2-e43d-4a7f-8b0c-0c69f636c888', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72501a99-f14a-45ea-b500-de3168568c29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f7cc0000-da5f-4361-8cef-e048a85a637d', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fc31ca7-4732-459d-b976-7988fdc200c2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bcd81d2-a0b0-4dab-8451-07382e2040ff', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd03b593-4ae0-44f6-8356-1b8867315250', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e95ea26e-6912-4b64-b2e6-d29c97b970e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c40d0fc0-2bd5-4b3d-9261-602070e566ae', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a6d540c7-3569-4952-9575-da8636df2e28', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72b8bad6-2e48-4877-8e76-c6c1e78788d2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('218fc449-780f-432a-9dc4-5bf977897c9f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5d1a190d-13f4-45d2-b67e-35ab99e4e418', 'Visitor Approval Required — Natraj Singh plus 5', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4c89890e-8d6d-47ec-982c-b6d44f70ebf4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('300a4cb1-9184-4f2a-b9bf-efca79b2f015', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('598ddee7-95e3-4de2-bfaa-b86e098296d4', 'Visitor Approval Required — Satish PLUS2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32914e7d-67e1-4ad9-a491-afec503eb9d1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72083250-f0e1-4e52-8f83-7203a3a63f5d', 'Visitor Approval Required — Suryaprakash  + 4', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8eb71d1c-5ebb-4ad7-9b9e-7a7e7cd978a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9046af2d-ab63-4553-bcfd-43ac45ff3773', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3514b431-c91f-4d4d-8720-519edfb24779', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73192c12-4483-4f2f-8f29-1f72c5278095', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae99aa6c-e003-4965-af87-4f67af597523', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97b9adbd-cbe8-4596-9b79-8e6052fba20f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ba2e0e09-4054-49bf-9e2a-f43165bacbca', 'Visitor Approval Required — Keerthi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('982573a7-7899-4fbe-af2b-5f06760707e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('691852c8-6ff6-4bd4-8651-fc63f201e178', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('265d8544-9b25-42b4-85f6-0148612ae2ae', 'Visitor Approval Required — Sreeleka', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bd617e37-a2b9-407f-975a-af5d329c026c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('89313bee-a390-4e76-89de-71907f6f0776', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16f90b7e-3f82-4fca-945f-36c7052e79a5', 'Visitor Approval Required — Durga prasad plus 2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('523b585c-64de-411d-868c-3623e69a15de', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6a58f45-190f-422a-ad5e-c2886758d1e5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f59a851-7bb3-42ae-93a2-8626965bde35', 'Visitor Approval Required — bhaskar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e6f8e476-af83-4deb-8b6d-293b8af4fa2e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2d6790c7-9843-4040-bb5e-897e70225195', 'Visitor Approval Required — Satish PLUS2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0da5bef-fa8c-4f91-9ce7-536abd991bc5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a7478798-70aa-4bfa-8fe9-4457e09caf4e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4305acbe-a0de-4e9a-a854-3605569e3bd5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b67fab4-2ed0-4aad-81b5-c40efc674705', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3386e2c1-c62a-47cc-b818-8f51d4e964a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('923bc1b4-1791-49d9-84d9-98b7fe2ca1cc', 'Visitor Approval Required — KARTIK +8', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4edac86d-8784-48ad-87ce-474471527b8b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29c5d582-9a3d-4e3a-920c-fee86726bd53', 'Visitor Approval Required — Ritu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dab4a7ce-18a5-4858-a280-a3242be203e6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('54b9d996-6cbd-4ebe-8566-2dcf57f5ef35', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7fcb4be7-c9c3-462d-9c15-a30c76554485', 'Visitor Approval Required — Amber', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf189dd0-aa49-4606-8afd-0aa7ba92cd47', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03ff29b6-2e54-4273-ad22-81477c9ad88a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6b5330b-ef9f-4a51-91eb-441dde1610b3', 'Visitor Approval Required — Sundaram murthy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e5d5f11e-4a38-4de2-a4e6-50d658fdb2a8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f95ec6f0-34c9-49dc-b1a6-fa255f617bb5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b4830638-c669-472a-a643-cc189a6421df', 'Visitor Approval Required — Ramesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55a28fcc-ae3d-4a07-a239-ffc0274680d2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('63a41044-9d32-4eec-9a0f-9e4d3c79177f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0f17d12b-bbe3-444a-ae35-55d93c5a6239', 'Visitor Approval Required — ramesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('78636702-b35e-41aa-ab25-43b042a3323a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fff9f9c1-40a1-472d-af99-71b124a5519b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d21550e8-d5f4-40a0-9e63-77181859e72a', 'Visitor Approval Required — asif', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('786c8ff6-fdee-4e90-9f9e-282f541d5662', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('182ba99a-2b1e-4bcf-94ee-9c32ebec3be3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('33e006ed-adcc-410d-ad11-18d652be4ac1', 'Visitor Approval Required — Akashraj', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ed24cd44-9baa-4e08-9a7d-60d9cb54971d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccf45f04-3ade-4531-9fcf-f42efa2c4d1b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45bed370-1927-47ef-8f4d-29a9b1f56e97', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ede20287-1b89-42e8-b597-38673fc3b7bc', 'Visitor Approval Required — Stalin sahayaraj', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa62d012-fff6-463f-933a-ed3d4776ef62', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('21ebed9b-b927-423c-8d0e-6aff65fda8fa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('999869e6-745c-4a27-93dc-c34c9fd55455', 'Visitor Approval Required — Prakash rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('800e23e4-2c01-48f8-a2e2-d45b8c0b7db2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ce01b4b-0d51-4443-8693-9131949f0ba5', 'Visitor Approval Required — Mysura reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a597378d-9579-42d5-835a-c2b4022fb788', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('390062fa-8df7-4005-aa3f-6bfb202c4228', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('868cfdac-06ac-43c3-9dd6-97c9fb21788a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c13ccd7-846f-4cbe-b468-3929abba4108', 'Visitor Approval Required — venkat', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('700be2f5-723a-4497-b83d-9846e4238339', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c38f23e9-5396-4d4a-a5f0-a9e321b2b7a4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('59553a88-5df1-4558-b863-8cde42a9d394', 'Visitor Approval Required — Vaibhav', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a5af6821-2c2b-4794-b722-b6450fd308e5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3be7e948-6065-4cac-87fb-dacc38644028', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a891d48e-8204-409d-8fc8-a1b3ee78459a', 'Visitor Approval Required — Narayana', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e2dea6a-8216-403a-be39-6891147e25ce', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8bc98579-f4c8-4878-a748-42d6f42d9f3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea0dfcbe-e7fe-4ab5-9561-9f91e617a437', 'Visitor Approval Required — Sudheer kumar yamsani', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9face87b-d65d-4843-8561-c5440c9eb70f', 'Visitor Approval Required — T Ramesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c4f3a00e-e9fb-47c8-a8dc-b36bb2961d18', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bbed1a63-2ff0-4a06-9c27-9444c57befb2', 'Visitor Approval Required — suredhar kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1dd47a4e-d79d-4395-a589-9b5af3a447e4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('541cd970-2f35-48e9-a9c9-fff7a23a62b4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4268aac8-9bd2-4e9c-8204-39547680383a', 'Visitor Approval Required — gouse', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f181fae0-32ab-4106-b09c-5c0e4f809de8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dd90cba4-47dc-4b7c-a83e-79b9ecda1d88', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('152ced2e-7e31-43c4-8b80-85c6a7bd38b8', 'Visitor Approval Required — jayanthu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('487a8827-d350-45b4-8536-b7b435dacc27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8dc8088-4ea3-4192-a940-edd6e9411f4c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8553bedd-1df5-4478-a0ff-7a065261bb36', 'Visitor Approval Required — P BHASKAR REDDY', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('11bcc026-f476-48f6-baab-53cada375741', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('065d6677-f848-412d-9e13-9a6711d2953c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('47f7aac6-da22-4f32-be31-13ad41b39b14', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('767db9f7-e830-412b-b449-7826aa148929', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7657df19-2e06-4ef6-bc61-f1d2deeeaae7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49e6d8b2-134d-4682-aff0-32334fd7f003', 'Visitor Approval Required — Ghousuddin', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f92b391-21d4-4c78-b4f5-f0034320545f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4d8a360a-9c96-475d-9f33-3e763062bf09', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09e202ad-46e4-4150-bcea-07b1922b0378', 'Visitor Approval Required — Shabman Ahmed', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c7a1ebf0-5f0c-48e9-9e30-1f8c86223aec', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56b01f14-5384-4160-8240-a9c0530c6127', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46387db4-cdcb-44e6-8ae0-022a418d27f2', 'Visitor Approval Required — yusub', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5f05c7e-009f-4abc-8545-1d3b0804fa91', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b96ff445-845c-4807-bf47-41c361785407', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('acb33674-0bde-4bc6-a52b-c6a76d155ff2', 'Visitor Approval Required — Vishwanathan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d26f86e-25a3-4e2a-a01b-28fb7d7e3fad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('032a607a-677e-4642-b825-dc69beb5a44f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e666696d-411b-424a-bd22-e3bcaf3ae0d4', 'Visitor Approval Required — Ramesh babu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24c94c5b-eae6-409d-bb2f-3f6eb2662f12', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b1bef26-1b56-4139-ae72-c2f2a72d3bc2', 'Visitor Approval Required — pullaiiah', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2efc2a9-35c4-49d0-96f1-b50002ce2fe9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1f9eaead-5ead-4f32-abf9-6068a9bfda21', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f01457fd-29ae-4bcf-b691-fec82e80050f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('95fd6eff-be87-4348-8574-e985e8c49d71', 'Visitor Approval Required — laxman', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d91304a-c88b-4d3e-ad8d-4abac02c58e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4386574b-5a40-4b7d-85ba-663a70ce7440', 'Visitor Approval Required — srikanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccdd6b37-14b9-4281-94bd-c851c8ad6bc4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('76ecbb0e-2e0a-4c8f-ac01-f42d0873068b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4882286f-43c2-40a8-bc0e-756b67286bc4', 'Visitor Approval Required — hariprathap', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d01e8afa-64b5-4412-a268-8ded265faf43', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d0e253a-80ba-499f-b47b-9ea721b757da', 'Visitor Approval Required — krishanakanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09d620fd-880c-4ed0-8f9f-371a2e2b1800', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67e73226-3058-45d3-9b36-e7d163ff1f73', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b198a3f-1c93-4b56-82a0-c92cce1bd717', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0afe203a-9680-4c46-ba5f-337a4608f666', 'Visitor Approval Required — amresh kumar ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40581fcf-dd99-402e-9b1e-cd4edf224a92', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b52fa5c6-bd8c-44c9-b96e-721f1d445c35', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1745b894-3226-4176-aa8f-a10d410da326', 'Visitor Approval Required — gaffar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ec3e1ea-cd5f-44e6-8e93-ff088d735c8d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f75dc000-216a-42d2-bf85-8d3b1ff69971', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1661408-e4b0-4182-8f09-cab309d7c34e', 'Visitor Approval Required — Rutu raj', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45b34585-2b5e-4315-85c9-517b2c37c665', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28ca60b2-8e99-49e2-a205-7fa341f6972a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('110eb8c1-3a03-4f1b-a735-2014f9fb3181', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6a7e70d4-65f8-486d-ae83-82f4e8980532', 'Visitor Approval Required — Dr Rajkumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8914b131-c7a3-46be-87d4-39b48c4999b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45315475-6dfb-4cc1-af15-ced52e4b5753', 'Visitor Approval Required — Satyam plus 2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43eb46ee-b1d3-4790-9991-f7458b36225b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bfafb6f-36c7-49d0-89b1-b043aa9ccf8b', 'Visitor Approval Required — radhika', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c1453843-0a50-4564-920e-ab468d56702f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7bb65dfe-8f9b-4dab-9689-bff64e4f6069', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a94c763d-6d75-49bc-98b6-4e6487937e23', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe19e14c-efb7-4b52-a5e0-36cd519f9bdc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f06aeee8-a6c2-449f-aa10-4343b13b1642', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0413a3a9-7acf-4be2-bd93-90729d779d7d', 'Visitor Approval Required — sandeep', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e526f80e-9053-44d8-8605-fad3b909ff41', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65c31364-e950-4939-9b2b-77adfad388de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3755b578-6d67-491b-a2bd-8be80db466ce', 'Visitor Approval Required — PLN VRao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1b7cbb34-0235-4c1a-b973-1e41a5cb42d3', 'Visitor Approval Required — Nagesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e9fa675-2ec8-46e0-baa7-35d2810a8d3e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48e36c3e-12c3-41fa-ad3e-d34077637301', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bcc75d2d-5ed0-49be-9085-b1803f79feb4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17968074-80f8-4df9-a7f1-669fd8350ab2', 'Visitor Approval Required — Devender reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79c76ec8-52ef-40b4-a966-7a92a2e15913', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d4643c3-72ff-4893-be76-76b03b61da67', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fc0940e5-83fa-4fc2-aed6-26a0f5a04cd2', 'Visitor Approval Required — Muralidhar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7ac64ca1-13fb-4cf3-9099-b839c7a79d04', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('554d41ae-913e-460c-8af9-d5c8a0f49846', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5fc01b80-ac71-4ad4-9da2-de219d98759b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32817a3b-0587-4d53-9dee-b573e9ebfa30', 'Visitor Approval Required — Dr Raj kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('501c8a17-1e62-421e-bd0c-5d0fdeaaab9e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cecb897-cc64-4dbd-89b8-b23eb275d532', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4be95a1-6427-49f1-b538-29506ebaec52', 'Visitor Approval Required — bulli babu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf48ae02-b57c-4ce1-88d3-6ed0aa7be641', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cfe730db-f77b-4ae3-b14a-d4013ef43cb1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('055ded7e-d188-4ac7-8d71-ff15e89852fa', 'Visitor Approval Required — Rajini', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ea817a7d-2c8b-4e90-8a94-855b4a7f95e4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7b85ade-a8b4-48f9-8d34-7a37487654da', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cfee223-29eb-4603-915f-b05fbf1a2353', 'Visitor Approval Required — Gourav', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7a4f1bb3-53ac-471a-b461-efc60c2474fd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f0e073a9-2660-4a13-9259-404f36af575f', 'Visitor Approval Required — Ram gopal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67ac4166-1fd1-4597-8136-823affc94724', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c425d201-86a2-4dc5-ae16-0a506b13a5b8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17e45821-2a6f-4f58-9696-c177ebcfef5f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81d07cb4-443f-484e-990e-2f7583038201', 'Visitor Approval Required — naresh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f4492529-5911-4023-967a-ddad41cd84f6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94d8f56b-39f3-4171-a633-905e4f77a63e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f92931e-5de8-4cc5-bbcd-8c1a412be413', 'Visitor Approval Required — Dinesh plus1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ade76957-d3a5-4e33-b4e7-8ecb4e35f0e1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5510350f-979a-44d3-b408-8e950835a88a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce52afd1-cf88-43eb-a224-f15cec1fc6d9', 'Visitor Approval Required — Laeequddin', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('67819bde-ee3d-42f4-a836-ed9314a6cd3e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f630b8c-c2cc-41a5-bb5f-fee377828fcd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e6c48dd-afd8-4356-9357-71d5c2bec696', 'Visitor Approval Required — Srinivasa rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('299d5acb-3003-4396-81ef-c59757c15473', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81becc5d-9e3a-4b80-982f-f65fe8815f2d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbcad898-7185-4c18-a031-c2ec329d6eab', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cc3ee28a-8774-4368-9f64-8efbeb6a7bda', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a484103a-44a0-491b-8606-fc1bc92e76e7', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e3e86bb-7e46-4238-91bc-3a8780e604d5', 'Visitor Approval Required — ratnakar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c60cdec-2120-4f46-9ac3-7c15fc3aec5f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('77f596f1-3711-4f78-ae17-ca6911a8b3e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('537e671b-000c-4047-a38a-007a9083ceaf', 'Visitor Approval Required — Bhanu prakash', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f634fdd5-6535-4889-abf1-a0842e01da4d', 'Visitor Approval Required — Parvesh alam', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e55f1d8-bd66-4aea-8c45-f0c1628dc71f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('caa13ba9-9ec9-47e9-a9ca-731a02e2adad', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e78bf94-a673-4ba7-9f59-6f19d5df8053', 'Visitor Approval Required — Saida reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae472e6c-f87a-40a1-8153-c109de977919', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('97e0af44-3b8b-4210-bac6-59a5db51bbf1', 'Visitor Approval Required — yusuf mallik', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e96ad131-191a-4805-a082-b2c1e47226ba', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('88220702-f494-4e95-ad57-024a98a8a4bf', 'Visitor Approval Required — Him Vardhan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f398a812-5b8b-4615-aae6-caf072ca4dce', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('50737085-24f2-4fc1-82b9-bdd11746369a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('36b8d107-93fa-49d0-ab58-7c9a1af2474a', 'Visitor Approval Required — thabul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('abdc8d49-318e-4c12-85f9-0edd366b3648', 'Visitor Approval Required — Him Vardhan plus 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('04c4daf9-fe21-45b3-9d8c-5e9b30293c63', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dec96bb4-8b66-4a46-92ad-2cbeb46a6219', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b549b98-2321-4a28-907b-299b6b0c4d89', 'Visitor Approval Required — V Subramanian +1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a27ccc51-39a7-4631-ba5a-c7f4256e1ec0', 'Visitor Approval Required — venkata raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e67ca71-be53-400d-8c6f-6d9584f10707', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7483bb5b-31f6-47a1-af5f-7717dd2472ac', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55b324f4-59d2-4a85-a327-1bbc13e59007', 'Visitor Approval Required — Gomathi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eb90c538-e921-428c-a221-7fe3fbba1ee4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('90393e3b-f471-4dab-a032-846bcc702143', 'Visitor Approval Required — vidushi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('53b64bfc-f614-4d30-92fb-808cf323d5b8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('afe10039-f7b6-421a-ab10-a8041551a98a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56f7f8f8-e4f7-4df2-8783-57f4f1ec911f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72b73a93-0888-42fd-96fb-01d6feac77cd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3114862-6810-4c4e-aad6-dbf3594755aa', 'Visitor Approval Required — balaji', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c76bac4d-7ed3-420d-bf46-0cebd5d63719', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('034d6a0b-6691-4cc3-9ed0-7c9712a27cc2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('92920ba5-91f1-47ac-938e-0ceacb393910', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8c23a4e2-1cfa-4eaa-a0ce-111cb8046523', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94056107-5536-4cf3-a2c8-68f35daa1787', 'Visitor Approval Required — suman', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('587c0a88-4b70-4a59-b24d-d6a608e95d0c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cd5342c-64ad-4c67-a1e5-b64817f17147', 'Visitor Approval Required — ravi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73040df8-0332-4fdf-9722-68b4b382b383', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3cce858c-558b-4459-b174-80f56a96615a', 'Visitor Approval Required — Shravya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('18cfd879-d2d7-4a04-a93e-1920eeb0033c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d85ec756-328a-4407-b663-8ef872d51d29', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4f5a19f-19f6-4950-8af0-449b366929a1', 'Visitor Approval Required — pulsing', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b9dbf1e7-d7ba-482e-9a97-0bb6e93a5aa0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7bd3d088-7f36-4fe7-a3f1-33e04f170518', 'Visitor Approval Required — Shravya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2897c63c-5ec1-4f43-87aa-b4904d1d5ada', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3312137f-7090-4600-8ad9-445c4c31b63a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('309528e0-8614-4673-9fc6-daa9b49c1802', 'Visitor Approval Required — suguvendhar ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a585dbf0-2b3f-4754-9c88-6f5e0b4d130a', 'Visitor Approval Required — ramannamurthi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af0db707-f526-4cc2-afff-07dc685cfa46', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a3115d17-77d8-4102-9c2d-7f2e7bb297fb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75a877f8-2161-44c9-ae7d-2f956082bfed', 'Visitor Approval Required —  Chiranjeevi K', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8a7810b6-d770-40ef-91c6-0f495958cc75', 'Visitor Approval Required — ramakrishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('10f5b807-ce52-4803-869b-302239c18fe6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2798fbe-9c7f-4367-b859-0f2da2dd5992', 'Visitor Approval Required — Sunil Tulasidas Patel', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d896a0e-3226-4568-9b71-50307428adc6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f8fef130-a367-4bfc-8a56-e70bb80720c4', 'Visitor Approval Required — Kiran ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45fb1b6b-c53d-4e0e-a176-e653f7ec1d9d', 'Visitor Approval Required — vara prathap sunchu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('75c67632-8c97-495d-aa9f-03ab89b8cb2f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0faff0a4-5cbf-4130-9bba-a59995eb50eb', 'Visitor Approval Required — Raja', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('03ffc721-5634-4f8a-8f37-b728bffc6ee2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6d554ac-93db-4cb9-95dc-df010ef2f6d8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8cb2106d-4bbe-47f1-9e7d-75fac428ce26', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5530db1-7a93-4a3c-9799-3869d2a0995a', 'Visitor Approval Required — nageshwar rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c9e543b-6b8d-41a6-8dfd-866c5f9e043a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a7e1fec-cb70-4f1a-99f9-3a29afa4cf80', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8d2c374a-025d-4833-8064-83baa136854d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b09c87db-4e81-4046-9f24-8372977db9ee', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e8f8e923-bfec-421d-bedc-a811907ad6e3', 'Visitor Approval Required — Sai krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('94ae39eb-033b-4f6f-a63e-a57a6c6c72b3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('081a457d-5f1b-4a46-b528-ad594d75c858', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('664f951e-c04e-42bb-9693-626d1d3b22fa', 'Visitor Approval Required — Kiran+1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('181240a7-4062-481d-9dae-3dc91bdb0ba8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('39a05b81-39cd-443b-8479-08c5e2d88238', 'Visitor Approval Required — N Srikanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('904d623f-26bf-4265-a37b-fa132e2c065d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7d5b5f78-cda2-4098-9aae-2126e32fd8f7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9393e47-65cf-42cc-a3bd-bea18cee8f7b', 'Visitor Approval Required — Suma', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1c1b74a-a2ed-4606-af9b-11dc768bfc3f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cdfaa18d-d75e-4ca4-be8b-9daf3ed3a3e5', 'Visitor Approval Required — Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5d532726-9b8e-43e2-b330-4c137fcfbcc2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('86240996-aa2e-4bfb-9ddc-428138023ecf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f96e62d4-4ee6-4a93-9f62-4585a112b3be', 'Visitor Approval Required — deelip', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44265544-50cf-4573-9805-db8c2c5b9541', 'Visitor Approval Required — Musharf', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41fd2167-f570-4cae-ba62-d9f395611e5d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d0defff1-d55c-4878-bb9f-7806a195cc86', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('72857cd4-4339-4f04-837d-7f2534605b94', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d18047ff-8d52-4442-bd7c-d98605c521d2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca5d0547-b212-437b-b6bf-218ad2f00712', 'Visitor Approval Required — chandan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('831b79ee-afd3-4d78-917e-122e6390b202', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('30aa939b-c657-473c-92f0-f201091a3e43', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f66a6fa0-d49b-4f65-85ff-6dc686266671', 'Visitor Approval Required — Vishnu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8fd3c85d-12a8-4a34-8148-6881f769f40a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5c309117-5e15-40ff-ba02-be0523917e5a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('434100dd-4a98-4a7d-a557-5918d118960c', 'Visitor Approval Required — pullayya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b6121f37-959e-4e2d-951d-86031074ec3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1d992679-38c9-441c-aad5-0fe64bedf3a8', 'Visitor Approval Required — Parvez + 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('153c7fa4-20da-4dc9-b70a-617034cab455', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fddf8731-bfe9-4efe-8a52-62edf3f36ea3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c00fc69-1dbf-4e86-9226-bbc89744c444', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('584143ae-bb0a-4b34-b049-e93e3f645562', 'Visitor Approval Required — Rakesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32220a94-2ed6-4587-b5fa-f4d2d0aecc9b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7ef035a-41f5-4261-936b-664d4e6be021', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d3a896b6-e6aa-4b8a-9fc4-71f03c18e6f0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('742a2a65-5725-4f0c-b291-700973a53cb2', 'Visitor Approval Required — Ahmed', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d187ca98-ecf0-47ab-a64f-241211bc3e25', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2a3b008-0371-4ffd-8083-d320d3d295cf', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a37b4b6-a9ad-466f-b150-ab2bb2946ce0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf39baff-b100-4bb1-99d3-80f80bd84bc1', 'Visitor Approval Required — Harish D ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf45dc53-5786-4600-9cea-fa995bcf39c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('43a086a1-e4a2-4eb9-a415-13d4333474bb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5d5d4f63-ba9e-46c4-a502-c48a2acef8f7', 'Visitor Approval Required — Rama Krishna', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0a32e6e-b3f2-4202-892a-28802b439bf5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41de2e4a-f63c-4a1c-b271-b9c9a4495bc5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a46a710f-f357-44bd-bbdc-a14034bb6165', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ac15656b-a297-42b7-9af0-a7344df75ee2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6261f2f-52b2-423c-9bcc-714fd3750ee2', 'Visitor Approval Required — Adharsh +1 ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d63d7282-a160-4dd7-b2e2-9c57d449bfdb', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('897f8ad0-d2fa-438f-83ca-45937808052f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a86a431-4cd5-44c5-b9c0-ee18c405ee86', 'Visitor Approval Required — devendhar reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2086d48-99cb-4d41-bf49-942d3e754539', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64fc647d-1078-4a39-9225-e907d402de11', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d4af6341-c95c-44c8-bdfa-31267be9c8ca', 'Visitor Approval Required — Pradeep +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6541eaae-cab4-43a1-a7fb-0800a356fe17', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9405141f-dbdd-4950-b34c-8c63368f1fcc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9300d384-5e40-452e-a61b-5d3fa3e8ab23', 'Visitor Approval Required — varun + 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9edf7b1b-2003-42a3-99cc-6573582c406a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f3eb6103-e7bb-4181-88cc-176436c2eddc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46c2c30e-be45-46d3-87e2-06f8e8dddb22', 'Visitor Approval Required — kalyan  +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e7874a8-688e-4870-a8d1-dfa2a5a32184', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99c79c97-e5b2-409b-8805-5e5ade11ebb4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79233c07-71dd-4738-8fab-721889de826e', 'Visitor Approval Required — Shabman Ahmed', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6926aea1-6c58-4f7e-bf2a-04bdc7d4a88e', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24ed03f8-74d7-4f1d-b926-0d1f8b176ee2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d14fd302-d5e5-43c6-8042-1fb410a22635', 'Visitor Approval Required — Vishwanathan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b580195-e4c5-401f-ba84-6ae36d1be885', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2c238748-c558-4f06-a3e8-f029c1fd4113', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e86fa6cd-dcee-4e23-b4e0-aee22659b367', 'Visitor Approval Required — manikanta', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa2febab-5da1-4a61-adc6-603f535e0346', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('426d0d14-10c9-40f9-8dce-fe2e9b8676ec', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f10106e-60ac-44f5-94c7-f436ffc59da5', 'Visitor Approval Required — Bueti', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ae9873c9-17fd-4c92-9c97-012873b41ab1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8ce7ab0-808f-4bae-bb09-86d14d1e8679', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3d8a6695-63cb-412e-9c00-d2f406157584', 'Visitor Approval Required — Pradeep', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cffb57f-7a6c-4c74-9375-e6fac9e29e3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('266574c7-7ba7-4b3a-9ea7-78a0023bb08b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bc9cbb3-8467-4898-9c35-298c9c074cb9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9d388903-49e2-4db0-a710-44e3bcfbc287', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7553880a-fbf5-42c0-bd5e-a51eceec4583', 'Visitor Approval Required — Prabhakar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdd70e7e-0b43-4091-91c8-bc12fa9491d7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3954c0c5-1e18-43c9-927a-b4b86ff73346', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbb08d83-af0f-4c22-822d-0f1f8d47108e', 'Visitor Approval Required — Hema malini', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ab78256-e344-498a-bdc3-a4b4fbaf7482', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08a7baf8-f82c-4f5f-af56-d9d929f1224e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('22f5faa2-56c2-4c9a-bd50-4e532e749278', 'Visitor Approval Required — Krishnaveni', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ab062b9b-c500-433c-ab7f-c1faa0dd5731', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ddfb0ed7-6fec-460c-927a-2d1241c268c5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1ffa33fc-a477-471f-b6e9-31b08d819a0d', 'Visitor Approval Required — Laeequddin', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca48b4ca-f20f-44e1-bdeb-5dbaa519e7a3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e3814dd-98ed-4784-98b0-fc308424c74f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1a905167-9f44-4935-a6d8-4dbf41967949', 'Visitor Approval Required — Mr. Shailesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('690f7249-efa2-4c63-b68a-b50d3013e23a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35dd8c08-e81e-44cc-b9d5-ddacaeabc28d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('179fc5cb-1627-476b-b466-c2650d16dbe1', 'Visitor Approval Required — Krupakar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('52863913-7107-4689-b913-feb9523bad68', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c54973dd-4331-416f-b378-a7b859ef0934', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c499dff-ea25-4e85-8e3e-a7c6287af02b', 'Visitor Approval Required — Nitin + 1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e2594a4-b215-42eb-a080-696b0eeb4560', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('407ad7d3-82cc-458a-86eb-bc77cfd02d41', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('29652e80-1bcb-46e0-aa30-7f6a9e85093e', 'Visitor Approval Required — Sudharshan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb6b9765-5a5f-4e99-a1d6-66d3b2baf4c5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('81350dd7-7b8b-4270-a517-9c28483ffdf6', 'Visitor Approval Required — Sudharshan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ce373e59-092b-4c8e-892a-347d01f7986c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cc32367-839b-4945-b2d3-37523cadeb86', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc6573a8-c56f-4aa3-9196-02ab453be61f', 'Visitor Approval Required — Lavanya', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bda89b5e-db92-47e4-998b-d985c9364831', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5b2cdf15-104b-44e6-bf5a-9e6c702ccd0a', 'Visitor Approval Required — Deepthi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('25283eeb-f51e-4206-97d4-50054f381dda', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b1531ee-002d-4ec3-bad2-d13e12e01f18', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('32d791c8-f66b-4e6f-8df0-cad3a47733d3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e205953b-2298-4690-a724-048976d799a1', 'Visitor Approval Required — Akshath mahajan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('31ad6727-89d6-44af-a30c-87df65e83569', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('08f614ea-0ea8-4774-aed4-2718c9b9e336', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('14ece5b9-1269-4abc-bdce-90da4c69cfe6', 'Visitor Approval Required — Ram bopal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e97aedb5-f79e-485a-a0c6-201fc04aaa85', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('01973c6e-b47e-4ab0-9dc8-6fed7d6e3119', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a975177b-ec69-4bee-a5a3-a99c848a113b', 'Visitor Approval Required — Abbas', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('985cb7a5-3843-403c-acec-f964ff701279', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('66baf44b-2db4-4df7-b454-ea31331745fd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9daaf1a9-1910-40ea-afda-0dbe8fbdb611', 'Visitor Approval Required — mahesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4221b60c-978a-41dc-8cb4-7502fc367435', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8347ced5-df26-4310-a166-19c935702941', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa8873bb-0424-47d4-b64c-9dfa235896fb', 'Visitor Approval Required — Syed shameer', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d6dae41f-1b80-4c38-b35c-ee4e5d55deba', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('24da661b-0dfe-4ef3-98a2-5cf815a543f7', 'Visitor Approval Required — Charishma', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('56818cd1-0f1f-43d2-9c92-8373cfe5403a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4695eece-b251-4142-8e2a-bbd2d1f53061', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a28c2d8-5443-425b-bd67-5103dc7fbd7f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf8715e2-835a-4ed5-b569-9907a72e6feb', 'Visitor Approval Required — Durga prasad plus 2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f08c766-46cd-4b65-b0c4-c0754708c581', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5a059f17-660c-40c1-8d73-808d170f71bc', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a15957b5-e417-4df6-93a0-1bf1f2b45406', 'Visitor Approval Required — naresh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2ff43a9-41c7-4d03-871b-57574f0ff94c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('21441326-fcb5-4cc5-859b-d0223ceca87a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aa6f1293-1725-45fb-9285-35b854d7c9c7', 'Visitor Approval Required — Chandu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d269dd19-4a88-4b92-970e-fc433f0316fd', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c2460b34-8fb7-4233-abba-6730a0331efa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4002fc4a-e89e-4ef4-85a4-15fbe27ff567', 'Visitor Approval Required — Swamy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c98fa8f7-ed11-46ff-bcdf-429b97d50d9b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6b4f792-9ef1-4423-a31a-eca7ac44f238', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('61d30d28-1bc8-498a-b89c-031033db86cc', 'Visitor Approval Required — Durga prasad plus 2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b90a6d8c-ae1b-4b24-ace7-9c34ab16044c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c3668d34-6108-4a39-9a06-1d05c48467ea', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('12fa50fc-0bd9-4404-96fe-4307ede55ee0', 'Visitor Approval Required — Rahul', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dd8c568c-c6b3-4ce3-98ed-703c81a3f8ad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b5d80495-c360-4bf5-86ba-266c3e954485', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8812e3db-ef10-4c90-9fbb-cfbc6a907ca8', 'Visitor Approval Required — Prashanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('79863d0e-c716-4bc0-bbb7-804405ed3d2f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45ad868c-94ee-4888-93d2-630de2a77430', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e21c8e3b-58ac-4749-9aae-ab0a9ddf3fb9', 'Visitor Approval Required — Arun gupta', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('44cfaf4d-1013-436c-b201-1e410300f756', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3345785b-8a71-4001-ad13-d48ebd168726', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9a80125b-34be-4344-b7e2-b90d85d48a48', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5944ec60-9302-4496-9635-b6a29047717c', 'Visitor Approval Required — Jonson', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d608ad1a-8973-4db2-87a0-fe18a5a18c69', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3852d278-c7cf-430b-adb7-8ebd79b422cf', 'Visitor Approval Required — Suresh raj', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('805a315f-6e75-4663-a015-54502bf86200', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fadfc3e5-e754-464e-bb2b-3027421f5414', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('82a708b8-ef28-4b88-a23e-830d8698f5d9', 'Visitor Approval Required — Varun', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cabe5a82-70c1-405c-9810-1761fe197d75', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9e6646a8-74fd-400a-9fdd-bbb491ddb1d6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cb09a04f-8c79-4ba3-a25c-43ba2820b57b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c1973d0-21f5-4233-8f16-3fc2549dcfbf', 'Visitor Approval Required — Harshavardhan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('28c44622-129b-47fc-8c8c-a2bc8be1ec30', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('283a3abd-562c-488f-b1aa-3b7a3add8320', 'Visitor Approval Required — Aravindh reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('949846dc-58aa-407c-9017-e6e666c45e5e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa78b571-da61-4445-8d3c-fca34759a224', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2d9a3df7-a60f-4041-b853-7e8cae069485', 'Visitor Approval Required — Bhaskar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d5931b15-76e5-4b7d-9fc0-656b23a4d243', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2768c7df-486b-458a-a7db-0ffcbbc09514', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07844888-37d6-4c4c-85ff-8756b7d38fde', 'Visitor Approval Required — Arun kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb0d47fa-fb58-4342-b7ec-c8a5271b828d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4902fb77-61b9-4ba0-b0c6-48b8d7b5138c', 'Visitor Approval Required — Vinay', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d5052b3-a1f3-4e44-a844-e8b931d1e706', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('770022f0-de17-4180-88e8-d0b6fbf79840', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('35afce2e-21e0-47f9-9999-c146e419caf2', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8e5d97c3-af55-4503-896c-06d8d02a2855', 'Visitor Approval Required — Kiran', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f82d61ea-80b9-417d-9540-09b9832bbc7a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('abff6ae6-b812-4bcb-b8d7-5538e9552832', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6d576f4-f56f-400b-b294-c9119b2a45f6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9c36bc51-fa66-45d0-ae4f-17860c7e12c1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fb271cef-3791-45e8-89ab-6ac02abcdbc8', 'Visitor Approval Required — Rupaak jain', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1d57fc04-6317-46f7-a08d-16a992603385', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('48cefd1d-9a8e-479f-914e-cf5ac840ee00', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c31caec3-cc59-4649-89ff-448dbb5dda0c', 'Visitor Approval Required — yamsani sudheer kumar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4b538b23-abf2-43c0-8745-a57edbb91fb0', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b952e85a-d7cc-42c3-ad7a-d3044992a255', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f26c7483-498f-49c4-8f61-ce733feb89ba', 'Visitor Approval Required — Jamit', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdd2cfa8-decb-4c8c-9738-1754da3eae7c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d44c0e92-023e-4356-a811-d708e8bfbae4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2ba705c3-8b85-4b2d-b7a4-8d9aa0fecf4a', 'Visitor Approval Required — narender', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4ce87df5-b1b2-4dc7-8a12-06a50d3b1cf8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ad6643b7-5d57-4077-a676-2cda23fdd44e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f4c93c4-77ca-492d-b715-dda849781d5a', 'Visitor Approval Required — Jyothi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a88b2270-e88e-45ed-ad77-e84cec6213f3', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf71fa4a-b8ad-4fae-a640-bea36077ac5d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1e25cd0d-3968-4062-a51b-b077f9f7720b', 'Visitor Approval Required — Pravesh +5', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('20ae5c48-a44b-4af3-8e1a-4b1dc3683be4', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09b3baca-9aba-4f73-82d2-0caa1f18880b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7c4ed7dd-27bd-4455-9616-c13121636a7f', 'Visitor Approval Required — Akshith', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('015d4ef9-eac3-4980-98f3-eb0264684f33', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0b818f4b-81c5-4b18-9ce0-b6c035c49521', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c8ee7a03-5f0d-44ac-a509-b88b3f03c166', 'Visitor Approval Required — Devendra babu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('766ba1d3-5df0-496f-88c8-56d1125045b7', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('164866de-e09a-4f95-aa05-2b8349b7ebb3', 'Visitor Approval Required — bhaskar raddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3885e97e-fdfb-419c-a9d1-52a05c59d6ed', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e150567f-f6e6-4c6b-94cb-db8e5e2a71ea', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('09b4f4a2-c8ca-45bf-88e8-14fa88dd84c5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c6f5a06b-05e3-4ad0-a041-680ce6cab518', 'Visitor Approval Required — agireddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('452943d2-219a-4ed1-9f3c-eee0e65f4b79', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8f4f4a89-3458-4d07-ab91-ed30ae9b938d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb22a5f7-1dd4-421c-81b7-404967011eb3', 'Visitor Approval Required — Nikki Abbas', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ed92545-1bd2-44e6-8ec4-81ac7bd10aad', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7edec23a-8a29-4361-a7b8-446e751a3e62', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb62e957-2801-4bf0-b60e-346991763007', 'Visitor Approval Required — MD ABBDUL', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4fc31f3b-2ff4-4730-ac5b-73357a90ae6a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f6fc46ea-7ce8-4bf3-afcc-3fd9518d0f4a', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9bac5cff-bc1e-453b-9691-ca190901f5dc', 'Visitor Approval Required — Raj Gopal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0c8e2b70-671f-4145-afff-61fb3e53b262', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1807beca-0d2f-4b12-a24f-127818a1e9c1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5cf9aade-41fc-475d-be3c-b7e68b868c5d', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2e86d618-5805-49a2-af4d-7463ede14a0a', 'Visitor Approval Required — Sravanthi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('381a2cee-5f79-4946-a39c-7805e22584d6', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e4bc91c2-5872-4860-aea1-07e71f9fc7db', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40f18551-c8f1-4336-9fc1-4d0ee7841ba9', 'Visitor Approval Required — Prakash rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('30767cce-095e-477f-9b0a-232eb728b50c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('04c51018-adb0-47e1-a3ed-f8e9b4428e7b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f2d2f4ee-eaf6-45ff-b384-a474e621952a', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fed56fae-d986-43bd-9955-a40b6748ca4a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fe54e89d-7422-4437-9a93-bfd50cf06c63', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b858fcb0-0ae1-4e1d-8a0a-4d58bcdb8bf2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f741f51a-6bfc-4658-9bb0-bf47a35185a5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ba6c4506-2965-4710-ba78-4e7e233cd9bb', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e1d0b07b-5a5b-45cc-8359-6fe5c659f491', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('387032af-0e59-440a-b8e6-6b30928ec47d', 'Visitor Approval Required — Harshavardhan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c02060b2-0b50-45b4-9c96-254535af18a1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f262a0ba-5f89-4e2b-bff3-846798bcd419', 'Visitor Approval Required — Aleem +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('46eb14a8-3a42-4cd7-819d-15e7c7fc32b9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('05ce1d21-17a1-4242-b77d-b6c00fff3ad9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0552b273-df8b-4efd-a72d-b3460e9c307f', 'Visitor Approval Required — Devendra babu', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0d914dd4-1df4-40f1-a093-b2973c997be9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bbf832cb-a752-4e4f-ba55-8b575c4f4ce9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('359b62cf-53a9-461d-b955-aaf91b60788c', 'Visitor Approval Required — Suchithra', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('73320950-b0d9-4d76-8166-530846cb01fa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a0f28ce4-bfc9-49c1-9ee0-660e06c195f6', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8b131487-ca75-472c-b857-b2e9719d5ba7', 'Visitor Approval Required — Devi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('095520f2-b868-483e-ba39-90514bf4b82b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('37019fbf-d6e9-410b-8a92-15a6f42b56fa', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0c99055-8ec0-4201-b521-66f8fc1a4617', 'Visitor Approval Required — Rama rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('58912b86-ae26-49da-982d-b5b3d9f3ad8e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2f6d92c2-51f7-450c-be1c-0ead83182ae8', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b0a36bd4-6107-4cbd-a02d-e098518604b1', 'Visitor Approval Required — Raju', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('766964e8-e1d2-4d9b-86ac-5df02f3a8786', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('657d3e47-a655-4352-9e1e-367894f6fffd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('727894a7-5f46-40ee-900e-94937844ad2b', 'Visitor Approval Required — Ashok', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dadc0f54-0819-43eb-8296-2b01a512fa2c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1df29649-279b-4842-9ffc-f6bfcf3c13af', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64c933b3-1b42-4d9a-ae31-aedf8b9b3530', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('17f53ab1-2464-4efe-979b-c7cc4d052f5b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99b04e1d-a015-4dc0-9b26-f959daf1a3ad', 'Visitor Approval Required — Satish +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('64cd6f0e-d77b-4fc1-903e-87c646867115', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0eebbfa9-e22d-4f24-92f8-bdab625c9b3f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7264e801-1eed-47ad-9798-9178f6bb8a2d', 'Visitor Approval Required — Manish +2', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07364d20-9c5c-42c5-ac10-3664a109e177', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('34494326-9aff-403d-8af2-3dd14577b03f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('c0a5c956-2556-42e4-9a43-56e755ae348c', 'Visitor Approval Required — Naqi Abbas plus 3', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2056de97-ebe8-43cb-9d28-ef14aa4121ce', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a84c53cf-6567-499f-8771-1d235b1cb1e1', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7e203600-9556-4fd6-a31b-838e04ed8a16', 'Visitor Approval Required — Arvind +5', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('26806f21-b8ca-42f8-8d00-5c1121578367', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b552796-4e40-40e3-8db1-2bc4fac5e94f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('10b78766-dbd2-4674-b1cc-cf36374e3a44', 'Visitor Approval Required — Nagesh S', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('183f070b-9a93-4a2f-a684-a9ee0736f5fe', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('dc7ee03b-a8d0-4147-9593-0695ca6a8f91', 'Visitor Approval Required — Venkatesan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7503bd65-0b59-463c-9bab-a1f99040ee93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7b0b83e9-0093-41bc-874b-33acd5ffc32f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('372dd51f-2870-4d52-8cb4-cc28e5ef91b2', 'Visitor Approval Required — Tushar', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3f5f317b-1bb9-4983-bb7d-93cc2f06fa25', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3fc73d75-bd2d-454c-b4ec-8419617e3cbc', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('db5b646d-c313-4e4c-a537-2de662b3f76f', 'Visitor Approval Required — Devid macias', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ca02443c-6b9a-4d46-9a88-ceabcf056c59', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b33a2158-5daa-4ab6-aa2e-b8908e866237', 'Visitor Approval Required — Srinivas M', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9835c64a-5a28-4e71-9975-f55cefb8787a', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('21d81b0f-368c-439a-86fb-53f3fe1874f5', 'Visitor Approval Required — Bharat', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f0dd482-a5c2-44e9-9044-fb90fc291ae1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('077cda8c-ce4e-49b1-ab4a-79752764b09c', 'Visitor Approval Required — Sivarami Reddy ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a43d2ea8-747e-408a-8240-84b0e3cc028b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9451ce38-75c1-4e4e-a71e-c48337a5eae5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fdba0b8b-1b7c-4e52-a723-9dee565072c1', 'Visitor Approval Required — Chiranjeevi ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2c94036-806d-453f-9e43-043fbfc219e5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('41c34dbb-ade1-4c52-88fc-47dd0c429f7e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0ceb252f-2b87-4a1c-bec3-bfe6b2689aa2', 'Visitor Approval Required — Akshat Mahajan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3b18c7dc-836f-45e4-86f5-0229e38b653b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7092dd34-52ac-4728-a18f-4c0f92058315', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e3877a7-1a88-4a3d-897a-faeda1f3e28c', 'Visitor Approval Required — Uma maheshwar rao', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e9625e51-8955-41b9-aff7-ba020ba5b6a9', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('a8a80e1b-c8de-4af8-b051-d2657bb055e8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51baf8ae-d6ee-44b2-89ba-931a052959de', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0a65c87d-8c77-4d9b-a235-b50c52f4c8e0', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8a0fe85-1979-4d73-af95-07d021941330', 'Visitor Approval Required — Sreekanth', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('099b945e-5f07-4237-a5c9-555953dd4886', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('07b4aa6f-5360-41ea-a517-cd52a6cb955b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d9ee74ad-4c46-43b7-8ea6-8bb47cea182e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9623286b-b5dd-40b1-872f-e5c8aec08d08', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e599f961-8889-4c7a-97ec-f941d2c3526b', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('76153f88-ffe9-45e4-a9fd-2077265dd62f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0fa1e0e4-5650-44cb-941c-97666d81b681', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d66662f4-659b-47b3-8662-a4e6cb9b038c', 'Visitor Approval Required — Rajamouli', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('40f05811-020b-430d-af54-5824c34f04fa', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('d7ff0c7b-f814-48c1-ba71-a5f75e55ff92', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cf7e8c45-2311-453d-bb40-91c2c8cdd519', 'Visitor Approval Required — Anandh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccf51051-f46e-41f8-b77f-8f184ff75673', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3916eaa7-0ea1-4ffd-a942-a9e17a08cc7e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3e8d0aeb-e72f-4e70-816c-5e8e81df4336', 'Visitor Approval Required — Zuber', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fa31f0e3-057f-4fcb-96c9-29cdda00b78d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('45f9300f-74fb-4ab4-8424-dd6001ceffc3', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9f8f0e75-cb45-4ecc-9f9d-ef20af70df5f', 'Visitor Approval Required — Hemnath', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('ccef00ef-7872-4285-b144-a638a62dd52f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e8a56236-9669-49e0-86e3-389fcd3442e4', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3ab98cce-7d7e-4a05-b518-eef0050f8660', 'Visitor Approval Required — Vinay+1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be641cfd-22c9-4bab-8bb0-9cf830f3c061', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0cf6f14e-9d8c-4f3c-b9e0-b1c6c806cdba', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('33448804-fa73-4d05-ab2b-095ccd0d8132', 'Visitor Approval Required — Laxmi', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('884c97ab-8b97-4970-8649-0ec1231fce8f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('16d6a863-0a1f-4ab8-824f-0a166ac8c020', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2babd41a-af99-4626-a5a5-98aba0f0677d', 'Visitor Approval Required — Mukesh', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('83e73e3e-8d63-42b6-9faa-fa2bf3bf49b2', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bb49698a-ebc6-4436-8656-c45e168cff4c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('0bf81247-d157-42e3-937c-528007f2d988', 'Visitor Approval Required — Sathish', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('8017452c-b794-4351-b162-cfbd83423c7f', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('49fc8ea9-cbfa-4a86-960c-b76d9e043b76', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b36e73bf-eb0a-4f05-ba3b-8dd1f855fd7b', 'Visitor Approval Required — Pavan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b41cdf6-4462-4b14-9c05-47add9566d88', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1c0aeeaa-50ed-411e-afc6-d54b8aa1e3a8', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('98760013-8d9a-4797-9fb7-abc00776936f', 'Visitor Approval Required — RAFIUDDIN', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('99100c2d-9121-4e56-b94d-ffa92186e3be', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('2a6edd36-bf09-46dd-bd7b-c5186efc1d54', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5ee1224c-d2ce-47fa-9903-06ad07644a39', 'Visitor Approval Required — Laeequddin', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('050d29e6-f65a-4ad6-8320-741ad24a2c93', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('af65ad57-025f-4586-b1c5-41a0f18baf74', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5f8870b3-b25d-43eb-bb43-1c3509069e7c', 'Visitor Approval Required — Naveen+1', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('855b0bfd-34b0-4435-bf49-940303fef398', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b3babcf4-1a1d-43e4-a517-22c84693ed3e', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5baa9487-a480-4de4-a2f4-66734c51a830', 'Visitor Approval Required — krishna mohan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('be45362e-b030-458f-b91e-a9482cdaab3d', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('96d83bfe-d8b7-4628-9bfb-72c3bf2630a9', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('91df431d-e235-43db-a44f-af396294b6c6', 'Visitor Approval Required — Sujiv Reddy ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('eb93984d-8963-46ae-ae32-f5e61a0380c5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b9516709-1548-4497-a9ea-9015af0d56bd', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3390a95d-e9a4-4dbb-9553-9707fa1c1628', 'Visitor Approval Required — Balakrishna ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f838b19a-a4e7-4ddd-8f7c-9c97dc4b9c27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('9fdc1626-a659-4146-820f-48aa9cfd59bb', 'Visitor Approval Required — Samuel ', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b2f70eca-25b5-4971-9019-64929d25bf27', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('bf88338c-9c71-4074-8369-8abf44f42cbb', 'Visitor Approval Required — Pavan', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fed4bf07-48d6-4d29-9815-06acce2bbada', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6b9803a2-3efc-4e5e-8b41-e20a1d517f65', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aac66c79-29ca-4e6d-a3fe-67cf158de82c', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('f861cd1b-5a26-42b0-a2a2-feef489530dc', 'Visitor Approval Required — Seetharam', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('e26f296b-9ad3-4e41-a23d-c9313cfdcbf5', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fc149256-b09f-4d17-957f-3312c2017e48', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b19fc5f0-7ede-459c-be11-0b1b36f8d0c0', 'Visitor Approval Required — K Rajaram', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('5e1ccbe9-cf25-4cc2-9131-e09546d0e318', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('171d001c-18d7-41b0-b9b7-ba1cd6d84602', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('4dcaf480-773a-4187-a335-9fe20fa23371', 'Visitor Approval Required — Dheeraj reddy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b8d9c99d-f7e0-4345-a50f-0565c97c20f1', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('7f4b50f9-8204-4b43-afc3-68c1cb7869d5', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('cbc2fa62-3f44-4497-878d-7b05fac9e6fe', 'Visitor Approval Required — swamy', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('58f853cc-1cec-4885-9208-4db0f2da7a1b', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('47a216fa-df5f-4566-9ce3-502000657d6c', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('55b99ebc-1e9b-43ec-ac9d-1422602bd345', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('65eb356e-3620-471d-9c1f-dde0f12a5834', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('101133ec-f24e-4acb-a99e-69b3b99715d9', 'Visitor Approval Required — Myank', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d8bce2c-b9ca-497c-b3f9-2000ac0d9996', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('6d15baaa-1050-44c4-9a05-f6658fef3162', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('3a4b1a68-33b8-40b0-8289-1204b1aa8590', 'Visitor Approval Required — Vinay choudhary', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('19280b8e-847f-4892-b15a-57bb0847b722', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('b3558525-1c89-454c-b051-342b8b5e8488', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('51a4fb97-225c-4647-82aa-4841bcf49804', 'Visitor Approval Required — Snehal', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1cd6375a-464c-4682-ac29-27658d0cc5af', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('fff233cc-c788-4eb7-8228-bff6c0ba904f', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('561059c8-c02f-4f56-9262-6fa9ebd74fdb', 'Visitor Approval Required — N.N Lakhani', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('1fdb1d6d-7fc4-4475-af70-78d1b220ca79', 'Visit Approved — Show This QR at the Gate', '<!DOCTYPE html>
+-- [sanitize-seed] dropped malformed row:
+-- [sanitize-seed] dropped malformed row (truncated by old grep filter):
+-- INSERT INTO public.email_logs (id, subject, body, recipients, cc, template, status, sent_at) VALUES ('aded8be6-85e8-49b8-a095-b281b18d9061', 'Visit Request Submitted — Awaiting Approval', '<!DOCTYPE html>
 COMMIT;
