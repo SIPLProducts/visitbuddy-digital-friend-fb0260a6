@@ -1,54 +1,36 @@
-## Problem
+## Why 16 fails
 
-`deploy.sh` writes the persisted env to **`$BASE_DIR/config.env`** (i.e. `/home/vmsadm/resl/vvms/config.env`).
+`16_profiles.sql` inserts 54 rows into `public.profiles`, each with a `user_id` that must already exist in `auth.users`. The repo intentionally does NOT ship password hashes, so `00_auth_users.sql` is missing — those 54 auth users don't exist yet on your on-prem Postgres. The very first row, `d4fb503e-...-798f` (your admin Bala), trips the FK and aborts the whole file.
 
-But `apply-migrations.sh` and `import-seed.sh` only look at **`$HERE/config.env`** (i.e. `deploy/config.env` inside the repo checkout) — which doesn't exist. So `POSTGRES_PASSWORD` is unset and the script aborts before any migrations or seed data run. That's why Studio shows empty tables.
+## Plan: generate one bootstrap SQL file you can run in Studio before 16
 
-`redeploy.sh` itself does `source "$ENV_FILE"` from the right path, so it works — the bug is only in the two child scripts it shells out to.
+Add a **new committed file** `deploy/seed/00_auth_users_bootstrap.sql` that:
 
-## Fix
+1. Inserts a row into `auth.users` for **every** `user_id` referenced by `16_profiles.sql` and `17_user_location_roles.sql` (54 unique IDs).
+2. Uses a **single shared bcrypt hash** for password `Sharvi@123` (precomputed constant — no runtime hashing needed).
+3. Recovers real emails where possible by joining profile `full_name` against the employee names in `20_employees.sql`. Falls back to `<slug>+<short-id>@local.visiguard` for the few profiles with no employee match (e.g. "Bala", "Priya Sharma", "Resl Admin").
+4. Hard-codes `bala@sharviinfotech.com` for user_id `d4fb503e-...-798f`.
+5. Fields set: `instance_id='00000000-0000-0000-0000-000000000000'`, `aud='authenticated'`, `role='authenticated'`, `email_confirmed_at=now()`, `created_at=now()`, `updated_at=now()`, `raw_app_meta_data='{"provider":"email","providers":["email"]}'`, `raw_user_meta_data` carries `full_name`.
+6. Also inserts matching `auth.identities` rows (`provider='email'`, `provider_id=email`, `identity_data` jsonb).
+7. Wraps everything in `ON CONFLICT (id) DO NOTHING` so it's safe to re-run.
 
-Update both scripts to source from `$BASE_DIR/config.env` (with `$HERE/config.env` as fallback for backward compatibility).
+I'll generate the file once locally by parsing `16_profiles.sql` + `20_employees.sql`, so the SQL is fully static — no shell needed in Studio.
 
-### Files to change
+## Your manual workflow after I implement
 
-**`deploy/apply-migrations.sh`** — replace the config-loading block:
-```bash
-SERVICE_USER="${SERVICE_USER:-vmsadm}"
-BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
-for CFG in "$BASE_DIR/config.env" "$HERE/config.env"; do
-  if [ -f "$CFG" ]; then
-    # shellcheck disable=SC1090
-    . "$CFG"
-    break
-  fi
-done
-: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD not set (run deploy.sh first)}"
-```
+In Supabase Studio SQL editor on your on-prem box:
 
-**`deploy/import-seed.sh`** — same change in its config-loading block.
+1. Run `deploy/seed/00_auth_users_bootstrap.sql` ← **new file**
+2. Re-run `deploy/seed/16_profiles.sql` ← FK now passes
+3. Continue with `17_user_location_roles.sql` and the rest
 
-That's it. After the patch, re-run:
-```bash
-sudo bash deploy/redeploy.sh --with-seed --keep-config
-```
-and migrations + seed (locations, gates, employees, vehicles, etc.) will populate the self-hosted Studio tables.
+Default login for every seeded account: password `Sharvi@123`. Admin can rotate passwords from User Management afterwards.
 
-## Why your manual `source /home/vmsadm/resl/vvms/config.env` didn't help
+## Also (small) — wire it into `import-seed.sh` so future automated deploys don't need this manual step
 
-That only sets the variables in your **interactive shell**. When `redeploy.sh` runs `bash apply-migrations.sh`, it spawns a new bash process which doesn't inherit unexported variables. The fix above makes the child script load the file itself.
+Add a check in `import-seed.sh`: if `00_auth_users.sql` is absent but `00_auth_users_bootstrap.sql` exists, run the bootstrap automatically before the rest of the seeds, and remove the "skipped" warning.
 
-## Workaround (if you don't want to wait for the patch)
+## Confirm before I implement
 
-You can re-run the two child scripts directly from the shell where you already sourced the config — no full redeploy needed:
-
-```bash
-source /home/vmsadm/resl/vvms/config.env
-sudo -E bash deploy/apply-migrations.sh
-sudo -E bash deploy/import-seed.sh
-sudo -E bash deploy/repair-postgrest.sh
-```
-
-The `-E` preserves your environment so the child sees `POSTGRES_PASSWORD`. After this Studio tables should be populated.
-
-Approve to apply the permanent fix.
+1. **Password convention**: `Sharvi@123` for all 54 accounts (matches your admin password), OR `123456` (matches the existing demo-credentials convention)?
+2. **Synthetic emails** for the ~7 profiles with no employee match (Bala, Priya Sharma, Rahul Verma, Amit Kumar, Suresh Patil, Ananya Reddy, Resl Admin, Sirisha, Anil, Front office) — OK to use `<slug>@local.visiguard`, or do you have a real email list you want me to use?
