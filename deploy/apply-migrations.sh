@@ -18,11 +18,16 @@ if [ ! -d "$MIG_DIR" ]; then
   exit 1
 fi
 
-if [ -f "$HERE/config.env" ]; then
-  # shellcheck disable=SC1091
-  . "$HERE/config.env"
-fi
-: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD not set (run deploy.sh first or source config.env)}"
+SERVICE_USER="${SERVICE_USER:-vmsadm}"
+BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
+for CFG in "$BASE_DIR/config.env" "$HERE/config.env"; do
+  if [ -f "$CFG" ]; then
+    # shellcheck disable=SC1090
+    . "$CFG"
+    break
+  fi
+done
+: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD not set (run deploy.sh first or source $BASE_DIR/config.env)}"
 
 PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
 PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=1"
