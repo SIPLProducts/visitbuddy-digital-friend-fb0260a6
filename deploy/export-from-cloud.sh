@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# DEPRECATED — kept for backward compatibility only.
+# Use deploy/generate-seed-files.sh to produce committed SQL seed files
+# (deploy/seed/*.sql) instead of a binary pg_dump. The on-prem redeploy now
+# runs `apply-migrations.sh` + `import-seed.sh`, not `pg_restore`.
 # Export DB + storage from Lovable Cloud (or any Supabase project) into
 # two artifacts that import-to-onprem.sh can consume:
 #   ./cloud-export.dump      (pg_dump custom format, public+auth+storage)
