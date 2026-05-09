@@ -26,6 +26,15 @@ require_var POSTGRES_PASSWORD
 
 wait_for_pg 60
 
+# Self-heal: an older generate-seed-files.sh used `grep '^INSERT'` which
+# truncates pg_dump rows whose text values contain newlines, leaving an
+# unterminated string literal that aborts the whole import with
+# "trailing junk after numeric literal". Comment those broken rows out.
+if [ -x "$HERE/sanitize-seed.sh" ] || [ -f "$HERE/sanitize-seed.sh" ]; then
+  log "Sanitizing seed files (drops malformed rows in-place)"
+  bash "$HERE/sanitize-seed.sh" || warn "sanitize-seed.sh reported errors (continuing)"
+fi
+
 log "Stopping functions container (avoid mid-import calls)"
 docker stop supabase-functions supabase-edge-functions 2>/dev/null || true
 

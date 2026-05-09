@@ -25,8 +25,22 @@ dump_table() {
   echo "-- Seed: $schema.$table  ($header)" > "$out"
   echo "BEGIN;" >> "$out"
   echo "TRUNCATE $schema.$table CASCADE;" >> "$out"
-  if pg_dump "${PG[@]}" --data-only --inserts --column-inserts -t "$schema.$table" 2>/dev/null \
-      | grep -E '^(INSERT|SELECT pg_catalog\.setval)' >> "$out"; then :; fi
+  # IMPORTANT: do NOT pipe through `grep '^INSERT'`. pg_dump can wrap a
+  # single INSERT across multiple lines when a text value contains a
+  # newline — grep would keep only the first line and silently drop the
+  # rest, leaving an unterminated string literal that breaks the whole
+  # import. Instead, strip pg_dump's preamble (comments + SET) but keep
+  # complete statements intact, even when they span multiple lines.
+  pg_dump "${PG[@]}" --data-only --inserts --column-inserts -t "$schema.$table" 2>/dev/null \
+    | python3 -c '
+import sys
+for line in sys.stdin:
+    if line.startswith("--") or line.startswith("SET ") \
+       or line.startswith("SELECT pg_catalog.set_config") \
+       or line.strip() == "":
+        continue
+    sys.stdout.write(line)
+' >> "$out" || true
   echo "COMMIT;" >> "$out"
   printf '  %-40s %s lines\n' "$(basename "$out")" "$(wc -l < "$out")"
 }

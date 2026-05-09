@@ -46,6 +46,36 @@ docker ps --filter 'publish=5432'
 
 ## 0c. `could not open file "global/pg_filenode.map": Permission denied`
 
+## 0d. `trailing junk after numeric literal at or near "1b"` during seed import
+
+**Symptom:** `import-seed.sh` runs a few `INSERT 0 1` lines then aborts with:
+```
+ERROR:  trailing junk after numeric literal at or near "1b"
+LINE 2: ...checkout_method, scheduled_date, ...) VALUES ('1b5eb6aa-5...
+```
+
+**Cause:** an older `deploy/generate-seed-files.sh` piped `pg_dump --inserts`
+through `grep '^INSERT'`. When a text value contains a newline, `pg_dump`
+wraps the row across multiple lines — `grep` keeps only the first line and
+silently drops the rest. The result is an unterminated string literal that
+fuses with the next row, and Postgres complains about the row that follows
+the broken one (not the broken row itself).
+
+**Fix:** `import-seed.sh` now runs `deploy/sanitize-seed.sh` automatically
+before importing. It comments out any malformed row in place so the rest
+of the import succeeds. Just re-run:
+```bash
+sudo bash deploy/import-seed.sh
+```
+
+The lost rows are preserved as `-- [sanitize-seed] dropped malformed row:`
+comments inside the seed files. To recover them you must regenerate the
+seeds (the fixed `generate-seed-files.sh` no longer truncates rows):
+```bash
+SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres' \
+  bash deploy/generate-seed-files.sh
+```
+
 **Symptom:** `deploy.sh` finishes ("DEPLOYMENT COMPLETE"), then
 `apply-migrations.sh` immediately fails with:
 ```
