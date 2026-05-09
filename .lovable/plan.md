@@ -1,36 +1,141 @@
-## Why 16 fails
+## Updates from your last message
 
-`16_profiles.sql` inserts 54 rows into `public.profiles`, each with a `user_id` that must already exist in `auth.users`. The repo intentionally does NOT ship password hashes, so `00_auth_users.sql` is missing — those 54 auth users don't exist yet on your on-prem Postgres. The very first row, `d4fb503e-...-798f` (your admin Bala), trips the FK and aborts the whole file.
+1. **Pre-install Postgres wipeout** — `install.sh` will detect and remove any existing system Postgres / leftover supabase-db data before bootstrapping, so port 5432 and `/var/lib/postgresql` are clean.
+2. **Use default port 5432** — supabase-db container will publish on host `127.0.0.1:5432:5432`. Scripts still use `docker exec` as the primary path (safest), but external tools (pgAdmin, DBeaver) can now connect on 5432.
 
-## Plan: generate one bootstrap SQL file you can run in Studio before 16
+## Root cause recap
 
-Add a **new committed file** `deploy/seed/00_auth_users_bootstrap.sql` that:
+```
+psql ... port 54322 ... pg_filenode.map: Permission denied
+```
 
-1. Inserts a row into `auth.users` for **every** `user_id` referenced by `16_profiles.sql` and `17_user_location_roles.sql` (54 unique IDs).
-2. Uses a **single shared bcrypt hash** for password `Sharvi@123` (precomputed constant — no runtime hashing needed).
-3. Recovers real emails where possible by joining profile `full_name` against the employee names in `20_employees.sql`. Falls back to `<slug>+<short-id>@local.visiguard` for the few profiles with no employee match (e.g. "Bala", "Priya Sharma", "Resl Admin").
-4. Hard-codes `bala@sharviinfotech.com` for user_id `d4fb503e-...-798f`.
-5. Fields set: `instance_id='00000000-0000-0000-0000-000000000000'`, `aud='authenticated'`, `role='authenticated'`, `email_confirmed_at=now()`, `created_at=now()`, `updated_at=now()`, `raw_app_meta_data='{"provider":"email","providers":["email"]}'`, `raw_user_meta_data` carries `full_name`.
-6. Also inserts matching `auth.identities` rows (`provider='email'`, `provider_id=email`, `identity_data` jsonb).
-7. Wraps everything in `ON CONFLICT (id) DO NOTHING` so it's safe to re-run.
+A stray local Postgres on 54322 hijacked the host `psql` connection. Switching to `docker exec` + cleaning the host makes this impossible to recur.
 
-I'll generate the file once locally by parsing `16_profiles.sql` + `20_employees.sql`, so the SQL is fully static — no shell needed in Studio.
+## Final architecture
 
-## Your manual workflow after I implement
+```
+Ubuntu host (post-wipeout)
+├── /home/vmsadm/resl/vvms/         (BASE_DIR — survives redeploys)
+│   ├── frontend/                   nginx-served Vite build
+│   ├── backend/supabase/docker/    self-hosted Supabase compose
+│   ├── middleware/whatsapp-bridge/
+│   ├── storage/                    bind-mounted to supabase-storage
+│   ├── backups/                    nightly pg_dump + storage tarballs
+│   └── config.env                  generated once, reused on redeploy
+└── /etc/nginx/sites-enabled/visiguard.conf
 
-In Supabase Studio SQL editor on your on-prem box:
+Deploy package (tar.gz)
+├── install.sh                      ONE command, wipes + installs everything
+├── deploy/
+│   ├── lib/common.sh               psql_exec helper, CRLF heal, logging
+│   ├── wipe-postgres.sh            NEW — purges any prior pg + frees 5432
+│   ├── deploy.sh                   first-time setup (docker, nginx, env)
+│   ├── redeploy.sh                 wipe DB volumes + reseed
+│   ├── update.sh                   code-only redeploy (DB untouched)
+│   ├── apply-migrations.sh         docker exec, _lovable_migrations tracking
+│   ├── import-seed.sh              docker exec, runs seed/*.sql + storage tgz
+│   ├── deploy-edge-functions.sh    rsync 21 functions → edge-runtime
+│   ├── repair-postgrest.sh         NOTIFY pgrst + restart
+│   ├── backup.sh                   pg_dumpall + storage tar
+│   ├── restore.sh                  inverse of backup
+│   ├── health-check.sh             6 probes (rest/auth/functions/db/nginx)
+│   ├── nginx/                      *.conf.tpl (ip + domain)
+│   ├── seed/                       00_auth_users_bootstrap + 10_*..49_*
+│   ├── storage-export.tgz          uploaded files
+│   └── README-troubleshooting.md
+└── supabase/                       migrations/ + functions/
+```
 
-1. Run `deploy/seed/00_auth_users_bootstrap.sql` ← **new file**
-2. Re-run `deploy/seed/16_profiles.sql` ← FK now passes
-3. Continue with `17_user_location_roles.sql` and the rest
+## NEW: `deploy/wipe-postgres.sh` (called from `install.sh` step 0)
 
-Default login for every seeded account: password `Sharvi@123`. Admin can rotate passwords from User Management afterwards.
+```bash
+# 1. Stop & remove any conflicting compose stack
+docker compose -f $COMPOSE_FILE down -v --remove-orphans 2>/dev/null || true
 
-## Also (small) — wire it into `import-seed.sh` so future automated deploys don't need this manual step
+# 2. Stop system Postgres if installed
+systemctl stop postgresql 2>/dev/null || true
+systemctl disable postgresql 2>/dev/null || true
+apt-get purge -y 'postgresql-*' 2>/dev/null || true
+rm -rf /etc/postgresql /var/lib/postgresql /var/log/postgresql
 
-Add a check in `import-seed.sh`: if `00_auth_users.sql` is absent but `00_auth_users_bootstrap.sql` exists, run the bootstrap automatically before the rest of the seeds, and remove the "skipped" warning.
+# 3. Kill any rogue Postgres process holding 5432/54322
+for port in 5432 54322; do
+  pid=$(lsof -ti tcp:$port 2>/dev/null || true)
+  [ -n "$pid" ] && kill -9 $pid || true
+done
 
-## Confirm before I implement
+# 4. Remove leftover supabase docker volumes
+docker volume ls -q | grep -E 'supabase_(db|storage|deno)' | xargs -r docker volume rm -f
 
-1. **Password convention**: `Sharvi@123` for all 54 accounts (matches your admin password), OR `123456` (matches the existing demo-credentials convention)?
-2. **Synthetic emails** for the ~7 profiles with no employee match (Bala, Priya Sharma, Rahul Verma, Amit Kumar, Suresh Patil, Ananya Reddy, Resl Admin, Sirisha, Anil, Front office) — OK to use `<slug>@local.visiguard`, or do you have a real email list you want me to use?
+# 5. Hard-fail if 5432 is still occupied
+if lsof -i :5432 >/dev/null 2>&1; then
+  echo "FATAL: port 5432 still in use after wipe"; exit 2
+fi
+echo "OK — host is clean, 5432 is free."
+```
+
+User is prompted **"This will DELETE any existing Postgres data on this host. Continue? [yes/NO]"** before step runs (skipped only with `--force-wipe`).
+
+## Updated docker-compose snippet
+
+```yaml
+supabase-db:
+  ports:
+    - "127.0.0.1:5432:5432"   # was 54322 → now standard 5432
+```
+`POSTGRES_HOST_PORT=5432` written to `config.env`. All scripts default to it but never need to use TCP — `psql_exec` always goes through `docker exec`.
+
+## Core fixes (unchanged from prior plan)
+
+1. `deploy/lib/common.sh` with `psql_exec` (docker exec only) sourced everywhere.
+2. CRLF self-heal in script headers + root `.gitattributes` forcing LF.
+3. Config loading: `$BASE_DIR/config.env` then `$HERE/config.env`, fail-fast on missing vars.
+4. URL-encoded password in `DATABASE_URL` (Python `urllib.parse.quote`).
+5. `until psql_exec -c 'select 1'` instead of blind sleeps.
+6. Per-step logs in `/var/log/visiguard/`.
+
+## Install flow
+
+```
+tar -xzf visiguard-onprem.tar.gz && cd visiguard-onprem
+sudo bash install.sh
+  [0]  wipe-postgres.sh            ← NEW (asks for confirmation)
+  [1]  deploy.sh                   docker, nginx, certbot, env, frontend build,
+                                   compose up (db on 5432)
+  [2]  apply-migrations.sh         all supabase/migrations/*.sql
+  [3]  import-seed.sh              auth bootstrap → reference → 30d tx → storage
+  [4]  deploy-edge-functions.sh    21 functions
+  [5]  health-check.sh             must exit 0 to declare success
+open http://<ip>  →  bala@sharviinfotech.com / Sharvi@123
+```
+
+`redeploy.sh --keep-config` re-runs steps 1–5 keeping `config.env` and storage; `--with-wipe` also re-runs step 0.
+`update.sh` rebuilds frontend + redeploys edge functions only.
+
+## Seed scope (unchanged)
+
+Reference tables always; last 30 days of `visitors / accompanying_visitors / vehicles / vehicle_entries / appointments`; skip `audit_logs / email_logs / notifications / anpr_events / visitor_agreements`.
+
+## Storage (unchanged)
+
+`deploy/storage-export.tgz` extracted into `$BASE_DIR/storage` (bind-mounted) + metadata-sync SQL into `storage.objects`.
+
+## Edge functions (unchanged)
+
+All 21 rsync'd into the edge-runtime volume; `config.env` injected via compose `env_file`. Missing optional secrets warn, not fail.
+
+## Health checks
+
+Container health, `/rest/v1/locations` 200, `/auth/v1/health` 200, `/functions/v1/notify-host` reachable, profiles count > 0, `nginx -t` clean.
+
+## Troubleshooting doc covers
+
+CRLF, `pg_filenode.map` perms, port 5432/54322 squatters, bad `DATABASE_URL`, PostgREST 503 / schema cache, edge functions stuck restarting, storage 404, nginx port 80 conflicts, ufw, certbot rate limit, what to do if `wipe-postgres.sh` refuses to free 5432.
+
+## Risks
+
+- **Destructive wipe**: `install.sh` deletes any prior Postgres on the host. Confirmation prompt + `--force-wipe` flag protect against accidents, but the user must understand this box becomes single-purpose.
+- Outbound HTTPS to Twilio/SMTP/Gemini must be allowed for those features.
+
+Approve and I'll implement in this order:
+**lib/common.sh + CRLF guard → wipe-postgres.sh → deploy.sh (5432 + URL-encode) → apply-migrations / import-seed / repair-postgrest → install.sh + health-check.sh → backup/restore → troubleshooting doc → tar.gz packager.**
