@@ -18,6 +18,32 @@ cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
 sudo bash install.sh --with-seed
 ```
 
+## 0b. `Bind for 127.0.0.1:5432 failed: port is already allocated`
+
+**Symptom:** `docker compose up` fails on `supabase-pooler` (or `supabase-db`)
+with `Bind for 127.0.0.1:5432 failed: port is already allocated`.
+
+**Cause:** Either a leftover system Postgres, an old Supabase container from a
+previous attempt, or the upstream compose file's pooler service is also trying
+to publish host port 5432. The current `deploy.sh` strips that pooler mapping
+and runs a preflight cleanup, but a stale stack on disk can still hold the port.
+
+**Fix (one-shot recovery):**
+```bash
+cd /home/vmsadm/resl/vvms/backend/supabase/docker 2>/dev/null && \
+  docker compose down -v --remove-orphans 2>/dev/null || true
+sudo bash /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6/deploy/wipe-postgres.sh --force
+sudo rm -rf /home/vmsadm/resl/vvms/backend
+cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
+sudo bash install.sh --force-wipe --with-seed
+```
+
+If port 5432 is *still* held after the wipe, see exactly what owns it:
+```bash
+sudo ss -lntp | awk '/:5432 /{print}'
+docker ps --filter 'publish=5432'
+```
+
 ## 1. `pg_filenode.map: Permission denied`
 
 **Symptom:** `psql ... global/pg_filenode.map: Permission denied`.
