@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
-# VisiGuard CLEAN REDEPLOY — wipes the on-prem stack, reinstalls, and (optionally)
-# restores a Lovable Cloud export so the on-prem app is a 1:1 mirror.
+# VisiGuard CLEAN REDEPLOY — wipes the on-prem stack, reinstalls, applies
+# supabase/migrations/*.sql, then optionally seeds with the snapshot of cloud
+# data committed under deploy/seed/.
 #
 # Usage (run as root):
-#   sudo bash deploy/redeploy.sh \
-#        --dump    /tmp/cloud-export.dump \
-#        --storage /tmp/storage-export.tgz
+#   sudo bash deploy/redeploy.sh                    # schema only (empty data)
+#   sudo bash deploy/redeploy.sh --with-seed        # schema + committed cloud data
+#   sudo bash deploy/redeploy.sh --with-seed \
+#         --storage /path/to/storage-export.tgz     # also restore uploaded files
 #
 # Optional flags:
 #   --keep-config     Don't delete config.env (keeps ports/passwords/secrets)
-#   --no-import       Just wipe + redeploy, skip the data import
+#
+# All uploaded files (visitor photos, branding logos) live under
+#   $BASE_DIR/backend/supabase/docker/volumes/storage/
+# which is bind-mounted into the storage-api container. That folder IS your
+# on-prem upload location — back it up like any other data.
 #
 # Idempotent. Safe to re-run if it fails halfway.
 set -euo pipefail
@@ -19,33 +25,30 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 SERVICE_USER="${SERVICE_USER:-vmsadm}"
 BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
 SUPA_DOCKER="$BASE_DIR/backend/supabase/docker"
 ENV_FILE="$BASE_DIR/config.env"
 
-DUMP=""; TGZ=""; KEEP_CONFIG=0; DO_IMPORT=1
+WITH_SEED=0; STORAGE_TGZ=""; KEEP_CONFIG=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --dump)        DUMP="$2"; shift 2 ;;
-    --storage)     TGZ="$2";  shift 2 ;;
+    --with-seed)   WITH_SEED=1; shift ;;
+    --storage)     STORAGE_TGZ="$2"; shift 2 ;;
     --keep-config) KEEP_CONFIG=1; shift ;;
-    --no-import)   DO_IMPORT=0; shift ;;
+    -h|--help)     sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "Unknown flag: $1"; exit 1 ;;
   esac
 done
 
-if [[ "$DO_IMPORT" == "1" ]]; then
-  [[ -f "$DUMP" ]] || { echo "ERROR: --dump file not found: $DUMP"; exit 1; }
-  [[ -f "$TGZ"  ]] || { echo "ERROR: --storage file not found: $TGZ"; exit 1; }
-fi
-
 echo "============================================================"
-echo " VisiGuard CLEAN REDEPLOY"
-echo "   base:      $BASE_DIR"
-echo "   dump:      ${DUMP:-<none>}"
-echo "   storage:   ${TGZ:-<none>}"
-echo "   keep cfg:  $KEEP_CONFIG"
+echo " VisiGuard CLEAN REDEPLOY (migrations + seed SQL)"
+echo "   base:        $BASE_DIR"
+echo "   migrations:  $REPO_ROOT/supabase/migrations  (\$(ls $REPO_ROOT/supabase/migrations | wc -l) files)"
+echo "   with-seed:   $WITH_SEED"
+echo "   storage tgz: ${STORAGE_TGZ:-<none>}"
+echo "   keep cfg:    $KEEP_CONFIG"
 echo "============================================================"
 
 # ---------------------------------------------------------------
@@ -56,7 +59,6 @@ if [[ -f "$SUPA_DOCKER/docker-compose.yml" ]]; then
   ( cd "$SUPA_DOCKER" && docker compose down -v --remove-orphans ) || true
 fi
 
-# Belt-and-braces: nuke any straggler containers from older deploys
 for c in wa-bridge supabase-db supabase-rest supabase-auth supabase-storage \
          supabase-realtime supabase-meta supabase-functions supabase-kong \
          supabase-studio supabase-imgproxy supabase-vector supabase-analytics \
@@ -64,11 +66,9 @@ for c in wa-bridge supabase-db supabase-rest supabase-auth supabase-storage \
   docker rm -f "$c" >/dev/null 2>&1 || true
 done
 
-# Remove project volumes left behind
 docker volume ls -q --filter label=com.docker.compose.project=docker \
   | xargs -r docker volume rm -f >/dev/null 2>&1 || true
 
-# Disk-level wipe (the supabase compose mounts these as bind mounts)
 rm -rf "$SUPA_DOCKER/volumes/db/data"      2>/dev/null || true
 rm -rf "$SUPA_DOCKER/volumes/storage"/*    2>/dev/null || true
 rm -rf "$BASE_DIR/middleware/whatsapp-bridge-data"/* 2>/dev/null || true
@@ -86,45 +86,71 @@ pick_port() {
   while ss -ltn "( sport = :$p )" 2>/dev/null | grep -q LISTEN; do p=$((p+1)); done
   echo "$p"
 }
-API_PORT_HINT=$(pick_port 8000)
-WA_PORT_HINT=$(pick_port 3001)
-KONG_HTTPS_HINT=$(pick_port 8443)
-echo "   API:        $API_PORT_HINT"
-echo "   WA bridge:  $WA_PORT_HINT"
-echo "   Kong HTTPS: $KONG_HTTPS_HINT"
-export API_PORT="$API_PORT_HINT"
-export WA_HOST_PORT="$WA_PORT_HINT"
-export KONG_HTTPS_PORT="$KONG_HTTPS_HINT"
+export API_PORT="$(pick_port 8000)"
+export WA_HOST_PORT="$(pick_port 3001)"
+export KONG_HTTPS_PORT="$(pick_port 8443)"
+echo "   API:        $API_PORT"
+echo "   WA bridge:  $WA_HOST_PORT"
+echo "   Kong HTTPS: $KONG_HTTPS_PORT"
 
 # ---------------------------------------------------------------
-# 3) Run the standard deploy
+# 3) Run deploy.sh WITHOUT the legacy init-schema/seed.sql path
+#    (we apply supabase/migrations/*.sql ourselves in step 4)
 # ---------------------------------------------------------------
-echo ">>> [3/5] Running deploy.sh..."
-bash "$SCRIPT_DIR/deploy.sh"
+echo ">>> [3/5] Running deploy.sh (SKIP_SCHEMA=1)..."
+SKIP_SCHEMA=1 bash "$SCRIPT_DIR/deploy.sh"
 
-# Reload env vars deploy.sh just wrote (API_PORT etc.)
+# Reload env vars deploy.sh just wrote (API_PORT, POSTGRES_PASSWORD, etc.)
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 
 # ---------------------------------------------------------------
-# 4) Restore cloud data (optional)
+# 4) Apply supabase/migrations/*.sql, then optionally seed data
 # ---------------------------------------------------------------
-if [[ "$DO_IMPORT" == "1" ]]; then
-  echo ">>> [4/5] Importing cloud dump + storage..."
-  bash "$SCRIPT_DIR/import-to-onprem.sh" "$DUMP" "$TGZ"
+echo ">>> [4/5] Applying schema migrations..."
+bash "$SCRIPT_DIR/apply-migrations.sh"
 
-  echo ">>> [4b/5] Re-running PostgREST repair to be safe..."
-  bash "$SCRIPT_DIR/repair-postgrest.sh" || true
+if [[ "$WITH_SEED" == "1" ]]; then
+  echo ">>> [4b/5] Importing committed cloud data from deploy/seed/..."
+  if [[ -n "$STORAGE_TGZ" ]]; then
+    bash "$SCRIPT_DIR/import-seed.sh" "$STORAGE_TGZ"
+  else
+    bash "$SCRIPT_DIR/import-seed.sh"
+  fi
 else
-  echo ">>> [4/5] Skipped data import (--no-import)."
+  echo ">>> [4b/5] Skipping data seed (run with --with-seed to populate)."
+  # Still bootstrap the primary admin so the app is usable on first login.
+  PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
+  PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=0"
+  ADMIN_RESP=$(curl -fsS -X POST "http://127.0.0.1:${API_PORT}/auth/v1/admin/users" \
+      -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+      -H "Content-Type: application/json" \
+      -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\",\"email_confirm\":true,\"user_metadata\":{\"full_name\":\"HO Admin\"}}" || true)
+  ADMIN_ID=$(echo "$ADMIN_RESP" | jq -r '.id // empty')
+  [[ -z "$ADMIN_ID" ]] && ADMIN_ID=$(echo "SELECT id FROM auth.users WHERE email='$ADMIN_EMAIL' LIMIT 1" \
+      | docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -tAq | tr -d ' \r\n')
+  if [[ -n "$ADMIN_ID" ]]; then
+    $PSQL <<SQL
+INSERT INTO public.profiles (user_id, full_name) VALUES ('$ADMIN_ID', 'HO Admin') ON CONFLICT DO NOTHING;
+INSERT INTO public.locations (id, name, city, country, status)
+VALUES ('00000000-0000-0000-0000-000000000001', 'Head Office', 'Bengaluru', 'India', 'active')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO public.user_location_roles (user_id, location_id, role, is_ho_admin)
+VALUES ('$ADMIN_ID', '00000000-0000-0000-0000-000000000001', 'admin', true)
+ON CONFLICT DO NOTHING;
+SQL
+  fi
 fi
+
+echo ">>> [4c/5] Repair PostgREST schema cache..."
+bash "$SCRIPT_DIR/repair-postgrest.sh" || true
 
 # ---------------------------------------------------------------
 # 5) Final health check
 # ---------------------------------------------------------------
 echo ">>> [5/5] Health check..."
 ANON_KEY=$(grep -E '^ANON_KEY=' "$SUPA_DOCKER/.env" | cut -d= -f2-)
-OK=0
+OK=0; CODE="000"
 for i in $(seq 1 40); do
   CODE=$(curl -s -o /dev/null -w "%{http_code}" \
     -H "apikey: $ANON_KEY" \
@@ -137,10 +163,11 @@ if [[ "$OK" == "1" ]]; then
   echo
   echo "============================================================"
   echo " REDEPLOY COMPLETE — REST returned 200 on port $API_PORT"
-  echo "   App URL:       http://${PUBLIC_IP}"
-  echo "   Supabase API:  http://${PUBLIC_IP}:${API_PORT}"
-  echo "   Studio login:  ${DASHBOARD_USERNAME} / ${DASHBOARD_PASSWORD}"
-  echo "   Admin login:   ${ADMIN_EMAIL} / <cloud password if imported, else ${ADMIN_PASSWORD}>"
+  echo "   App URL:        http://${PUBLIC_IP}"
+  echo "   Supabase API:   http://${PUBLIC_IP}:${API_PORT}"
+  echo "   Studio login:   ${DASHBOARD_USERNAME} / ${DASHBOARD_PASSWORD}"
+  echo "   Admin login:    ${ADMIN_EMAIL} / <cloud password if seeded, else ${ADMIN_PASSWORD}>"
+  echo "   Uploads on disk:$SUPA_DOCKER/volumes/storage/"
   echo "============================================================"
 else
   echo "ERROR: REST still returning $CODE after retries."

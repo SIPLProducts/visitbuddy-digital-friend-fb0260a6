@@ -2,53 +2,73 @@
 
 One-shot installer for Ubuntu 22.04 / 24.04. Everything lives under a single base directory (default `/home/vmsadm/resl/vvms`):
 
-## Clean redeploy from cloud (recommended for a true mirror)
+## Clean redeploy — migrations + seed SQL (recommended)
 
-Use this when you want the on-prem app to look and behave **exactly** like the
-cloud app — same users, same passwords, same visitor history, same uploaded
-photos. The flow is two scripts: one on a machine with cloud DB access, one on
-the on-prem server.
+The on-prem app is reproduced from **plain SQL files** committed in this repo:
 
-### Step 1 — Export from cloud (run anywhere with internet)
+1. `supabase/migrations/*.sql` — schema, RLS, functions, storage buckets (already in repo).
+2. `deploy/seed/*.sql` — a snapshot of cloud data as `INSERT … ON CONFLICT DO NOTHING` (regenerated whenever you want to refresh the mirror).
+
+No `pg_dump` / `pg_restore` is involved, so there is no Postgres-version mismatch and no binary artifact to ship.
+
+### Step 1 (one-time / when you want a fresh snapshot) — Refresh seed files
+
+On any machine that can reach the cloud DB:
 
 ```bash
 SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres' \
-SUPABASE_URL='https://<ref>.supabase.co' \
-SUPABASE_SERVICE_ROLE_KEY='eyJ...service-role...' \
-  bash deploy/export-from-cloud.sh
+  bash deploy/generate-seed-files.sh
+
+git add deploy/seed && git commit -m "Refresh cloud snapshot"
+git push
 ```
 
-Outputs:
-- `cloud-export.dump` — full `auth + public + storage` schema (includes user password hashes).
-- `storage-export.tgz` — `visitor-photos/` and `branding/` bucket files.
+This rewrites `deploy/seed/*.sql` (auth users + every public table). Ship `00_auth_users.sql` via `scp` if it's gitignored at your site.
 
-### Step 2 — Ship to the on-prem server
+### Step 2 — Wipe + redeploy on the Ubuntu server
 
 ```bash
-scp cloud-export.dump storage-export.tgz vmsadm@<server>:/tmp/
-```
-
-### Step 3 — Wipe + redeploy + import (one command)
-
-```bash
-sudo bash deploy/redeploy.sh \
-     --dump    /tmp/cloud-export.dump \
-     --storage /tmp/storage-export.tgz
+git pull
+sudo bash deploy/redeploy.sh --with-seed
+# or, also restore uploaded photos:
+sudo bash deploy/redeploy.sh --with-seed --storage /tmp/storage-export.tgz
 ```
 
 `redeploy.sh` does the following automatically:
 
-1. **Tear down**: `docker compose down -v`, removes any straggler containers, deletes the DB, storage and WhatsApp volumes.
+1. **Tear down**: `docker compose down -v`, removes straggler containers, deletes DB / storage / WhatsApp volumes.
 2. **Free-port pre-flight**: probes `8000` (API), `3001` (WhatsApp bridge), `8443` (Kong HTTPS) and picks the next free port if any are taken. Persists the chosen ports in `config.env`.
-3. **Reinstall**: re-runs `deploy.sh` (Supabase stack, frontend build, edge functions, Nginx, WhatsApp bridge).
-4. **Restore**: streams the cloud dump through the DB container's `pg_restore`, untars the storage bucket files into `volumes/storage/stub/stub-stub-stub/<bucket>/`, then re-applies the Supabase role grants that `pg_restore --clean` strips.
-5. **Verify**: polls `/rest/v1/locations` until it returns `200`, otherwise exits non-zero with log hints.
+3. **Reinstall**: re-runs `deploy.sh` with `SKIP_SCHEMA=1` (Supabase stack, frontend build, edge functions, Nginx, WhatsApp bridge — but no schema bootstrap).
+4. **Apply migrations**: `apply-migrations.sh` runs every `supabase/migrations/*.sql` in chronological order, tracked in `public._lovable_migrations`. Already-applied files are skipped.
+5. **Seed data** (with `--with-seed`): `import-seed.sh` runs every `deploy/seed/*.sql` (auth users → reference tables → transactional history) and re-applies Supabase grants.
+6. **Restore uploads** (with `--storage`): untars the bucket archive into `volumes/storage/`.
+7. **Verify**: polls `/rest/v1/locations` until it returns `200`.
 
 After it finishes, log in with **any cloud user and their existing password**. Visitor photos and branding render exactly as on cloud.
 
 Optional flags:
 - `--keep-config` — don't delete `config.env`; reuse the previous JWT secret, ports and SMTP/Twilio answers without re-prompting.
-- `--no-import` — wipe and redeploy only (no cloud data); the script still picks free ports.
+- (omit `--with-seed`) — wipe and redeploy with empty data; only the primary admin (`bala@sharviinfotech.com`) and a default Head Office location are created.
+
+### Where do uploaded files live on the Ubuntu server?
+
+All files written via `supabase.storage.from(...).upload(...)` (visitor photos,
+branding logos, badges) land on the local disk under:
+
+```
+$BASE_DIR/backend/supabase/docker/volumes/storage/
+# e.g. /home/vmsadm/resl/vvms/backend/supabase/docker/volumes/storage/
+```
+
+That folder is bind-mounted into the `storage-api` container — there is no
+cloud round-trip and nothing leaves the server. Back it up alongside the
+Postgres data directory.
+
+### Legacy scripts
+
+`export-from-cloud.sh` and `import-to-onprem.sh` (binary `pg_dump` /
+`pg_restore` flow) are kept for backward compatibility but are no longer
+called by `redeploy.sh`. Prefer the migrations + seed SQL flow above.
 
 ---
 
