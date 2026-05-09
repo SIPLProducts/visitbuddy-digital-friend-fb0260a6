@@ -96,10 +96,11 @@ pg_smoke_test() {
   fi
   if echo "$out" | grep -qi "permission denied"; then
     warn "Postgres new-backend smoke test failed: Permission denied on data files."
-    warn "$out" | head -3
+    printf '%s\n' "$out" | head -5 >&2
     return 1
   fi
-  warn "Postgres smoke test failed: $out"
+  warn "Postgres smoke test failed. Raw output:"
+  printf '%s\n' "$out" | head -10 >&2
   return 2
 }
 
