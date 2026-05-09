@@ -92,6 +92,32 @@ git pull
 sudo bash deploy/import-seed.sh
 ```
 
+## 0e. Login returns `{"code":"unexpected_failure","message":"Database error querying schema"}`
+
+**Symptom:** login from the app fails. `docker logs --tail=200 supabase-auth`
+shows:
+```
+error finding user: sql: Scan error on column index 3,
+  name "confirmation_token": converting NULL to string is unsupported
+```
+
+**Cause:** the seeded `auth.users` rows were inserted without the GoTrue
+token columns (`confirmation_token`, `recovery_token`,
+`email_change_token_new`, `email_change`, etc.), so they default to `NULL`.
+GoTrue scans them as Go strings and crashes — every password login returns
+HTTP 500 with `unexpected_failure`.
+
+**Fix:** one-shot repair script. Safe to re-run, no data loss:
+```bash
+sudo bash deploy/repair-auth.sh
+```
+It backfills the NULL token columns to empty strings, re-asserts auth
+schema grants for `supabase_auth_admin`, restarts `supabase-auth`, and
+verifies `/auth/v1/health` returns 200.
+
+`import-seed.sh` and `00_auth_users_bootstrap.sql` now run the same
+normalization automatically, so fresh installs won't hit this.
+
 **Symptom:** `deploy.sh` finishes ("DEPLOYMENT COMPLETE"), then
 `apply-migrations.sh` immediately fails with:
 ```
