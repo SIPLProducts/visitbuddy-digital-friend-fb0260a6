@@ -38,7 +38,21 @@ if ! id "$SERVICE_USER" >/dev/null 2>&1; then
 fi
 
 mkdir -p "$BASE_DIR" "$FRONTEND_DIR" "$BACKEND_DIR" "$MIDDLEWARE_DIR" "$BACKUP_DIR"
-chown -R "$SERVICE_USER:$SERVICE_USER" "$BASE_DIR"
+# Scoped chown: NEVER touch backend/supabase/docker/volumes — that contains
+# the live Postgres bind-mount (volumes/db/data) which must stay owned by
+# uid 70 (postgres) inside the supabase-db container. A blanket
+# `chown -R vmsadm $BASE_DIR` silently rewrites those data files to vmsadm
+# and the next psql connection fails with:
+#   FATAL: could not open file "global/pg_filenode.map": Permission denied
+safe_chown_base() {
+  local target="$1"
+  [ -d "$target" ] || return 0
+  find "$target" \
+    -path "$target/backend/supabase/docker/volumes" -prune -o \
+    -path "$target/backend/supabase/docker/volumes/*" -prune -o \
+    \( -type f -o -type d -o -type l \) -exec chown "$SERVICE_USER:$SERVICE_USER" {} +
+}
+safe_chown_base "$BASE_DIR"
 
 echo "============================================================"
 echo " VisiGuard Self-Hosted Deployment"
@@ -556,7 +570,8 @@ cat > /etc/cron.d/visiguard-backup <<EOF
 0 2 * * * root /usr/local/bin/visiguard-backup >> /var/log/visiguard-backup.log 2>&1
 EOF
 
-chown -R "$SERVICE_USER:$SERVICE_USER" "$BASE_DIR"
+# Scoped chown — see top of file for why we exclude the PG bind mount.
+safe_chown_base "$BASE_DIR"
 
 cat <<EOF
 

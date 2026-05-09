@@ -81,6 +81,28 @@ wait_for_pg() {
   ok "Postgres is accepting queries."
 }
 
+# Verify a fresh backend can actually open data files. pg_isready talks to
+# the existing postmaster (which holds open FDs), so it can still answer
+# "yes" even when new backends fail with:
+#   FATAL: could not open file "global/pg_filenode.map": Permission denied
+# Returns 0 if a new backend works, 1 if "Permission denied" detected,
+# 2 for any other failure.
+pg_smoke_test() {
+  require_var POSTGRES_PASSWORD
+  local out
+  if out=$(echo 'SELECT 1' | docker exec -i -e PGPASSWORD="$POSTGRES_PASSWORD" \
+               "$PG_CONTAINER" psql -U "$PG_USER" -d "$PG_DB" -tAq 2>&1); then
+    return 0
+  fi
+  if echo "$out" | grep -qi "permission denied"; then
+    warn "Postgres new-backend smoke test failed: Permission denied on data files."
+    warn "$out" | head -3
+    return 1
+  fi
+  warn "Postgres smoke test failed: $out"
+  return 2
+}
+
 # ---- URL-encode a password for DATABASE_URL --------------------------------
 urlencode() {
   python3 -c 'import sys,urllib.parse;print(urllib.parse.quote(sys.argv[1], safe=""))' "$1"
