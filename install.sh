@@ -73,6 +73,14 @@ load_config "$HERE/deploy" || die "config.env not produced by deploy.sh"
 
 # [2] migrations
 log "[2/5] Applying schema migrations"
+# Self-heal: if a previous deploy.sh chowned the PG bind mount, new psql
+# backends will fail with "Permission denied" on global/pg_filenode.map.
+# Detect and auto-repair before apply-migrations.sh chokes on it.
+wait_for_pg 60 || true
+if ! pg_smoke_test; then
+  warn "Detected broken PG data dir ownership. Running repair-pg-perms.sh..."
+  bash "$HERE/deploy/repair-pg-perms.sh"
+fi
 bash "$HERE/deploy/apply-migrations.sh"
 
 # [3] seed
