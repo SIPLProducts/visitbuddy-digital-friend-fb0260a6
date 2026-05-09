@@ -313,6 +313,29 @@ ports = db.get('ports') or []
 ports = [p for p in ports if not str(p).rstrip('"').endswith(':5432')]
 ports.append(mapping)
 db['ports'] = ports
+
+# The Supabase upstream compose also publishes the supavisor "pooler" on host
+# 5432 by default, which collides with our db mapping above. Strip any host
+# binding on the pooler that targets 5432 (keep its 6543 transaction port and
+# any other ports untouched).
+for svc_name in ('pooler', 'supavisor'):
+    svc = services.get(svc_name)
+    if not isinstance(svc, dict):
+        continue
+    sp = svc.get('ports') or []
+    new_sp = []
+    for p in sp:
+        s = str(p).rstrip('"')
+        # Drop "host:container" entries where host port is 5432 OR container
+        # side is 5432 (covers both "5432:5432" and "127.0.0.1:5432:5432").
+        parts = s.split(':')
+        host_port = parts[-2] if len(parts) >= 2 else ''
+        cont_port = parts[-1]
+        if host_port == '5432' or cont_port == '5432':
+            continue
+        new_sp.append(p)
+    svc['ports'] = new_sp
+
 with open(path, 'w') as f:
     yaml.safe_dump(doc, f, sort_keys=False)
 PY
@@ -326,6 +349,27 @@ grep -q '^POSTGRES_HOST_PORT=' "$ENV_FILE" || echo "POSTGRES_HOST_PORT=$POSTGRES
 
 echo ">>> Starting Supabase stack..."
 cd "$SUPA_DOCKER"
+
+# Preflight: make absolutely sure host :5432 is free before compose tries to bind.
+if ss -lnt 2>/dev/null | awk '{print $4}' | grep -qE ':5432$'; then
+  echo ">>> Port 5432 is in use — attempting auto-cleanup before starting stack..."
+  # Stop any docker container publishing 5432 (other than ones we own here).
+  for c in $(docker ps -q --filter 'publish=5432' 2>/dev/null); do
+    echo "   stopping container $c (publishing :5432)"
+    docker rm -f "$c" >/dev/null 2>&1 || true
+  done
+  # Stop a system Postgres if installed.
+  systemctl stop postgresql 2>/dev/null || true
+  sleep 1
+  if ss -lnt 2>/dev/null | awk '{print $4}' | grep -qE ':5432$'; then
+    echo "ERROR: port 5432 still in use. Owner:" >&2
+    ss -lntp 2>/dev/null | awk '/:5432 /{print}' >&2
+    docker ps --filter 'publish=5432' --format '   {{.Names}}  {{.Image}}  {{.Ports}}' >&2 || true
+    echo "Run: sudo bash deploy/wipe-postgres.sh --force   then re-run install.sh" >&2
+    exit 1
+  fi
+fi
+
 docker compose pull
 docker compose up -d
 
