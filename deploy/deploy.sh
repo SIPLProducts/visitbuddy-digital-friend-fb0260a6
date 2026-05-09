@@ -70,6 +70,15 @@ prompt() {
   printf -v "$var" '%s' "$input"
 }
 
+# Auto-pick the next free TCP port starting from $1 (skips anything LISTENing)
+pick_port() {
+  local p="$1"
+  while ss -ltn "( sport = :$p )" 2>/dev/null | grep -q LISTEN; do
+    p=$((p+1))
+  done
+  echo "$p"
+}
+
 prompt DEPLOY_MODE             "Deploy mode: 'ip' (public IP + ports, no TLS) or 'domain'" "ip"
 if [[ "$DEPLOY_MODE" == "domain" ]]; then
   prompt APP_DOMAIN            "App domain (e.g. visiguard.example.com)"
@@ -81,8 +90,10 @@ if [[ "$DEPLOY_MODE" == "domain" ]]; then
 else
   DETECTED_IP="$(curl -fsS --max-time 4 https://api.ipify.org 2>/dev/null || hostname -I | awk '{print $1}')"
   prompt PUBLIC_IP             "Public IP address of this server"               "$DETECTED_IP"
-  prompt API_PORT              "Port to expose Supabase API (Studio + REST)"    "8000"
-  prompt WA_PORT               "Port to expose WhatsApp bridge (0 = keep private)" "0"
+  AUTO_API_PORT="$(pick_port "${API_PORT:-8000}")"
+  AUTO_WA_PORT="$(pick_port "${WA_PORT:-3001}")"
+  prompt API_PORT              "Port to expose Supabase API (auto-detected free port)" "$AUTO_API_PORT"
+  prompt WA_PORT               "Port to expose WhatsApp bridge (0 = keep private)"     "0"
   APP_DOMAIN="$PUBLIC_IP"
   API_DOMAIN="$PUBLIC_IP"
   WA_DOMAIN="$PUBLIC_IP"
@@ -252,7 +263,12 @@ sed -i \
 # In IP mode, expose Kong API gateway on the public interface (default binds to 127.0.0.1)
 if [[ "$DEPLOY_MODE" == "ip" ]]; then
   COMPOSE_FILE="$SUPA_DOCKER/docker-compose.yml"
-  sed -i -E "s|127\.0\.0\.1:8000:8000|0.0.0.0:${API_PORT}:8000|g; s|127\.0\.0\.1:8443:8443|0.0.0.0:8443:8443|g" "$COMPOSE_FILE" || true
+  # Pick a free HTTPS port for Kong too (default 8443 may already be in use)
+  KONG_HTTPS_PORT="$(pick_port "${KONG_HTTPS_PORT:-8443}")"
+  sed -i -E "s|127\.0\.0\.1:8000:8000|0.0.0.0:${API_PORT}:8000|g; s|127\.0\.0\.1:8443:8443|0.0.0.0:${KONG_HTTPS_PORT}:8443|g" "$COMPOSE_FILE" || true
+  # Persist for downstream scripts (import-to-onprem.sh, repair-postgrest.sh)
+  grep -q '^API_PORT=' "$ENV_FILE" || echo "API_PORT=$API_PORT" >> "$ENV_FILE"
+  grep -q '^KONG_HTTPS_PORT=' "$ENV_FILE" || echo "KONG_HTTPS_PORT=$KONG_HTTPS_PORT" >> "$ENV_FILE"
 fi
 
 echo ">>> Starting Supabase stack..."
@@ -262,35 +278,35 @@ docker compose up -d
 
 echo ">>> Waiting for Supabase API..."
 for i in $(seq 1 60); do
-  if curl -fsS "http://127.0.0.1:8000/auth/v1/health" -H "apikey: $ANON_KEY" >/dev/null 2>&1; then
+  if curl -fsS "http://127.0.0.1:${API_PORT:-8000}/auth/v1/health" -H "apikey: $ANON_KEY" >/dev/null 2>&1; then
     echo "    Supabase up."; break
   fi
   sleep 3
 done
 
-# Schema + seed
-export PGPASSWORD="$POSTGRES_PASSWORD"
-PGCONN="postgresql://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/postgres"
+# Schema + seed (port-agnostic: go through the container, not host:5432)
+PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
+PSQL_DOCKER="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres"
 for i in $(seq 1 30); do
-  psql "$PGCONN" -c "SELECT 1" >/dev/null 2>&1 && break || sleep 2
+  $PSQL_DOCKER -c "SELECT 1" >/dev/null 2>&1 && break || sleep 2
 done
 
-if ! psql "$PGCONN" -tAc "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='visitors'" | grep -q 1; then
+if ! $PSQL_DOCKER -tAc "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='visitors'" | grep -q 1; then
   echo "    Importing init-schema.sql..."
-  psql "$PGCONN" -v ON_ERROR_STOP=0 -f "$SCRIPT_DIR/init-schema.sql" || true
+  $PSQL_DOCKER -v ON_ERROR_STOP=0 < "$SCRIPT_DIR/init-schema.sql" || true
 fi
-psql "$PGCONN" -v ON_ERROR_STOP=0 -f "$SCRIPT_DIR/seed.sql" || true
+$PSQL_DOCKER -v ON_ERROR_STOP=0 < "$SCRIPT_DIR/seed.sql" || true
 
 # Primary admin user
 echo ">>> Ensuring admin user $ADMIN_EMAIL..."
-ADMIN_RESP=$(curl -fsS -X POST "http://127.0.0.1:8000/auth/v1/admin/users" \
+ADMIN_RESP=$(curl -fsS -X POST "http://127.0.0.1:${API_PORT:-8000}/auth/v1/admin/users" \
   -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
   -H "Content-Type: application/json" \
   -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\",\"email_confirm\":true,\"user_metadata\":{\"full_name\":\"HO Admin\"}}" || true)
 ADMIN_ID=$(echo "$ADMIN_RESP" | jq -r '.id // empty')
-[[ -z "$ADMIN_ID" ]] && ADMIN_ID=$(psql "$PGCONN" -tAc "SELECT id FROM auth.users WHERE email='$ADMIN_EMAIL' LIMIT 1")
+[[ -z "$ADMIN_ID" ]] && ADMIN_ID=$($PSQL_DOCKER -tAc "SELECT id FROM auth.users WHERE email='$ADMIN_EMAIL' LIMIT 1" | tr -d ' \r\n')
 if [[ -n "$ADMIN_ID" ]]; then
-  psql "$PGCONN" <<SQL
+  $PSQL_DOCKER <<SQL
 INSERT INTO public.profiles (user_id, full_name) VALUES ('$ADMIN_ID', 'HO Admin') ON CONFLICT DO NOTHING;
 INSERT INTO public.locations (id, name, city, country, status)
 VALUES ('00000000-0000-0000-0000-000000000001', 'Head Office', 'Bengaluru', 'India', 'active')
@@ -337,8 +353,10 @@ cd "$MIDDLEWARE_DIR/whatsapp-bridge"
 docker build -t visiguard-wa . >/dev/null
 
 docker rm -f wa-bridge >/dev/null 2>&1 || true
+WA_HOST_PORT="${WA_HOST_PORT:-$(pick_port 3001)}"
+grep -q '^WA_HOST_PORT=' "$ENV_FILE" || echo "WA_HOST_PORT=$WA_HOST_PORT" >> "$ENV_FILE"
 docker run -d --name wa-bridge --restart=always \
-  -p 127.0.0.1:3001:3000 \
+  -p 127.0.0.1:${WA_HOST_PORT}:3000 \
   -v "$MIDDLEWARE_DIR/whatsapp-bridge-data":/data \
   -e API_KEY="$WHATSAPP_BRIDGE_API_KEY" \
   --add-host=host.docker.internal:host-gateway \
