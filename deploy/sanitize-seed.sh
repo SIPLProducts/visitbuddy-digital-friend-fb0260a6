@@ -35,37 +35,55 @@ TOTAL_DROPPED=0
 for f in "$SEED_DIR"/*.sql; do
   [ -f "$f" ] || continue
   dropped=$(python3 - "$f" <<'PY'
-import sys, os, re
+import sys
 path = sys.argv[1]
 with open(path, 'r', encoding='utf-8', errors='replace') as fh:
     lines = fh.readlines()
 
-# Identify INSERT lines that don't terminate with ");" (with optional
-# trailing whitespace). Those are rows truncated by the old grep filter.
+# A statement that starts with INSERT must terminate with ");" before the
+# next top-level statement begins. If a NEW statement keyword appears
+# before the previous INSERT terminates, the previous one was truncated
+# (by the legacy `grep '^INSERT'` filter that dropped continuation lines).
+# Comment out only the truncated buffer; keep everything else intact —
+# including legitimate multi-line INSERTs that DO eventually terminate.
+TOP_KEYWORDS = ('INSERT ', 'BEGIN', 'COMMIT', 'TRUNCATE ', 'SELECT ',
+                'UPDATE ', 'DELETE ', 'ALTER ', 'CREATE ', 'DROP ', 'SET ')
+
+def is_top_stmt(line):
+    return any(line.startswith(k) for k in TOP_KEYWORDS)
+
+def terminates(buf):
+    # buf is a list of lines forming an INSERT statement.
+    last = ''.join(buf).rstrip()
+    return last.endswith(');') or last.endswith(';')
+
 out = []
 dropped = 0
 i = 0
 while i < len(lines):
     line = lines[i]
     if line.startswith('INSERT '):
-        stripped = line.rstrip('\n').rstrip()
-        if not stripped.endswith(');'):
-            # Broken row — comment it out so psql ignores it. Also comment
-            # any subsequent non-statement lines (defensive; usually none
-            # because grep already dropped them, but handles the case where
-            # a future generator leaves trailing bits).
-            out.append('-- [sanitize-seed] dropped malformed row:\n')
-            out.append('-- ' + line)
+        # Buffer until terminator or next top-level statement.
+        buf = [line]
+        j = i + 1
+        while j < len(lines):
+            nxt = lines[j]
+            if terminates(buf):
+                break
+            if is_top_stmt(nxt):
+                # Truncated! Don't consume nxt — let outer loop reprocess it.
+                break
+            buf.append(nxt)
+            j += 1
+        if terminates(buf):
+            out.extend(buf)
+        else:
+            out.append('-- [sanitize-seed] dropped malformed row (truncated by old grep filter):\n')
+            for b in buf:
+                out.append('-- ' + b if not b.startswith('--') else b)
             dropped += 1
-            i += 1
-            while i < len(lines):
-                nxt = lines[i]
-                if nxt.startswith(('INSERT ', 'BEGIN', 'COMMIT', 'TRUNCATE',
-                                   'SELECT ', '--', '\n')):
-                    break
-                out.append('-- ' + nxt)
-                i += 1
-            continue
+        i = j
+        continue
     out.append(line)
     i += 1
 
