@@ -307,7 +307,12 @@ else
   $PSQL_DOCKER -v ON_ERROR_STOP=0 < "$SCRIPT_DIR/seed.sql" || true
 fi
 
-# Primary admin user
+# Primary admin user (only when schema seeding is owned by deploy.sh).
+# When SKIP_SCHEMA=1, redeploy.sh applies migrations + import-seed.sh which
+# already includes 00_auth_users.sql with the cloud admin row.
+if [[ "${SKIP_SCHEMA:-0}" == "1" ]]; then
+  echo ">>> SKIP_SCHEMA=1 — leaving admin/profile/role bootstrap to import-seed.sh."
+else
 echo ">>> Ensuring admin user $ADMIN_EMAIL..."
 ADMIN_RESP=$(curl -fsS -X POST "http://127.0.0.1:${API_PORT:-8000}/auth/v1/admin/users" \
   -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
@@ -325,6 +330,7 @@ INSERT INTO public.user_location_roles (user_id, location_id, role, is_ho_admin)
 VALUES ('$ADMIN_ID', '00000000-0000-0000-0000-000000000001', 'admin', true)
 ON CONFLICT DO NOTHING;
 SQL
+fi
 fi
 
 # Edge functions -> deploy into Supabase volume
