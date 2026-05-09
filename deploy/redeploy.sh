@@ -32,11 +32,13 @@ SUPA_DOCKER="$BASE_DIR/backend/supabase/docker"
 ENV_FILE="$BASE_DIR/config.env"
 
 WITH_SEED=0; STORAGE_TGZ=""; KEEP_CONFIG=0
+BUILD_WA=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --with-seed)   WITH_SEED=1; shift ;;
     --storage)     STORAGE_TGZ="$2"; shift 2 ;;
     --keep-config) KEEP_CONFIG=1; shift ;;
+    --build-wa)    BUILD_WA=1; shift ;;
     -h|--help)     sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "Unknown flag: $1"; exit 1 ;;
   esac
@@ -98,7 +100,7 @@ echo "   Kong HTTPS: $KONG_HTTPS_PORT"
 #    (we apply supabase/migrations/*.sql ourselves in step 4)
 # ---------------------------------------------------------------
 echo ">>> [3/5] Running deploy.sh (SKIP_SCHEMA=1)..."
-SKIP_SCHEMA=1 bash "$SCRIPT_DIR/deploy.sh"
+SKIP_SCHEMA=1 BUILD_WA_BRIDGE="$BUILD_WA" bash "$SCRIPT_DIR/deploy.sh"
 
 # Reload env vars deploy.sh just wrote (API_PORT, POSTGRES_PASSWORD, etc.)
 # shellcheck disable=SC1090

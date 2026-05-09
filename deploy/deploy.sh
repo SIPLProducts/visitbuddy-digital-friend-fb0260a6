@@ -119,7 +119,10 @@ prompt TWILIO_SMS_NUMBER       "Twilio SMS number (optional)"                   
 prompt WHATSAPP_BRIDGE_API_KEY "WhatsApp bridge API key (auto if empty)"         ""
 AUTO_WA_HOST_PORT="$(pick_port "${WA_HOST_PORT:-3001}")"
 WA_HOST_PORT="$AUTO_WA_HOST_PORT"
-prompt WHATSAPP_BRIDGE_URL     "WhatsApp bridge URL reachable from edge functions" "http://host.docker.internal:${WA_HOST_PORT}"
+# Default to the server's own IP so the bridge URL works exactly like the ngrok
+# pattern (an external URL the edge function calls). Override with any reachable
+# endpoint (ngrok, another VM, etc.).
+prompt WHATSAPP_BRIDGE_URL     "WhatsApp bridge URL reachable from edge functions" "http://${PUBLIC_IP:-host.docker.internal}:${WA_HOST_PORT}"
 prompt GEMINI_API_KEY          "Google Gemini API key (for ANPR, optional)"      ""
 prompt RESEND_API_KEY          "Resend API key (optional)"                       ""
 
@@ -365,18 +368,36 @@ rsync -a --delete "$APP_REPO_DIR/whatsapp-bridge/" "$MIDDLEWARE_DIR/whatsapp-bri
 mkdir -p "$MIDDLEWARE_DIR/whatsapp-bridge-data"
 chown -R "$SERVICE_USER:$SERVICE_USER" "$MIDDLEWARE_DIR"
 
-cd "$MIDDLEWARE_DIR/whatsapp-bridge"
-docker build -t visiguard-wa . >/dev/null
-
-docker rm -f wa-bridge >/dev/null 2>&1 || true
 WA_HOST_PORT="${WA_HOST_PORT:-$(pick_port 3001)}"
 grep -q '^WA_HOST_PORT=' "$ENV_FILE" || echo "WA_HOST_PORT=$WA_HOST_PORT" >> "$ENV_FILE"
-docker run -d --name wa-bridge --restart=always \
-  -p 127.0.0.1:${WA_HOST_PORT}:3000 \
-  -v "$MIDDLEWARE_DIR/whatsapp-bridge-data":/data \
-  -e API_KEY="$WHATSAPP_BRIDGE_API_KEY" \
-  --add-host=host.docker.internal:host-gateway \
-  visiguard-wa
+
+# WhatsApp bridge build/run is OPT-IN. By default we treat it the same way as
+# the ngrok setup: an external URL (WHATSAPP_BRIDGE_URL) that the edge function
+# calls. The Docker build pulls Chromium from deb.debian.org which fails behind
+# many corporate firewalls — so we never run it unless asked.
+#
+# To run a bridge locally on this host:    sudo bash deploy/run-wa-bridge.sh
+# To force build inside this script:       BUILD_WA_BRIDGE=1 bash deploy/deploy.sh
+if [[ "${BUILD_WA_BRIDGE:-0}" == "1" ]]; then
+  echo ">>> BUILD_WA_BRIDGE=1 — building local bridge image..."
+  ( cd "$MIDDLEWARE_DIR/whatsapp-bridge" && docker build --network=host -t visiguard-wa . ) || {
+    echo "WARN: WA bridge image build failed — continuing without it. Use deploy/run-wa-bridge.sh later."
+    BUILD_WA_BRIDGE=0
+  }
+fi
+if [[ "${BUILD_WA_BRIDGE:-0}" == "1" ]]; then
+  docker rm -f wa-bridge >/dev/null 2>&1 || true
+  docker run -d --name wa-bridge --restart=always \
+    -p 0.0.0.0:${WA_HOST_PORT}:3000 \
+    -v "$MIDDLEWARE_DIR/whatsapp-bridge-data":/data \
+    -e API_KEY="$WHATSAPP_BRIDGE_API_KEY" \
+    --add-host=host.docker.internal:host-gateway \
+    visiguard-wa
+else
+  echo ">>> Skipping WA bridge container (external URL mode)."
+  echo "    WHATSAPP_BRIDGE_URL = $WHATSAPP_BRIDGE_URL"
+  echo "    To start a local bridge later: sudo bash $SCRIPT_DIR/run-wa-bridge.sh"
+fi
 
 # ---------------------------------------------------------------
 # 8) Nginx + TLS
