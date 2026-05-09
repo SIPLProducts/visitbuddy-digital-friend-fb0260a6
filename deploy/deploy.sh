@@ -284,6 +284,30 @@ if [[ "$DEPLOY_MODE" == "ip" ]]; then
   grep -q '^KONG_HTTPS_PORT=' "$ENV_FILE" || echo "KONG_HTTPS_PORT=$KONG_HTTPS_PORT" >> "$ENV_FILE"
 fi
 
+# Always publish Postgres on host 127.0.0.1:5432 so admins can connect with
+# pgAdmin / DBeaver. Scripts themselves use docker exec, so the host port is
+# only for humans.
+POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT:-5432}"
+if ! grep -qE "^\s*-\s*\"?${POSTGRES_HOST_PORT}:5432" "$SUPA_DOCKER/docker-compose.yml"; then
+  # Insert ports stanza under the db service if not already present.
+  python3 - "$SUPA_DOCKER/docker-compose.yml" "$POSTGRES_HOST_PORT" <<'PY' || true
+import re,sys
+path,port = sys.argv[1], sys.argv[2]
+src = open(path).read()
+# Find the `  db:` block and ensure a `ports:` line listing host:5432
+pat = re.compile(r"(^\s{2}db:\s*\n(?:\s{4}.*\n)+?)", re.M)
+def add_ports(m):
+    block = m.group(1)
+    if 'ports:' in block:
+        return block
+    return block + f"    ports:\n      - \"127.0.0.1:{port}:5432\"\n"
+new = pat.sub(add_ports, src, count=1)
+if new != src:
+    open(path,'w').write(new)
+PY
+fi
+grep -q '^POSTGRES_HOST_PORT=' "$ENV_FILE" || echo "POSTGRES_HOST_PORT=$POSTGRES_HOST_PORT" >> "$ENV_FILE"
+
 echo ">>> Starting Supabase stack..."
 cd "$SUPA_DOCKER"
 docker compose pull
@@ -347,11 +371,13 @@ fi
 # Edge functions -> deploy into Supabase volume
 FUNC_DIR="$SUPA_DOCKER/volumes/functions"
 mkdir -p "$FUNC_DIR"
+# URL-encode the Postgres password so DATABASE_URL doesn't break on @, :, /, etc.
+POSTGRES_PASSWORD_URLENC=$(python3 -c 'import sys,urllib.parse;print(urllib.parse.quote(sys.argv[1], safe=""))' "$POSTGRES_PASSWORD")
 cat > "$FUNC_DIR/.env" <<EOF
 SUPABASE_URL=http://kong:8000
 SUPABASE_ANON_KEY=$ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY
-SUPABASE_DB_URL=postgresql://postgres:$POSTGRES_PASSWORD@db:5432/postgres
+SUPABASE_DB_URL=postgresql://postgres:${POSTGRES_PASSWORD_URLENC}@db:5432/postgres
 TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN
 TWILIO_WHATSAPP_NUMBER=$TWILIO_WHATSAPP_NUMBER
