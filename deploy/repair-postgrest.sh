@@ -16,27 +16,30 @@
 #   sudo bash deploy/repair-postgrest.sh
 set -euo pipefail
 
+# CRLF self-heal
+if grep -q $'\r' "$0" 2>/dev/null; then
+  sed -i 's/\r$//' "$0" 2>/dev/null || true
+  exec bash "$0" "$@"
+fi
+
 if [[ $EUID -ne 0 ]]; then
   echo "Please run as root: sudo bash $0"; exit 1
 fi
 
-SERVICE_USER="${SERVICE_USER:-vmsadm}"
-BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
-# shellcheck disable=SC1090
-source "$BASE_DIR/config.env"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# shellcheck disable=SC1091
+source "$HERE/lib/common.sh"
+load_config "$HERE" || die "config.env not found in $BASE_DIR or $HERE"
+require_var POSTGRES_PASSWORD
 
 SUPA_DOCKER="$BASE_DIR/backend/supabase/docker"
-PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
-PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=0"
 
 if ! docker ps --format '{{.Names}}' | grep -qx "$PG_CONTAINER"; then
-  echo "ERROR: Postgres container '$PG_CONTAINER' is not running. Start the stack first:"
-  echo "  cd $SUPA_DOCKER && docker compose up -d"
-  exit 1
+  die "Postgres container '$PG_CONTAINER' not running. Start: cd $SUPA_DOCKER && docker compose up -d"
 fi
 
-echo "==> Re-applying Supabase role grants on public/auth/storage..."
-$PSQL <<'SQL'
+log "Re-applying Supabase role grants on public/auth/storage..."
+psql_soft <<'SQL'
 -- Schema USAGE
 DO $$
 DECLARE r text;
@@ -106,30 +109,19 @@ NOTIFY pgrst, 'reload schema';
 NOTIFY pgrst, 'reload config';
 SQL
 
-echo "==> Restarting REST / Auth / Storage / Realtime / Meta containers..."
+log "Restarting REST / Auth / Storage / Realtime / Meta containers..."
 cd "$SUPA_DOCKER"
 docker compose restart rest auth storage realtime meta || true
 
-echo "==> Waiting for PostgREST to come back..."
+log "Waiting for PostgREST to come back..."
 ANON_KEY=$(grep -E '^ANON_KEY=' "$SUPA_DOCKER/.env" | cut -d= -f2-)
-OK=0
-for i in $(seq 1 30); do
-  CODE=$(curl -s -o /tmp/pgrst.out -w "%{http_code}" \
-    -H "apikey: $ANON_KEY" \
-    "http://127.0.0.1:8000/rest/v1/locations?select=id&limit=1" || true)
-  if [[ "$CODE" == "200" ]]; then OK=1; break; fi
-  sleep 2
-done
-
-if [[ "$OK" == "1" ]]; then
+API_PORT="${API_PORT:-8000}"
+if wait_for_http "http://127.0.0.1:${API_PORT}/rest/v1/locations?select=id&limit=1" 200 60 "apikey: $ANON_KEY"; then
   echo
-  echo "SUCCESS — PostgREST is healthy. /rest/v1/locations returned 200."
-  echo "Reload the browser tab; the blank page should now render data."
+  ok "PostgREST is healthy. /rest/v1/locations returned 200."
 else
   echo
-  echo "STILL FAILING — last response (HTTP $CODE):"
-  cat /tmp/pgrst.out; echo
-  echo "Check container logs:"
+  warn "STILL FAILING. Check container logs:"
   echo "  docker compose -f $SUPA_DOCKER/docker-compose.yml logs --tail=80 rest"
   echo "  docker compose -f $SUPA_DOCKER/docker-compose.yml logs --tail=80 auth"
   exit 1
