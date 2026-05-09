@@ -263,3 +263,75 @@ sudo bash /home/vmsadm/resl/vvms/frontend/deploy/repair-postgrest.sh
 ```
 
 Reload the browser tab afterwards. The script is idempotent and safe to re-run.
+
+### Manual recovery (if `repair-postgrest.sh` is unavailable)
+
+These commands talk to Postgres through the running container, so they don't
+depend on which host port the DB is exposed on (`5432` vs `54322`):
+
+```bash
+cd /home/vmsadm/resl/vvms/backend/supabase/docker
+sudo docker compose ps
+sudo docker compose exec db psql -U postgres -d postgres -c "select now();"
+
+# Re-apply public/auth/storage grants and reload PostgREST
+sudo docker exec -i supabase-db psql -U postgres -d postgres <<'SQL'
+DO $$
+DECLARE r text;
+BEGIN
+  FOREACH r IN ARRAY ARRAY[
+    'anon','authenticated','service_role','authenticator',
+    'supabase_admin','supabase_auth_admin','supabase_storage_admin'
+  ] LOOP
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname='public')  THEN EXECUTE format('GRANT USAGE ON SCHEMA public  TO %I', r); END IF;
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname='auth')    THEN EXECUTE format('GRANT USAGE ON SCHEMA auth    TO %I', r); END IF;
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname='storage') THEN EXECUTE format('GRANT USAGE ON SCHEMA storage TO %I', r); END IF;
+    END IF;
+  END LOOP;
+END $$;
+GRANT ALL ON ALL TABLES    IN SCHEMA public TO postgres, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO anon, authenticated, service_role;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='auth' AND table_name='users') THEN
+    GRANT SELECT ON auth.users TO anon, authenticated, service_role;
+  END IF;
+END $$;
+NOTIFY pgrst, 'reload schema';
+NOTIFY pgrst, 'reload config';
+SQL
+
+sudo docker compose restart rest auth storage realtime meta functions
+
+ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
+curl -i "http://127.0.0.1:8000/rest/v1/locations?select=id&limit=1" \
+  -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY"
+```
+
+### `profiles_user_id_fkey` error during seed import
+
+If `import-seed.sh` aborts with:
+
+```text
+ERROR: insert or update on table "profiles" violates foreign key constraint "profiles_user_id_fkey"
+DETAIL: Key (user_id)=(...) is not present in table "users".
+```
+
+then `deploy/seed/00_auth_users.sql` is missing or empty (it isn't committed
+to git because it contains password hashes). Generate it from a machine that
+can read `auth.users` on the source DB:
+
+```bash
+SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres' \
+  bash deploy/generate-seed-files.sh
+scp deploy/seed/00_auth_users.sql vmsadm@<server>:/home/vmsadm/resl/vvms/.../deploy/seed/
+sudo bash deploy/import-seed.sh
+```
+
+`import-seed.sh` will now skip `16_profiles.sql` and `17_user_location_roles.sql`
+with a warning when `00_auth_users.sql` is empty, instead of failing the whole import.
