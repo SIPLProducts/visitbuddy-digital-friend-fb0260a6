@@ -294,10 +294,18 @@ for i in $(seq 1 30); do
 done
 
 if ! $PSQL_DOCKER -tAc "SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='visitors'" | grep -q 1; then
-  echo "    Importing init-schema.sql..."
-  $PSQL_DOCKER -v ON_ERROR_STOP=0 < "$SCRIPT_DIR/init-schema.sql" || true
+  if [[ "${SKIP_SCHEMA:-0}" == "1" ]]; then
+    echo "    SKIP_SCHEMA=1 — leaving schema empty (redeploy.sh will apply supabase/migrations/*.sql)."
+  else
+    echo "    Importing init-schema.sql..."
+    $PSQL_DOCKER -v ON_ERROR_STOP=0 < "$SCRIPT_DIR/init-schema.sql" || true
+  fi
 fi
-$PSQL_DOCKER -v ON_ERROR_STOP=0 < "$SCRIPT_DIR/seed.sql" || true
+if [[ "${SKIP_SCHEMA:-0}" == "1" ]]; then
+  echo "    SKIP_SCHEMA=1 — skipping seed.sql (redeploy.sh will run import-seed.sh)."
+else
+  $PSQL_DOCKER -v ON_ERROR_STOP=0 < "$SCRIPT_DIR/seed.sql" || true
+fi
 
 # Primary admin user
 echo ">>> Ensuring admin user $ADMIN_EMAIL..."
