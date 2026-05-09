@@ -26,11 +26,17 @@ BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
 source "$BASE_DIR/config.env"
 
 SUPA_DOCKER="$BASE_DIR/backend/supabase/docker"
-PGCONN="postgresql://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/postgres"
-export PGPASSWORD="$POSTGRES_PASSWORD"
+PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
+PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=0"
+
+if ! docker ps --format '{{.Names}}' | grep -qx "$PG_CONTAINER"; then
+  echo "ERROR: Postgres container '$PG_CONTAINER' is not running. Start the stack first:"
+  echo "  cd $SUPA_DOCKER && docker compose up -d"
+  exit 1
+fi
 
 echo "==> Re-applying Supabase role grants on public/auth/storage..."
-psql "$PGCONN" -v ON_ERROR_STOP=0 <<'SQL'
+$PSQL <<'SQL'
 -- Schema USAGE
 DO $$
 DECLARE r text;
@@ -39,7 +45,15 @@ BEGIN
                            'supabase_admin','supabase_auth_admin','supabase_storage_admin']
   LOOP
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
-      EXECUTE format('GRANT USAGE ON SCHEMA public, auth, storage TO %I', r);
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'public') THEN
+        EXECUTE format('GRANT USAGE ON SCHEMA public TO %I', r);
+      END IF;
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'auth') THEN
+        EXECUTE format('GRANT USAGE ON SCHEMA auth TO %I', r);
+      END IF;
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'storage') THEN
+        EXECUTE format('GRANT USAGE ON SCHEMA storage TO %I', r);
+      END IF;
     END IF;
   END LOOP;
   IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'extensions') THEN
@@ -77,7 +91,15 @@ BEGIN
 END $$;
 
 -- PostgREST exposed roles need to read auth.users for RLS via auth.uid()
-GRANT SELECT ON auth.users TO anon, authenticated, service_role;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'auth' AND table_name = 'users'
+  ) THEN
+    GRANT SELECT ON auth.users TO anon, authenticated, service_role;
+  END IF;
+END $$;
 
 -- Reload PostgREST schema cache
 NOTIFY pgrst, 'reload schema';
