@@ -274,8 +274,18 @@ sed -i \
   "$SUPA_DOCKER/.env"
 
 # In IP mode, expose Kong API gateway on the public interface (default binds to 127.0.0.1)
+COMPOSE_FILE="$SUPA_DOCKER/docker-compose.yml"
+
+# Always start from a pristine compose file so re-runs cannot accumulate damage
+# from previous patch attempts (duplicate keys, partial seds, etc.).
+if [ -f "$COMPOSE_FILE" ] && [ ! -f "$COMPOSE_FILE.orig" ]; then
+  cp "$COMPOSE_FILE" "$COMPOSE_FILE.orig"
+fi
+if [ -f "$COMPOSE_FILE.orig" ]; then
+  cp "$COMPOSE_FILE.orig" "$COMPOSE_FILE"
+fi
+
 if [[ "$DEPLOY_MODE" == "ip" ]]; then
-  COMPOSE_FILE="$SUPA_DOCKER/docker-compose.yml"
   # Pick a free HTTPS port for Kong too (default 8443 may already be in use)
   KONG_HTTPS_PORT="$(pick_port "${KONG_HTTPS_PORT:-8443}")"
   sed -i -E "s|127\.0\.0\.1:8000:8000|0.0.0.0:${API_PORT}:8000|g; s|127\.0\.0\.1:8443:8443|0.0.0.0:${KONG_HTTPS_PORT}:8443|g" "$COMPOSE_FILE" || true
@@ -288,23 +298,29 @@ fi
 # pgAdmin / DBeaver. Scripts themselves use docker exec, so the host port is
 # only for humans.
 POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT:-5432}"
-if ! grep -qE "^\s*-\s*\"?${POSTGRES_HOST_PORT}:5432" "$SUPA_DOCKER/docker-compose.yml"; then
-  # Insert ports stanza under the db service if not already present.
-  python3 - "$SUPA_DOCKER/docker-compose.yml" "$POSTGRES_HOST_PORT" <<'PY' || true
-import re,sys
-path,port = sys.argv[1], sys.argv[2]
-src = open(path).read()
-# Find the `  db:` block and ensure a `ports:` line listing host:5432
-pat = re.compile(r"(^\s{2}db:\s*\n(?:\s{4}.*\n)+?)", re.M)
-def add_ports(m):
-    block = m.group(1)
-    if 'ports:' in block:
-        return block
-    return block + f"    ports:\n      - \"127.0.0.1:{port}:5432\"\n"
-new = pat.sub(add_ports, src, count=1)
-if new != src:
-    open(path,'w').write(new)
+# Ensure PyYAML is available for safe YAML editing.
+python3 -c 'import yaml' 2>/dev/null || sudo apt-get install -y python3-yaml >/dev/null 2>&1 || true
+python3 - "$COMPOSE_FILE" "$POSTGRES_HOST_PORT" <<'PY'
+import sys, yaml
+path, port = sys.argv[1], sys.argv[2]
+with open(path) as f:
+    doc = yaml.safe_load(f)
+services = doc.setdefault('services', {})
+db = services.setdefault('db', {})
+mapping = f"127.0.0.1:{port}:5432"
+ports = db.get('ports') or []
+# Drop any prior mapping that publishes container 5432 to avoid duplicates.
+ports = [p for p in ports if not str(p).rstrip('"').endswith(':5432')]
+ports.append(mapping)
+db['ports'] = ports
+with open(path, 'w') as f:
+    yaml.safe_dump(doc, f, sort_keys=False)
 PY
+# Validate the resulting compose file before continuing.
+if ! docker compose -f "$COMPOSE_FILE" config >/dev/null 2>&1; then
+  echo "ERROR: docker compose config failed after patching $COMPOSE_FILE" >&2
+  docker compose -f "$COMPOSE_FILE" config >&2 || true
+  exit 1
 fi
 grep -q '^POSTGRES_HOST_PORT=' "$ENV_FILE" || echo "POSTGRES_HOST_PORT=$POSTGRES_HOST_PORT" >> "$ENV_FILE"
 
