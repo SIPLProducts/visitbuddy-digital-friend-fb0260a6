@@ -20,14 +20,20 @@
 # Idempotent. Safe to re-run if it fails halfway.
 set -euo pipefail
 
+# CRLF self-heal
+if grep -q $'\r' "$0" 2>/dev/null; then
+  sed -i 's/\r$//' "$0" 2>/dev/null || true
+  exec bash "$0" "$@"
+fi
+
 if [[ $EUID -ne 0 ]]; then
   echo "Please run as root: sudo bash $0 [...]"; exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-SERVICE_USER="${SERVICE_USER:-vmsadm}"
-BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/lib/common.sh"
 SUPA_DOCKER="$BASE_DIR/backend/supabase/docker"
 ENV_FILE="$BASE_DIR/config.env"
 
@@ -121,18 +127,16 @@ if [[ "$WITH_SEED" == "1" ]]; then
   fi
 else
   echo ">>> [4b/5] Skipping data seed (run with --with-seed to populate)."
-  # Still bootstrap the primary admin so the app is usable on first login.
-  PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
-  PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=0"
+  # Bootstrap the primary admin so the app is usable on first login (no host psql).
   ADMIN_RESP=$(curl -fsS -X POST "http://127.0.0.1:${API_PORT}/auth/v1/admin/users" \
       -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
       -H "Content-Type: application/json" \
       -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\",\"email_confirm\":true,\"user_metadata\":{\"full_name\":\"HO Admin\"}}" || true)
   ADMIN_ID=$(echo "$ADMIN_RESP" | jq -r '.id // empty')
   [[ -z "$ADMIN_ID" ]] && ADMIN_ID=$(echo "SELECT id FROM auth.users WHERE email='$ADMIN_EMAIL' LIMIT 1" \
-      | docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -tAq | tr -d ' \r\n')
+      | psql_query | tr -d ' \r\n')
   if [[ -n "$ADMIN_ID" ]]; then
-    $PSQL <<SQL
+    psql_soft <<SQL
 INSERT INTO public.profiles (user_id, full_name) VALUES ('$ADMIN_ID', 'HO Admin') ON CONFLICT DO NOTHING;
 INSERT INTO public.locations (id, name, city, country, status)
 VALUES ('00000000-0000-0000-0000-000000000001', 'Head Office', 'Bengaluru', 'India', 'active')

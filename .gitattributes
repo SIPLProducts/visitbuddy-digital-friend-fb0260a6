@@ -1,0 +1,11 @@
+# Force LF line endings on all deploy / shell / SQL / nginx template files so
+# Windows-edited copies don't break bash on the Ubuntu host.
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.tpl       text eol=lf
+*.sql       text eol=lf
+*.conf      text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+Dockerfile  text eol=lf
+deploy/**   text eol=lf

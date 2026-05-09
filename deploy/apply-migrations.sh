@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Apply every supabase/migrations/*.sql file (chronological) to the on-prem
-# Postgres running in the supabase-db container.
+# Postgres running in the supabase-db container — via docker exec only.
 #
 # Idempotent: tracked in public._lovable_migrations(name PK). Already-applied
 # files are skipped on re-runs.
@@ -9,38 +9,27 @@
 #   sudo bash deploy/apply-migrations.sh
 set -euo pipefail
 
+# CRLF self-heal
+if grep -q $'\r' "$0" 2>/dev/null; then
+  sed -i 's/\r$//' "$0" 2>/dev/null || true
+  exec bash "$0" "$@"
+fi
+
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$HERE/.." && pwd)"
 MIG_DIR="$REPO_ROOT/supabase/migrations"
 
-if [ ! -d "$MIG_DIR" ]; then
-  echo "ERROR: migrations dir not found: $MIG_DIR" >&2
-  exit 1
-fi
+# shellcheck disable=SC1091
+source "$HERE/lib/common.sh"
+load_config "$HERE" || die "config.env not found in $BASE_DIR or $HERE"
+require_var POSTGRES_PASSWORD
 
-SERVICE_USER="${SERVICE_USER:-vmsadm}"
-BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
-for CFG in "$BASE_DIR/config.env" "$HERE/config.env"; do
-  if [ -f "$CFG" ]; then
-    # shellcheck disable=SC1090
-    . "$CFG"
-    break
-  fi
-done
-: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD not set (run deploy.sh first or source $BASE_DIR/config.env)}"
+[ -d "$MIG_DIR" ] || die "migrations dir not found: $MIG_DIR"
 
-PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
-PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=1"
-PSQL_TA="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -tAq"
+wait_for_pg 60
 
-echo "==> Waiting for Postgres to accept queries..."
-for i in $(seq 1 30); do
-  if echo "SELECT 1" | $PSQL_TA >/dev/null 2>&1; then break; fi
-  sleep 2
-done
-
-echo "==> Ensuring tracking table public._lovable_migrations"
-$PSQL <<'SQL'
+log "Ensuring tracking table public._lovable_migrations"
+psql_exec <<'SQL'
 CREATE TABLE IF NOT EXISTS public._lovable_migrations (
   name TEXT PRIMARY KEY,
   applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -57,7 +46,7 @@ FAILED=0
 
 for f in "${FILES[@]}"; do
   base=$(basename "$f")
-  exists=$(echo "SELECT 1 FROM public._lovable_migrations WHERE name='$base'" | $PSQL_TA 2>/dev/null || true)
+  exists=$(echo "SELECT 1 FROM public._lovable_migrations WHERE name='$base'" | psql_query 2>/dev/null || true)
   if [ "$exists" = "1" ]; then
     SKIPPED=$((SKIPPED+1))
     continue
@@ -65,9 +54,9 @@ for f in "${FILES[@]}"; do
   echo "  -> $base"
   # Each migration is wrapped in its own transaction so a failure rolls back
   # cleanly. ON_ERROR_STOP=1 makes psql return non-zero on the first error.
-  if (echo "BEGIN;"; cat "$f"; echo; echo "COMMIT;") | $PSQL >/dev/null 2>/tmp/mig_err.$$; then
+  if (echo "BEGIN;"; cat "$f"; echo; echo "COMMIT;") | psql_exec >/dev/null 2>/tmp/mig_err.$$; then
     echo "INSERT INTO public._lovable_migrations(name) VALUES ('$base') ON CONFLICT DO NOTHING;" \
-      | $PSQL >/dev/null
+      | psql_exec >/dev/null
     APPLIED=$((APPLIED+1))
   else
     FAILED=$((FAILED+1))
@@ -88,8 +77,8 @@ if [ "$FAILED" -gt 0 ]; then
   exit 2
 fi
 
-echo "==> Refreshing PostgREST schema cache"
-$PSQL <<'SQL' || true
+log "Refreshing PostgREST schema cache"
+psql_soft <<'SQL' || true
 NOTIFY pgrst, 'reload schema';
 NOTIFY pgrst, 'reload config';
 SQL
