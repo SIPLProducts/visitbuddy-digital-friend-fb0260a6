@@ -23,6 +23,9 @@ BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
 CONFIG_ENV="$BASE_DIR/config.env"
 SUPABASE_ENV="$BASE_DIR/backend/supabase/docker/.env"
 SUPABASE_DIR="$BASE_DIR/backend/supabase/docker"
+# This is the env file actually mounted into the supabase-edge-functions
+# container by deploy.sh. Updating it is what makes Deno.env.get(...) work.
+FUNCTIONS_ENV="$SUPABASE_DIR/volumes/functions/.env"
 
 # Self-heal CRLF
 sed -i 's/\r$//' "$0" 2>/dev/null || true
@@ -34,6 +37,11 @@ die()  { printf '\033[1;31m[FAIL]\033[0m %s\n' "$*" >&2; exit 1; }
 
 [[ -f "$CONFIG_ENV"   ]] || die "$CONFIG_ENV not found. Run install.sh first."
 [[ -f "$SUPABASE_ENV" ]] || die "$SUPABASE_ENV not found. Run install.sh first."
+if [[ ! -f "$FUNCTIONS_ENV" ]]; then
+  warn "$FUNCTIONS_ENV not found — creating it. (deploy.sh normally creates this.)"
+  mkdir -p "$(dirname "$FUNCTIONS_ENV")"
+  : > "$FUNCTIONS_ENV"
+fi
 
 # Upsert KEY=VALUE into a shell-style env file, preserving everything else.
 upsert_env() {
@@ -76,6 +84,10 @@ upsert_env "$CONFIG_ENV" WHATSAPP_BRIDGE_URL     "$BRIDGE_URL"
 log "Updating $SUPABASE_ENV ..."
 upsert_env "$SUPABASE_ENV" WHATSAPP_BRIDGE_API_KEY "$API_KEY"
 upsert_env "$SUPABASE_ENV" WHATSAPP_BRIDGE_URL     "$BRIDGE_URL"
+
+log "Updating $FUNCTIONS_ENV (the file mounted into supabase-edge-functions) ..."
+upsert_env "$FUNCTIONS_ENV" WHATSAPP_BRIDGE_API_KEY "$API_KEY"
+upsert_env "$FUNCTIONS_ENV" WHATSAPP_BRIDGE_URL     "$BRIDGE_URL"
 ok "Env files updated."
 
 # 3) Build & start the bridge
@@ -87,6 +99,15 @@ if [[ -d "$SUPABASE_DIR" ]]; then
   log "Recreating supabase-edge-functions container ..."
   ( cd "$SUPABASE_DIR" && docker compose up -d --force-recreate functions ) \
     || warn "Could not recreate functions service automatically — restart it manually."
+  # Give the container a moment to boot, then check for the missing-secrets line
+  sleep 3
+  if docker logs --tail=40 supabase-edge-functions 2>&1 | grep -q "missing secrets"; then
+    warn "supabase-edge-functions still reports 'missing secrets'."
+    warn "Check that vars are present in: $FUNCTIONS_ENV"
+    warn "Then: docker compose -f $SUPABASE_DIR/docker-compose.yml up -d --force-recreate functions"
+  else
+    ok "supabase-edge-functions has the bridge env."
+  fi
 else
   warn "Supabase dir $SUPABASE_DIR missing; skipping functions recreate."
 fi
