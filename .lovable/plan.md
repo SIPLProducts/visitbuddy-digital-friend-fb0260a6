@@ -1,36 +1,53 @@
-## Root cause
+## Confirmed cause
 
-The committed seed files `deploy/seed/00_auth_users_bootstrap.sql` (106 lines) and `deploy/seed/48_email_logs.sql` (3,382 lines) contain bare lines:
+The login failure is not frontend-related. Your server log shows the exact backend auth error:
 
+```text
+sql: Scan error on column index 3, name "confirmation_token": converting NULL to string is unsupported
 ```
-[sanitize-seed] dropped malformed row:
-```
 
-with no `--` prefix. These were injected by an earlier buggy version of `sanitize-seed.sh` and committed to the repo. The current sanitizer is now idempotent and won't touch them again, but the damage is permanent in those files. psql sees `[sanitize-seed]...` as raw SQL and fails immediately.
+The seeded `auth.users` rows were inserted without token columns such as `confirmation_token`, so they defaulted to `NULL`. The auth service expects string values and crashes during password login.
 
-The actual INSERTs interleaved between those marker lines are valid and complete (each on its own line, ending in `;`).
+## Immediate server fix
 
-## Plan
+Add a repair script `deploy/repair-auth.sh` that:
 
-1. **Strip the bare markers from the two committed files** — every line that starts with `[sanitize-seed]` (no leading `--`) is garbage from the old buggy run. Remove them so the surrounding INSERTs stand alone.
+1. Loads the existing on-prem config.
+2. Connects only through `docker exec supabase-db`.
+3. Updates existing auth users by replacing nullable token fields with empty strings:
+   ```sql
+   UPDATE auth.users
+   SET confirmation_token = COALESCE(confirmation_token, ''),
+       recovery_token = COALESCE(recovery_token, ''),
+       email_change_token_new = COALESCE(email_change_token_new, ''),
+       email_change = COALESCE(email_change, ''),
+       aud = COALESCE(NULLIF(aud, ''), 'authenticated'),
+       role = COALESCE(NULLIF(role, ''), 'authenticated'),
+       raw_app_meta_data = COALESCE(raw_app_meta_data, '{"provider":"email","providers":["email"]}'::jsonb),
+       raw_user_meta_data = COALESCE(raw_user_meta_data, '{}'::jsonb);
+   ```
+4. Re-applies expected auth schema privileges for `supabase_auth_admin`.
+5. Restarts `supabase-auth`.
+6. Prints the health endpoint result and a login retry instruction.
 
-   - `deploy/seed/00_auth_users_bootstrap.sql` — 106 lines to remove
-   - `deploy/seed/48_email_logs.sql` — 3,382 lines to remove
+## Permanent fix
 
-2. **Harden `deploy/sanitize-seed.sh` to also self-heal this corruption** — at the start of each file, drop or comment out any line starting with `[sanitize-seed]` (bare, no `--`). This way any user who already pulled the corrupted files gets fixed automatically by `import-seed.sh` (which already invokes the sanitizer).
+Update the seed/import flow so this does not happen again:
 
-3. **Add a regression note in `deploy/README-troubleshooting.md`** under section `0d`: if you see `syntax error at or near "["` followed by `LINE 1: [sanitize-seed]...`, re-pull and re-run `import-seed.sh` (the sanitizer now strips them).
+1. Harden `deploy/seed/00_auth_users_bootstrap.sql` so all bootstrap users are repaired at the end of the file after insert.
+2. Add the same auth-user normalization block to `deploy/import-seed.sh` immediately after applying `00_auth_users_bootstrap.sql`.
+3. Fix `deploy/generate-seed-files.sh` auth export to stop using `grep '^INSERT'` for `auth.users`, because that can truncate multi-line auth rows the same way it previously damaged visitor seed rows.
+4. Document the issue in `deploy/README-troubleshooting.md` as:
+   ```text
+   0e. Login returns {"code":"unexpected_failure","message":"Database error querying schema"}
+   ```
 
-No other seed files are affected (verified — only `00_*` and `48_*` have bare markers).
-
-## Server recovery
-
-After approval the user runs:
+## Recovery command after implementation
 
 ```bash
 cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
 git pull
-sudo bash deploy/import-seed.sh
+sudo bash deploy/repair-auth.sh
 ```
 
-`import-seed.sh` already calls the sanitizer first, so the import will proceed cleanly.
+No wipe and no seed re-import needed.
