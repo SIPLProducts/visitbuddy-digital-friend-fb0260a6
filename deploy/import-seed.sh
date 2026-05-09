@@ -26,6 +26,7 @@ fi
 
 PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
 PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=1"
+PSQL_SOFT="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres -v ON_ERROR_STOP=0"
 
 echo "==> Stopping functions container (avoid mid-import calls)"
 docker stop supabase-functions 2>/dev/null || true
@@ -34,22 +35,76 @@ shopt -s nullglob
 FILES=( "$SEED_DIR"/*.sql )
 IFS=$'\n' FILES=( $(printf '%s\n' "${FILES[@]}" | sort) )
 
+# Guard: profile/role seeds depend on auth.users. If 00_auth_users.sql is
+# missing or empty, the FK insert will hard-fail and abort the whole import.
+AUTH_FILE="$SEED_DIR/00_auth_users.sql"
+if [ ! -s "$AUTH_FILE" ] || ! grep -q -i 'INSERT INTO' "$AUTH_FILE"; then
+  echo "WARNING: $AUTH_FILE is missing or empty."
+  echo "         profiles / user_location_roles inserts will fail because their"
+  echo "         user_id values won't exist in auth.users. Skipping those files."
+  SKIP_USER_DEPENDENT=1
+else
+  SKIP_USER_DEPENDENT=0
+fi
+
 echo "==> Importing ${#FILES[@]} seed files"
 for f in "${FILES[@]}"; do
-  echo "  -> $(basename "$f")"
+  base=$(basename "$f")
+  if [ "$SKIP_USER_DEPENDENT" = "1" ] && [[ "$base" =~ ^(16_profiles|17_user_location_roles)\.sql$ ]]; then
+    echo "  -- skipped $base (no auth users seeded)"
+    continue
+  fi
+  echo "  -> $base"
   $PSQL < "$f"
 done
 
 echo "==> Re-applying Supabase role grants"
-$PSQL <<'SQL'
-GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
-GRANT ALL ON ALL TABLES    IN SCHEMA public TO anon, authenticated, service_role;
-GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
-GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES    TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
+$PSQL_SOFT <<'SQL'
+DO $$
+DECLARE r text;
+BEGIN
+  FOREACH r IN ARRAY ARRAY['anon','authenticated','service_role','authenticator',
+                           'supabase_admin','supabase_auth_admin','supabase_storage_admin']
+  LOOP
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'public') THEN
+        EXECUTE format('GRANT USAGE ON SCHEMA public TO %I', r);
+      END IF;
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'auth') THEN
+        EXECUTE format('GRANT USAGE ON SCHEMA auth TO %I', r);
+      END IF;
+      IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'storage') THEN
+        EXECUTE format('GRANT USAGE ON SCHEMA storage TO %I', r);
+      END IF;
+    END IF;
+  END LOOP;
+END $$;
+
+GRANT ALL ON ALL TABLES    IN SCHEMA public TO postgres, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE
+              ON ALL TABLES    IN SCHEMA public TO anon, authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO postgres, anon, authenticated, service_role;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES    TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT ALL                            ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT EXECUTE                        ON FUNCTIONS TO anon, authenticated, service_role;
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema='auth' AND table_name='users'
+  ) THEN
+    GRANT SELECT ON auth.users TO anon, authenticated, service_role;
+  END IF;
+END $$;
+
 NOTIFY pgrst, 'reload schema';
+NOTIFY pgrst, 'reload config';
 SQL
 
 if [ -n "$STORAGE_TGZ" ] && [ -f "$STORAGE_TGZ" ]; then
@@ -63,10 +118,27 @@ echo "==> Restarting Supabase services"
 docker restart supabase-rest supabase-auth supabase-storage supabase-realtime supabase-meta supabase-functions 2>/dev/null || true
 
 echo "==> Verifying REST API"
-sleep 3
-curl -sf -o /dev/null -w "  /rest/v1/locations -> HTTP %{http_code}\n" \
-  http://localhost:8000/rest/v1/locations \
-  -H "apikey: ${ANON_KEY:-anon}" || true
+ANON_KEY="${ANON_KEY:-$(grep -E '^ANON_KEY=' /home/${SERVICE_USER:-vmsadm}/resl/vvms/backend/supabase/docker/.env 2>/dev/null | cut -d= -f2-)}"
+OK=0
+for i in $(seq 1 30); do
+  CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+    -H "apikey: ${ANON_KEY:-anon}" \
+    "http://127.0.0.1:8000/rest/v1/locations?select=id&limit=1" || true)
+  if [ "$CODE" = "200" ]; then OK=1; break; fi
+  sleep 2
+done
+if [ "$OK" = "1" ]; then
+  echo "  /rest/v1/locations -> HTTP 200 (OK)"
+else
+  echo "  /rest/v1/locations -> HTTP $CODE (NOT OK)"
+  echo "  Run: sudo bash $(dirname "$0")/repair-postgrest.sh"
+fi
 
 echo
-echo "Done. bala@sharviinfotech.com should now have HO-Admin role (verify in Settings > User Management)."
+if [ "$SKIP_USER_DEPENDENT" = "1" ]; then
+  echo "Done — but profiles/roles were skipped because 00_auth_users.sql was empty."
+  echo "Generate it with:  bash deploy/generate-seed-files.sh   (using a connection that can read auth.users)"
+  echo "Then re-run:        sudo bash deploy/import-seed.sh"
+else
+  echo "Done. bala@sharviinfotech.com should now have HO-Admin role (verify in Settings > User Management)."
+fi
