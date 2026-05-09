@@ -235,6 +235,30 @@ sudo bash deploy/run-wa-bridge.sh
 ```
 Otherwise set `WHATSAPP_BRIDGE_URL` in `config.env` to point at an external bridge.
 
+## 0h. `Bridge call failed — unconfigured`
+
+**Symptom:** WhatsApp Settings shows
+`WhatsApp Web bridge is not configured. Set WHATSAPP_BRIDGE_URL and WHATSAPP_BRIDGE_API_KEY secrets.`
+
+**Cause:** the `supabase-edge-functions` container has no
+`WHATSAPP_BRIDGE_URL` / `WHATSAPP_BRIDGE_API_KEY` env vars. The bridge
+container may also not be running yet, or its image build failed because
+the old `Dockerfile` ran the `postinstall` hook (`install-chrome.js`)
+inside Docker.
+
+**Fix (one command, idempotent):**
+```bash
+git pull
+sudo bash deploy/configure-wa-bridge.sh
+```
+It generates an API key if none exists, writes the same key + URL into
+both `config.env` and `backend/supabase/docker/.env`, builds & starts
+`wa-bridge`, recreates `supabase-edge-functions`, and probes `/health`.
+
+Then in the app: **Settings → WhatsApp → Connect WhatsApp**, scan the QR
+with your phone, switch the channel to **WhatsApp Web (Demo)**, and click
+**Send test**.
+
 ## 10. Health check fails on profiles count
 
 Seed wasn't imported. Run:

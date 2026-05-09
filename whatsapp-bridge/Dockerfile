@@ -20,7 +20,10 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 WORKDIR /app
 COPY package.json ./
-RUN npm install --omit=dev
+# --ignore-scripts skips the `postinstall` hook (install-chrome.js) which
+# isn't needed inside Docker — Chromium is provided by apt above and
+# PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true tells puppeteer to use it.
+RUN npm install --omit=dev --ignore-scripts
 COPY server.js ./
 
 # Persist auth across restarts (mount a volume on /data)
