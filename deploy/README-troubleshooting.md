@@ -251,3 +251,37 @@ sudo bash deploy/import-seed.sh
 | Postgres              | postgres                       | from prompt |
 
 All seeded user accounts share password `Sharvi@123` until rotated via User Management.
+## 0f. Edge functions return `{"message":"name resolution failed"}`
+
+**Symptom:** "Send Test Email", WhatsApp test, or any other edge function that
+calls an external service (Twilio, Gmail SMTP, your WhatsApp bridge) returns:
+```json
+{ "message": "name resolution failed", "request_id": "..." }
+```
+The Lovable UI and database keep working — only edge functions fail.
+
+**Cause:** the `supabase-edge-functions` container cannot resolve external
+hostnames. Almost always this is because the host uses `systemd-resolved`
+(stub `127.0.0.53` in `/etc/resolv.conf`), which Docker copies into containers
+but the container itself cannot reach. Less commonly the host firewall is
+blocking outbound DNS (53/UDP) or HTTPS (443/TCP).
+
+**Diagnose first (read-only):**
+```bash
+sudo bash deploy/diagnose-egress.sh
+```
+Look for `FAIL  container CANNOT resolve ...` — that confirms the issue.
+
+**Fix:**
+```bash
+sudo bash deploy/fix-edge-dns.sh
+```
+This writes `/etc/docker/daemon.json` with `"dns": ["8.8.8.8","1.1.1.1"]`,
+restarts Docker, brings the Supabase stack back up, and verifies that the
+edge-functions container can resolve `smtp.gmail.com`. Safe to re-run.
+
+**If the fix script reports the container still cannot resolve:** your host
+firewall is blocking outbound traffic. Allow:
+- `53/UDP` (DNS) outbound
+- `443/TCP` to `api.twilio.com` outbound
+- `587/TCP` to `smtp.gmail.com` outbound (or whichever SMTP host you use)
