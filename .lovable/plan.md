@@ -1,68 +1,64 @@
+# Fix: supabase-edge-functions container is not running
 
-## Problem
+## What the diagnostic actually showed
 
-Edge functions (`test-smtp`, `send-whatsapp-badge`, etc.) return:
-```json
-{ "message": "name resolution failed", "request_id": "..." }
-```
+- Host DNS works (resolves smtp.gmail.com, api.twilio.com)
+- Outbound 53/443/587 all reachable
+- UFW is fine for outbound
+- **`supabase-edge-functions` container exists but is NOT running** — `Error response from daemon: container ... is not running`
 
-The Lovable app + DB work because they go through nginx/Postgres locally. Edge functions, however, run inside the `supabase-edge-functions` Docker container and need to resolve external hostnames (`smtp.gmail.com`, `api.twilio.com`, your WhatsApp bridge URL). The Deno runtime is reporting it cannot resolve DNS — meaning the container has no working resolver, or the host has no outbound DNS/egress.
-
-## Root cause (most likely)
-
-On a self-hosted Ubuntu server, Docker copies `/etc/resolv.conf` from the host. If the host uses `systemd-resolved` (stub `127.0.0.53`), Docker containers inherit a resolver they cannot reach, so every outbound DNS lookup fails. Less likely but possible: UFW/corporate firewall is blocking outbound 53/443/587.
+So the "name resolution failed" response from the app is misleading. Kong is returning that because the upstream (edge-functions) is down. We don't need a DNS fix — we need to find out why the container died and bring it back up.
 
 ## Plan
 
-### 1. Add `deploy/diagnose-egress.sh` (read-only diagnostic)
+### 1. New script: `deploy/diagnose-edge-functions.sh` (read-only)
 
-One script that prints exactly what's broken so we don't guess:
-- `getent hosts smtp.gmail.com` on host
-- `cat /etc/resolv.conf` on host
-- `docker exec supabase-edge-functions cat /etc/resolv.conf`
-- `docker exec supabase-edge-functions getent hosts smtp.gmail.com api.twilio.com`
-- `docker exec supabase-edge-functions wget -qO- --timeout=5 https://api.twilio.com 2>&1 | head -5`
-- `ufw status` and outbound port test to 53/443/587
+Print everything needed to know why the container exited:
 
-User runs it once; output tells us which fix to apply.
+- `docker ps -a --filter name=supabase-edge-functions` — current state, exit code, restart count
+- `docker inspect supabase-edge-functions --format '{{.State.Status}} exit={{.State.ExitCode}} err={{.State.Error}} oom={{.State.OOMKilled}} startedAt={{.State.StartedAt}} finishedAt={{.State.FinishedAt}}'`
+- `docker logs --tail=200 supabase-edge-functions` — actual crash reason (most likely missing env var, bad import map, or a function that fails to boot)
+- `docker inspect supabase-edge-functions --format '{{json .Config.Env}}' | tr ',' '\n'` — confirm `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`, `TWILIO_*`, SMTP secrets are present
+- `ls supabase/functions/` and a quick syntax sanity ls of `index.ts` files
 
-### 2. Add `deploy/fix-edge-dns.sh` (the fix)
+### 2. New script: `deploy/restart-edge-functions.sh` (recover)
 
-Configures Docker daemon with explicit public DNS so containers stop inheriting the broken stub resolver:
+Safe re-run:
+- `docker compose -f $COMPOSE_DIR/docker-compose.yml up -d functions` (service name in supabase compose is `functions`)
+- Wait up to 30s polling `docker inspect -f '{{.State.Running}}' supabase-edge-functions`
+- If still not running: print last 100 lines of logs and exit non-zero
+- If running: hit `http://localhost:8000/functions/v1/test-smtp` (Kong) with a HEAD/POST and confirm non-503
 
-```text
-/etc/docker/daemon.json
-{
-  "dns": ["8.8.8.8", "1.1.1.1"]
-}
-```
+### 3. Likely root causes the script will surface (and the matching fix)
 
-Then:
-- `systemctl restart docker`
-- `cd backend/supabase/docker && docker compose up -d` to recreate containers with new DNS
-- Re-test from inside the container: `docker exec supabase-edge-functions getent hosts smtp.gmail.com`
+| Symptom in `docker logs supabase-edge-functions` | Cause | Fix |
+|---|---|---|
+| `BootError: Worker boot error` referencing one function | One edge function has a syntax/import error | Identify function, fix or temporarily move its folder out |
+| `Missing environment variable JWT_SECRET` / `SUPABASE_SERVICE_ROLE_KEY` | `.env` missing keys after recent edit | Re-add to `backend/supabase/docker/.env` and `docker compose up -d` |
+| `Cannot find module ... import_map.json` | `import_map.json` path wrong | Restore from git or remove the per-function config |
+| `OOMKilled: true` | Memory limit | Bump container memory in compose |
+| Exit 137 right after start | Killed by host (likely OOM) | Same as above |
+| `failed to bind 0.0.0.0:9000` | Port conflict | Free port / change |
 
-Safe to re-run. Preserves any existing keys in `daemon.json` if present.
+### 4. README update
 
-### 3. Update `deploy/README-troubleshooting.md`
+Add section `0g` to `deploy/README-troubleshooting.md` documenting:
+- The misleading "name resolution failed" error can also mean the edge-functions container is down (not DNS).
+- Run `deploy/diagnose-edge-functions.sh` first; only run `fix-edge-dns.sh` if DNS inside a *running* container fails.
 
-Add section `0f` — "Edge functions return `name resolution failed`":
-- What it means (container can't reach DNS)
-- Run `deploy/diagnose-egress.sh` first
-- Then `sudo bash deploy/fix-edge-dns.sh`
-- Firewall checklist if egress also blocked: allow outbound 53/UDP, 443/TCP, 587/TCP
+## What I will NOT change
 
-### 4. No code/edge function changes
+- No edits to actual edge function code (`send-email`, `send-whatsapp-badge`, etc.) — they work on Lovable Cloud already, and the container being down is an infra issue, not a code issue.
+- No DNS changes (host DNS is healthy).
+- No firewall changes.
 
-The Twilio + SMTP edge functions themselves are fine — `test-smtp` and `send-whatsapp-badge` work on Lovable Cloud. The fix is purely the on-prem Docker DNS configuration.
-
-## Recovery sequence the user will run
+## Recovery commands you'll run after I push
 
 ```bash
 cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
 git pull
-sudo bash deploy/diagnose-egress.sh        # paste output back if anything is red
-sudo bash deploy/fix-edge-dns.sh           # applies the DNS fix + restarts containers
+sudo bash deploy/diagnose-edge-functions.sh    # paste output if it still fails
+sudo bash deploy/restart-edge-functions.sh
 ```
 
-Then retry the "Send Test Email" / WhatsApp test in the app.
+Then retry "Send Test Email" in the app.
