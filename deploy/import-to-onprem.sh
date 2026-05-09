@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# DEPRECATED — kept for backward compatibility only.
+# The supported flow is migrations + committed seed SQL:
+#   sudo bash deploy/redeploy.sh --with-seed
+# This script (pg_restore from a binary cloud dump) is no longer called by
+# redeploy.sh and may be removed in a future release.
 # Import a Lovable Cloud export (DB dump + storage tarball) into the
 # locally running self-hosted Supabase stack created by deploy.sh.
 #
