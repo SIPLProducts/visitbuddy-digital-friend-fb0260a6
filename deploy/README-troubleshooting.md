@@ -252,8 +252,16 @@ git pull
 sudo bash deploy/configure-wa-bridge.sh
 ```
 It generates an API key if none exists, writes the same key + URL into
-both `config.env` and `backend/supabase/docker/.env`, builds & starts
-`wa-bridge`, recreates `supabase-edge-functions`, and probes `/health`.
+`config.env`, `backend/supabase/docker/.env`, and (most importantly)
+`backend/supabase/docker/volumes/functions/.env` — the file actually
+mounted into the `supabase-edge-functions` container. It then builds &
+starts `wa-bridge`, force-recreates `supabase-edge-functions` so it picks
+up the new env, and probes `/health`.
+
+> If logs still show `[whatsapp-bridge] missing secrets` after running
+> the script, confirm the keys exist in
+> `backend/supabase/docker/volumes/functions/.env` and re-run:
+> `docker compose -f backend/supabase/docker/docker-compose.yml up -d --force-recreate functions`
 
 Then in the app: **Settings → WhatsApp → Connect WhatsApp**, scan the QR
 with your phone, switch the channel to **WhatsApp Web (Demo)**, and click
