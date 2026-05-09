@@ -72,6 +72,23 @@ sudo bash deploy/health-check.sh
 
 No wipe / reinstall needed — your data survives.
 
+### If `repair-pg-perms.sh` reports "Smoke test still failing"
+
+The new repair script now prints real diagnostics. Read them carefully:
+
+1. **Files still owned by wrong uid** — re-run as root and confirm
+   `BASE_DIR` matches your install (default `/home/vmsadm/resl/vvms`).
+   The script fixes both the in-container path AND the host bind mount
+   `backend/supabase/docker/volumes/db/data`.
+2. **`POSTGRES_PASSWORD not set`** — `config.env` is missing or moved.
+   Re-source it: `source /home/vmsadm/resl/vvms/config.env` then re-run.
+3. **Logs show "database files are incompatible" / corruption / FATAL on
+   startup** — the data dir is unrecoverable. Wipe and re-init:
+   ```bash
+   sudo bash deploy/wipe-postgres.sh --force
+   sudo bash install.sh --force-wipe --with-seed
+   ```
+
 ## 1. `pg_filenode.map: Permission denied`
 
 **Symptom:** `psql ... global/pg_filenode.map: Permission denied`.
