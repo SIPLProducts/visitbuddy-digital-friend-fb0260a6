@@ -285,3 +285,41 @@ firewall is blocking outbound traffic. Allow:
 - `53/UDP` (DNS) outbound
 - `443/TCP` to `api.twilio.com` outbound
 - `587/TCP` to `smtp.gmail.com` outbound (or whichever SMTP host you use)
+
+## 0g. `name resolution failed` but the diagnose script says the container is **not running**
+
+**Symptom:** `deploy/diagnose-egress.sh` reports:
+```
+OK    host resolves smtp.gmail.com
+OK    TCP smtp.gmail.com:587 reachable from host
+...
+Error response from daemon: container ... is not running
+FAIL  container CANNOT resolve smtp.gmail.com
+```
+The host DNS and egress are fine — the `supabase-edge-functions` container
+itself has crashed/exited. Kong then returns `name resolution failed` because
+its upstream is down. **Do NOT run `fix-edge-dns.sh` for this case** — it's not
+a DNS issue.
+
+**Diagnose:**
+```bash
+sudo bash deploy/diagnose-edge-functions.sh
+```
+This prints the container's exit code, OOM status, last 200 log lines, and
+whether required env vars (`SUPABASE_SERVICE_ROLE_KEY`, `JWT_SECRET`,
+`TWILIO_*`, etc.) are present.
+
+**Fix:**
+```bash
+sudo bash deploy/restart-edge-functions.sh
+```
+This stops, removes, and recreates only the `functions` service, then probes
+Kong to confirm functions are reachable.
+
+**Common root causes seen in the logs:**
+| Log line                                              | Fix |
+|-------------------------------------------------------|-----|
+| `BootError: Worker boot error` for one function       | That function has a syntax/import error — fix it or temporarily move its folder out of `volumes/functions/` |
+| `Missing environment variable JWT_SECRET` / `SUPABASE_SERVICE_ROLE_KEY` | Re-add the key to `backend/supabase/docker/.env` and re-run the restart script |
+| `OOMKilled: true` / exit `137` immediately after start | Bump the container memory limit in the compose file |
+| `failed to bind 0.0.0.0:9000`                          | Another process holds the port — free it or change the port |
