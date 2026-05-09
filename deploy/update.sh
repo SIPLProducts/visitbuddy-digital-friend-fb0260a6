@@ -21,6 +21,7 @@ rsync -a --delete \
   --exclude node_modules --exclude dist --exclude .git \
   --exclude supabase --exclude whatsapp-bridge --exclude deploy \
   "$APP_REPO_DIR"/ "$FRONTEND_DIR"/
+# Frontend dir is safe to chown recursively (no PG bind mount inside).
 chown -R "$SERVICE_USER:$SERVICE_USER" "$FRONTEND_DIR"
 sudo -u "$SERVICE_USER" -H bash -c "cd '$FRONTEND_DIR' && npm ci --no-audit --no-fund && npm run build"
 
