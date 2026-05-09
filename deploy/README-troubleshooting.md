@@ -44,6 +44,34 @@ sudo ss -lntp | awk '/:5432 /{print}'
 docker ps --filter 'publish=5432'
 ```
 
+## 0c. `could not open file "global/pg_filenode.map": Permission denied`
+
+**Symptom:** `deploy.sh` finishes ("DEPLOYMENT COMPLETE"), then
+`apply-migrations.sh` immediately fails with:
+```
+psql: error: connection to server on socket "/run/postgresql/.s.PGSQL.5432" failed:
+FATAL:  could not open file "global/pg_filenode.map": Permission denied
+```
+
+**Cause:** an older `deploy.sh` ran `chown -R vmsadm $BASE_DIR`, which
+walked into `backend/supabase/docker/volumes/db/data` and rewrote every
+PostgreSQL data file to `vmsadm:vmsadm`. The already-running postmaster
+keeps its open file descriptors so `pg_isready` still says OK, but every
+**new** backend (every `psql` connection) can't open its own data files.
+
+The current `deploy.sh` no longer chowns the PG bind mount, and
+`install.sh` auto-repairs this before running migrations. If you're on a
+server already in the bad state, run the repair manually:
+
+```bash
+sudo bash deploy/repair-pg-perms.sh
+sudo bash deploy/apply-migrations.sh
+sudo bash deploy/import-seed.sh
+sudo bash deploy/health-check.sh
+```
+
+No wipe / reinstall needed — your data survives.
+
 ## 1. `pg_filenode.map: Permission denied`
 
 **Symptom:** `psql ... global/pg_filenode.map: Permission denied`.
