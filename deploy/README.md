@@ -405,3 +405,32 @@ sudo bash deploy/import-seed.sh
 
 `import-seed.sh` will now skip `16_profiles.sql` and `17_user_location_roles.sql`
 with a warning when `00_auth_users.sql` is empty, instead of failing the whole import.
+
+---
+
+## WhatsApp bridge (external-URL / ngrok-style mode)
+
+By default `deploy.sh` and `redeploy.sh` **do not** build the WhatsApp bridge
+Docker image. The bridge is treated like ngrok — it lives outside the deploy
+pipeline and the edge function reaches it via `WHATSAPP_BRIDGE_URL`.
+
+The default URL is `http://<SERVER_IP>:<WA_HOST_PORT>` (auto-filled from your
+public IP prompt). Override with any reachable URL: another server, an ngrok
+tunnel, etc.
+
+Three ways to run a bridge:
+
+1. **External (default)** — point `WHATSAPP_BRIDGE_URL` at any reachable
+   bridge endpoint. Nothing else to do.
+
+2. **Local helper** — run on this host without coupling to the deploy pipeline:
+   ```bash
+   sudo bash deploy/run-wa-bridge.sh
+   ```
+   Builds with `--network=host` (bypasses UFW/Docker-bridge issues that block
+   `deb.debian.org`) and exposes the bridge on `0.0.0.0:<WA_HOST_PORT>`.
+
+3. **Inside redeploy** — only if your network can reach Debian mirrors:
+   ```bash
+   sudo bash deploy/redeploy.sh --with-seed --keep-config --build-wa
+   ```
