@@ -43,13 +43,17 @@ IFS=$'\n' FILES=( $(printf '%s\n' "${FILES[@]}" | sort) )
 # Guard: profile/role seeds depend on auth.users. If 00_auth_users.sql is
 # missing or empty, the FK insert will hard-fail and abort the whole import.
 AUTH_FILE="$SEED_DIR/00_auth_users.sql"
+BOOTSTRAP_FILE="$SEED_DIR/00_auth_users_bootstrap.sql"
+SKIP_USER_DEPENDENT=0
 if [ ! -s "$AUTH_FILE" ] || ! grep -q -i 'INSERT INTO' "$AUTH_FILE"; then
-  echo "WARNING: $AUTH_FILE is missing or empty."
-  echo "         profiles / user_location_roles inserts will fail because their"
-  echo "         user_id values won't exist in auth.users. Skipping those files."
-  SKIP_USER_DEPENDENT=1
-else
-  SKIP_USER_DEPENDENT=0
+  if [ -s "$BOOTSTRAP_FILE" ]; then
+    echo "==> 00_auth_users.sql missing — applying $BOOTSTRAP_FILE (default password Sharvi@123)"
+    $PSQL < "$BOOTSTRAP_FILE"
+  else
+    echo "WARNING: neither $AUTH_FILE nor $BOOTSTRAP_FILE present."
+    echo "         profiles / user_location_roles inserts will fail. Skipping those files."
+    SKIP_USER_DEPENDENT=1
+  fi
 fi
 
 echo "==> Importing ${#FILES[@]} seed files"
@@ -57,6 +61,10 @@ for f in "${FILES[@]}"; do
   base=$(basename "$f")
   if [ "$SKIP_USER_DEPENDENT" = "1" ] && [[ "$base" =~ ^(16_profiles|17_user_location_roles)\.sql$ ]]; then
     echo "  -- skipped $base (no auth users seeded)"
+    continue
+  fi
+  # Bootstrap already applied above; don't re-apply as a regular seed file.
+  if [ "$base" = "00_auth_users_bootstrap.sql" ]; then
     continue
   fi
   echo "  -> $base"
