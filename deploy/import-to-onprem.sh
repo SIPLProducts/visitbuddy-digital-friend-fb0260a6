@@ -22,14 +22,19 @@ source "$BASE_DIR/config.env"
 
 SUPA_DOCKER="$BASE_DIR/backend/supabase/docker"
 STORAGE_VOL="$SUPA_DOCKER/volumes/storage"
-PGCONN="postgresql://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/postgres"
-export PGPASSWORD="$POSTGRES_PASSWORD"
+PG_CONTAINER="${PG_CONTAINER:-supabase-db}"
+# Port-agnostic DB access — go through the container, not the host port.
+PSQL="docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER psql -U postgres -d postgres"
+
+if ! docker ps --format '{{.Names}}' | grep -qx "$PG_CONTAINER"; then
+  echo "ERROR: Postgres container '$PG_CONTAINER' is not running. Start the stack first."; exit 1
+fi
 
 echo "==> Pausing edge functions during restore..."
 docker compose -f "$SUPA_DOCKER/docker-compose.yml" stop functions || true
 
 echo "==> Wiping stale on-prem auth/profile/role rows so cloud UUIDs become source of truth..."
-psql "$PGCONN" -v ON_ERROR_STOP=0 <<'SQL'
+$PSQL -v ON_ERROR_STOP=0 <<'SQL'
 -- Any users that were created locally on the on-prem stack (e.g. a fresh
 -- bala@sharviinfotech.com signup) get removed here, so pg_restore can
 -- repopulate auth.users with the original cloud UUIDs + password hashes.
@@ -40,11 +45,14 @@ TRUNCATE public.profiles CASCADE;
 SQL
 
 echo "==> Restoring database from $DUMP"
-pg_restore --clean --if-exists --no-owner --no-privileges \
-  --dbname="$PGCONN" --jobs=2 --verbose "$DUMP" 2>&1 | tail -n 40 || true
+# Stream the dump into the container's pg_restore so we don't depend on the
+# host having pg_restore matching the server major version.
+docker exec -i -e PGPASSWORD=$POSTGRES_PASSWORD $PG_CONTAINER \
+  pg_restore --clean --if-exists --no-owner --no-privileges \
+  --dbname=postgres --username=postgres --verbose < "$DUMP" 2>&1 | tail -n 40 || true
 
 echo "==> Re-applying Supabase role grants (pg_restore stripped them)..."
-psql "$PGCONN" -v ON_ERROR_STOP=0 <<'SQL'
+$PSQL -v ON_ERROR_STOP=0 <<'SQL'
 DO $$
 DECLARE r text;
 BEGIN
@@ -91,7 +99,7 @@ NOTIFY pgrst, 'reload config';
 SQL
 
 echo "==> Re-creating storage buckets locally (idempotent)..."
-psql "$PGCONN" <<'SQL'
+$PSQL <<'SQL'
 INSERT INTO storage.buckets (id, name, public)
   VALUES ('visitor-photos', 'visitor-photos', true),
          ('branding',       'branding',       true)
@@ -114,6 +122,8 @@ for bucket_dir in "$TMP_EXTRACT"/*/; do
   rsync -a "$bucket_dir" "$STORAGE_VOL/stub/stub-stub-stub/$bucket/"
 done
 rm -rf "$TMP_EXTRACT"
+# Storage container runs as uid 1000 by default in supabase/storage-api
+chown -R 1000:1000 "$STORAGE_VOL" 2>/dev/null || true
 
 echo "==> Restarting all containers..."
 docker compose -f "$SUPA_DOCKER/docker-compose.yml" up -d
@@ -121,13 +131,14 @@ docker compose -f "$SUPA_DOCKER/docker-compose.yml" up -d
 docker compose -f "$SUPA_DOCKER/docker-compose.yml" restart rest auth storage realtime meta || true
 
 echo "==> Verification"
-psql "$PGCONN" -c "ANALYZE;" >/dev/null
+$PSQL -c "ANALYZE;" >/dev/null
 
 ANON_KEY=$(grep -E '^ANON_KEY=' "$SUPA_DOCKER/.env" | cut -d= -f2-)
+API_PORT="${API_PORT:-8000}"
 for i in $(seq 1 30); do
   CODE=$(curl -s -o /dev/null -w "%{http_code}" \
     -H "apikey: $ANON_KEY" \
-    "http://127.0.0.1:8000/rest/v1/locations?select=id&limit=1" || true)
+    "http://127.0.0.1:${API_PORT}/rest/v1/locations?select=id&limit=1" || true)
   [[ "$CODE" == "200" ]] && { echo "    PostgREST OK (200)"; break; }
   sleep 2
 done
@@ -135,7 +146,7 @@ if [[ "$CODE" != "200" ]]; then
   echo "    WARNING: PostgREST still returns $CODE. Run: sudo bash $(dirname "$0")/repair-postgrest.sh"
 fi
 
-psql "$PGCONN" <<'SQL'
+$PSQL <<'SQL'
 \echo Row counts:
 SELECT 'auth.users'                AS t, count(*) FROM auth.users
 UNION ALL SELECT 'profiles',        count(*) FROM public.profiles
