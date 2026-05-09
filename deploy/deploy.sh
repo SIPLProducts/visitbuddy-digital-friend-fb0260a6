@@ -570,7 +570,8 @@ cat > /etc/cron.d/visiguard-backup <<EOF
 0 2 * * * root /usr/local/bin/visiguard-backup >> /var/log/visiguard-backup.log 2>&1
 EOF
 
-chown -R "$SERVICE_USER:$SERVICE_USER" "$BASE_DIR"
+# Scoped chown — see top of file for why we exclude the PG bind mount.
+safe_chown_base "$BASE_DIR"
 
 cat <<EOF
 
