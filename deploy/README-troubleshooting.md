@@ -1,5 +1,23 @@
 # Troubleshooting — VisiGuard on-prem
 
+## 0. `mapping key "ports" already defined` when starting the stack
+
+**Symptom:**
+```
+failed to parse .../supabase/docker/docker-compose.yml:
+  yaml: construct errors: line ...: mapping key "ports" already defined at line ...
+```
+
+**Cause:** an older deploy script appended a duplicate `ports:` block to the Supabase compose file. The current `deploy.sh` patches YAML safely and keeps a `.orig` backup, but the file already on disk is corrupted.
+
+**Fix (one-time recovery):**
+```bash
+cd /home/vmsadm/resl/vvms/backend/supabase/docker 2>/dev/null && docker compose down -v 2>/dev/null || true
+sudo rm -rf /home/vmsadm/resl/vvms/backend
+cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
+sudo bash install.sh --with-seed
+```
+
 ## 1. `pg_filenode.map: Permission denied`
 
 **Symptom:** `psql ... global/pg_filenode.map: Permission denied`.
