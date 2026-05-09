@@ -57,6 +57,15 @@ for c in $(docker ps -aq --filter 'name=supabase-' 2>/dev/null) \
   docker rm -f "$c" >/dev/null 2>&1 || true
 done
 
+# Also remove ANY container that publishes host port 5432 / 54322 — old
+# stacks, leftover pgadmin, stray pg containers, etc.
+for port in 5432 54322; do
+  for c in $(docker ps -aq --filter "publish=$port" 2>/dev/null); do
+    warn "removing container $c (was publishing :$port)"
+    docker rm -f "$c" >/dev/null 2>&1 || true
+  done
+done
+
 log "[3/5] Stopping system Postgres (if installed) and purging packages"
 systemctl stop  postgresql 2>/dev/null || true
 systemctl disable postgresql 2>/dev/null || true
@@ -92,8 +101,10 @@ rm -rf "$BASE_DIR/backend/supabase/docker/volumes/storage" 2>/dev/null || true
 # Final guard
 if (ss -lnt 2>/dev/null | awk '{print $4}' | grep -qE ':5432$'); then
   warn "Port 5432 STILL in use after wipe."
-  ss -lntp | awk '/:5432$/{print}' | sed 's/^/    /'
-  die "Free port 5432 manually, then re-run."
+  ss -lntp 2>/dev/null | awk '/:5432 /{print}' | sed 's/^/    /'
+  warn "Docker containers publishing :5432 (if any):"
+  docker ps --filter 'publish=5432' --format '    {{.ID}}  {{.Names}}  {{.Image}}  {{.Ports}}' 2>/dev/null || true
+  die "Free port 5432 manually (stop the listed process/container), then re-run."
 fi
 
 ok "Host is clean. Port 5432 is free. You can now run install.sh / deploy.sh."

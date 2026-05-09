@@ -1,69 +1,28 @@
-## Fix duplicate `ports:` key in Supabase compose file
+## Plan
 
-### Root cause
-`deploy/deploy.sh` patches the Supabase `docker-compose.yml` to publish Postgres on host `5432`. The current Python regex is non-greedy and only captures the first lines under `  db:`, so the existing `ports:` stanza further down in the db service is invisible to the check — a second `ports:` block gets appended → YAML duplicate key error.
+Fix the installer so the current VisiGuard stack owns `127.0.0.1:5432` and old/system Postgres cannot keep blocking it.
 
-The compose file already on disk at `/home/vmsadm/resl/vvms/backend/supabase/docker/docker-compose.yml` is now corrupted, and `deploy.sh` doesn't re-clone the Supabase repo on each run, so the next run will hit the same broken file.
+### 1. Harden the preflight wipe
+- Update `deploy/wipe-postgres.sh` to also stop/remove containers publishing `5432`, not only containers named `supabase-*`.
+- Purge conflicting apt packages more reliably, including `postgresql-client-common` cleanup only when safe.
+- Add a final diagnostic that shows exactly what still owns `5432` if the wipe cannot free it.
 
-### Changes
+### 2. Prevent Supabase pooler from taking the same port
+- Update the compose patching in `deploy/deploy.sh` so only the real database service publishes host `127.0.0.1:5432`.
+- Remove/replace any Supabase pooler host mapping that tries to bind `127.0.0.1:5432`.
+- Keep pooler internal for Docker services, or move its host binding to another non-conflicting port if the upstream compose file requires it.
 
-**1. `deploy/deploy.sh` — replace the fragile patcher (lines ~287–308)**
+### 3. Add a deploy-time guard before `docker compose up`
+- Right before starting the stack, check whether `5432` is already in use.
+- If it is used by system Postgres or an old container, stop/remove it automatically.
+- If another unrelated process owns it, fail with a clear command output so the admin knows what to remove.
 
-Use a YAML-aware approach with PyYAML (already available with python3 on Ubuntu via `python3-yaml`, install if missing). Idempotent and safe:
+### 4. Update recovery instructions
+- Add the immediate server commands to `deploy/README-troubleshooting.md`:
+  - stop current broken compose stack
+  - run `deploy/wipe-postgres.sh --force`
+  - remove the half-created backend if needed
+  - rerun `sudo bash install.sh --force-wipe --with-seed`
 
-```bash
-POSTGRES_HOST_PORT="${POSTGRES_HOST_PORT:-5432}"
-python3 - "$COMPOSE_FILE" "$POSTGRES_HOST_PORT" <<'PY'
-import sys, yaml
-path, port = sys.argv[1], sys.argv[2]
-with open(path) as f:
-    doc = yaml.safe_load(f)
-db = doc.get('services', {}).get('db', {})
-mapping = f"127.0.0.1:{port}:5432"
-ports = db.get('ports') or []
-# Strip any prior 5432 mapping to avoid duplicates
-ports = [p for p in ports if not str(p).endswith(':5432')]
-ports.append(mapping)
-db['ports'] = ports
-doc['services']['db'] = db
-with open(path, 'w') as f:
-    yaml.safe_dump(doc, f, sort_keys=False)
-PY
-```
-
-Add a one-line apt fallback above it:
-```bash
-python3 -c 'import yaml' 2>/dev/null || sudo apt-get install -y python3-yaml
-```
-
-**2. `deploy/deploy.sh` — re-clone Supabase compose on every run (or self-repair)**
-
-Add right before the patch step:
-```bash
-# Always start from a pristine compose file so re-runs cannot accumulate damage.
-if [ -d "$SUPA_DOCKER" ] && [ ! -f "$SUPA_DOCKER/docker-compose.yml.orig" ]; then
-  cp "$SUPA_DOCKER/docker-compose.yml" "$SUPA_DOCKER/docker-compose.yml.orig"
-fi
-if [ -f "$SUPA_DOCKER/docker-compose.yml.orig" ]; then
-  cp "$SUPA_DOCKER/docker-compose.yml.orig" "$SUPA_DOCKER/docker-compose.yml"
-fi
-```
-Then re-run the API_PORT/KONG sed and the new ports patcher against the fresh file.
-
-**3. Immediate manual recovery for the user**
-
-Document in `README-troubleshooting.md` (and tell user in chat) the one-time fix:
-```bash
-cd /home/vmsadm/resl/vvms/backend/supabase/docker
-docker compose down -v 2>/dev/null || true
-cd /home/vmsadm/resl/vvms
-sudo rm -rf backend
-cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
-sudo bash install.sh --with-seed
-```
-
-### Testing checklist
-- [ ] Fresh run: patched compose has exactly one `ports:` under db, mapping `127.0.0.1:5432:5432`
-- [ ] Re-run on same host: still exactly one mapping (idempotent)
-- [ ] `docker compose -f .../docker-compose.yml config` exits 0
-- [ ] Stack boots; `psql_exec -c 'select 1'` succeeds inside container
+### Technical note
+The current error says `supabase-pooler` is trying to bind `127.0.0.1:5432`. That means the default upstream compose file already exposes the pooler on host `5432`, while our script also wants Postgres on host `5432`. The fix should make that idempotent: database gets `5432`, pooler does not.
