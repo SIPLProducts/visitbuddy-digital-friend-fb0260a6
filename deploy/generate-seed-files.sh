@@ -70,9 +70,31 @@ AUTH_OUT="$OUT/00_auth_users.sql"
 {
   echo "-- Seed: auth.users + auth.identities (SENSITIVE - password hashes)"
   echo "BEGIN;"
-  pg_dump "${PG[@]}" --data-only --inserts -t auth.users -t auth.identities 2>/dev/null \
-    | grep -E '^INSERT' \
-    | sed -E 's/;$/ ON CONFLICT (id) DO NOTHING;/' || true
+  # Do NOT pipe through `grep '^INSERT'` — pg_dump can wrap a single INSERT
+  # over multiple lines when a value contains a newline, and grep would
+  # silently truncate it. Strip only the preamble; keep statements intact.
+  pg_dump "${PG[@]}" --data-only --column-inserts -t auth.users -t auth.identities 2>/dev/null \
+    | python3 -c '
+import sys
+for line in sys.stdin:
+    if line.startswith("--") or line.startswith("SET ") \
+       or line.startswith("SELECT pg_catalog.set_config") \
+       or line.strip() == "":
+        continue
+    sys.stdout.write(line)
+' || true
+  # Backfill nullable token columns so GoTrue can scan the rows.
+  cat <<'SQL'
+UPDATE auth.users
+SET confirmation_token         = COALESCE(confirmation_token, ''),
+    recovery_token             = COALESCE(recovery_token, ''),
+    email_change_token_new     = COALESCE(email_change_token_new, ''),
+    email_change               = COALESCE(email_change, ''),
+    email_change_token_current = COALESCE(email_change_token_current, ''),
+    reauthentication_token     = COALESCE(reauthentication_token, ''),
+    phone_change               = COALESCE(phone_change, ''),
+    phone_change_token         = COALESCE(phone_change_token, '');
+SQL
   echo "COMMIT;"
 } > "$AUTH_OUT"
 lines=$(wc -l < "$AUTH_OUT")
