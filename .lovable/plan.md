@@ -1,87 +1,54 @@
-## Root cause of "no data in tables"
+## Problem
 
-`redeploy.sh` runs in 5 phases:
+`deploy.sh` writes the persisted env to **`$BASE_DIR/config.env`** (i.e. `/home/vmsadm/resl/vvms/config.env`).
 
-```
-[3/5] deploy.sh        ← failed here
-[4/5] apply-migrations.sh   ← never ran
-[4b/5] import-seed.sh       ← never ran  (this is what populates tables)
-[4c/5] repair-postgrest.sh
-[5/5] health check
-```
+But `apply-migrations.sh` and `import-seed.sh` only look at **`$HERE/config.env`** (i.e. `deploy/config.env` inside the repo checkout) — which doesn't exist. So `POSTGRES_PASSWORD` is unset and the script aborts before any migrations or seed data run. That's why Studio shows empty tables.
 
-`deploy.sh` aborted at the Nginx step because two templates are missing in `deploy/nginx/`:
+`redeploy.sh` itself does `source "$ENV_FILE"` from the right path, so it works — the bug is only in the two child scripts it shells out to.
 
-- `supabase-api.conf.tpl` ← missing (domain mode only)
-- `whatsapp.conf.tpl` ← missing (domain mode only)
-- `frontend-ip.conf.tpl` ✓
-- `frontend.conf.tpl` ✓
+## Fix
 
-Your saved `config.env` has `DEPLOY_MODE=domain`, so `install_site` tried to read `supabase-api.conf.tpl`, `sed` errored, and `set -euo pipefail` killed the script before migrations + seed could run. **That is why Studio shows empty tables.**
+Update both scripts to source from `$BASE_DIR/config.env` (with `$HERE/config.env` as fallback for backward compatibility).
 
-A second issue visible in the log: `WHATSAPP_BRIDGE_URL = http://host.docker.internal:3001`. Edge functions inside the docker-compose network can't reach `host.docker.internal` reliably — and `supabase-edge-functions` is currently `Restarting`. It should point at the host's public IP.
+### Files to change
 
-## Plan
-
-### 1. Add the two missing Nginx templates
-
-**`deploy/nginx/supabase-api.conf.tpl`** — vhost for `api.<domain>` proxying to Kong on `127.0.0.1:${API_PORT}`. Includes WebSocket upgrade headers for Realtime, `client_max_body_size 25M` for uploads, no buffering for edge-function streams.
-
-**`deploy/nginx/whatsapp.conf.tpl`** — vhost for `wa.<domain>` proxying to the WhatsApp bridge on `127.0.0.1:${WA_HOST_PORT}` with WS upgrade headers for the QR pairing stream.
-
-Both use `__API_DOMAIN__` / `__WA_DOMAIN__` / `__ROOT__` placeholders to match the existing `install_site` sed substitutions.
-
-### 2. Harden `install_site` in `deploy.sh`
-
-Wrap the `sed` call in an existence check. If the template is missing, log a clear warning and continue instead of killing the whole deploy. This guarantees a partially-broken nginx setup never blocks the migration + seed phases again.
-
-### 3. Auto-detect `PUBLIC_IP` in both modes + fix stale WA URL
-
-In `deploy.sh`:
-- Move the `DETECTED_IP=$(curl … ipify)` block out of the `ip`-mode branch so it runs for `domain` mode too.
-- Persist `PUBLIC_IP` to `config.env`.
-- When the cached `WHATSAPP_BRIDGE_URL` still equals `http://host.docker.internal:<port>`, replace the prompt default with `http://<PUBLIC_IP>:<WA_HOST_PORT>` so a single Enter fixes it.
-
-### 4. Document edge-function restart troubleshooting
-
-After redeploy, if `supabase-edge-functions` keeps restarting, check:
-```
-docker compose -f $BASE_DIR/backend/supabase/docker/docker-compose.yml logs --tail=80 functions
-```
-Likely cause: a function importing a module not available in `edge-runtime` or referring to an env var with a value the runtime rejects. Not blocking for the data-import problem — REST/Auth/Realtime work without it.
-
-## Files to add / change
-
-- **add** `deploy/nginx/supabase-api.conf.tpl`
-- **add** `deploy/nginx/whatsapp.conf.tpl`
-- **edit** `deploy/deploy.sh`:
-  - Detect & persist `PUBLIC_IP` in both modes
-  - Override stale `host.docker.internal` default for `WHATSAPP_BRIDGE_URL`
-  - Make `install_site` resilient to missing templates
-
-No DB migrations, no edge-function code changes, no frontend changes.
-
-## What you'll do on the server after the patch
-
+**`deploy/apply-migrations.sh`** — replace the config-loading block:
 ```bash
-cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
-# pull the new files (git pull or re-copy)
+SERVICE_USER="${SERVICE_USER:-vmsadm}"
+BASE_DIR="${BASE_DIR:-/home/${SERVICE_USER}/resl/vvms}"
+for CFG in "$BASE_DIR/config.env" "$HERE/config.env"; do
+  if [ -f "$CFG" ]; then
+    # shellcheck disable=SC1090
+    . "$CFG"
+    break
+  fi
+done
+: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD not set (run deploy.sh first)}"
+```
 
-# Run again — keep saved answers, re-import seed
+**`deploy/import-seed.sh`** — same change in its config-loading block.
+
+That's it. After the patch, re-run:
+```bash
 sudo bash deploy/redeploy.sh --with-seed --keep-config
 ```
+and migrations + seed (locations, gates, employees, vehicles, etc.) will populate the self-hosted Studio tables.
 
-When it gets to the prompt:
+## Why your manual `source /home/vmsadm/resl/vvms/config.env` didn't help
+
+That only sets the variables in your **interactive shell**. When `redeploy.sh` runs `bash apply-migrations.sh`, it spawns a new bash process which doesn't inherit unexported variables. The fix above makes the child script load the file itself.
+
+## Workaround (if you don't want to wait for the patch)
+
+You can re-run the two child scripts directly from the shell where you already sourced the config — no full redeploy needed:
+
+```bash
+source /home/vmsadm/resl/vvms/config.env
+sudo -E bash deploy/apply-migrations.sh
+sudo -E bash deploy/import-seed.sh
+sudo -E bash deploy/repair-postgrest.sh
 ```
-WhatsApp bridge URL reachable from edge functions [http://<your-public-ip>:3001]:
-```
-just press Enter.
 
-Expected result on completion:
-- All 4 nginx vhosts written, `nginx -t` passes
-- `apply-migrations.sh` runs every file in `supabase/migrations/`
-- `import-seed.sh` loads all `deploy/seed/*.sql` files (locations, screens, employees, vehicles, etc.)
-- Health check: `REST returned 200 on port 8000`
-- Studio shows all seeded rows
+The `-E` preserves your environment so the child sees `POSTGRES_PASSWORD`. After this Studio tables should be populated.
 
-Then point DNS A records for `<APP_DOMAIN>`, `api.<APP_DOMAIN>`, `wa.<APP_DOMAIN>` at this server's public IP and run `sudo certbot --nginx` for TLS.
+Approve to apply the permanent fix.
