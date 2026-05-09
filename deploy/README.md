@@ -2,6 +2,56 @@
 
 One-shot installer for Ubuntu 22.04 / 24.04. Everything lives under a single base directory (default `/home/vmsadm/resl/vvms`):
 
+## Clean redeploy from cloud (recommended for a true mirror)
+
+Use this when you want the on-prem app to look and behave **exactly** like the
+cloud app — same users, same passwords, same visitor history, same uploaded
+photos. The flow is two scripts: one on a machine with cloud DB access, one on
+the on-prem server.
+
+### Step 1 — Export from cloud (run anywhere with internet)
+
+```bash
+SUPABASE_DB_URL='postgresql://postgres:<PWD>@db.<ref>.supabase.co:5432/postgres' \
+SUPABASE_URL='https://<ref>.supabase.co' \
+SUPABASE_SERVICE_ROLE_KEY='eyJ...service-role...' \
+  bash deploy/export-from-cloud.sh
+```
+
+Outputs:
+- `cloud-export.dump` — full `auth + public + storage` schema (includes user password hashes).
+- `storage-export.tgz` — `visitor-photos/` and `branding/` bucket files.
+
+### Step 2 — Ship to the on-prem server
+
+```bash
+scp cloud-export.dump storage-export.tgz vmsadm@<server>:/tmp/
+```
+
+### Step 3 — Wipe + redeploy + import (one command)
+
+```bash
+sudo bash deploy/redeploy.sh \
+     --dump    /tmp/cloud-export.dump \
+     --storage /tmp/storage-export.tgz
+```
+
+`redeploy.sh` does the following automatically:
+
+1. **Tear down**: `docker compose down -v`, removes any straggler containers, deletes the DB, storage and WhatsApp volumes.
+2. **Free-port pre-flight**: probes `8000` (API), `3001` (WhatsApp bridge), `8443` (Kong HTTPS) and picks the next free port if any are taken. Persists the chosen ports in `config.env`.
+3. **Reinstall**: re-runs `deploy.sh` (Supabase stack, frontend build, edge functions, Nginx, WhatsApp bridge).
+4. **Restore**: streams the cloud dump through the DB container's `pg_restore`, untars the storage bucket files into `volumes/storage/stub/stub-stub-stub/<bucket>/`, then re-applies the Supabase role grants that `pg_restore --clean` strips.
+5. **Verify**: polls `/rest/v1/locations` until it returns `200`, otherwise exits non-zero with log hints.
+
+After it finishes, log in with **any cloud user and their existing password**. Visitor photos and branding render exactly as on cloud.
+
+Optional flags:
+- `--keep-config` — don't delete `config.env`; reuse the previous JWT secret, ports and SMTP/Twilio answers without re-prompting.
+- `--no-import` — wipe and redeploy only (no cloud data); the script still picks free ports.
+
+---
+
 ## Cloud → On-Prem migration via seed files (preferred)
 
 Plain SQL files committed in `deploy/seed/` reproduce the cloud database on
