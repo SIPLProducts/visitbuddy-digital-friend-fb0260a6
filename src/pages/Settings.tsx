@@ -37,6 +37,7 @@ interface TenantSettings {
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
   whatsapp_provider: 'twilio' | 'whatsapp_web';
+  public_app_url?: string | null;
 }
 
 interface EmailConfig {
