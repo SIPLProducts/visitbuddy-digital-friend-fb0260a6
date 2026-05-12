@@ -11,6 +11,34 @@ interface NotifyHostRequest {
   visitorId: string;
 }
 
+// Resolve the public-facing app URL used in approval links.
+// Priority: request Origin -> request Referer origin -> tenant_settings.public_app_url
+// -> PUBLIC_URL env -> null (caller decides what to do).
+async function resolvePublicUrl(req: Request, supabase: any): Promise<string | null> {
+  const fromHeader = (h: string | null): string | null => {
+    if (!h) return null;
+    try {
+      const u = new URL(h);
+      // Ignore the supabase functions host itself (would point to the API, not the app).
+      if (/\.functions\.supabase\.co$/i.test(u.hostname)) return null;
+      return `${u.protocol}//${u.host}`;
+    } catch { return null; }
+  };
+  const origin = fromHeader(req.headers.get("origin")) || fromHeader(req.headers.get("referer"));
+  if (origin) return origin.replace(/\/+$/, "");
+  try {
+    const { data } = await supabase
+      .from("tenant_settings")
+      .select("public_app_url")
+      .limit(1)
+      .maybeSingle();
+    if (data?.public_app_url) return String(data.public_app_url).replace(/\/+$/, "");
+  } catch (_) { /* ignore */ }
+  const env = Deno.env.get("PUBLIC_URL");
+  if (env) return env.replace(/\/+$/, "");
+  return null;
+}
+
 // ---- Shared branded header / footer ----
 const DEFAULT_LOGO_URL = "https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/branding/re-logo-mark.png";
 const DEFAULT_COMPANY = "Re Sustainability";
