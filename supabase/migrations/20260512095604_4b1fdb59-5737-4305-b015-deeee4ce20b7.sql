@@ -1,0 +1,1 @@
+ALTER TABLE public.tenant_settings ADD COLUMN IF NOT EXISTS public_app_url text;

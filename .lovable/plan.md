@@ -1,43 +1,71 @@
-## Root cause
+## The issue (root cause)
 
-The edge function logs show `[whatsapp-bridge] missing secrets { hasUrl: false, hasKey: false }` even after `configure-wa-bridge.sh` runs. The Supabase `functions` container does **not** read its env from `backend/supabase/docker/.env` — `deploy.sh` writes the edge-function env to:
+Yes — the approval URL is effectively hardcoded. In `supabase/functions/notify-host/index.ts` line 373:
 
-```
-backend/supabase/docker/volumes/functions/.env
-```
-
-That is the file mounted into the `supabase-edge-functions` container. Our current `deploy/configure-wa-bridge.sh` only updates `config.env` and `backend/supabase/docker/.env`, so the bridge vars never reach the container — which is exactly what the logs confirm.
-
-## Fix
-
-1. **Update `deploy/configure-wa-bridge.sh`**
-   - Add a third target file: `$BASE_DIR/backend/supabase/docker/volumes/functions/.env` (the real edge-function env file).
-   - Upsert `WHATSAPP_BRIDGE_URL` and `WHATSAPP_BRIDGE_API_KEY` into it (create the file if missing — but normally `deploy.sh` has already created it).
-   - Keep upserting into `config.env` (used by `run-wa-bridge.sh`) so the bridge container itself keeps the same `API_KEY`.
-   - Drop or de-emphasize the write to `backend/supabase/docker/.env` (it's harmless but misleading — the functions container does not read it).
-   - After writing, run `docker compose -f backend/supabase/docker/docker-compose.yml up -d --force-recreate functions` so the container picks up the new env file.
-
-2. **Verify in the script**
-   - After recreate, poll `docker logs supabase-edge-functions` for the `missing secrets` line for ~10s; if still present, print a clear remediation hint pointing at `volumes/functions/.env`.
-   - Hit `http://127.0.0.1:${WA_HOST_PORT}/health` (already done) and additionally curl the edge function once via Kong to confirm it no longer returns `unconfigured`.
-
-3. **Document in `deploy/README-troubleshooting.md` (section 0h)**
-   - Note that the canonical env file for edge functions is `backend/supabase/docker/volumes/functions/.env`, not `backend/supabase/docker/.env`.
-   - Reiterate the recovery command:
-     ```bash
-     git pull
-     sudo bash deploy/configure-wa-bridge.sh
-     ```
-
-No app code or edge-function code changes are needed — the function already reads `Deno.env.get("WHATSAPP_BRIDGE_URL"/"WHATSAPP_BRIDGE_API_KEY")` correctly; we just need those vars to actually be present in the container.
-
-## After approval, on your server
-
-```bash
-cd /home/vmsadm/resl/vvms/vvms_deploy/visitbuddy-digital-friend-fb0260a6
-git pull
-sudo bash deploy/configure-wa-bridge.sh
-docker logs --tail=20 supabase-edge-functions   # should no longer show "missing secrets"
+```ts
+const publicUrl = Deno.env.get("PUBLIC_URL") || "https://visitbuddy-digital-friend.lovable.app";
 ```
 
-Then in the app: Settings → WhatsApp → Connect WhatsApp → scan QR → flip channel to "WhatsApp Web (Demo)" → Send test.
+The approve / reject links in the host email + WhatsApp + SMS are then built as:
+
+```ts
+`${publicUrl}/approve-visitor?id=${visitor.id}&action=approve`
+```
+
+So the link is whatever `PUBLIC_URL` was set to when the edge-functions container was started. On your on‑prem box that env var is currently set to `https://visiguard.sharvisoftwareservices.com` (left over from the earlier deploy), so every email — even ones triggered from `vms.resustainability.com` — points back to the old domain.
+
+It is *not* hardcoded to `sharvisoftwareservices.com` in the source, but it *is* hardcoded into the running container's environment. That's why it doesn't follow the browser you registered the visitor from.
+
+## Fix — make it dynamic, in priority order
+
+The edge function will pick the first source that resolves to a non‑empty URL:
+
+1. **Request `Origin` / `Referer` header** — whichever domain actually invoked the function (so registering from `vms.resustainability.com` produces links to `vms.resustainability.com`, and the same code on `visiguard.sharvisoftwareservices.com` produces links to that domain — automatically, with no env change).
+2. **`tenant_settings.public_app_url`** column (new, optional) — lets an admin force a canonical domain from the Settings UI when emails/WhatsApp are triggered by a cron or webhook with no Origin header.
+3. **`PUBLIC_URL` env var** — same as today, kept as a final fallback for server‑side jobs.
+4. **Hardcoded lovable URL** — removed.
+
+## Changes
+
+### 1. `supabase/functions/notify-host/index.ts`
+- Replace the single `publicUrl` line with a `resolvePublicUrl(req, supabase)` helper:
+  - Read `Origin` header; if present and not the supabase functions host, normalize it (strip trailing slash) and use it.
+  - Else read `Referer`, take its origin.
+  - Else `select public_app_url from tenant_settings limit 1`.
+  - Else `Deno.env.get("PUBLIC_URL")`.
+  - Else throw a clear error (no silent fallback to a wrong domain).
+- Use the resolved value for both the WhatsApp/SMS approve/reject links (around line 516, 519) and the email links (line 678, 679).
+
+### 2. `supabase/functions/approve-visitor/index.ts`
+- Apply the same `resolvePublicUrl` so the *post‑approval* badge email/WhatsApp also use the right domain. (Currently relies on the same kind of fallback.)
+
+### 3. New DB column (optional override)
+Migration:
+```sql
+alter table public.tenant_settings
+  add column if not exists public_app_url text;
+```
+No RLS change needed (table already readable by admins).
+
+### 4. Settings UI
+In `src/pages/Settings.tsx` (General tab), add one input:
+- Label: **Public app URL** (e.g. `https://vms.resustainability.com`)
+- Helper text: "Used in approval links sent by email / WhatsApp / SMS when the system can't detect the browser domain (cron jobs, webhooks)."
+- Persists to `tenant_settings.public_app_url`.
+
+### 5. Frontend invocations
+Where `supabase.functions.invoke('notify-host'|'approve-visitor', …)` is called from the browser, the SDK already sends `Origin` automatically — no client change needed. Confirmed call sites: `Visitors.tsx`, `PendingApprovals.tsx`, `CheckInOut.tsx`, `ApproveVisitor.tsx`, `NewVisitor.tsx`.
+
+### 6. Operational note (no code, just for your on‑prem box)
+After deploying these function changes, you can simply unset (or leave stale) `PUBLIC_URL` in `backend/supabase/docker/volumes/functions/.env` — the function will derive the domain from the request. If you prefer a hard override, set `PUBLIC_URL=https://vms.resustainability.com` and restart the `supabase-edge-functions` container.
+
+## What this gives you
+
+- Register on `vms.resustainability.com` → email link goes to `vms.resustainability.com/approve-visitor?...`
+- Register on `visiguard.sharvisoftwareservices.com` → link goes there.
+- Same code, no per‑deployment env edit required.
+- Optional admin override in Settings for cron‑driven / headless flows.
+
+## Out of scope
+- No change to QR code generation in `GateQRCodes.tsx` (separate `VITE_PUBLIC_URL` build var, unrelated to email).
+- No change to the User Management edge functions discussed earlier.

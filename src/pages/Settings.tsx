@@ -37,6 +37,7 @@ interface TenantSettings {
   enable_photo_capture: boolean;
   enable_watchlist_check: boolean;
   whatsapp_provider: 'twilio' | 'whatsapp_web';
+  public_app_url?: string | null;
 }
 
 interface EmailConfig {
@@ -292,6 +293,18 @@ export default function Settings() {
                       {languages.map(l => <SelectItem key={l.code} value={l.code}>{l.nativeName} ({l.name})</SelectItem>)}
                     </SelectContent>
                   </Select>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <Label>Public app URL</Label>
+                  <Input
+                    value={settings.public_app_url || ''}
+                    onChange={e => update('public_app_url', e.target.value)}
+                    placeholder="https://vms.your-domain.com"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Used in approval links sent by email / WhatsApp / SMS when the system can't detect the browser domain (e.g. cron jobs). Leave blank to auto-detect from the request origin.
+                  </p>
                 </div>
               </CardContent>
             </Card>
