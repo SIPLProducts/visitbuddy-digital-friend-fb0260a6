@@ -398,7 +398,9 @@ const handler = async (req: Request): Promise<Response> => {
     let twilioWhatsAppNumber = Deno.env.get("TWILIO_WHATSAPP_NUMBER");
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const publicUrl = Deno.env.get("PUBLIC_URL") || "https://visitbuddy-digital-friend.lovable.app";
+    const publicUrl = (await resolvePublicUrl(req, createClient(supabaseUrl!, supabaseServiceKey!)))
+      || "https://visitbuddy-digital-friend.lovable.app";
+    console.log(`[notify-host] publicUrl = ${publicUrl}`);
 
     if (!supabaseUrl || !supabaseServiceKey) {
       console.error("Missing Supabase credentials");
