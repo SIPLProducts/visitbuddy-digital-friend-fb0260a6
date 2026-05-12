@@ -798,6 +798,7 @@ export type Database = {
           logo_url: string | null
           nda_text: string | null
           primary_color: string | null
+          public_app_url: string | null
           secondary_color: string | null
           session_timeout_minutes: number | null
           updated_at: string
@@ -819,6 +820,7 @@ export type Database = {
           logo_url?: string | null
           nda_text?: string | null
           primary_color?: string | null
+          public_app_url?: string | null
           secondary_color?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
@@ -840,6 +842,7 @@ export type Database = {
           logo_url?: string | null
           nda_text?: string | null
           primary_color?: string | null
+          public_app_url?: string | null
           secondary_color?: string | null
           session_timeout_minutes?: number | null
           updated_at?: string
