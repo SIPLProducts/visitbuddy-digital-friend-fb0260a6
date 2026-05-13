@@ -140,6 +140,92 @@ const roleColors: Record<AppRole, string> = {
   visitor: 'bg-secondary text-secondary-foreground',
 };
 
+function UserCombobox({
+  value,
+  onChange,
+  profiles,
+  userEmails,
+}: {
+  value: string;
+  onChange: (id: string) => void;
+  profiles: Profile[];
+  userEmails: Record<string, string>;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = profiles.find((p) => p.user_id === value);
+  const selectedEmail = selected ? userEmails[selected.user_id] : undefined;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn(
+            'w-full justify-between font-normal h-auto min-h-10 py-2',
+            !selected && 'text-muted-foreground',
+          )}
+        >
+          <span className="truncate text-left">
+            {selected
+              ? selected.full_name || 'Unknown User'
+              : 'Select user'}
+            {selectedEmail && (
+              <span className="block text-xs text-muted-foreground truncate">
+                {selectedEmail}
+              </span>
+            )}
+          </span>
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[--radix-popover-trigger-width] p-0 bg-popover z-50">
+        <Command
+          filter={(itemValue, search) => {
+            if (!search) return 1;
+            return itemValue.toLowerCase().includes(search.toLowerCase()) ? 1 : 0;
+          }}
+        >
+          <CommandInput placeholder="Search by name or email..." autoFocus />
+          <CommandList className="max-h-60">
+            <CommandEmpty>No user found.</CommandEmpty>
+            <CommandGroup>
+              {profiles.map((profile) => {
+                const email = userEmails[profile.user_id] || '';
+                const name = profile.full_name || 'Unknown User';
+                return (
+                  <CommandItem
+                    key={profile.user_id}
+                    value={`${name} ${email} ${profile.user_id}`}
+                    onSelect={() => {
+                      onChange(profile.user_id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        value === profile.user_id ? 'opacity-100' : 'opacity-0',
+                      )}
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="truncate">{name}</span>
+                      {email && (
+                        <span className="text-xs text-muted-foreground truncate">{email}</span>
+                      )}
+                    </div>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 const roleLabels: Record<AppRole, string> = {
   admin: 'Admin',
   manager: 'Manager',
