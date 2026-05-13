@@ -123,7 +123,8 @@ export default function VisitorReport() {
         *,
         host:employees(*, department:departments(*)),
         department:departments(*),
-        gate:gates(*, location:locations(*))
+        gate:gates(*, location:locations(*)),
+        accompanying:accompanying_visitors(*)
       `)
       .order('created_at', { ascending: false });
 
@@ -299,7 +300,7 @@ export default function VisitorReport() {
   }, [visitors]);
 
   const exportToCsv = () => {
-    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Created Date', 'Date of Visit', 'Location', 'Status', 'Checkout By', 'Check In', 'Check Out'];
+    const headers = ['Name', 'Visitor ID', 'Email', 'Phone', 'Company', 'Purpose', 'Host', 'Created Date', 'Date of Visit', 'Location', 'Status', 'Checkout By', 'Check In', 'Check Out', 'Accompanying Count', 'Accompanying Names'];
     const rows = filteredVisitors.map((v) => [
       v.name,
       v.visitor_id,
@@ -315,6 +316,8 @@ export default function VisitorReport() {
       (v as any).checkout_method || '',
       v.check_in_time ? format(new Date(v.check_in_time), 'yyyy-MM-dd HH:mm:ss') : '',
       v.check_out_time ? format(new Date(v.check_out_time), 'yyyy-MM-dd HH:mm:ss') : '',
+      String(v.accompanying?.length ?? 0),
+      (v.accompanying || []).map(a => a.name).join('; '),
     ]);
 
     const escapeCsvField = (field: string) => {
@@ -1039,12 +1042,13 @@ export default function VisitorReport() {
                 <TableHead>Check In</TableHead>
                 <TableHead>Check Out</TableHead>
                 <TableHead>Laptop</TableHead>
+                <TableHead>Accompanying</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8">
+                  <TableCell colSpan={13} className="text-center py-8">
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                       Loading...
@@ -1053,7 +1057,7 @@ export default function VisitorReport() {
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={13} className="text-center py-8 text-muted-foreground">
                     No visitors found matching your criteria
                   </TableCell>
                 </TableRow>
@@ -1142,6 +1146,18 @@ export default function VisitorReport() {
                         </div>
                       ) : (
                         <span className="text-muted-foreground">No</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {visitor.accompanying && visitor.accompanying.length > 0 ? (
+                        <div>
+                          <p className="font-medium">{visitor.accompanying.length}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-2 max-w-[180px]">
+                            {visitor.accompanying.map(a => a.name).join(', ')}
+                          </p>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                   </TableRow>

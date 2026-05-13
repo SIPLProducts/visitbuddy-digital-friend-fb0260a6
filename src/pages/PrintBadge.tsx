@@ -13,6 +13,7 @@ interface VisitorData {
   has_laptop?: boolean | null;
   photo_url?: string | null;
   check_in_time?: string | null;
+  id?: string;
   host?: {
     name?: string;
     department?: { name?: string } | null;
@@ -40,6 +41,13 @@ interface VisitorData {
       assembly_point?: string | null;
     } | null;
   } | null;
+  accompanying?: Array<{
+    id: string;
+    name: string;
+    phone?: string | null;
+    has_laptop?: boolean | null;
+    has_mobile?: boolean | null;
+  }>;
 }
 
 const safeFormat = (date: Date, fmt: string): string => {
@@ -79,7 +87,8 @@ export default function PrintBadge() {
           *,
           host:employees(name, department:departments(name)),
           department:departments(name, floor_number, building_section, location:locations!departments_location_id_fkey(name, geo_address, latitude, longitude, emergency_contact, assembly_point)),
-          gate:gates(name, location:locations!gates_location_id_fkey(name, geo_address, latitude, longitude, emergency_contact, assembly_point))
+          gate:gates(name, location:locations!gates_location_id_fkey(name, geo_address, latitude, longitude, emergency_contact, assembly_point)),
+          accompanying:accompanying_visitors(id, name, phone, has_laptop, has_mobile)
         `)
         .eq('id', visitorId)
         .single();
@@ -593,6 +602,14 @@ export default function PrintBadge() {
                     <span className="detail-label">Validity</span>
                     <span className="detail-value">: {safeFormat(checkInTime, 'dd/MM/yyyy')}</span>
                   </div>
+                  {visitor.accompanying && visitor.accompanying.length > 0 && (
+                    <div className="detail-row" style={{ alignItems: 'flex-start' }}>
+                      <span className="detail-label">Accompanying</span>
+                      <span className="detail-value">
+                        : {visitor.accompanying.map(a => a.name + (a.phone ? ` (${a.phone})` : '')).join(', ')}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="officer-sig">

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +7,11 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Visitor } from '@/types/database';
-import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin, ShieldCheck, Car, Smartphone, LogOut } from 'lucide-react';
+import { Visitor, AccompanyingVisitor } from '@/types/database';
+import { Building2, Mail, Phone, Laptop, Calendar, Clock, User, MapPin, ShieldCheck, Car, Smartphone, LogOut, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { supabase } from '@/integrations/supabase/client';
 
 interface VisitorDetailsDialogProps {
   visitor: Visitor | null;
@@ -18,6 +20,22 @@ interface VisitorDetailsDialogProps {
 }
 
 export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDetailsDialogProps) {
+  const [accompanying, setAccompanying] = useState<AccompanyingVisitor[]>([]);
+
+  useEffect(() => {
+    if (!visitor || !open) return;
+    if (visitor.accompanying && visitor.accompanying.length >= 0) {
+      setAccompanying(visitor.accompanying || []);
+      if (visitor.accompanying.length > 0 || (visitor.accompanying_count ?? 0) === 0) return;
+    }
+    // Fallback fetch when relation not preloaded
+    supabase
+      .from('accompanying_visitors')
+      .select('*')
+      .eq('visitor_id', visitor.id)
+      .then(({ data }) => setAccompanying((data as AccompanyingVisitor[]) || []));
+  }, [visitor, open]);
+
   if (!visitor) return null;
 
   const getInitials = (name: string) => {
@@ -275,12 +293,45 @@ export function VisitorDetailsDialog({ visitor, open, onOpenChange }: VisitorDet
             )}
 
             {/* Accompanying */}
-            {visitor.accompanying_count && visitor.accompanying_count > 0 && (
-              <div className="border-t pt-4">
-                <p className="text-sm">
-                  <span className="text-muted-foreground">Accompanying persons:</span>{' '}
-                  <span className="font-medium">{visitor.accompanying_count}</span>
-                </p>
+            {(accompanying.length > 0 || (visitor.accompanying_count ?? 0) > 0) && (
+              <div className="border-t pt-4 space-y-3">
+                <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
+                  <Users className="h-4 w-4" /> Accompanying Visitors ({accompanying.length || visitor.accompanying_count})
+                </h4>
+                {accompanying.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">Loading…</p>
+                ) : (
+                  <div className="space-y-2">
+                    {accompanying.map((a) => (
+                      <div key={a.id} className="bg-muted/50 rounded-lg p-3 text-sm">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="font-medium">{a.name}</div>
+                          {a.phone && (
+                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                              <Phone className="h-3 w-3" /> {a.phone}
+                            </div>
+                          )}
+                        </div>
+                        {(a.has_laptop || a.has_mobile) && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {a.has_laptop && (
+                              <Badge variant="outline" className="gap-1 text-xs">
+                                <Laptop className="h-3 w-3" />
+                                {a.laptop_brand || 'Laptop'}{a.laptop_serial ? ` · ${a.laptop_serial}` : ''}
+                              </Badge>
+                            )}
+                            {a.has_mobile && (
+                              <Badge variant="outline" className="gap-1 text-xs">
+                                <Smartphone className="h-3 w-3" />
+                                {a.mobile_brand || 'Mobile'}{a.mobile_serial ? ` · ${a.mobile_serial}` : ''}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -114,6 +114,7 @@ export interface Visitor {
   host?: Employee;
   department?: Department;
   gate?: Gate;
+  accompanying?: AccompanyingVisitor[];
 }
 
 export interface Appointment {
@@ -145,6 +146,9 @@ export interface AccompanyingVisitor {
   has_laptop: boolean;
   laptop_brand: string | null;
   laptop_serial: string | null;
+  has_mobile?: boolean;
+  mobile_brand?: string | null;
+  mobile_serial?: string | null;
   created_at: string;
 }
 
