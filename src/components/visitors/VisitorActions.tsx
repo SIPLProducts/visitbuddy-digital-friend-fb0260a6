@@ -129,7 +129,7 @@ export function VisitorActions({
               Check Out
             </DropdownMenuItem>
           )}
-          {canCheckInOut && isScheduledToday && (visitor.status === 'scheduled' || visitor.status === 'checked_out') && (
+          {canCheckInOut && isScheduledToday && visitor.status === 'scheduled' && (
             <DropdownMenuItem onClick={() => onCheckIn(visitor)}>
               <LogIn className="h-4 w-4 mr-2" />
               Check In
