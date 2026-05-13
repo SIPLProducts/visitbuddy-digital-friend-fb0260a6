@@ -622,12 +622,19 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                         form.setValue('department_id', opt.department.id);
                       }
                     }}
-                    onClear={() => form.setValue('host_id', '')}
+                    onClear={() => {
+                      form.setValue('host_id', '');
+                      form.setValue('department_id', '');
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Department</Label>
-                  <Select value={form.watch('department_id')} onValueChange={(value) => form.setValue('department_id', value)}>
+                  <Select
+                    value={form.watch('department_id')}
+                    onValueChange={(value) => form.setValue('department_id', value)}
+                    disabled={!!form.watch('host_id')}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
