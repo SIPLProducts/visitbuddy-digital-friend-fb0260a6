@@ -9,6 +9,7 @@ const corsHeaders = {
 
 interface NotifyHostRequest {
   visitorId: string;
+  force?: boolean;
 }
 
 // Resolve the public-facing app URL used in approval links.
@@ -411,7 +412,7 @@ const handler = async (req: Request): Promise<Response> => {
     const publicUrl = (await resolvePublicUrl(req, supabase))
       || "https://visitbuddy-digital-friend.lovable.app";
     console.log(`[notify-host] publicUrl = ${publicUrl}`);
-    const { visitorId }: NotifyHostRequest = await req.json();
+    const { visitorId, force }: NotifyHostRequest = await req.json();
     const branding = await getBranding(supabase);
     const logoBytes = await fetchLogoBytes(branding.logoUrl);
 
@@ -441,7 +442,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Fetch visitor details - added email field
     const { data: visitor, error: visitorError } = await supabase
       .from("visitors")
-      .select("id, visitor_id, name, phone, email, company, purpose, photo_url, host_id, department_id, gate_id, status")
+      .select("id, visitor_id, name, phone, email, company, purpose, photo_url, host_id, department_id, gate_id, status, scheduled_date")
       .eq("id", visitorId)
       .single();
 
@@ -456,6 +457,18 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log("Visitor data:", JSON.stringify(visitor));
+
+    // Defer host notifications until the date of visit (Asia/Kolkata).
+    // Visitor confirmation email/WhatsApp still goes out immediately so the
+    // visitor knows their request was received. The cron job
+    // `send-pending-approval-reminders` re-invokes this function with
+    // `force: true` on the morning of the visit.
+    const todayIST = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); // YYYY-MM-DD
+    const visitDateStr = visitor.scheduled_date ? String(visitor.scheduled_date).slice(0, 10) : todayIST;
+    const skipHost = !force && visitDateStr > todayIST;
+    if (skipHost) {
+      console.log(`[notify-host] visit date ${visitDateStr} is in the future (today=${todayIST}) — deferring host notification`);
+    }
 
     if (!visitor.host_id) {
       console.log("No host assigned to this visitor");
@@ -532,7 +545,7 @@ const handler = async (req: Request): Promise<Response> => {
     let hostTransport: "twilio" | "whatsapp_web" | null = null;
     let visitorTransport: "twilio" | "whatsapp_web" | null = null;
 
-    if (hostData.phone) {
+    if (hostData.phone && !skipHost) {
       if (twilioWhatsAppNumber) {
         twilioWhatsAppNumber = twilioWhatsAppNumber.replace(/^whatsapp:/i, "").trim();
       }
@@ -621,8 +634,10 @@ const handler = async (req: Request): Promise<Response> => {
       } else if (!hostNotificationSent) {
         console.log("Twilio not configured, skipping host WhatsApp fallback");
       }
-    } else {
+    } else if (!hostData.phone) {
       console.log("Host has no phone, skipping WhatsApp to host");
+    } else {
+      console.log("Host WhatsApp deferred (future-dated visit)");
     }
 
     // WhatsApp confirmation to visitor
@@ -704,7 +719,7 @@ const handler = async (req: Request): Promise<Response> => {
     let visitorEmailSent = false;
 
     // Email to host (if host has email and visitor is pending approval)
-    if (hostData.email && isPendingApproval) {
+    if (hostData.email && isPendingApproval && !skipHost) {
       const approveLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=approve`;
       const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
       const hostEmailHtml = generateHostApprovalEmail(
@@ -717,7 +732,7 @@ const handler = async (req: Request): Promise<Response> => {
         hostEmailHtml,
         logoBytes
       );
-    } else if (hostData.email && !isPendingApproval) {
+    } else if (hostData.email && !isPendingApproval && !skipHost) {
       // For direct check-in, still notify host via email
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
