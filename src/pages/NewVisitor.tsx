@@ -108,6 +108,41 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
   const hasLaptop = form.watch('has_laptop');
   const hasMobile = form.watch('has_mobile');
   const vehicleType = form.watch('vehicle_type');
+  const phoneValue = form.watch('phone');
+  const [returningInfo, setReturningInfo] = useState<{ visit_count: number } | null>(null);
+
+  // Auto-fill from frequent_visitors table when phone is entered
+  useEffect(() => {
+    const digits = (phoneValue || '').replace(/\D/g, '');
+    if (digits.length < 10) {
+      setReturningInfo(null);
+      return;
+    }
+    const handle = setTimeout(async () => {
+      const { data } = await supabase
+        .from('frequent_visitors')
+        .select('name, email, company, govt_id_number, visit_count, phone')
+        .eq('phone', phoneValue)
+        .maybeSingle();
+      if (!data) {
+        setReturningInfo(null);
+        return;
+      }
+      const fillIfEmpty = (field: 'name' | 'email' | 'company' | 'govt_id_number', value: string | null) => {
+        if (!value) return;
+        const current = (form.getValues(field) || '').toString().trim();
+        if (!current) form.setValue(field, value, { shouldValidate: true, shouldDirty: true });
+      };
+      fillIfEmpty('name', data.name);
+      fillIfEmpty('email', data.email);
+      fillIfEmpty('company', data.company);
+      fillIfEmpty('govt_id_number', data.govt_id_number);
+      setReturningInfo({ visit_count: data.visit_count });
+      toast.success(`Returning visitor — details auto-filled (${data.visit_count} previous visits)`);
+    }, 500);
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phoneValue]);
 
   useEffect(() => {
     fetchFormData();
@@ -339,6 +374,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                   {form.formState.errors.phone && (
                     <p className="text-sm text-destructive">
                       {form.formState.errors.phone.message}
+                    </p>
+                  )}
+                  {returningInfo && (
+                    <p className="text-xs text-emerald-600 font-medium">
+                      ✓ Returning visitor ({returningInfo.visit_count} previous visits) — details auto-filled
                     </p>
                   )}
                 </div>

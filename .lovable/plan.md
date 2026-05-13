@@ -1,29 +1,44 @@
-## Goal
+## Frequent Visitor Auto-Fill (3+ visits)
 
-Defer the host approval email so it is sent on the morning of the visit date (08:00 IST), not at registration.
+When a visitor has 3 or more past visits, save their core profile and auto-fill it on future registrations when the security operator types their phone number.
 
-## Changes
+### 1. New table: `frequent_visitors`
 
-### 1. `notify-host` edge function
-- Read `visitor.scheduled_date`. If it is in the future (later than today in Asia/Kolkata), **skip** the host approval email and host WhatsApp/SMS.
-- Still send the visitor's "Visit Request Submitted" confirmation email immediately so they know their request was received.
-- Same-day registrations continue to behave exactly as today (immediate host email).
+Store one row per recurring visitor, keyed by phone number.
 
-### 2. New edge function `send-pending-approval-reminders`
-- Runs daily. Queries visitors where `status = 'pending_approval'` AND `scheduled_date = today (Asia/Kolkata)`.
-- For each one, calls the existing `notify-host` logic (host email + WhatsApp/SMS with approve/reject links). To avoid duplicating ~700 lines, it will reuse `notify-host` by invoking it per visitor with a flag `force=true` that bypasses the future-date guard.
-- Logs results; safe to re-run (idempotent — host can already be approved).
+Columns:
+- `phone` (text, unique) — primary lookup key
+- `name`, `email`, `company`, `govt_id_number`
+- `visit_count` (int)
+- `last_visit_at` (timestamptz)
+- standard `id`, `created_at`, `updated_at`
 
-### 3. Schedule via `pg_cron` + `pg_net`
-- Enable `pg_cron` and `pg_net` extensions.
-- Schedule `send-pending-approval-reminders` daily at **02:30 UTC = 08:00 IST**.
+RLS: authenticated users at any location can SELECT/INSERT/UPDATE (used by registration flow).
 
-### 4. `notify-host` accepts `force` flag
-- New optional body field `force?: boolean`. When true, the future-date guard is skipped (used by the cron reminder).
+### 2. Auto-promotion trigger
 
-## Technical notes
+Database trigger on `visitors` AFTER INSERT:
+- Count distinct prior visits for the same `phone` (including the new one).
+- If count ≥ 3, UPSERT into `frequent_visitors` with the latest non-null values for name/email/company/govt_id_number, and refresh `visit_count` + `last_visit_at`.
+- If row already exists, just update the latest details and counters on every subsequent visit.
 
-- Date comparison uses `Asia/Kolkata` so the cutoff matches Indian operating hours.
-- Visitor confirmation email path is unchanged — only the host-side notifications are deferred.
-- No DB schema changes required; `scheduled_date` already exists on `visitors`.
-- The cron `pg_cron` SQL contains the project URL and anon key, so it will be executed via `supabase--insert` (not a migration), per platform guidance.
+This means the table fills itself from existing history retroactively only on the next visit; we'll also run a one-time backfill for existing visitors who already cross the threshold.
+
+### 3. Backfill (one-time)
+
+SQL inside the migration: aggregate `visitors` by `phone`, take rows with count ≥ 3, insert into `frequent_visitors` using most recent non-null values.
+
+### 4. UI: auto-fill on phone entry in `src/pages/NewVisitor.tsx`
+
+- Debounce (~500 ms) on the Phone input.
+- When phone has ≥10 digits, query `frequent_visitors` by phone.
+- If found:
+  - Auto-fill Name, Email, Company, Government ID using `form.setValue(..., { shouldDirty: true })` only for fields the user hasn't manually typed.
+  - Show a small inline badge/toast: "Returning visitor — details auto-filled (X previous visits)".
+- If not found, do nothing.
+
+No change to `VisitorEditDialog` or other flows.
+
+### Out of scope
+- No change to self-service portal (can be added later if requested).
+- No UI to manage the frequent_visitors list (driven entirely by trigger).
