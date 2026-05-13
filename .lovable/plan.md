@@ -1,1 +1,1 @@
-Replace `src/assets/re-sustainability-logo.png` with the newly uploaded `user-uploads://image008-4.jpg` (overwrite). All existing imports in `Sidebar.tsx` (title bar) and `Auth.tsx` will pick up the new logo automatically — no code changes needed.
+Replace `public/favicon.png` with the uploaded `user-uploads://image008-5.jpg` (RE Sustainability icon). The `index.html` already references `/favicon.png`, so no code changes are needed — the new icon will appear as the browser tab favicon automatically.
