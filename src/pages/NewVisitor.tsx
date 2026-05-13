@@ -376,6 +376,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                       {form.formState.errors.phone.message}
                     </p>
                   )}
+                  {returningInfo && (
+                    <p className="text-xs text-emerald-600 font-medium">
+                      ✓ Returning visitor ({returningInfo.visit_count} previous visits) — details auto-filled
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="company">Company</Label>
