@@ -1,16 +1,9 @@
-## Replace login page logo with RE Sustainability logo
+## Replace sidebar logo with RE Sustainability logo
 
-**Goal:** On the `/auth` page, replace the current Shield icon (shown next to "VisiGuard / Enterprise VMS") with the uploaded RE Sustainability logo image.
+Update `src/components/layout/Sidebar.tsx` (lines ~155–158): replace the gradient "V" tile with an `<img>` of the existing `src/assets/re-sustainability-logo.png` asset.
 
-### Steps
+- Import `reLogo from '@/assets/re-sustainability-logo.png'`
+- Swap the `w-9 h-9 rounded-xl bg-gradient-to-br ...` tile for a white-background tile (`bg-white`) with `<img src={reLogo} className="w-full h-full object-contain p-0.5" alt="RE Sustainability" />` so the colored logo is readable on the dark sidebar.
+- Keep "VisiGuard / Enterprise VMS" text and collapse behavior unchanged.
 
-1. Copy the uploaded image `user-uploads://image008.jpg` into the project at `src/assets/re-sustainability-logo.png` (PNG to preserve transparency on the dark panel).
-2. Update `src/pages/Auth.tsx`:
-   - Import the new logo asset.
-   - **Desktop left panel** (dark branding side): replace the gradient square containing `<Shield />` with an `<img>` of the RE Sustainability logo, sized appropriately (~48–56px tall, `object-contain`), keeping the "VisiGuard / Enterprise VMS" text beside it.
-   - **Mobile header** (small screens): same swap — replace the small Shield icon tile with the logo image.
-3. Remove the now-unused `Shield` import if no longer referenced.
-
-### Notes
-- Only the logo mark changes; "VisiGuard" wordmark and "Enterprise VMS" tagline stay.
-- No backend, routing, or auth logic changes.
+No other components touched.

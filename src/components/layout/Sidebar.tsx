@@ -153,8 +153,8 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
       {/* Logo */}
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-sidebar-primary flex items-center justify-center shadow-lg shadow-primary/30">
-            <span className="text-primary-foreground font-bold text-sm font-display">V</span>
+          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-primary/30 p-1">
+            <img src={reLogo} alt="RE Sustainability" className="w-full h-full object-contain" />
           </div>
           {(!collapsed || isMobile) && (
             <div>
