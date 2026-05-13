@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Shield, Loader2 } from 'lucide-react';
+import reLogo from '@/assets/re-sustainability-logo.png';
 import authHero from '@/assets/auth-hero.jpg';
 import authCheckin from '@/assets/auth-checkin.jpg';
 import authAccess from '@/assets/auth-access.jpg';
@@ -111,8 +112,8 @@ export default function Auth() {
         {/* Logo */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[hsl(195,85%,45%)] to-[hsl(195,85%,35%)] flex items-center justify-center shadow-lg">
-              <Shield className="w-7 h-7 text-white" />
+            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-lg p-1.5">
+              <img src={reLogo} alt="RE Sustainability" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white tracking-tight">VisiGuard</h1>
@@ -159,8 +160,8 @@ export default function Auth() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="inline-flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <Shield className="w-6 h-6 text-primary-foreground" />
+              <div className="w-10 h-10 rounded-xl bg-white border flex items-center justify-center p-1">
+                <img src={reLogo} alt="RE Sustainability" className="w-full h-full object-contain" />
               </div>
               <h1 className="text-2xl font-bold text-foreground">VisiGuard</h1>
             </div>
