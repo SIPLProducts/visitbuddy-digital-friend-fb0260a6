@@ -32,7 +32,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen } from 'lucide-react';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen, Users } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Visitor } from '@/types/database';
@@ -142,7 +143,8 @@ export default function Visitors() {
         *,
         host:employees(*, department:departments(*)),
         department:departments(*),
-        gate:gates(*)
+        gate:gates(*),
+        accompanying:accompanying_visitors(*)
       `)
       .order('created_at', { ascending: false });
 
@@ -613,6 +615,28 @@ export default function Visitors() {
                         <div>
                           <p className="font-medium text-foreground">
                             {visitor.name}
+                            {visitor.accompanying && visitor.accompanying.length > 0 && (
+                              <TooltipProvider delayDuration={150}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700 cursor-help">
+                                      <Users className="h-3 w-3" />+{visitor.accompanying.length}
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-xs">
+                                    <p className="text-xs font-semibold mb-1">Accompanying ({visitor.accompanying.length})</p>
+                                    <ul className="text-xs space-y-0.5">
+                                      {visitor.accompanying.slice(0, 5).map((a) => (
+                                        <li key={a.id}>• {a.name}{a.phone ? ` — ${a.phone}` : ''}</li>
+                                      ))}
+                                      {visitor.accompanying.length > 5 && (
+                                        <li className="text-muted-foreground">+{visitor.accompanying.length - 5} more</li>
+                                      )}
+                                    </ul>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
                           </p>
                           {visitor.email && (
                             <p className="text-sm text-muted-foreground flex items-center gap-1">
