@@ -1,9 +1,12 @@
-## Replace sidebar logo with RE Sustainability logo
+## Changes
 
-Update `src/components/layout/Sidebar.tsx` (lines ~155–158): replace the gradient "V" tile with an `<img>` of the existing `src/assets/re-sustainability-logo.png` asset.
+**1. Make Government Photo ID mandatory on New Visitor form**
+- File: `src/pages/NewVisitor.tsx`
+- Update zod schema: `govt_id_number: z.string().trim().min(1, "Government ID is required")`
+- Add `*` to the field label to indicate required.
 
-- Import `reLogo from '@/assets/re-sustainability-logo.png'`
-- Swap the `w-9 h-9 rounded-xl bg-gradient-to-br ...` tile for a white-background tile (`bg-white`) with `<img src={reLogo} className="w-full h-full object-contain p-0.5" alt="RE Sustainability" />` so the colored logo is readable on the dark sidebar.
-- Keep "VisiGuard / Enterprise VMS" text and collapse behavior unchanged.
+**2. Hide "Check In" action once a visitor is checked out**
+- File: `src/components/visitors/VisitorActions.tsx` (line 132)
+- Change condition from `(visitor.status === 'scheduled' || visitor.status === 'checked_out')` to only `visitor.status === 'scheduled'`, so checked-out visitors no longer show the Check In option in the actions menu.
 
-No other components touched.
+No backend / DB changes required.
