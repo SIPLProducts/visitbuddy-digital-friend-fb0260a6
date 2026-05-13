@@ -114,6 +114,7 @@ export interface Visitor {
   host?: Employee;
   department?: Department;
   gate?: Gate;
+  accompanying?: AccompanyingVisitor[];
 }
 
 export interface Appointment {
