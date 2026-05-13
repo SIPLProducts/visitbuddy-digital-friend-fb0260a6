@@ -69,7 +69,19 @@ import {
   Plus,
   ChevronRight,
   ChevronLeft,
+  Check,
+  ChevronsUpDown,
 } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { logAudit } from '@/lib/auditLog';
 import { toast } from 'sonner';
@@ -1562,24 +1574,12 @@ export default function UserManagement() {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label>User</Label>
-                <Select value={assignUserId} onValueChange={setAssignUserId}>
-                  <SelectTrigger><SelectValue placeholder="Select user" /></SelectTrigger>
-                  <SelectContent className="bg-popover border border-border z-50 max-h-60">
-                    {profiles.map((profile) => {
-                      const email = userEmails[profile.user_id];
-                      return (
-                        <SelectItem key={profile.user_id} value={profile.user_id}>
-                          <div className="flex flex-col">
-                            <span>{profile.full_name || 'Unknown User'}</span>
-                            {email && (
-                              <span className="text-xs text-muted-foreground">{email}</span>
-                            )}
-                          </div>
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+                <UserCombobox
+                  value={assignUserId}
+                  onChange={setAssignUserId}
+                  profiles={profiles}
+                  userEmails={userEmails}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Location</Label>
