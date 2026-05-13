@@ -1,18 +1,17 @@
-## Add searchable user picker in "Assign User to Role" dialog
+## Auto-fill department from host and disable the field
 
-**File:** `src/pages/UserManagement.tsx` (lines ~1563-1583)
+**File:** `src/pages/NewVisitor.tsx` (Visit Details section, ~lines 614–642)
 
-Replace the plain `<Select>` for the User field with a searchable Combobox (Popover + cmdk Command), matching the pattern already used in `src/components/visitors/HostCombobox.tsx`.
+### Current behavior
+- Host picker (`HostCombobox`) already auto-sets `department_id` to the host's department on selection.
+- Department `<Select>` remains editable, allowing the user to override it.
 
-### Behavior
-- Trigger button shows the selected user's name (and email below) or "Select user" placeholder.
-- Opens a popover with a search input that filters by **full name** and **email**.
-- Empty state: "No user found."
-- Selecting an item sets `assignUserId` and closes the popover.
-- Width matches the trigger; max-height with scroll for long lists.
+### Change
+1. Disable the Department `<Select>` whenever a `host_id` is selected, so it cannot be edited.
+2. When the host is cleared via `onClear`, also clear `department_id` so the field unlocks again.
+3. Keep the existing auto-fill logic; no schema, validation, or submit changes.
 
-### Implementation notes
-- Import `Popover`, `PopoverTrigger`, `PopoverContent`, `Command`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`, plus `Check`, `ChevronsUpDown` from lucide-react.
-- Add a local `useState` for the popover open state inside the dialog (or a small inline component).
-- Build the searchable `value` string per item as `"{full_name} {email} {user_id}"` so cmdk's filter matches both name and email.
-- No changes to submit logic, schema, or other dialog fields (Location, Role, HO Admin) — keep those as-is.
+### Notes
+- Use `<Select disabled={!!form.watch('host_id')}>` to lock the field.
+- Label can be updated to `Department (auto from host)` for clarity — optional, will include.
+- No backend or RLS changes.
