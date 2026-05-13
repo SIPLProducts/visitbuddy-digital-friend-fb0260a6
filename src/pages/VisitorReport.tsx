@@ -1042,12 +1042,13 @@ export default function VisitorReport() {
                 <TableHead>Check In</TableHead>
                 <TableHead>Check Out</TableHead>
                 <TableHead>Laptop</TableHead>
+                <TableHead>Accompanying</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8">
+                  <TableCell colSpan={13} className="text-center py-8">
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                       Loading...
@@ -1056,7 +1057,7 @@ export default function VisitorReport() {
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={13} className="text-center py-8 text-muted-foreground">
                     No visitors found matching your criteria
                   </TableCell>
                 </TableRow>
@@ -1145,6 +1146,18 @@ export default function VisitorReport() {
                         </div>
                       ) : (
                         <span className="text-muted-foreground">No</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {visitor.accompanying && visitor.accompanying.length > 0 ? (
+                        <div>
+                          <p className="font-medium">{visitor.accompanying.length}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-2 max-w-[180px]">
+                            {visitor.accompanying.map(a => a.name).join(', ')}
+                          </p>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
                       )}
                     </TableCell>
                   </TableRow>
