@@ -52,7 +52,7 @@ const visitorSchema = z.object({
     (date) => date >= startOfToday(),
     { message: 'Date of visit cannot be in the past' }
   ),
-  govt_id_number: z.string().optional(),
+  govt_id_number: z.string().trim().min(1, "Government ID is required"),
 });
 
 type VisitorFormData = z.infer<typeof visitorSchema>;
@@ -356,12 +356,15 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="govt_id_number">Government Photo ID</Label>
+                <Label htmlFor="govt_id_number">Government Photo ID *</Label>
                 <Input
                   id="govt_id_number"
                   placeholder="Enter ID number"
                   {...form.register('govt_id_number')}
                 />
+                {form.formState.errors.govt_id_number && (
+                  <p className="text-sm text-destructive">{form.formState.errors.govt_id_number.message}</p>
+                )}
               </div>
               
               {/* WhatsApp Badge Option */}
