@@ -451,6 +451,45 @@ export type Database = {
           },
         ]
       }
+      frequent_visitors: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          govt_id_number: string | null
+          id: string
+          last_visit_at: string | null
+          name: string | null
+          phone: string
+          updated_at: string
+          visit_count: number
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          govt_id_number?: string | null
+          id?: string
+          last_visit_at?: string | null
+          name?: string | null
+          phone: string
+          updated_at?: string
+          visit_count?: number
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          govt_id_number?: string | null
+          id?: string
+          last_visit_at?: string | null
+          name?: string | null
+          phone?: string
+          updated_at?: string
+          visit_count?: number
+        }
+        Relationships: []
+      }
       gates: {
         Row: {
           building: string | null
