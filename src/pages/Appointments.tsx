@@ -571,7 +571,14 @@ export default function Appointments() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Host</Label>
-                <Select value={formData.host_id} onValueChange={(v) => setFormData({ ...formData, host_id: v })}>
+                <Select value={formData.host_id} onValueChange={(v) => {
+                  const emp = employees.find((e) => e.id === v);
+                  setFormData({
+                    ...formData,
+                    host_id: v,
+                    department_id: emp?.department?.id || formData.department_id || '',
+                  });
+                }}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select host" />
                   </SelectTrigger>
