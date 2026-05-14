@@ -1,18 +1,32 @@
 ## Goal
-On the Appointments screen, when a Host is selected in the New/Edit Appointment dialog, automatically populate the Department field with that host's department.
+On the Appointments screen's New/Edit Appointment dialog, replace the basic Host `Select` with the same searchable `HostCombobox` used on the Visitors (NewVisitor) screen — so it shows host name, employee ID, email, and department, with type-to-search.
 
 ## Change
 
-**File: `src/pages/Appointments.tsx`** (Host Select, ~line 574)
+**File: `src/pages/Appointments.tsx`**
 
-Update the Host `Select`'s `onValueChange` so it also sets `department_id` from the chosen employee's `department.id`:
+1. Add import: `import { HostCombobox } from '@/components/visitors/HostCombobox';`
+2. In the dialog (~line 572-590), replace the Host `<Select>...</Select>` block with:
 
-- Look up the selected employee in the existing `employees` array (already loaded with `department:departments(*)`).
-- Set both `host_id` and `department_id` in one `setFormData` call.
-- If the employee has no department, leave `department_id` empty so the user can pick one manually.
+```tsx
+<HostCombobox
+  value={formData.host_id || ''}
+  options={employees as any}
+  onChange={(id, opt) =>
+    setFormData({
+      ...formData,
+      host_id: id,
+      department_id: opt?.department?.id || formData.department_id || '',
+    })
+  }
+  onClear={() => setFormData({ ...formData, host_id: '' })}
+  placeholder="Select host"
+/>
+```
 
-No DB, RLS, query, or UI layout changes. Department dropdown still remains editable so the user can override.
+The existing employees query already selects `*, department:departments(*)` which includes `email` and `employee_id`, so the combobox will render the same rich rows (name - department, with employee_id • email subtitle) and search across all those fields, matching the screenshot.
 
 ## Out of scope
-- Filtering Department list by host (still shows all departments for the location).
-- NewVisitor screen (separate flow).
+- Department dropdown (kept as-is, still auto-populated from selected host).
+- Visitors page (already uses HostCombobox).
+- Backend / RLS / queries (no changes).
