@@ -1,20 +1,18 @@
 ## Goal
-On the Visitors screen, scope the **Department** and **Gate** filter dropdowns so they only show items belonging to the currently selected plant (location), instead of listing every department and gate across all plants.
+On the Appointments screen, when a Host is selected in the New/Edit Appointment dialog, automatically populate the Department field with that host's department.
 
-## Changes
+## Change
 
-**File: `src/pages/Visitors.tsx`**
+**File: `src/pages/Appointments.tsx`** (Host Select, ~line 574)
 
-1. Re-run `fetchFilterOptions()` whenever the global selected location changes (add `globalLocationId` / `isAllLocations` to the effect dependency).
-2. In `fetchFilterOptions()`:
-   - If a specific plant is selected (`!isAllLocations`), filter:
-     - `departments` query → `.eq('location_id', globalLocationId)`
-     - `gates` query → `.eq('location_id', globalLocationId)`
-   - If "All Locations" is active, keep current behavior (load all).
-3. When the selected plant changes, reset `departmentFilter` and `gateFilter` back to `'all'` so a stale id from another plant doesn't hide all rows.
+Update the Host `Select`'s `onValueChange` so it also sets `department_id` from the chosen employee's `department.id`:
 
-No DB, RLS, or other UI changes. Department/gate dropdown rendering stays the same — only the list source narrows.
+- Look up the selected employee in the existing `employees` array (already loaded with `department:departments(*)`).
+- Set both `host_id` and `department_id` in one `setFormData` call.
+- If the employee has no department, leave `department_id` empty so the user can pick one manually.
+
+No DB, RLS, query, or UI layout changes. Department dropdown still remains editable so the user can override.
 
 ## Out of scope
-- NewVisitor form (separate screen, already filters by location internally).
-- Visitor list query itself (location filtering is already applied via `locationFilter`).
+- Filtering Department list by host (still shows all departments for the location).
+- NewVisitor screen (separate flow).
