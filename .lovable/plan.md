@@ -1,44 +1,70 @@
-## Frequent Visitor Auto-Fill (3+ visits)
+## The actual problem
 
-When a visitor has 3 or more past visits, save their core profile and auto-fill it on future registrations when the security operator types their phone number.
+Your self-hosted Supabase `edge-runtime` container starts with:
 
-### 1. New table: `frequent_visitors`
+```
+--main-service /home/deno/functions/main
+```
 
-Store one row per recurring visitor, keyed by phone number.
+It expects a **router file** at `volumes/functions/main/index.ts` that dispatches incoming requests to each function folder (`notify-host`, `send-email`, etc.).
 
-Columns:
-- `phone` (text, unique) — primary lookup key
-- `name`, `email`, `company`, `govt_id_number`
-- `visit_count` (int)
-- `last_visit_at` (timestamptz)
-- standard `id`, `created_at`, `updated_at`
+Your `volumes/functions/` directory has all 18 function folders but **no `main/` folder**. So the runtime boots, fails with:
 
-RLS: authenticated users at any location can SELECT/INSERT/UPDATE (used by registration flow).
+```
+worker boot error: failed to bootstrap runtime:
+could not find an appropriate entrypoint
+```
 
-### 2. Auto-promotion trigger
+…exits with code 1, Docker restarts it, it crashes again → restart loop. Kong then returns 503 because there's no healthy upstream. DNS is a red herring — it's already working.
 
-Database trigger on `visitors` AFTER INSERT:
-- Count distinct prior visits for the same `phone` (including the new one).
-- If count ≥ 3, UPSERT into `frequent_visitors` with the latest non-null values for name/email/company/govt_id_number, and refresh `visit_count` + `last_visit_at`.
-- If row already exists, just update the latest details and counters on every subsequent visit.
+Twilio env vars are unrelated to this crash. We can ignore them for now.
 
-This means the table fills itself from existing history retroactively only on the next visit; we'll also run a one-time backfill for existing visitors who already cross the threshold.
+## Fix — 2 steps
 
-### 3. Backfill (one-time)
+### Step 1: Add `supabase/functions/main/index.ts` to the repo
 
-SQL inside the migration: aggregate `visitors` by `phone`, take rows with count ≥ 3, insert into `frequent_visitors` using most recent non-null values.
+A standard Supabase self-hosted router that:
+- Reads the function name from the URL (`/functions/v1/<name>`)
+- Loads `volumes/functions/<name>/index.ts` via `EdgeRuntime.userWorkers.create()`
+- Forwards the request and streams back the response
+- Honors `verify_jwt` per function (defaults to false to match your `config.toml`)
 
-### 4. UI: auto-fill on phone entry in `src/pages/NewVisitor.tsx`
+This file lives in the repo so future `deploy/update.sh` runs copy it into `volumes/functions/main/` automatically — you won't lose it again.
 
-- Debounce (~500 ms) on the Phone input.
-- When phone has ≥10 digits, query `frequent_visitors` by phone.
-- If found:
-  - Auto-fill Name, Email, Company, Government ID using `form.setValue(..., { shouldDirty: true })` only for fields the user hasn't manually typed.
-  - Show a small inline badge/toast: "Returning visitor — details auto-filled (X previous visits)".
-- If not found, do nothing.
+### Step 2: Deploy and restart
 
-No change to `VisitorEditDialog` or other flows.
+On the server:
 
-### Out of scope
-- No change to self-service portal (can be added later if requested).
-- No UI to manage the frequent_visitors list (driven entirely by trigger).
+```bash
+cd /home/vmsadm/resl/vvms/visitbuddy-digital-friend-fb0260a6-main
+git pull          # or however you sync the repo
+sudo bash deploy/update.sh           # rsyncs main/ into volumes/functions/main/
+sudo bash deploy/restart-edge-functions.sh
+```
+
+Expected output from `restart-edge-functions.sh`:
+
+```
+OK  supabase-edge-functions is running
+OK  container resolves smtp.gmail.com
+OK  functions are reachable (got 401 — auth required, that's expected)
+```
+
+A `401` (not `503`) from `curl http://localhost:8000/functions/v1/test-smtp` means the runtime is up and Kong is forwarding correctly.
+
+## How to verify it's actually fixed
+
+1. `docker ps | grep edge-functions` — STATUS should be `Up X minutes`, not `Restarting`.
+2. `docker logs --tail=20 supabase-edge-functions` — should show `serving HTTP requests`, no `BootError`.
+3. From the app: open Settings → Email → Send Test Email. You should get a real success/failure response (no more `503 name resolution failed`).
+
+## What this does NOT fix
+
+- **Twilio WhatsApp/SMS** — those will still fail until `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_WHATSAPP_NUMBER` / `TWILIO_SMS_NUMBER` are added to `backend/supabase/docker/.env` and passed through the `functions:` service in `docker-compose.yml`. You said to skip this — noted, parking it.
+- Email (SMTP/Gmail) **will** start working as soon as the runtime is up, because SMTP creds come from the `email_config` table, not env vars.
+
+## Confirm before I implement
+
+I'll only add **one new file**: `supabase/functions/main/index.ts`. No changes to existing functions, no DB migrations, no docker-compose edits.
+
+Approve and I'll create it.
