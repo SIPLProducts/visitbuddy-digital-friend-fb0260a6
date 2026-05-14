@@ -1,14 +1,8 @@
 ## Goal
-On the Appointments New/Edit dialog: filter Hosts and Departments by the currently selected plant (location), and lock the Department field once a Host is selected.
+Widen the Schedule Appointment dialog so Host (with department/email) and Department selectors render fully without truncation.
 
-## Changes (`src/pages/Appointments.tsx`)
+## Change
+**File: `src/pages/Appointments.tsx`** (line 538)
+- `DialogContent` className: `max-w-lg` → `max-w-3xl w-[95vw]` (keeps `max-h-[90vh] overflow-y-auto`).
 
-1. **Filter `fetchData()` by plant** — apply `.eq('location_id', selectedLocationId)` to both `departments` and `employees` queries when `!isAllLocations && selectedLocationId`.
-
-2. **Re-fetch on plant change** — add `selectedLocationId` and `isAllLocations` to the `useEffect` that calls `fetchData()` (and reset `host_id` / `department_id` in `formData` when plant changes so stale selections don't persist).
-
-3. **Lock Department when Host selected** — disable the Department `<Select>` when `formData.host_id` is set. Department auto-fills from host (already implemented); user can clear the host to change department manually.
-
-## Out of scope
-- Visitors page (already handled).
-- Backend / RLS changes.
+That's it — the inner two-column grid expands automatically and the host combobox gets enough room.
