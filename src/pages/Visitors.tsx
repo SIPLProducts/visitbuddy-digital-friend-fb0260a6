@@ -135,6 +135,14 @@ export default function Visitors() {
     };
   }, []);
 
+  // Refetch department/gate options and reset filters when the selected plant changes
+  useEffect(() => {
+    fetchFilterOptions();
+    setDepartmentFilter('all');
+    setGateFilter('all');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalLocationId, isAllLocations]);
+
   const fetchVisitors = async () => {
     setLoading(true);
     const { data, error } = await supabase
