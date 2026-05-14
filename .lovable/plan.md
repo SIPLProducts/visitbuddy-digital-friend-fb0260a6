@@ -1,8 +1,11 @@
 ## Goal
-Widen the Schedule Appointment dialog so Host (with department/email) and Department selectors render fully without truncation.
+The host approval link opens a page titled "VisiGuard" (shown in the screenshot at `vms.resustainability.com/approve-visitor`). Change that title to **Re Sustainability** so the host-facing approval flow matches the company brand.
 
 ## Change
-**File: `src/pages/Appointments.tsx`** (line 538)
-- `DialogContent` className: `max-w-lg` → `max-w-3xl w-[95vw]` (keeps `max-h-[90vh] overflow-y-auto`).
+**File: `src/pages/ApproveVisitor.tsx`** (line 271)
+- `<CardTitle className="text-lg">VisiGuard</CardTitle>` → `<CardTitle className="text-lg">Re Sustainability</CardTitle>`
 
-That's it — the inner two-column grid expands automatically and the host combobox gets enough room.
+## Notes
+- The email body itself (sent by the `notify-host` edge function) already renders the company name as **Re Sustainability** — it explicitly maps the legacy `VisiGuard` tenant setting to `Re Sustainability` via `getBranding()` (line 62). No edge-function change needed.
+- Only the approval landing page header still shows "VisiGuard"; this fix updates it to match.
+- The subtitle "Visitor Approval System" stays as-is (descriptive, not branding).

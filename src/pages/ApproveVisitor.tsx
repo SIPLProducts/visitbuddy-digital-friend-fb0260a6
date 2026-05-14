@@ -268,7 +268,7 @@ export default function ApproveVisitor() {
         <CardHeader className="text-center border-b">
           <div className="flex items-center justify-center gap-2 mb-2">
             <img src={reslLogo} alt="Logo" className="h-10 w-10 object-contain" />
-            <CardTitle className="text-lg">VisiGuard</CardTitle>
+            <CardTitle className="text-lg">Re Sustainability</CardTitle>
           </div>
           <p className="text-xs text-muted-foreground">Visitor Approval System</p>
         </CardHeader>
