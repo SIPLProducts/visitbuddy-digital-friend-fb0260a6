@@ -7,6 +7,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { HostCombobox } from '@/components/visitors/HostCombobox';
 import {
   Dialog,
   DialogContent,
