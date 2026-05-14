@@ -135,6 +135,14 @@ export default function Visitors() {
     };
   }, []);
 
+  // Refetch department/gate options and reset filters when the selected plant changes
+  useEffect(() => {
+    fetchFilterOptions();
+    setDepartmentFilter('all');
+    setGateFilter('all');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalLocationId, isAllLocations]);
+
   const fetchVisitors = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -155,10 +163,16 @@ export default function Visitors() {
   };
 
   const fetchFilterOptions = async () => {
+    let deptQuery: any = supabase.from('departments').select('id, name').order('name');
+    let gateQuery: any = supabase.from('gates').select('id, name, building').order('name');
+    if (!isAllLocations && globalLocationId) {
+      deptQuery = deptQuery.eq('location_id', globalLocationId);
+      gateQuery = gateQuery.eq('location_id', globalLocationId);
+    }
     const [deptRes, locRes, gateRes] = await Promise.all([
-      supabase.from('departments').select('id, name').order('name'),
+      deptQuery,
       supabase.from('locations').select('id, name').order('name'),
-      supabase.from('gates').select('id, name, building').order('name'),
+      gateQuery,
     ]);
     if (deptRes.data) setDepartments(deptRes.data);
     if (locRes.data) setLocations(locRes.data);
