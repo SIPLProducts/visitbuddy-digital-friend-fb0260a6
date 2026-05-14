@@ -116,7 +116,7 @@ export default function Auth() {
               <img src={reLogo} alt="RE Sustainability" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">VisiGuard</h1>
+              <h1 className="text-2xl font-bold text-white tracking-tight">Resustainability</h1>
               <p className="text-sm text-white/60">Enterprise VMS</p>
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function Auth() {
               <div className="w-10 h-10 rounded-xl bg-white border flex items-center justify-center p-1">
                 <img src={reLogo} alt="RE Sustainability" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-2xl font-bold text-foreground">VisiGuard</h1>
+              <h1 className="text-2xl font-bold text-foreground">Resustainability</h1>
             </div>
             <p className="text-muted-foreground text-sm">Enterprise Visitor Management</p>
           </div>
@@ -176,7 +176,7 @@ export default function Auth() {
             <p className="text-muted-foreground mt-1">
               {isLogin
                 ? 'Enter your credentials to access your dashboard'
-                : 'Get started with VisiGuard today'}
+                : 'Get started with Resustainability today'}
             </p>
           </div>
 
