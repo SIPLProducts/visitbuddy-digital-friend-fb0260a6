@@ -81,20 +81,29 @@ export default function Appointments() {
   useEffect(() => {
     fetchData();
     fetchTodayStats();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLocationId, isAllLocations]);
 
   useEffect(() => {
     fetchAppointments();
   }, [selectedDate, selectedLocationId, isAllLocations]);
 
   const fetchData = async () => {
-    const [deptRes, empRes] = await Promise.all([
-      supabase.from('departments').select('*').order('name'),
-      supabase.from('employees').select('*, department:departments(*)').eq('is_host', true).order('name'),
-    ]);
+    let deptQuery: any = supabase.from('departments').select('*').order('name');
+    let empQuery: any = supabase
+      .from('employees')
+      .select('*, department:departments(*)')
+      .eq('is_host', true)
+      .order('name');
+    if (!isAllLocations && selectedLocationId) {
+      deptQuery = deptQuery.eq('location_id', selectedLocationId);
+      empQuery = empQuery.eq('location_id', selectedLocationId);
+    }
+    const [deptRes, empRes] = await Promise.all([deptQuery, empQuery]);
 
     if (deptRes.data) setDepartments(deptRes.data as Department[]);
     if (empRes.data) setEmployees(empRes.data as unknown as Employee[]);
+    setFormData((prev) => ({ ...prev, host_id: '', department_id: '' }));
   };
 
   const fetchTodayStats = async () => {
