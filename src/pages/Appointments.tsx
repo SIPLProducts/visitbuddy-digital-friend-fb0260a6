@@ -597,8 +597,8 @@ export default function Appointments() {
               </div>
               <div className="space-y-2">
                 <Label>Department</Label>
-                <Select value={formData.department_id} onValueChange={(v) => setFormData({ ...formData, department_id: v })}>
-                  <SelectTrigger>
+                <Select value={formData.department_id} onValueChange={(v) => setFormData({ ...formData, department_id: v })} disabled={!!formData.host_id}>
+                  <SelectTrigger disabled={!!formData.host_id}>
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
                   <SelectContent>
