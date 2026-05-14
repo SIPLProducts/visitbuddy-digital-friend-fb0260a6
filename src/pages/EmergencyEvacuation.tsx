@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, Users, Truck, Phone, Download, RefreshCw, MapPin, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { logAudit } from '@/lib/auditLog';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 interface CheckedInVisitor {
   id: string;
@@ -33,6 +34,8 @@ interface CheckedInVehicle {
 }
 
 export default function EmergencyEvacuation() {
+  const { selectedLocationId, isAllLocations } = useSelectedLocation();
+  const [locationName, setLocationName] = useState<string>('');
   const [visitors, setVisitors] = useState<CheckedInVisitor[]>([]);
   const [vehicles, setVehicles] = useState<CheckedInVehicle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,17 +43,60 @@ export default function EmergencyEvacuation() {
 
   const fetchData = async () => {
     setLoading(true);
-    const [vRes, veRes] = await Promise.all([
-      supabase.from('visitors').select('id, name, phone, company, check_in_time, host:employees(name), department:departments(name), gate:gates(name, location:locations(name))').eq('status', 'checked_in'),
-      supabase.from('vehicles').select('id, vehicle_number, driver_name, driver_phone, vehicle_type, check_in_time, company, gate:gates(name)').eq('status', 'checked_in'),
-    ]);
+
+    let vQuery = supabase
+      .from('visitors')
+      .select('id, name, phone, company, check_in_time, host:employees(name), department:departments(name), gate:gates(name, location:locations(name))')
+      .eq('status', 'checked_in');
+
+    let veQuery = supabase
+      .from('vehicles')
+      .select('id, vehicle_number, driver_name, driver_phone, vehicle_type, check_in_time, company, gate:gates(name), location_id')
+      .eq('status', 'checked_in');
+
+    if (!isAllLocations && selectedLocationId) {
+      veQuery = veQuery.eq('location_id', selectedLocationId);
+
+      const { data: gatesData } = await supabase
+        .from('gates')
+        .select('id')
+        .eq('location_id', selectedLocationId);
+      const gateIds = gatesData?.map((g) => g.id) || [];
+      if (gateIds.length > 0) {
+        vQuery = vQuery.in('gate_id', gateIds);
+      } else {
+        // No gates at this location — force empty visitor result
+        vQuery = vQuery.in('gate_id', ['00000000-0000-0000-0000-000000000000']);
+      }
+    }
+
+    const [vRes, veRes] = await Promise.all([vQuery, veQuery]);
     setVisitors((vRes.data as any) || []);
     setVehicles((veRes.data as any) || []);
     setLastRefresh(new Date());
     setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, [selectedLocationId, isAllLocations]);
+
+  useEffect(() => {
+    if (isAllLocations) {
+      setLocationName('All Plants');
+      return;
+    }
+    if (selectedLocationId) {
+      supabase
+        .from('locations')
+        .select('name')
+        .eq('id', selectedLocationId)
+        .single()
+        .then(({ data }) => {
+          setLocationName(data?.name || 'Selected Plant');
+        });
+    }
+  }, [selectedLocationId, isAllLocations]);
 
   const exportReport = () => {
     const timestamp = format(new Date(), 'yyyy-MM-dd_HH-mm');
@@ -84,7 +130,10 @@ export default function EmergencyEvacuation() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">Emergency Evacuation</h1>
-                <p className="text-sm text-white/80">Real-time headcount of all personnel & vehicles on premises</p>
+                <p className="text-sm text-white/80">
+                  Real-time headcount of all personnel & vehicles on premises
+                  {!isAllLocations && locationName && ` · ${locationName}`}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
