@@ -130,7 +130,10 @@ export default function EmergencyEvacuation() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">Emergency Evacuation</h1>
-                <p className="text-sm text-white/80">Real-time headcount of all personnel & vehicles on premises</p>
+                <p className="text-sm text-white/80">
+                  Real-time headcount of all personnel & vehicles on premises
+                  {!isAllLocations && locationName && ` · ${locationName}`}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
