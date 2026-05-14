@@ -572,23 +572,19 @@ export default function Appointments() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Host</Label>
-                <Select value={formData.host_id} onValueChange={(v) => {
-                  const emp = employees.find((e) => e.id === v);
-                  setFormData({
-                    ...formData,
-                    host_id: v,
-                    department_id: emp?.department?.id || formData.department_id || '',
-                  });
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select host" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {employees.map((emp) => (
-                      <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <HostCombobox
+                  value={formData.host_id || ''}
+                  options={employees as any}
+                  onChange={(id, opt) =>
+                    setFormData({
+                      ...formData,
+                      host_id: id,
+                      department_id: opt?.department?.id || formData.department_id || '',
+                    })
+                  }
+                  onClear={() => setFormData({ ...formData, host_id: '' })}
+                  placeholder="Select host"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Department</Label>
