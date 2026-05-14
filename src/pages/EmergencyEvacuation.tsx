@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertTriangle, Users, Truck, Phone, Download, RefreshCw, MapPin, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { logAudit } from '@/lib/auditLog';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
 
 interface CheckedInVisitor {
   id: string;
