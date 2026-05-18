@@ -481,41 +481,45 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Send SMS
-    if (accountSid && authToken && twilioSmsNumber && visitor.phone) {
-      twilioSmsNumber = twilioSmsNumber.replace(/^sms:/i, "").trim();
-      let formattedPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "");
-      if (!formattedPhone.startsWith("+")) {
-        formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
-      }
+    // Send SMS via SMS Striker (RESUST)
+    const smsStrikerKey = Deno.env.get("SMS_STRIKER_KEY");
+    if (smsStrikerKey && visitor.phone) {
+      // SMS Striker expects a plain 10-digit Indian number (no +91)
+      let strikerPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "").replace(/^\+?91/, "").replace(/^0/, "");
 
-      const smsMessage = `${branding.companyName}: Your visit is APPROVED. ID: ${visitor.visitor_id}. Show the CHECK-IN QR (sent on WhatsApp/Email) at the gate. Host: ${visitor.host?.name || 'N/A'}.`;
+      const var1 = visitor.name || "Visitor";
+      const var2 = visitor.company || "Guest";
+      const var3 = currentDate;
+      const var4 = visitor.gate?.name || "Main Gate";
+      const var5 = qrCodeUrl;
+      const var6 = visitor.host?.name || "Host";
+      const var7 = visitor.department?.name || "-";
+
+      const strikerMsg = `Dear ${var1}, Your visitor access for ${var2} is confirmed on ${var3} at ${var4}. QR Link: ${var5} Host: ${var6} FROM ${var7} Regards: RE SUSTAINABILITY LIMITED`;
 
       try {
-        const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-        const formData = new URLSearchParams();
-        formData.append("To", formattedPhone);
-        formData.append("From", twilioSmsNumber);
-        formData.append("Body", smsMessage);
-
-        const twilioResponse = await fetch(twilioUrl, {
+        const strikerPayload = {
+          key: smsStrikerKey,
+          from: "RESUST",
+          to: strikerPhone,
+          msg: strikerMsg,
+          type: "1",
+        };
+        const strikerResp = await fetch("https://www.smsstriker.com/API/sendsmsapi.php", {
           method: "POST",
-          headers: {
-            "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formData,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(strikerPayload),
         });
-        const twilioResult = await twilioResponse.json();
-        if (twilioResponse.ok) {
+        const strikerText = await strikerResp.text();
+        if (strikerResp.ok) {
           smsSent = true;
-          smsSid = twilioResult.sid;
-          console.log("SMS notification sent:", twilioResult.sid);
+          smsSid = strikerText.trim();
+          console.log("SMS Striker sent:", strikerText);
         } else {
-          console.error("Twilio SMS error:", twilioResult);
+          console.error("SMS Striker error:", strikerResp.status, strikerText);
         }
       } catch (smsError) {
-        console.error("Error sending SMS:", smsError);
+        console.error("Error sending SMS Striker:", smsError);
       }
     }
 
