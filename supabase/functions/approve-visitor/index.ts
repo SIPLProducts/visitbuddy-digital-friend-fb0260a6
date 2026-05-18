@@ -483,43 +483,74 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send SMS via SMS Striker (RESUST)
     const smsStrikerKey = Deno.env.get("SMS_STRIKER_KEY");
-    if (smsStrikerKey && visitor.phone) {
-      // SMS Striker expects a plain 10-digit Indian number (no +91)
-      let strikerPhone = visitor.phone.replace(/\s/g, "").replace(/-/g, "").replace(/^\+?91/, "").replace(/^0/, "");
+    if (!smsStrikerKey) {
+      console.error("SMS_STRIKER_KEY secret is missing — SMS not sent");
+    } else if (!visitor.phone) {
+      console.warn("Visitor has no phone number — SMS not sent");
+    } else {
+      // SMS Striker expects a plain 10-digit Indian number (no +91 / no 0)
+      const strikerPhone = String(visitor.phone)
+        .replace(/\D/g, "")          // keep digits only
+        .replace(/^91/, "")          // strip country code
+        .replace(/^0+/, "")          // strip leading zeros
+        .slice(-10);                 // take last 10 digits
 
-      const var1 = visitor.name || "Visitor";
-      const var2 = visitor.company || "Guest";
-      const var3 = currentDate;
-      const var4 = visitor.gate?.name || "Main Gate";
-      const var5 = qrCodeUrl;
-      const var6 = visitor.host?.name || "Host";
-      const var7 = visitor.department?.name || "-";
+      if (strikerPhone.length !== 10) {
+        console.error(`SMS Striker skipped — invalid phone after sanitization: '${visitor.phone}' -> '${strikerPhone}'`);
+      } else {
+        const var1 = visitor.name || "Visitor";
+        const var2 = visitor.company || "Guest";
+        const var3 = currentDate;
+        const var4 = visitor.gate?.name || "Main Gate";
+        const var5 = qrCodeUrl;
+        const var6 = visitor.host?.name || "Host";
+        const var7 = visitor.department?.name || "-";
 
-      const strikerMsg = `Dear ${var1}, Your visitor access for ${var2} is confirmed on ${var3} at ${var4}. QR Link: ${var5} Host: ${var6} FROM ${var7} Regards: RE SUSTAINABILITY LIMITED`;
+        const strikerMsg = `Dear ${var1}, Your visitor access for ${var2} is confirmed on ${var3} at ${var4}. QR Link: ${var5} Host: ${var6} FROM ${var7} Regards: RE SUSTAINABILITY LIMITED`;
 
-      try {
-        const strikerPayload = {
-          key: smsStrikerKey,
-          from: "RESUST",
-          to: strikerPhone,
-          msg: strikerMsg,
-          type: "1",
-        };
-        const strikerResp = await fetch("https://www.smsstriker.com/API/sendsmsapi.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(strikerPayload),
-        });
-        const strikerText = await strikerResp.text();
-        if (strikerResp.ok) {
-          smsSent = true;
-          smsSid = strikerText.trim();
-          console.log("SMS Striker sent:", strikerText);
-        } else {
-          console.error("SMS Striker error:", strikerResp.status, strikerText);
+        console.log(`SMS Striker -> to=${strikerPhone}, msgLen=${strikerMsg.length}`);
+
+        try {
+          const strikerPayload = {
+            key: smsStrikerKey,
+            from: "RESUST",
+            to: strikerPhone,
+            msg: strikerMsg,
+            type: "1",
+          };
+          const strikerResp = await fetch("https://www.smsstriker.com/API/sendsmsapi.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(strikerPayload),
+          });
+          const strikerText = (await strikerResp.text()).trim();
+
+          // SMS Striker returns text or JSON; try to parse JSON for richer status
+          let parsed: any = null;
+          try { parsed = JSON.parse(strikerText); } catch { /* not JSON */ }
+
+          const providerStatusCode = parsed?.statusCode ?? parsed?.status ?? null;
+          const providerMessage = parsed?.statusMessage ?? parsed?.message ?? strikerText;
+          const providerJobId = parsed?.["Job Id"] ?? parsed?.jobId ?? parsed?.job_id ?? null;
+
+          const accepted = strikerResp.ok && (
+            providerStatusCode === 200 ||
+            providerStatusCode === "200" ||
+            /sent|success|messages has been sent/i.test(providerMessage || "")
+          );
+
+          if (accepted) {
+            smsSent = true;
+            smsSid = providerJobId ? String(providerJobId) : strikerText;
+            console.log(`SMS Striker accepted (jobId=${smsSid}) — ${providerMessage}`);
+          } else {
+            console.error(
+              `SMS Striker rejected (httpStatus=${strikerResp.status}, providerStatus=${providerStatusCode}): ${providerMessage}`
+            );
+          }
+        } catch (smsError) {
+          console.error("Error calling SMS Striker:", smsError);
         }
-      } catch (smsError) {
-        console.error("Error sending SMS Striker:", smsError);
       }
     }
 
