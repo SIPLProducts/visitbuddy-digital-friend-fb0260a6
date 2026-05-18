@@ -820,6 +820,57 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_logs: {
+        Row: {
+          created_at: string
+          http_status: number | null
+          id: string
+          message: string
+          provider: string
+          provider_job_id: string | null
+          provider_message: string | null
+          provider_status_code: string | null
+          raw_response: string | null
+          recipient_phone: string
+          sender_id: string | null
+          status: string
+          visitor_code: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          http_status?: number | null
+          id?: string
+          message: string
+          provider?: string
+          provider_job_id?: string | null
+          provider_message?: string | null
+          provider_status_code?: string | null
+          raw_response?: string | null
+          recipient_phone: string
+          sender_id?: string | null
+          status?: string
+          visitor_code?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          http_status?: number | null
+          id?: string
+          message?: string
+          provider?: string
+          provider_job_id?: string | null
+          provider_message?: string | null
+          provider_status_code?: string | null
+          raw_response?: string | null
+          recipient_phone?: string
+          sender_id?: string | null
+          status?: string
+          visitor_code?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
       tenant_settings: {
         Row: {
           auto_checkout_hours: number | null

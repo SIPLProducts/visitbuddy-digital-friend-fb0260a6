@@ -559,8 +559,40 @@ const handler = async (req: Request): Promise<Response> => {
               `SMS Striker rejected (httpStatus=${strikerResp.status}, providerStatus=${providerStatusCode}): ${providerMessage}`
             );
           }
+
+          // Persist SMS attempt for delivery auditing
+          try {
+            await supabase.from("sms_logs").insert({
+              visitor_id: visitor.id,
+              visitor_code: visitor.visitor_id,
+              recipient_phone: strikerPhone,
+              sender_id: "RESUST",
+              message: strikerMsg,
+              provider: "sms_striker",
+              provider_job_id: providerJobId ? String(providerJobId) : null,
+              http_status: strikerResp.status,
+              provider_status_code: providerStatusCode != null ? String(providerStatusCode) : null,
+              provider_message: providerMessage ?? null,
+              status: accepted ? "submitted" : "failed",
+              raw_response: strikerText,
+            });
+          } catch (logErr) {
+            console.error("Failed to persist sms_logs row:", logErr);
+          }
         } catch (smsError) {
           console.error("Error calling SMS Striker:", smsError);
+          try {
+            await supabase.from("sms_logs").insert({
+              visitor_id: visitor.id,
+              visitor_code: visitor.visitor_id,
+              recipient_phone: strikerPhone,
+              sender_id: "RESUST",
+              message: strikerMsg,
+              provider: "sms_striker",
+              status: "error",
+              provider_message: (smsError as any)?.message ?? String(smsError),
+            });
+          } catch (_) { /* ignore */ }
         }
       }
     }
