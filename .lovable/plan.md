@@ -1,39 +1,47 @@
-## Plan
+## Why the SMS doesn't land (even though SMS Striker returns success)
 
-1. **Keep SMS sending on host approval**
-   - Continue using the existing `approve-visitor` backend function.
-   - SMS will still be triggered immediately after the host clicks **Approve** and the visitor status becomes `scheduled`.
+The Postman request and our edge function both POST the same JSON to `https://www.smsstriker.com/API/sendsmsapi.php` and both get `statusCode: 200, "Messages has been sent."`.
 
-2. **Harden the SMS Striker payload**
-   - Normalize visitor mobile numbers to exactly 10 digits.
-   - If the number is invalid or missing, log a clear reason instead of silently skipping.
-   - Send the payload in the SMS Striker format:
+The only real difference is the `msg` content:
 
-```json
-{
-  "key": "<secret>",
-  "from": "RESUST",
-  "to": "<visitor mobile>",
-  "msg": "Dear <visitor>, Your visitor access for <company> is confirmed on <date> at <gate>. QR Link: <qr link> Host: <host> FROM <department> Regards: RE SUSTAINABILITY LIMITED",
-  "type": "1"
-}
-```
+- **Postman (delivered):** ~180 chars, short fake URL `https:visitlink`
+- **Edge function (not delivered):** **455 chars**, contains `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=<huge URL-encoded JSON>` with `{`, `}`, `?`, `&`, `=`
 
-3. **Improve SMS Striker response handling**
-   - Parse the SMS Striker response JSON instead of treating any HTTP 200 as final success.
-   - Mark `notifications.sms = true` only when SMS Striker returns `statusCode: 200`.
-   - Return `smsSid` as the Job Id when available.
-   - Return/log the provider message when it is rejected, failed, or malformed.
+DLT (Indian SMS regulator) checks every message against the registered template on the operator side. The provider accepts the API call but the operator drops the SMS when:
+- the body is much longer than the registered template, or
+- the URL doesn't match the registered `{#var#}` URL pattern (query string with `?` `&` `=` `{` `}` is a common rejection cause).
 
-4. **Add safe debug logging**
-   - Log the sanitized phone number, message length, and SMS Striker status.
-   - Do **not** log the API key.
-   - This will confirm whether the app sent the SMS correctly or whether the provider rejected/did not deliver it.
+So this is **not a code bug** in the API call — it's a message-content mismatch.
 
-5. **Deploy and verify**
-   - Deploy the updated `approve-visitor` function.
-   - Test approval again and check function logs for `SMS Striker accepted` or the exact rejection reason.
+## Fix
 
-## Expected result
+Update `supabase/functions/approve-visitor/index.ts` SMS Striker block only:
 
-After host approval, the visitor should receive the SMS if SMS Striker accepts and delivers the DLT-approved template. If it still does not reach the phone, the logs/API response will show whether it is a provider-side delivery issue such as DLT template mismatch, sender header issue, or operator rejection.
+1. **Use a short, clean link instead of the giant qrserver URL.**
+   Send the visitor to a public approval/QR landing page that already exists:
+   ```
+   https://visiguard.sharvisoftwareservices.com/visitor/<visitor_id>
+   ```
+   (or whatever short URL maps to the visitor's QR — we can use the public `SelfService` style route). No `?`, no `&`, no `=`.
+
+2. **Trim the SMS body to match a DLT-friendly template.** Target ~200 chars:
+   ```
+   Dear {name}, Your visitor access for {company} is confirmed on {date} at {gate}. QR Link: {short_url} Host: {host} FROM {dept} Regards: RE SUSTAINABILITY LIMITED
+   ```
+   - Strip the long weekday/year format for `currentDate` (use `dd-MM-yyyy` → ~10 chars instead of ~30).
+   - Cap `company`, `gate`, `host`, `dept` at e.g. 30 chars each to stay inside the DLT length.
+
+3. **Log the final `msgLen` and `accepted` flag** (already there) so we can verify the new length is ≪ 455.
+
+4. **No changes** to WhatsApp, email, or any other code path. Twilio WhatsApp already works.
+
+5. **Deploy `approve-visitor`** and re-test by approving a visitor — confirm SMS now lands on the phone.
+
+## What I will NOT change
+
+- SMS Striker URL, headers, JSON shape, key, `from=RESUST`, `type=1` — all already match Postman.
+- The QR image itself in WhatsApp / Email — those don't have DLT limits.
+
+## Confirm before I implement
+
+- Is the public short URL `https://visiguard.sharvisoftwareservices.com/visitor/<visitor_id>` correct, or do you want a different short link (e.g. `/q/<id>`)? Once you confirm, I'll update the function, deploy it, and you can re-test approval.
