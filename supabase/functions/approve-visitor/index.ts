@@ -488,38 +488,37 @@ const handler = async (req: Request): Promise<Response> => {
     } else if (!visitor.phone) {
       console.warn("Visitor has no phone number — SMS not sent");
     } else {
-      // SMS Striker expects a plain 10-digit Indian number (no +91 / no 0)
-      const strikerPhone = String(visitor.phone)
-        .replace(/\D/g, "")          // keep digits only
-        .replace(/^91/, "")          // strip country code
-        .replace(/^0+/, "")          // strip leading zeros
-        .slice(-10);                 // take last 10 digits
+      // Normalize phone to 91XXXXXXXXXX (accept 10 digits or already 12-digit with 91)
+      const digits = String(visitor.phone).replace(/\D/g, "").replace(/^0+/, "");
+      let strikerPhone = "";
+      if (digits.length === 10) strikerPhone = "91" + digits;
+      else if (digits.length === 12 && digits.startsWith("91")) strikerPhone = digits;
+      else if (digits.length === 11 && digits.startsWith("1")) strikerPhone = "9" + digits; // safety
 
-      if (strikerPhone.length !== 10) {
-        console.error(`SMS Striker skipped — invalid phone after sanitization: '${visitor.phone}' -> '${strikerPhone}'`);
+      if (!/^91\d{10}$/.test(strikerPhone)) {
+        console.error(`SMS Striker skipped — invalid phone: '${visitor.phone}' -> '${strikerPhone}'`);
       } else {
-        // Keep body short to match DLT-registered template (operators silently drop
-        // SMS when the body or URL doesn't match the approved template).
-        const cap = (s: string | null | undefined, n: number) =>
-          (s ? String(s).trim() : "").slice(0, n);
+        const pick = (s: string | null | undefined, fallback: string) => {
+          const v = (s == null ? "" : String(s)).trim();
+          return v.length > 0 ? v : fallback;
+        };
 
-        const shortDate = new Date().toLocaleDateString("en-GB", {
+        const var1 = pick(visitor.name, "Visitor");
+        const var2 = pick(visitor.company, "Guest");
+        const var3 = new Date().toLocaleDateString("en-GB", {
           day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
-        }); // dd/MM/yyyy
+        });
+        const var4 = pick(visitor.gate?.name, "Main Gate");
+        const var5 = `https://visiguard.sharvisoftwareservices.com/visitor/${visitor.visitor_id}`;
+        const var6 = pick(visitor.host?.name, "Host");
+        const var7 = pick(visitor.department?.name, "NA");
 
-        const shortLink = `https://visiguard.sharvisoftwareservices.com/visitor/${visitor.visitor_id}`;
-
-        const var1 = cap(visitor.name, 30) || "Visitor";
-        const var2 = cap(visitor.company, 30) || "Guest";
-        const var3 = shortDate;
-        const var4 = cap(visitor.gate?.name, 20) || "Main Gate";
-        const var5 = shortLink;
-        const var6 = cap(visitor.host?.name, 30) || "Host";
-        const var7 = cap(visitor.department?.name, 20) || "-";
-
+        // EXACT DLT-approved template — do not alter spacing or punctuation
         const strikerMsg = `Dear ${var1}, Your visitor access for ${var2} is confirmed on ${var3} at ${var4}. QR Link: ${var5} Host: ${var6} FROM ${var7} Regards: RE SUSTAINABILITY LIMITED`;
 
-        console.log(`SMS Striker -> to=${strikerPhone}, msgLen=${strikerMsg.length}`);
+        console.log("SMS Striker payload:", JSON.stringify({
+          to: strikerPhone, from: "RESUST", type: "1", msg: strikerMsg, msgLen: strikerMsg.length,
+        }));
 
         try {
           const strikerPayload = {
@@ -535,6 +534,7 @@ const handler = async (req: Request): Promise<Response> => {
             body: JSON.stringify(strikerPayload),
           });
           const strikerText = (await strikerResp.text()).trim();
+          console.log("SMS Striker response:", JSON.stringify({ httpStatus: strikerResp.status, body: strikerText }));
 
           // SMS Striker returns text or JSON; try to parse JSON for richer status
           let parsed: any = null;
