@@ -481,44 +481,53 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Send SMS via SMS Striker (RESUST)
+    // Send SMS via SMS Striker (RESUST) using the key-based API verified in Postman.
     const smsStrikerKey = Deno.env.get("SMS_STRIKER_KEY");
     if (!smsStrikerKey) {
       console.error("SMS_STRIKER_KEY secret is missing — SMS not sent");
     } else if (!visitor.phone) {
       console.warn("Visitor has no phone number — SMS not sent");
     } else {
-      // Normalize phone to 91XXXXXXXXXX (accept 10 digits or already 12-digit with 91)
+      // Match SMS Striker/Postman format: send a clean 10-digit Indian mobile number, no 91 prefix.
       const digits = String(visitor.phone).replace(/\D/g, "").replace(/^0+/, "");
-      let strikerPhone = "";
-      if (digits.length === 10) strikerPhone = "91" + digits;
-      else if (digits.length === 12 && digits.startsWith("91")) strikerPhone = digits;
-      else if (digits.length === 11 && digits.startsWith("1")) strikerPhone = "9" + digits; // safety
+      const strikerPhone = digits.length >= 10 ? digits.slice(-10) : "";
 
-      if (!/^91\d{10}$/.test(strikerPhone)) {
-        console.error(`SMS Striker skipped — invalid phone: '${visitor.phone}' -> '${strikerPhone}'`);
+      if (!/^[6-9]\d{9}$/.test(strikerPhone)) {
+        console.error(`SMS Striker skipped — invalid Indian mobile: '${visitor.phone}' -> '${strikerPhone}'`);
       } else {
         const pick = (s: string | null | undefined, fallback: string) => {
-          const v = (s == null ? "" : String(s)).trim();
+          const v = (s == null ? "" : String(s)).replace(/\s+/g, " ").trim();
           return v.length > 0 ? v : fallback;
         };
+        const cleanUrlPart = (s: string) => s.replace(/[^A-Za-z0-9-]/g, "").toUpperCase();
 
-        const var1 = pick(visitor.name, "Visitor");
-        const var2 = pick(visitor.company, "Guest");
-        const var3 = new Date().toLocaleDateString("en-GB", {
-          day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
-        });
-        const var4 = pick(visitor.gate?.name, "Main Gate");
-        const var5 = `https://visiguard.sharvisoftwareservices.com/visitor/${visitor.visitor_id}`;
-        const var6 = pick(visitor.host?.name, "Host");
-        const var7 = pick(visitor.department?.name, "NA");
+        const visitorName = pick(visitor.name, "Visitor");
+        const companyName = pick(visitor.company, "RESL");
+        const visitDate = visitor.scheduled_date
+          ? new Date(`${visitor.scheduled_date}T00:00:00`).toLocaleDateString("en-GB", {
+              day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
+            })
+          : new Date().toLocaleDateString("en-GB", {
+              day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
+            });
+        const gateName = pick(visitor.gate?.name, "Main Entry");
+        const hostName = pick(visitor.host?.name, "Host");
+        const fromName = pick(visitor.department?.name, "RESUST");
+        const qrLink = `https://visiguard.sharvisoftwareservices.com/visitor/${cleanUrlPart(visitor.visitor_id)}`;
 
-        // EXACT DLT-approved template — do not alter spacing or punctuation
-        const strikerMsg = `Dear ${var1}, Your visitor access for ${var2} is confirmed on ${var3} at ${var4}. QR Link: ${var5} Host: ${var6} FROM ${var7} Regards: RE SUSTAINABILITY LIMITED`;
+        // Keep this close to the successful Postman template; QR is sent as a clickable URL.
+        const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
 
-        console.log("SMS Striker payload:", JSON.stringify({
-          to: strikerPhone, from: "RESUST", type: "1", msg: strikerMsg, msgLen: strikerMsg.length,
-        }));
+        const loggedPayload = {
+          to: strikerPhone,
+          from: "RESUST",
+          type: "1",
+          msg: strikerMsg,
+          msgLen: strikerMsg.length,
+          qrLink,
+          keyConfigured: true,
+        };
+        console.log("SMS Striker payload:", JSON.stringify(loggedPayload));
 
         try {
           const strikerPayload = {
@@ -536,7 +545,6 @@ const handler = async (req: Request): Promise<Response> => {
           const strikerText = (await strikerResp.text()).trim();
           console.log("SMS Striker response:", JSON.stringify({ httpStatus: strikerResp.status, body: strikerText }));
 
-          // SMS Striker returns text or JSON; try to parse JSON for richer status
           let parsed: any = null;
           try { parsed = JSON.parse(strikerText); } catch { /* not JSON */ }
 
@@ -550,6 +558,24 @@ const handler = async (req: Request): Promise<Response> => {
             /sent|success|messages has been sent/i.test(providerMessage || "")
           );
 
+          let dlrText: string | null = null;
+          const dlrUsername = Deno.env.get("SMS_STRIKER_USERNAME");
+          const dlrPassword = Deno.env.get("SMS_STRIKER_PASSWORD");
+          if (accepted && providerJobId && dlrUsername && dlrPassword) {
+            try {
+              const dlrUrl = new URL("https://www.smsstriker.com/API/get_dlr_status.php");
+              dlrUrl.searchParams.set("username", dlrUsername);
+              dlrUrl.searchParams.set("password", dlrPassword);
+              dlrUrl.searchParams.set("job_id", String(providerJobId));
+              const dlrResp = await fetch(dlrUrl.toString(), { method: "GET" });
+              dlrText = (await dlrResp.text()).trim();
+              console.log("SMS Striker DLR response:", JSON.stringify({ httpStatus: dlrResp.status, body: dlrText }));
+            } catch (dlrError) {
+              dlrText = `DLR check failed: ${(dlrError as any)?.message ?? String(dlrError)}`;
+              console.warn(dlrText);
+            }
+          }
+
           if (accepted) {
             smsSent = true;
             smsSid = providerJobId ? String(providerJobId) : strikerText;
@@ -560,7 +586,6 @@ const handler = async (req: Request): Promise<Response> => {
             );
           }
 
-          // Persist SMS attempt for delivery auditing
           try {
             await supabase.from("sms_logs").insert({
               visitor_id: visitor.id,
@@ -572,9 +597,14 @@ const handler = async (req: Request): Promise<Response> => {
               provider_job_id: providerJobId ? String(providerJobId) : null,
               http_status: strikerResp.status,
               provider_status_code: providerStatusCode != null ? String(providerStatusCode) : null,
-              provider_message: providerMessage ?? null,
+              provider_message: dlrText ? `${providerMessage ?? ""} | DLR: ${dlrText}` : providerMessage ?? null,
               status: accepted ? "submitted" : "failed",
-              raw_response: strikerText,
+              raw_response: JSON.stringify({
+                response: parsed ?? strikerText,
+                responseText: strikerText,
+                deliveryReport: dlrText,
+                sentPayload: loggedPayload,
+              }),
             });
           } catch (logErr) {
             console.error("Failed to persist sms_logs row:", logErr);
@@ -591,6 +621,7 @@ const handler = async (req: Request): Promise<Response> => {
               provider: "sms_striker",
               status: "error",
               provider_message: (smsError as any)?.message ?? String(smsError),
+              raw_response: JSON.stringify({ error: (smsError as any)?.message ?? String(smsError), sentPayload: loggedPayload }),
             });
           } catch (_) { /* ignore */ }
         }
