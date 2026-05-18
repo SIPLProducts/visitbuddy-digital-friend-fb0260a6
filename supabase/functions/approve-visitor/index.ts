@@ -498,13 +498,24 @@ const handler = async (req: Request): Promise<Response> => {
       if (strikerPhone.length !== 10) {
         console.error(`SMS Striker skipped — invalid phone after sanitization: '${visitor.phone}' -> '${strikerPhone}'`);
       } else {
-        const var1 = visitor.name || "Visitor";
-        const var2 = visitor.company || "Guest";
-        const var3 = currentDate;
-        const var4 = visitor.gate?.name || "Main Gate";
-        const var5 = qrCodeUrl;
-        const var6 = visitor.host?.name || "Host";
-        const var7 = visitor.department?.name || "-";
+        // Keep body short to match DLT-registered template (operators silently drop
+        // SMS when the body or URL doesn't match the approved template).
+        const cap = (s: string | null | undefined, n: number) =>
+          (s ? String(s).trim() : "").slice(0, n);
+
+        const shortDate = new Date().toLocaleDateString("en-GB", {
+          day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
+        }); // dd/MM/yyyy
+
+        const shortLink = `https://visiguard.sharvisoftwareservices.com/visitor/${visitor.visitor_id}`;
+
+        const var1 = cap(visitor.name, 30) || "Visitor";
+        const var2 = cap(visitor.company, 30) || "Guest";
+        const var3 = shortDate;
+        const var4 = cap(visitor.gate?.name, 20) || "Main Gate";
+        const var5 = shortLink;
+        const var6 = cap(visitor.host?.name, 30) || "Host";
+        const var7 = cap(visitor.department?.name, 20) || "-";
 
         const strikerMsg = `Dear ${var1}, Your visitor access for ${var2} is confirmed on ${var3} at ${var4}. QR Link: ${var5} Host: ${var6} FROM ${var7} Regards: RE SUSTAINABILITY LIMITED`;
 
