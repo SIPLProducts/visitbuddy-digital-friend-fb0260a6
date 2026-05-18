@@ -35,12 +35,13 @@ export default function ApproveVisitor() {
   const isValidAction = action === 'approve' || action === 'reject';
 
   useEffect(() => {
+    autoActionRanRef.current = false;
     if (visitorId) {
       fetchVisitor();
     } else {
       setStatus('error');
     }
-  }, [visitorId]);
+  }, [visitorId, action]);
 
   const fetchVisitor = async () => {
     if (!visitorId) return;
