@@ -1,6 +1,6 @@
 -- Seed HWMP visitors (location_id=013e5f3f-0fee-45a8-a1a8-c625ef9e53bb)
 -- Idempotent: skips rows whose visitor_id already exists.
-BEGIN;
+-- apply-migrations.sh already wraps this in BEGIN/COMMIT.
 CREATE TEMP TABLE _hwmp_visitors_seed (LIKE public.visitors INCLUDING DEFAULTS) ON COMMIT DROP;
 COPY _hwmp_visitors_seed FROM stdin;
 68da4aee-57ef-4cc9-9a82-7aa6ad17f74f	VIS-043F8CF0-4E21	s. mahendra kumar	smkumar@drreddys.com	9849828385	dr reddys	sample handover	29e695bc-06ac-4c07-ba1c-5361853c4f0a	9d177f01-3373-45b2-9220-e5c01e50be20	7932f688-fde0-4c7d-8359-78a33a183177	\N	\N	f	checked_out	2026-04-18 03:48:49.413+00	2026-04-18 04:19:26.721+00	t	\N	https://bzyvykyuiuihzvhdpxsi.supabase.co/storage/v1/object/public/visitor-photos/68da4aee-57ef-4cc9-9a82-7aa6ad17f74f/checkin.jpg	2026-04-18 03:45:41.944524+00	2026-04-18 04:19:07.001183+00	0	t	samsung	f2	\N	by_walk	\N	security	2026-04-18	3ccc770a-b79d-4719-bb74-a45d9731ee6c
@@ -277,4 +277,3 @@ a4a34fb0-5aae-49b9-af7f-a91eca3c8813	VIS-76C9C369-194E	Ramesh	ramesh@gmail.com	9
 
 INSERT INTO public.visitors SELECT * FROM _hwmp_visitors_seed s
   WHERE NOT EXISTS (SELECT 1 FROM public.visitors v WHERE v.visitor_id = s.visitor_id);
-COMMIT;
