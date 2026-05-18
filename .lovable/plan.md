@@ -1,52 +1,47 @@
-## SMS Striker on visitor approval — already in place
+Findings from live logs:
 
-The exact integration you described is already implemented in `supabase/functions/approve-visitor/index.ts` (lines 484–566). No code changes are required.
+- The app is calling SMS Striker successfully during host approval.
+- SMS Striker is returning success: `statusCode: 200`, `Messages has been sent`.
+- Recent accepted job IDs:
+  - `1892268557` to `917995122017`
+  - `1892261442` to `918008889682`
+  - `1892261304` to `918519954889`
+- So the current issue is not that the approval function is failing to send the API request. The issue is most likely after SMS Striker accepts the message: DLT/template/carrier delivery, sender ID approval, URL/template mismatch, DND/operator filtering, or delivery report failure.
 
-### What is already wired
+Plan to fix/debug properly:
 
-**Endpoint & headers**
-- `POST https://www.smsstriker.com/API/sendsmsapi.php`
-- `Content-Type: application/json`
+1. Keep the existing SMS Striker approval trigger
+   - Do not change the host approval workflow.
+   - Keep sending SMS immediately when visitor status changes to `scheduled`.
 
-**Payload**
-```json
-{
-  "key": "<SMS_STRIKER_KEY secret>",
-  "from": "RESUST",
-  "to": "91XXXXXXXXXX",
-  "msg": "<rendered template>",
-  "type": "1"
-}
+2. Improve SMS Striker response tracking
+   - Store the SMS Striker job ID, destination number, message text, provider response, and send status in backend logs/audit data.
+   - This makes it easy to prove whether each visitor SMS was submitted successfully.
+
+3. Add delivery-status visibility
+   - If SMS Striker provides a delivery report/status API, wire it in using the returned job ID.
+   - Show whether the SMS is only `submitted` or actually `delivered/failed`.
+   - If there is no delivery-report API available, keep the job ID visible so it can be checked with SMS Striker support.
+
+4. Validate DLT/template compatibility
+   - Confirm the exact registered DLT template matches this generated message:
+
+```text
+Dear {name}, Your visitor access for {company} is confirmed on {date} at {entry_gate}. QR Link: {qr_url} Host: {host} FROM {department} Regards: RE SUSTAINABILITY LIMITED
 ```
 
-**Variable mapping (rendered into the DLT template)**
-| Var | Source | Fallback |
-|-----|--------|----------|
-| var1 | `visitor.name` | "Visitor" |
-| var2 | `visitor.company` | "Guest" |
-| var3 | Visit date `dd/MM/yyyy` (Asia/Kolkata) | — |
-| var4 | `visitor.gate.name` (Entry Gate) | "Main Gate" |
-| var5 | `https://visiguard.sharvisoftwareservices.com/visitor/{visitor_id}` (QR link as URL) | — |
-| var6 | `visitor.host.name` | "Host" |
-| var7 | `visitor.department.name` | "NA" |
+   - Check whether SMS Striker requires additional fields like template ID, entity ID, route, or campaign ID even if the basic API currently returns success.
 
-Rendered text (exact DLT wording, spacing, punctuation preserved):
-```
-Dear {var1}, Your visitor access for {var2} is confirmed on {var3} at {var4}. QR Link: {var5} Host: {var6} FROM {var7} Regards: RE SUSTAINABILITY LIMITED
-```
+5. Reduce delivery-risk in message content if needed
+   - If SMS Striker confirms URL/template filtering, replace the long QR URL with a shorter approved domain URL.
+   - If DLT rejects dynamic URLs, use a registered/static URL prefix and only keep the visitor ID as the variable.
 
-**Phone normalization** — accepts `7013584342` or `917013584342`, strips spaces/`+`/`-`/leading zeros, rejects invalid numbers with a log line.
+6. Test with one real approval
+   - Approve one pending visitor.
+   - Verify app log shows SMS Striker success.
+   - Verify delivery status/job ID with SMS Striker.
+   - Adjust template/payload only if the provider says it was filtered or failed after acceptance.
 
-**Trigger** — fires immediately when host approves a visitor (status → `scheduled`).
+Important note:
 
-**Secret** — `SMS_STRIKER_KEY` is already configured in Lovable Cloud.
-
-**Logging** — payload (key omitted), HTTP status, and provider response are logged for every send.
-
-### Action
-
-Redeploy the `approve-visitor` edge function and approve a test visitor to confirm via function logs. I can run the redeploy as soon as you approve this plan.
-
-### One small confirmation
-
-Your spec listed `var4 = Entry Gate` — that's what the function does today, rendering as `"...on 18/05/2026 at Main Gate"`. If you actually intended `var4 = visit time` (e.g. `10:30`) and the gate belongs in a different slot, tell me and I'll swap it; otherwise I'll leave the mapping exactly as above.
+The live app is already sending the SMS request and SMS Striker is accepting it. The next real fix depends on whether SMS Striker needs `template_id/entity_id` fields or whether the DLT template/URL is being filtered after acceptance.
