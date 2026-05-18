@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,9 +27,12 @@ export default function ApproveVisitor() {
   const [status, setStatus] = useState<ApprovalStatus>('loading');
   const [visitor, setVisitor] = useState<Visitor | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const autoActionRanRef = useRef(false);
 
   const visitorId = searchParams.get('id');
   const action = searchParams.get('action') as 'approve' | 'reject' | null;
+
+  const isValidAction = action === 'approve' || action === 'reject';
 
   useEffect(() => {
     if (visitorId) {
@@ -65,6 +68,10 @@ export default function ApproveVisitor() {
 
       if (data.status === 'pending_approval') {
         setStatus('pending');
+        if (isValidAction && !autoActionRanRef.current) {
+          autoActionRanRef.current = true;
+          void handleAction(action);
+        }
       } else if (data.status === 'scheduled' || data.status === 'checked_in') {
         setStatus('already_processed');
       } else if (data.status === 'cancelled') {
@@ -129,8 +136,16 @@ export default function ApproveVisitor() {
               <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <UserCheck className="h-8 w-8 text-amber-600" />
               </div>
-              <h2 className="text-xl font-bold">Visitor Approval Required</h2>
-              <p className="text-muted-foreground mt-1">Please review and approve or reject this visitor</p>
+              <h2 className="text-xl font-bold">
+                {isProcessing && isValidAction
+                  ? `${action === 'approve' ? 'Approving' : 'Rejecting'} Visitor...`
+                  : 'Visitor Approval Required'}
+              </h2>
+              <p className="text-muted-foreground mt-1">
+                {isProcessing && isValidAction
+                  ? 'Please wait while the request is processed.'
+                  : 'Please review and approve or reject this visitor'}
+              </p>
             </div>
 
             {visitor && (
