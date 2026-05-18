@@ -1,45 +1,42 @@
-I checked the live data and the current approval flow. The backend is approving visitors and writing `sms_logs` rows, and SMS Striker is returning `statusCode: 200` / `Messages has been sent` with job IDs. So the app is not failing before the provider; the failure is most likely provider-side delivery filtering after submission.
+Your Postman screenshot is useful: it confirms SMS Striker accepts the current `sendsmsapi.php` JSON API with only `key`, `from`, `to`, `msg`, and `type`. So we should not switch to username/password.
 
-The main issues I found:
+What the live app is currently doing:
 
-- The current code sends SMS to SMS Striker using `https://www.smsstriker.com/API/sendsmsapi.php` with JSON payload and `key`.
-- SMS Striker’s public API documentation shows the DLT route should use `https://www.smsstriker.com/API/sms.php` with `username`, `password`, `from`, `to`, `msg`, `type=1`, and `template_id`.
-- The documentation also says the `to` value should be a 10-digit mobile number without `91`, but the current code sends `91XXXXXXXXXX`.
-- The current message includes a dynamic URL, but no DLT template ID is being sent. In India, this can be accepted by the API but blocked later by DLT/operator filtering.
+- Host approval is changing visitor status correctly.
+- The backend is calling SMS Striker.
+- SMS Striker is returning success with job IDs.
+- The message is being logged as `submitted`.
+- But the visitor is still not receiving SMS, which means the issue is after API acceptance: most likely DLT/operator delivery rejection, sender/template mismatch, or URL text mismatch.
 
-Plan to solve it:
+Plan to solve this without changing credentials:
 
-1. Update the approval SMS sender
-   - Change the `approve-visitor` backend SMS block to use SMS Striker’s documented `sms.php` endpoint.
-   - Send form/query parameters instead of the current JSON payload.
-   - Send the visitor number as a clean 10-digit Indian mobile number.
-   - Include the DLT `template_id` in the request.
+1. Keep the working SMS Striker API
+   - Continue using `https://www.smsstriker.com/API/sendsmsapi.php`.
+   - Continue using `SMS_STRIKER_KEY` only.
+   - Do not require username/password.
 
-2. Add required secure configuration
-   - Keep the existing `SMS_STRIKER_KEY` fallback if needed.
-   - Add support for these runtime secrets:
-     - `SMS_STRIKER_USERNAME`
-     - `SMS_STRIKER_PASSWORD`
-     - `SMS_STRIKER_TEMPLATE_ID`
-   - If those are not configured, the function will clearly log that SMS delivery cannot be DLT-compliant.
+2. Make the generated app SMS match your working Postman SMS format
+   - Use the same structure shown in Postman:
+     `Dear {name}, Your visitor access for {company} is confirmed on {host/date-time}. QR Link: {url} Host: {host} FROM {department/sender} Regards: RE SUSTAINABILITY LIMITED`
+   - Keep the QR as a URL link.
+   - Use a short, stable QR URL prefix. If the long `/visitor/VIS-...` URL is getting filtered, reduce it to an approved/static URL pattern.
 
-3. Keep the QR URL in the SMS
-   - Continue sending the QR as a clickable URL like:
-     `https://visiguard.sharvisoftwareservices.com/visitor/VIS-XXXX`
-   - That page will show the QR image when opened.
+3. Add strict SMS delivery debugging
+   - Log the exact outgoing JSON payload shape, but not the secret key.
+   - Store the provider job ID, full response, recipient, message length, and generated QR URL in `sms_logs`.
+   - Mark API response as `submitted`, not `delivered`, because provider success does not guarantee handset delivery.
 
-4. Add delivery report tracking
-   - Use the returned SMS Striker job ID to call the documented DLR/status endpoint where possible.
-   - Store the DLR result in `sms_logs`, so we can see whether the message is only submitted or actually delivered/failed.
+4. Add DLR/status check support for job IDs
+   - Add a safe helper in `approve-visitor` to query SMS Striker delivery status if the key-based API supports a status endpoint or if the documented DLR endpoint can work with the returned job ID.
+   - Store the delivery result in `sms_logs.raw_response/provider_message` when available.
+   - This will show whether the message is delivered, failed, DND, invalid number, or filtered.
 
-5. Improve backend logging and response
-   - Return and log the exact provider endpoint result, job ID, template ID usage, recipient number, and final status.
-   - Keep email/WhatsApp working even if SMS fails.
+5. Add a backend fallback if SMS Striker accepts but delivery is uncertain
+   - If SMS Striker returns success but no delivery status is available, keep the email QR working.
+   - Optionally also trigger the existing Twilio SMS function only as a fallback if configured, so the visitor gets at least one SMS path.
 
-What I will need from you during implementation:
-
-- The SMS Striker username
-- The SMS Striker password
-- The approved DLT template ID for this exact SMS text
-
-Without the DLT template ID, the provider may keep accepting the API request but mobile operators can still block delivery.
+6. After implementation, test one approval
+   - Approve one pending visitor.
+   - Confirm a new `sms_logs` row contains the same message format as Postman.
+   - Confirm SMS Striker returns a new job ID.
+   - If still not delivered, the job ID must be checked with SMS Striker support because the app is successfully submitting the SMS.
