@@ -1,47 +1,45 @@
-Findings from live logs:
+I checked the live data and the current approval flow. The backend is approving visitors and writing `sms_logs` rows, and SMS Striker is returning `statusCode: 200` / `Messages has been sent` with job IDs. So the app is not failing before the provider; the failure is most likely provider-side delivery filtering after submission.
 
-- The app is calling SMS Striker successfully during host approval.
-- SMS Striker is returning success: `statusCode: 200`, `Messages has been sent`.
-- Recent accepted job IDs:
-  - `1892268557` to `917995122017`
-  - `1892261442` to `918008889682`
-  - `1892261304` to `918519954889`
-- So the current issue is not that the approval function is failing to send the API request. The issue is most likely after SMS Striker accepts the message: DLT/template/carrier delivery, sender ID approval, URL/template mismatch, DND/operator filtering, or delivery report failure.
+The main issues I found:
 
-Plan to fix/debug properly:
+- The current code sends SMS to SMS Striker using `https://www.smsstriker.com/API/sendsmsapi.php` with JSON payload and `key`.
+- SMS Striker’s public API documentation shows the DLT route should use `https://www.smsstriker.com/API/sms.php` with `username`, `password`, `from`, `to`, `msg`, `type=1`, and `template_id`.
+- The documentation also says the `to` value should be a 10-digit mobile number without `91`, but the current code sends `91XXXXXXXXXX`.
+- The current message includes a dynamic URL, but no DLT template ID is being sent. In India, this can be accepted by the API but blocked later by DLT/operator filtering.
 
-1. Keep the existing SMS Striker approval trigger
-   - Do not change the host approval workflow.
-   - Keep sending SMS immediately when visitor status changes to `scheduled`.
+Plan to solve it:
 
-2. Improve SMS Striker response tracking
-   - Store the SMS Striker job ID, destination number, message text, provider response, and send status in backend logs/audit data.
-   - This makes it easy to prove whether each visitor SMS was submitted successfully.
+1. Update the approval SMS sender
+   - Change the `approve-visitor` backend SMS block to use SMS Striker’s documented `sms.php` endpoint.
+   - Send form/query parameters instead of the current JSON payload.
+   - Send the visitor number as a clean 10-digit Indian mobile number.
+   - Include the DLT `template_id` in the request.
 
-3. Add delivery-status visibility
-   - If SMS Striker provides a delivery report/status API, wire it in using the returned job ID.
-   - Show whether the SMS is only `submitted` or actually `delivered/failed`.
-   - If there is no delivery-report API available, keep the job ID visible so it can be checked with SMS Striker support.
+2. Add required secure configuration
+   - Keep the existing `SMS_STRIKER_KEY` fallback if needed.
+   - Add support for these runtime secrets:
+     - `SMS_STRIKER_USERNAME`
+     - `SMS_STRIKER_PASSWORD`
+     - `SMS_STRIKER_TEMPLATE_ID`
+   - If those are not configured, the function will clearly log that SMS delivery cannot be DLT-compliant.
 
-4. Validate DLT/template compatibility
-   - Confirm the exact registered DLT template matches this generated message:
+3. Keep the QR URL in the SMS
+   - Continue sending the QR as a clickable URL like:
+     `https://visiguard.sharvisoftwareservices.com/visitor/VIS-XXXX`
+   - That page will show the QR image when opened.
 
-```text
-Dear {name}, Your visitor access for {company} is confirmed on {date} at {entry_gate}. QR Link: {qr_url} Host: {host} FROM {department} Regards: RE SUSTAINABILITY LIMITED
-```
+4. Add delivery report tracking
+   - Use the returned SMS Striker job ID to call the documented DLR/status endpoint where possible.
+   - Store the DLR result in `sms_logs`, so we can see whether the message is only submitted or actually delivered/failed.
 
-   - Check whether SMS Striker requires additional fields like template ID, entity ID, route, or campaign ID even if the basic API currently returns success.
+5. Improve backend logging and response
+   - Return and log the exact provider endpoint result, job ID, template ID usage, recipient number, and final status.
+   - Keep email/WhatsApp working even if SMS fails.
 
-5. Reduce delivery-risk in message content if needed
-   - If SMS Striker confirms URL/template filtering, replace the long QR URL with a shorter approved domain URL.
-   - If DLT rejects dynamic URLs, use a registered/static URL prefix and only keep the visitor ID as the variable.
+What I will need from you during implementation:
 
-6. Test with one real approval
-   - Approve one pending visitor.
-   - Verify app log shows SMS Striker success.
-   - Verify delivery status/job ID with SMS Striker.
-   - Adjust template/payload only if the provider says it was filtered or failed after acceptance.
+- The SMS Striker username
+- The SMS Striker password
+- The approved DLT template ID for this exact SMS text
 
-Important note:
-
-The live app is already sending the SMS request and SMS Striker is accepting it. The next real fix depends on whether SMS Striker needs `template_id/entity_id` fields or whether the DLT template/URL is being filtered after acceptance.
+Without the DLT template ID, the provider may keep accepting the API request but mobile operators can still block delivery.
