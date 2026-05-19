@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer } from 'lucide-react';
+import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer, UsersRound, ChevronDown, ChevronUp, Laptop, Smartphone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -32,6 +32,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
   }, [userRoles, isHoAdmin]);
   const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
   const [captureVisitor, setCaptureVisitor] = useState<Visitor | null>(null);
+  const [expandedGuests, setExpandedGuests] = useState<Record<string, boolean>>({});
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
