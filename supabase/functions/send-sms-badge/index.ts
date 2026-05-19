@@ -126,6 +126,11 @@ const handler = async (req: Request): Promise<Response> => {
     if (gateName) message += `Gate: ${gateName}\n`;
     message += `Date: ${currentDate}\n`;
     message += `Time: ${currentTime}\n`;
+
+    const longQrUrl = `${SITE_URL}/visitor/${visitorId}`;
+    const shortQrUrl = await shortenUrl(longQrUrl);
+    message += `QR: ${shortQrUrl}\n`;
+
     message += `\nShow this at security desk.`;
 
     console.log(`SMS message length: ${message.length} characters`);
