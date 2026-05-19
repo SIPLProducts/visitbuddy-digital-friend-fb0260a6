@@ -1279,6 +1279,7 @@ export type Database = {
           purpose: string | null
           qr_code: string | null
           scheduled_date: string | null
+          short_code: string | null
           status: Database["public"]["Enums"]["visitor_status"] | null
           updated_at: string
           vehicle_number: string | null
@@ -1312,6 +1313,7 @@ export type Database = {
           purpose?: string | null
           qr_code?: string | null
           scheduled_date?: string | null
+          short_code?: string | null
           status?: Database["public"]["Enums"]["visitor_status"] | null
           updated_at?: string
           vehicle_number?: string | null
@@ -1345,6 +1347,7 @@ export type Database = {
           purpose?: string | null
           qr_code?: string | null
           scheduled_date?: string | null
+          short_code?: string | null
           status?: Database["public"]["Enums"]["visitor_status"] | null
           updated_at?: string
           vehicle_number?: string | null
@@ -1384,8 +1387,13 @@ export type Database = {
         Args: { _location_id: string; _user_id: string }
         Returns: boolean
       }
+      generate_visitor_short_code: { Args: never; Returns: string }
       get_admin_location_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_location_ids: { Args: { _user_id: string }; Returns: string[] }
+      get_visitor_id_by_short_code: {
+        Args: { _short_code: string }
+        Returns: string
+      }
       has_role_at_location: {
         Args: {
           _location_id: string
