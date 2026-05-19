@@ -9,39 +9,6 @@ const SITE_URL =
   Deno.env.get("PUBLIC_SITE_URL") ||
   "https://visitbuddy-digital-friend.lovable.app";
 
-async function fetchShortUrl(url: string, longUrl: string): Promise<string | null> {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(`${url}${encodeURIComponent(longUrl)}`, {
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-    if (!res.ok) return null;
-    const text = (await res.text()).trim();
-    if (!text.startsWith("http")) return null;
-    return text;
-  } catch (e) {
-    console.warn("Shortener failed:", (e as Error).message);
-    return null;
-  }
-}
-
-async function shortenUrl(longUrl: string): Promise<string> {
-  const isgd = await fetchShortUrl(
-    "https://is.gd/create.php?format=simple&url=",
-    longUrl,
-  );
-  if (isgd) return isgd;
-  const tinyurl = await fetchShortUrl(
-    "https://tinyurl.com/api-create.php?url=",
-    longUrl,
-  );
-  if (tinyurl) return tinyurl;
-  console.warn("All shorteners failed; falling back to long URL");
-  return longUrl;
-}
-
 interface BadgeRequest {
   visitorName: string;
   visitorId: string;
@@ -106,11 +73,9 @@ const handler = async (req: Request): Promise<Response> => {
       day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
     });
     const cleanUrlPart = (s: string) => s.replace(/[^A-Za-z0-9-]/g, "").toUpperCase();
-    const longQrUrl = `https://visiguard.sharvisoftwareservices.com/visitor/${cleanUrlPart(visitorId)}`;
-    // DLT requires the URL domain to be pre-whitelisted with the telco.
-    // Using the registered domain directly; do NOT shorten via tinyurl/is.gd
-    // because those domains are not on the DLT whitelist and operators will drop the SMS.
-    const shortQrUrl = longQrUrl;
+    // Branded "click" link on the main (DLT-whitelisted) domain. The
+    // /click/<code> route redirects to /visitor/<code> in the SPA.
+    const clickUrl = `${SITE_URL}/click/${cleanUrlPart(visitorId)}`;
 
     const visitorNameSafe = (visitorName || "Visitor").trim();
     const companySafe = (company || "RESL").trim();
@@ -120,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const message =
       `Dear ${visitorNameSafe}, Your visitor access for ${companySafe} is confirmed on ${visitDate} at ${gateSafe}. ` +
-      `QR Link: ${shortQrUrl} Host: ${hostSafe} FROM ${fromSafe} Regards: RE SUSTAINABILITY LIMITED`;
+      `Click: ${clickUrl} Host: ${hostSafe} FROM ${fromSafe} Regards: RE SUSTAINABILITY LIMITED`;
 
     console.log(`SMS message length: ${message.length} characters`);
 
