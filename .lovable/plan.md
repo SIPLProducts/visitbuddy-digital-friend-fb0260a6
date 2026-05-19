@@ -1,49 +1,44 @@
-## Goal
-Make every SMS badge contain a short, branded "click" link on the main domain (`visiguard.sharvisoftwareservices.com/click/<code>`) that redirects the visitor to their existing QR page (`/visitor/:visitorCode`). Word "Click:" labels the link in the SMS body. Applies to host-approval SMS and every other SMS badge send.
+# Fix SMS delivery on visitor approval
 
-## Current behavior
-- `supabase/functions/send-sms-badge/index.ts` builds: `QR Link: https://visiguard.sharvisoftwareservices.com/visitor/<VISITOR-ID>`
-- `approve-visitor` and direct registration both call `send-sms-badge`.
-- Visitor QR page already lives at `/visitor/:visitorCode` (route `VisitorQrLink.tsx`).
+## Diagnosis
+
+From the last approval logs:
+- `SMS Striker accepted (jobId=1892895491) — Messages has been sent` to `7995122017`. Our app DID submit the SMS successfully (HTTP 200).
+- BUT the SMS body still uses the OLD format: `... QR Link: https://visiguard.sharvisoftwareservices.com/visitor/VIS-...`. We updated `send-sms-badge` last turn, but `approve-visitor` has its OWN duplicate SMS code path that was never updated.
+
+The most likely reason no SMS reached the handset: the **DLT-registered template** at SMS Striker / TRAI expects a specific wording. If the live message body no longer matches the approved template variant character-for-character, the operator silently drops it (accepted by aggregator → filtered by carrier). Our recent change made `send-sms-badge` emit `Click: .../click/<code>` while `approve-visitor` still emits `QR Link: .../visitor/<id>`. One of these is now off-template — and the approval path is the one that just failed delivery.
 
 ## Changes
 
-### 1. New frontend route `/click/:code` → redirects to `/visitor/:code`
-File: `src/App.tsx`
-- Add lightweight `<Route path="/click/:code" element={<ClickRedirect />} />` (public, no auth wrapper, alongside the existing `/visitor/:visitorCode` route).
+### 1. `supabase/functions/approve-visitor/index.ts` (~lines 516–519, plus log payload + sms_logs row)
+Replace:
+```ts
+const qrLink = `https://visiguard.sharvisoftwareservices.com/visitor/${cleanUrlPart(visitor.visitor_id)}`;
+const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
+```
+With:
+```ts
+const clickLink = `https://visiguard.sharvisoftwareservices.com/click/${cleanUrlPart(visitor.visitor_id)}`;
+const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. Click: ${clickLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
+```
+Update the `loggedPayload` (`qrLink` → `clickLink`) and the `sms_logs.message` value accordingly. This brings approve-visitor in sync with `send-sms-badge` (single source of truth).
 
-New file: `src/pages/ClickRedirect.tsx`
-- Read `:code` param, immediately `navigate(`/visitor/${code}`, { replace: true })` inside `useEffect`.
-- Render a tiny "Opening your visitor pass…" splash with the RESL logo + spinner for the millisecond before the redirect, so the SMS click feels intentional and branded.
-- Same `<title>` / meta as the visitor page for SEO/social previews.
+### 2. Extra reliability tweaks in `approve-visitor`
+- Log the full SMS Striker response body in both success and failure branches (already partially there) so we can see operator-level rejection reasons.
+- Also write a row into `sms_logs` even when `SMS_STRIKER_KEY` is missing so the Settings page surfaces the misconfiguration.
 
-### 2. SMS body uses the new click URL
-File: `supabase/functions/send-sms-badge/index.ts`
-- Replace the `longQrUrl` construction with:
-  - `const clickCode = cleanUrlPart(visitorId);`
-  - `const clickUrl = `${SITE_URL}/click/${clickCode}`;`
-  - `SITE_URL` already defaults to the Lovable URL; override via existing `PUBLIC_SITE_URL` env, which in production points to `https://visiguard.sharvisoftwareservices.com`.
-- Update the message template from `QR Link: ...` to:
-  `Click: ${clickUrl}`
-- Remove the dead shortener helpers (`fetchShortUrl`, `shortenUrl`) — they were already bypassed and add noise.
-- Keep DLT template structure (greeting, visit date, gate, host, "Regards: RE SUSTAINABILITY LIMITED") otherwise unchanged so the telco template match is preserved. The only token swap is `QR Link:` → `Click:` and the path changes from `/visitor/` to `/click/`.
-- **Important**: confirm with the user whether the DLT-registered template wording allows the `Click:` label and `/click/` path before deploying — if the template was registered with `QR Link:` and `/visitor/`, the operator will drop the SMS. If DLT can't be edited quickly, fallback option: keep `QR Link:` label but still swap the URL path to `/click/<code>` (only the path differs; same domain).
+### 3. Live verification after deploy
+After you create a visitor and approve them, I will:
+- Pull the latest `approve-visitor` edge logs to confirm the new `Click:` payload was used and SMS Striker returned 200.
+- Query `sms_logs` for `recipient_phone='7995122017'` to show provider job id + status.
+- If SMS Striker reports OK but the phone still does not ring, the remaining cause is the DLT template registration at the `RESUST` header — that is a portal action on your DLT provider (re-register the template body that now contains the word `Click:` and the `/click/` URL), not code. I will flag this clearly with the exact template string to copy-paste into the DLT portal.
 
-### 3. Approval-flow audit
-File: `supabase/functions/approve-visitor/index.ts`
-- No code change needed; it already invokes `send-sms-badge`, so it inherits the new link.
+## Out of scope
+- `send-sms-badge` (already correct from last turn).
+- WhatsApp, email, RLS, DB schema, frontend routes.
+- DLT template re-registration on the SMS Striker portal (manual portal step on your side if delivery still fails after the code fix).
 
-### 4. Out of scope
-- WhatsApp badge (`send-whatsapp-badge`) — sends an image + full link; not touched.
-- Email badge — uses HTML hyperlinks already; not touched.
-- Any DB schema, RLS, or new tables. The `code` is the visitor's existing `visitor_id`; no new tokens table.
+## Files touched
+- `supabase/functions/approve-visitor/index.ts` — SMS body + logged payload + sms_logs message string.
 
-## Technical notes
-- `/click/:code` is public (anonymous). It performs only a client-side redirect, so RLS on `visitors` is unaffected. The visitor QR page already handles "not found" gracefully.
-- Using the main domain keeps DLT-whitelisted delivery and removes the third-party shortener dependency entirely.
-- Approx SMS URL length: `https://visiguard.sharvisoftwareservices.com/click/VIS-XXXXXXXX-XXXX` ≈ 73 chars — same order as today's `/visitor/...` URL, no segment-count regression.
-
-## Verification
-1. Deploy `send-sms-badge`; trigger an approval from the host UI and confirm the SMS reads `Click: https://visiguard.sharvisoftwareservices.com/click/VIS-...`.
-2. Tap the link on a phone → lands on `/click/<code>` → instantly redirected to the existing visitor QR page with the QR rendered.
-3. Check edge function logs for `SMS message length` and SMS Striker `statusCode: 200`.
+No other files change.
