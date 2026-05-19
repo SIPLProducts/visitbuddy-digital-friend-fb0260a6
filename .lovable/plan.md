@@ -1,27 +1,29 @@
 ## Goal
-Surface accompanying visitor information on the Dashboard so security staff can see at a glance when a primary visitor brought guests along.
+Make the accompanying-visitor counts visible in more places, not just on the Dashboard's "Recent Visitors" rows. Today the data is loaded but the headline stats and the main Visitors list table don't show how many guests are involved.
 
 ## Changes
 
-### 1. Recent Visitors card (`src/components/dashboard/RecentVisitors.tsx`)
-- When a visitor has `accompanying_count > 0`, show a small pill next to the status badge: `+N guest(s)`.
-- Fetch the accompanying rows (name, has_laptop, has_mobile) for visitors visible in the list and render their names as a compact secondary line:
-  `With: Ramesh K., Priya S. (+1 more)` — truncate after 2 names.
-- Expand an inline collapsible (chevron) to show the full list with device flags (laptop/mobile) for each accompanying entry.
+### 1. Dashboard stat tiles (`src/pages/Dashboard.tsx`)
+- "Today's Visitors" StatCard — append a sub-line: `+ N guests` using `filteredStats.guestsToday` (only when > 0).
+- "Active Check-ins" StatCard — append a sub-line: `+ N guests inside` using `filteredStats.guestsInside` (only when > 0).
+- Keep the existing "Total People Inside" tile as-is (already shows primary + guests).
+- Use the `UsersRound` icon already imported, muted-foreground text styling, small `text-xs` line to stay within the StatCard footprint.
 
-### 2. Dashboard stats (`src/pages/Dashboard.tsx`)
-- Add a new KPI tile (or extend existing visitor card) showing **Total People Inside** = checked-in visitors + sum of their `accompanying_count`. This gives an accurate facility headcount.
-- Add today's "Accompanying Guests" count to `filteredStats` (sum of accompanying_count for visitors filtered to today).
+### 2. Visitors list table (`src/pages/Visitors.tsx`)
+- Add a new "Guests" column header between "Laptop" and "Status".
+- Cell content:
+  - If `visitor.accompanying_count > 0`: show a pill `+N` with `UsersRound` icon and a Tooltip listing guest names (first 5 + "+X more"), reusing the same Tooltip pattern already implemented inline on the visitor name (lines 632–650).
+  - Else show `—`.
+- Update the `colSpan={14}` placeholders to `colSpan={15}` for loading / empty rows.
 
-### 3. Data fetch
-- In `fetchDashboardData`, after loading visitors, fetch `accompanying_visitors` rows where `visitor_id` is in the loaded set (single query) and attach them to each visitor as `accompanying: []`.
-- Pass enriched visitors to `RecentVisitors`.
+### 3. Footer summary row (optional, low-risk)
+- Below the Visitors table filters, add a small summary chip: `Showing X visitors · Y guests` where Y = sum of `accompanying_count` across `filteredVisitors`. Helps security see total facility headcount in the filtered scope.
 
-### Technical notes
-- `visitors.accompanying_count` already exists; `accompanying_visitors` table already has public SELECT RLS — no DB changes needed.
-- Keep styling consistent with the existing glassmorphism tokens; use `Badge variant="secondary"` and existing `Users` icon from lucide-react.
-- Real-time subscription on `visitors` table already refreshes; add an additional channel for `accompanying_visitors` so the badge updates live when guests are added.
+## Technical notes
+- No DB changes, no RLS changes — `accompanying_count` and the `accompanying` relation are already fetched on both pages.
+- Real-time channel for `accompanying_visitors` already exists on the Dashboard; the Visitors page already refreshes via the `visitors` realtime channel (the count column on `visitors` is updated by app code when guests are saved).
+- Reuse existing tokens (indigo pill, `UsersRound`, `Badge variant="secondary"`).
 
 ## Out of scope
-- No changes to the visitor registration flow, RLS, or schema.
-- No changes to other pages (Visitors list, Reports) in this task.
+- No changes to badge printing, check-in/out dialog, reports, or registration flow.
+- No schema or edge-function changes.
