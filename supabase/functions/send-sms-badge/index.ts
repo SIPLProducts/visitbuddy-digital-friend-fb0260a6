@@ -78,9 +78,29 @@ const handler = async (req: Request): Promise<Response> => {
       day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
     });
     const cleanUrlPart = (s: string) => s.replace(/[^A-Za-z0-9-]/g, "").toUpperCase();
-    // DLT-whitelisted short URL: https://vms.resustainability.com/?qr<CODE>
-    // The SPA shortlink handler rewrites this to /visitor/<CODE> on load.
-    const qrUrl = `${SMS_LINK_BASE}/?qr${cleanUrlPart(visitorId)}`;
+    // Look up the 8-char short_code so the URL tail stays <= 10 chars (DLT constraint).
+    let shortCode = "";
+    try {
+      const supaUrl = Deno.env.get("SUPABASE_URL");
+      const supaKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (supaUrl && supaKey) {
+        const lookup = await fetch(
+          `${supaUrl}/rest/v1/visitors?select=short_code&visitor_id=eq.${encodeURIComponent(cleanUrlPart(visitorId))}&limit=1`,
+          { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } }
+        );
+        if (lookup.ok) {
+          const rows = await lookup.json();
+          if (Array.isArray(rows) && rows[0]?.short_code) {
+            shortCode = String(rows[0].short_code).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 10);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("short_code lookup failed:", e);
+    }
+    const qrUrl = shortCode
+      ? `${SMS_LINK_BASE}/?${shortCode}`
+      : `${SMS_LINK_BASE}/?${cleanUrlPart(visitorId).toLowerCase().slice(0, 10)}`;
 
     const visitorNameSafe = (visitorName || "Visitor").trim();
     const companySafe = (company || "RESL").trim();
