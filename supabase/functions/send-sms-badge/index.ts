@@ -101,36 +101,23 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending SMS badge to ${strikerPhone} for visitor ${visitorName}`);
 
-    // Create the badge message (SMS has 160 char limit per segment, keep it concise)
-    const currentDate = new Date().toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      timeZone: "Asia/Kolkata",
+    // DLT-approved template (matches approve-visitor flow registered with SMS Striker).
+    const visitDate = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
     });
-
-    const currentTime = new Date().toLocaleTimeString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "Asia/Kolkata",
-    });
-
-    // Build a concise SMS message
-    let message = `VisiGuard Badge\n`;
-    message += `Name: ${visitorName}\n`;
-    message += `ID: ${visitorId}\n`;
-    if (company) message += `Company: ${company}\n`;
-    if (hostName) message += `Host: ${hostName}\n`;
-    if (departmentName) message += `Dept: ${departmentName}\n`;
-    if (gateName) message += `Gate: ${gateName}\n`;
-    message += `Date: ${currentDate}\n`;
-    message += `Time: ${currentTime}\n`;
-
-    const longQrUrl = `${SITE_URL}/visitor/${visitorId}`;
+    const cleanUrlPart = (s: string) => s.replace(/[^A-Za-z0-9-]/g, "").toUpperCase();
+    const longQrUrl = `https://visiguard.sharvisoftwareservices.com/visitor/${cleanUrlPart(visitorId)}`;
     const shortQrUrl = await shortenUrl(longQrUrl);
-    message += `QR: ${shortQrUrl}\n`;
 
-    message += `\nShow this at security desk.`;
+    const visitorNameSafe = (visitorName || "Visitor").trim();
+    const companySafe = (company || "RESL").trim();
+    const gateSafe = (gateName || "Main Entry").trim();
+    const hostSafe = (hostName || "Host").trim();
+    const fromSafe = (departmentName || "RESUST").trim();
+
+    const message =
+      `Dear ${visitorNameSafe}, Your visitor access for ${companySafe} is confirmed on ${visitDate} at ${gateSafe}. ` +
+      `QR Link: ${shortQrUrl} Host: ${hostSafe} FROM ${fromSafe} Regards: RE SUSTAINABILITY LIMITED`;
 
     console.log(`SMS message length: ${message.length} characters`);
 
