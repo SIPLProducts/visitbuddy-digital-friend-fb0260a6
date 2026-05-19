@@ -523,6 +523,7 @@ export default function Dashboard() {
             <StatCard
               title="Today's Visitors"
               value={filteredStats.todaysVisitors}
+              subtitle={filteredStats.guestsToday > 0 ? `+ ${filteredStats.guestsToday} guest${filteredStats.guestsToday === 1 ? '' : 's'}` : undefined}
               icon={<Users className="h-5 w-5" />}
               trend={stats.yesterdaysVisitors > 0 ? {
                 value: `${stats.todaysVisitors >= stats.yesterdaysVisitors ? '+' : ''}${Math.round(((stats.todaysVisitors - stats.yesterdaysVisitors) / stats.yesterdaysVisitors) * 100)}% vs yesterday`,
@@ -533,7 +534,12 @@ export default function Dashboard() {
             <StatCard
               title="Currently Inside"
               value={filteredStats.activeCheckIns}
-              subtitle={filteredStats.overstayed > 0 ? `${filteredStats.overstayed} overstayed` : undefined}
+              subtitle={
+                [
+                  filteredStats.overstayed > 0 ? `${filteredStats.overstayed} overstayed` : null,
+                  filteredStats.guestsInside > 0 ? `+ ${filteredStats.guestsInside} guest${filteredStats.guestsInside === 1 ? '' : 's'} inside` : null,
+                ].filter(Boolean).join(' · ') || undefined
+              }
               icon={<UserCheck className="h-5 w-5" />}
               iconColor="emerald"
             />
