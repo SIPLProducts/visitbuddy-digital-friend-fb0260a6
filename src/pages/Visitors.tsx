@@ -32,7 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen, Users } from 'lucide-react';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen, Users, UsersRound } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -591,6 +591,7 @@ export default function Visitors() {
                 <TableHead>{t('visitors.dateOfVisit')}</TableHead>
                 <TableHead>{t('visitors.vehicle')}</TableHead>
                 <TableHead>{t('visitors.laptop')}</TableHead>
+                <TableHead>Guests</TableHead>
                 <TableHead>{t('visitors.status')}</TableHead>
                 <TableHead>Checkout By</TableHead>
                 <TableHead>{t('visitors.checkInOut')}</TableHead>
@@ -600,13 +601,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={14} className="text-center py-8">
+                   <TableCell colSpan={15} className="text-center py-8">
                     {t('visitors.loading')}
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={14} className="text-center py-8">
+                  <TableCell colSpan={15} className="text-center py-8">
                     {t('visitors.noVisitors')}
                   </TableCell>
                 </TableRow>
