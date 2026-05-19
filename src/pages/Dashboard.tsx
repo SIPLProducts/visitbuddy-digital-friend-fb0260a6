@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, AlertTriangle } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, AlertTriangle, UsersRound } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useHostEmployee } from '@/hooks/useHostEmployee';
@@ -113,11 +113,19 @@ export default function Dashboard() {
       })
       .subscribe();
 
+    const accompanyingChannel = supabase
+      .channel(`dashboard-accompanying-${safeRandomId()}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'accompanying_visitors' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
     return () => {
       window.removeEventListener('locationChanged', handleLocationChange);
       supabase.removeChannel(visitorChannel);
       supabase.removeChannel(vehicleChannel);
       supabase.removeChannel(appointmentChannel);
+      supabase.removeChannel(accompanyingChannel);
     };
   }, [user, locationFilter]);
 
@@ -147,7 +155,23 @@ export default function Dashboard() {
       .order('created_at', { ascending: false });
 
     if (visitorsData) {
-      setVisitors(visitorsData as unknown as Visitor[]);
+      const idsWithGuests = (visitorsData as any[])
+        .filter(v => (v.accompanying_count ?? 0) > 0)
+        .map(v => v.id);
+      const accMap: Record<string, any[]> = {};
+      if (idsWithGuests.length > 0) {
+        const { data: accRows } = await supabase
+          .from('accompanying_visitors')
+          .select('*')
+          .in('visitor_id', idsWithGuests);
+        if (accRows) {
+          for (const row of accRows as any[]) {
+            (accMap[row.visitor_id] ||= []).push(row);
+          }
+        }
+      }
+      const enriched = (visitorsData as any[]).map(v => ({ ...v, accompanying: accMap[v.id] || [] }));
+      setVisitors(enriched as unknown as Visitor[]);
 
       const todaysVisitors = visitorsData.filter(
         (v) => v.created_at.startsWith(today)
@@ -320,6 +344,15 @@ export default function Dashboard() {
     const pendingApproval = filteredVisitors.filter(v => v.status === 'pending_approval').length;
     const checkedOut = filteredVisitors.filter(v => v.status === 'checked_out').length;
 
+    // Accompanying guests aggregates
+    const guestsToday = filteredVisitors
+      .filter(v => isToday(new Date(v.created_at)))
+      .reduce((sum, v) => sum + ((v as any).accompanying_count || 0), 0);
+    const guestsInside = filteredVisitors
+      .filter(v => v.status === 'checked_in')
+      .reduce((sum, v) => sum + ((v as any).accompanying_count || 0), 0);
+    const totalPeopleInside = activeCheckIns + guestsInside;
+
     // Compute avg duration from filtered data
     const completedVisits = filteredVisitors.filter(v => v.check_in_time && v.check_out_time);
     let avgVisitDuration = '0h 0m';
@@ -347,6 +380,9 @@ export default function Dashboard() {
       scheduledAppointments: stats.scheduledAppointments,
       avgVisitDuration,
       overstayed,
+      guestsToday,
+      guestsInside,
+      totalPeopleInside,
     };
   }, [filteredVisitors, stats]);
 
@@ -482,8 +518,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Stats Grid - 6 cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
             <StatCard
               title="Today's Visitors"
               value={filteredStats.todaysVisitors}
@@ -500,6 +536,13 @@ export default function Dashboard() {
               subtitle={filteredStats.overstayed > 0 ? `${filteredStats.overstayed} overstayed` : undefined}
               icon={<UserCheck className="h-5 w-5" />}
               iconColor="emerald"
+            />
+            <StatCard
+              title="Total People Inside"
+              value={filteredStats.totalPeopleInside}
+              subtitle={filteredStats.guestsInside > 0 ? `incl. ${filteredStats.guestsInside} guest${filteredStats.guestsInside === 1 ? '' : 's'}` : 'incl. accompanying'}
+              icon={<UsersRound className="h-5 w-5" />}
+              iconColor="teal"
             />
             <StatCard
               title="Pending Approval"

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer } from 'lucide-react';
+import { MoreHorizontal, Building2, User, MapPin, Clock, Navigation, LogIn, LogOut, Eye, Printer, UsersRound, ChevronDown, ChevronUp, Laptop, Smartphone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Visitor } from '@/types/database';
 import { cn } from '@/lib/utils';
@@ -32,6 +32,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
   }, [userRoles, isHoAdmin]);
   const [captureDialogOpen, setCaptureDialogOpen] = useState(false);
   const [captureVisitor, setCaptureVisitor] = useState<Visitor | null>(null);
+  const [expandedGuests, setExpandedGuests] = useState<Record<string, boolean>>({});
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
@@ -149,6 +150,11 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
         ) : (
           visitors.slice(0, 5).map((visitor) => {
             const swipeActions = getSwipeActions(visitor);
+            const guests = ((visitor as any).accompanying || []) as Array<any>;
+            const guestCount = (visitor as any).accompanying_count || guests.length || 0;
+            const isExpanded = !!expandedGuests[visitor.id];
+            const previewNames = guests.slice(0, 2).map((g) => g.name).join(', ');
+            const moreCount = Math.max(0, guests.length - 2);
             return (
               <SwipeableCard
                 key={visitor.id}
@@ -162,7 +168,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium text-foreground">{visitor.name}</p>
                         <Badge
                           variant="outline"
@@ -170,6 +176,12 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                         >
                           {getStatusLabel(visitor.status)}
                         </Badge>
+                        {guestCount > 0 && (
+                          <Badge variant="secondary" className="text-xs gap-1">
+                            <UsersRound className="h-3 w-3" />
+                            +{guestCount} guest{guestCount === 1 ? '' : 's'}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
                         {visitor.company && (
@@ -203,6 +215,46 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                           </span>
                         )}
                       </div>
+                      {guests.length > 0 && (
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedGuests((prev) => ({ ...prev, [visitor.id]: !prev[visitor.id] }));
+                            }}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                          >
+                            <span className="truncate max-w-[260px]">
+                              With: {previewNames}{moreCount > 0 ? ` (+${moreCount} more)` : ''}
+                            </span>
+                            {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                          </button>
+                          {isExpanded && (
+                            <ul className="mt-1.5 space-y-1 pl-3 border-l-2 border-border">
+                              {guests.map((g) => (
+                                <li key={g.id} className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                  <User className="h-3 w-3" />
+                                  <span className="text-foreground font-medium">{g.name}</span>
+                                  {g.phone && <span>· {g.phone}</span>}
+                                  {g.has_laptop && (
+                                    <span className="flex items-center gap-1">
+                                      <Laptop className="h-3 w-3" />
+                                      {g.laptop_brand || 'Laptop'}
+                                    </span>
+                                  )}
+                                  {g.has_mobile && (
+                                    <span className="flex items-center gap-1">
+                                      <Smartphone className="h-3 w-3" />
+                                      {g.mobile_brand || 'Mobile'}
+                                    </span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
