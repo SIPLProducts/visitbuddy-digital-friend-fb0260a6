@@ -150,6 +150,11 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
         ) : (
           visitors.slice(0, 5).map((visitor) => {
             const swipeActions = getSwipeActions(visitor);
+            const guests = ((visitor as any).accompanying || []) as Array<any>;
+            const guestCount = (visitor as any).accompanying_count || guests.length || 0;
+            const isExpanded = !!expandedGuests[visitor.id];
+            const previewNames = guests.slice(0, 2).map((g) => g.name).join(', ');
+            const moreCount = Math.max(0, guests.length - 2);
             return (
               <SwipeableCard
                 key={visitor.id}
@@ -163,7 +168,7 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium text-foreground">{visitor.name}</p>
                         <Badge
                           variant="outline"
@@ -171,6 +176,12 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                         >
                           {getStatusLabel(visitor.status)}
                         </Badge>
+                        {guestCount > 0 && (
+                          <Badge variant="secondary" className="text-xs gap-1">
+                            <UsersRound className="h-3 w-3" />
+                            +{guestCount} guest{guestCount === 1 ? '' : 's'}
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
                         {visitor.company && (
