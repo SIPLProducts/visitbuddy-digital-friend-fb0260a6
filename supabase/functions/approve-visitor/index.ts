@@ -516,7 +516,18 @@ const handler = async (req: Request): Promise<Response> => {
         const smsBase = (Deno.env.get("PUBLIC_SMS_LINK_BASE")
           || Deno.env.get("PUBLIC_SITE_URL")
           || "https://vms.resustainability.com").replace(/\/+$/, "");
-        const qrLink = `${smsBase}/?qr${cleanUrlPart(visitor.visitor_id)}`;
+        // Short code keeps the URL tail <= 10 chars after `?` (DLT constraint).
+        const shortCode = (visitor as any).short_code
+          ? String((visitor as any).short_code).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 10)
+          : "";
+        const qrLink = shortCode
+          ? `${smsBase}/?${shortCode}`
+          : `${smsBase}/?${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`;
+
+        const qrTail = qrLink.split("?")[1] ?? "";
+        if (qrTail.length > 10) {
+          console.error(`SMS abort — qr tail exceeds 10 chars: '${qrTail}' (len=${qrTail.length})`);
+        }
 
         // DLT-approved template: QR Link variable carries the full short URL.
         const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
