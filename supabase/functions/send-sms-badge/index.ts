@@ -5,6 +5,43 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const SITE_URL =
+  Deno.env.get("PUBLIC_SITE_URL") ||
+  "https://visitbuddy-digital-friend.lovable.app";
+
+async function fetchShortUrl(url: string, longUrl: string): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(`${url}${encodeURIComponent(longUrl)}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const text = (await res.text()).trim();
+    if (!text.startsWith("http")) return null;
+    return text;
+  } catch (e) {
+    console.warn("Shortener failed:", (e as Error).message);
+    return null;
+  }
+}
+
+async function shortenUrl(longUrl: string): Promise<string> {
+  const isgd = await fetchShortUrl(
+    "https://is.gd/create.php?format=simple&url=",
+    longUrl,
+  );
+  if (isgd) return isgd;
+  const tinyurl = await fetchShortUrl(
+    "https://tinyurl.com/api-create.php?url=",
+    longUrl,
+  );
+  if (tinyurl) return tinyurl;
+  console.warn("All shorteners failed; falling back to long URL");
+  return longUrl;
+}
+
 interface BadgeRequest {
   visitorName: string;
   visitorId: string;
@@ -89,6 +126,11 @@ const handler = async (req: Request): Promise<Response> => {
     if (gateName) message += `Gate: ${gateName}\n`;
     message += `Date: ${currentDate}\n`;
     message += `Time: ${currentTime}\n`;
+
+    const longQrUrl = `${SITE_URL}/visitor/${visitorId}`;
+    const shortQrUrl = await shortenUrl(longQrUrl);
+    message += `QR: ${shortQrUrl}\n`;
+
     message += `\nShow this at security desk.`;
 
     console.log(`SMS message length: ${message.length} characters`);

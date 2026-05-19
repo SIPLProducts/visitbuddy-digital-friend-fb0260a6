@@ -1,29 +1,39 @@
 ## Goal
-Make the accompanying-visitor counts visible in more places, not just on the Dashboard's "Recent Visitors" rows. Today the data is loaded but the headline stats and the main Visitors list table don't show how many guests are involved.
+Include a QR-code link in the SMS badge that stays under ~30 characters, so it fits cleanly inside the SMS template without consuming an extra segment.
 
-## Changes
+## Problem
+The visitor QR page lives at `/visitor/:visitorCode`. Even the shortest full URL today is well over 30 chars:
+- `https://visitbuddy-digital-friend.lovable.app/visitor/VIS-XXXXXXXX-XXXX` → ~70 chars
+- Custom domain (`visiguard.sharvisoftwareservices.com`) is even longer.
 
-### 1. Dashboard stat tiles (`src/pages/Dashboard.tsx`)
-- "Today's Visitors" StatCard — append a sub-line: `+ N guests` using `filteredStats.guestsToday` (only when > 0).
-- "Active Check-ins" StatCard — append a sub-line: `+ N guests inside` using `filteredStats.guestsInside` (only when > 0).
-- Keep the existing "Total People Inside" tile as-is (already shows primary + guests).
-- Use the `UsersRound` icon already imported, muted-foreground text styling, small `text-xs` line to stay within the StatCard footprint.
+A self-hosted slug route (e.g. `/v/abcde`) still can't beat 30 chars once the domain is included, so we need an external URL shortener.
 
-### 2. Visitors list table (`src/pages/Visitors.tsx`)
-- Add a new "Guests" column header between "Laptop" and "Status".
-- Cell content:
-  - If `visitor.accompanying_count > 0`: show a pill `+N` with `UsersRound` icon and a Tooltip listing guest names (first 5 + "+X more"), reusing the same Tooltip pattern already implemented inline on the visitor name (lines 632–650).
-  - Else show `—`.
-- Update the `colSpan={14}` placeholders to `colSpan={15}` for loading / empty rows.
+## Approach
+Use the free **is.gd** shortener (no API key, returns `https://is.gd/xxxxxx` ≈ 20–24 chars). Fallback to TinyURL if is.gd fails. Add the shortened URL to the SMS body in `send-sms-badge`.
 
-### 3. Footer summary row (optional, low-risk)
-- Below the Visitors table filters, add a small summary chip: `Showing X visitors · Y guests` where Y = sum of `accompanying_count` across `filteredVisitors`. Helps security see total facility headcount in the filtered scope.
+### 1. `supabase/functions/send-sms-badge/index.ts`
+- Build the full visitor QR URL: `${SITE_URL}/visitor/${visitorId}` (SITE_URL read from a new env var `PUBLIC_SITE_URL`, falling back to the published Lovable URL).
+- New helper `shortenUrl(longUrl)`:
+  - Try `https://is.gd/create.php?format=simple&url=...` (GET, plain text response).
+  - On non-200 or error, try `https://tinyurl.com/api-create.php?url=...`.
+  - If both fail, fall back to the full URL (log a warning).
+- Append one line to the SMS body: `QR: <shortUrl>`.
+- Keep the rest of the message unchanged; log the final length for visibility.
+
+### 2. `supabase/functions/send-whatsapp-badge/index.ts` (consistency only)
+- No code change required (WhatsApp already sends a full link / image). Out of scope unless we discover the same 30-char need there.
+
+### 3. Settings / template
+- No DB or template changes — the SMS body is built in code, not from a stored template.
+- No new tables, no new RLS.
 
 ## Technical notes
-- No DB changes, no RLS changes — `accompanying_count` and the `accompanying` relation are already fetched on both pages.
-- Real-time channel for `accompanying_visitors` already exists on the Dashboard; the Visitors page already refreshes via the `visitors` realtime channel (the count column on `visitors` is updated by app code when guests are saved).
-- Reuse existing tokens (indigo pill, `UsersRound`, `Badge variant="secondary"`).
+- is.gd and TinyURL are public, free, no auth. Network egress from Supabase Edge Functions is allowed.
+- Add a 3-second timeout (`AbortController`) on the shortener call so SMS sending is never delayed if the service is slow.
+- The shortened URL is generated per-send (cheap, no caching needed). If we want to cache later, we can add a `short_links` table — out of scope for this change.
+- CORS / secrets: no new secrets required. Optional new env `PUBLIC_SITE_URL` (defaults to `https://visitbuddy-digital-friend.lovable.app`).
 
 ## Out of scope
-- No changes to badge printing, check-in/out dialog, reports, or registration flow.
-- No schema or edge-function changes.
+- Building an internal shortener with its own slug table.
+- Changing the WhatsApp badge, email badge, or the `/visitor/:code` page itself.
+- Editing the stored email templates.
