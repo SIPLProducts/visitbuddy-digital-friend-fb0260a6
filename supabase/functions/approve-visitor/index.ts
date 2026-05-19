@@ -513,10 +513,10 @@ const handler = async (req: Request): Promise<Response> => {
         const gateName = pick(visitor.gate?.name, "Main Entry");
         const hostName = pick(visitor.host?.name, "Host");
         const fromName = pick(visitor.department?.name, "RESUST");
-        const qrLink = `https://visiguard.sharvisoftwareservices.com/visitor/${cleanUrlPart(visitor.visitor_id)}`;
+        const clickLink = `https://visiguard.sharvisoftwareservices.com/click/${cleanUrlPart(visitor.visitor_id)}`;
 
-        // Keep this close to the successful Postman template; QR is sent as a clickable URL.
-        const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
+        // Synced with send-sms-badge: use Click: + /click/<code> short link on main domain.
+        const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. Click: ${clickLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
 
         const loggedPayload = {
           to: strikerPhone,
@@ -524,7 +524,7 @@ const handler = async (req: Request): Promise<Response> => {
           type: "1",
           msg: strikerMsg,
           msgLen: strikerMsg.length,
-          qrLink,
+          clickLink,
           keyConfigured: true,
         };
         console.log("SMS Striker payload:", JSON.stringify(loggedPayload));
