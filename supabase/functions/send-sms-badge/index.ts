@@ -60,21 +60,16 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const twilioSmsNumber = Deno.env.get("TWILIO_SMS_NUMBER");
-
-    if (!accountSid || !authToken || !twilioSmsNumber) {
-      console.error("Missing Twilio SMS credentials");
+    const smsStrikerKey = Deno.env.get("SMS_STRIKER_KEY");
+    if (!smsStrikerKey) {
+      console.error("SMS_STRIKER_KEY is missing");
       return new Response(
         JSON.stringify({ error: "SMS service not configured" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    console.log(`Using Twilio SMS From number: ${twilioSmsNumber}`);
-
-    const { 
+    const {
       visitorName, 
       visitorId, 
       phone, 
@@ -93,14 +88,18 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Format phone number for SMS (remove spaces, ensure + prefix)
-    let formattedPhone = phone.replace(/\s/g, "").replace(/-/g, "");
-    if (!formattedPhone.startsWith("+")) {
-      // Assume Indian number if no country code
-      formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
+    // SMS Striker expects a clean 10-digit Indian mobile number (no +91).
+    const digits = String(phone).replace(/\D/g, "").replace(/^0+/, "");
+    const strikerPhone = digits.length >= 10 ? digits.slice(-10) : "";
+    if (!/^[6-9]\d{9}$/.test(strikerPhone)) {
+      console.error(`Invalid Indian mobile: '${phone}' -> '${strikerPhone}'`);
+      return new Response(
+        JSON.stringify({ error: "Invalid Indian mobile number" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
-    console.log(`Sending SMS badge to ${formattedPhone} for visitor ${visitorName}`);
+    console.log(`Sending SMS badge to ${strikerPhone} for visitor ${visitorName}`);
 
     // Create the badge message (SMS has 160 char limit per segment, keep it concise)
     const currentDate = new Date().toLocaleDateString("en-IN", {
@@ -135,19 +134,58 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`SMS message length: ${message.length} characters`);
 
-    // Send via Twilio SMS API
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    
-    const formData = new URLSearchParams();
-    formData.append("To", formattedPhone);
-    formData.append("From", twilioSmsNumber);
-    formData.append("Body", message);
-
-    const twilioResponse = await fetch(twilioUrl, {
+    // Send via SMS Striker (RESUST sender ID)
+    const strikerResp = await fetch("https://www.smsstriker.com/API/sendsmsapi.php", {
       method: "POST",
-      headers: {
-        "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
-        "Content-Type": "application/x-www-form-urlencoded",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        key: smsStrikerKey,
+        from: "RESUST",
+        to: strikerPhone,
+        msg: message,
+        type: "1",
+      }),
+    });
+
+    const strikerText = (await strikerResp.text()).trim();
+    let parsed: any = null;
+    try { parsed = JSON.parse(strikerText); } catch { /* not JSON */ }
+    const providerStatusCode = parsed?.statusCode ?? parsed?.status ?? null;
+    const providerMessage = parsed?.statusMessage ?? parsed?.message ?? strikerText;
+    const accepted = strikerResp.ok && (
+      providerStatusCode === 200 ||
+      providerStatusCode === "200" ||
+      /sent|success/i.test(providerMessage || "")
+    );
+
+    console.log("SMS Striker response:", JSON.stringify({ httpStatus: strikerResp.status, body: strikerText }));
+
+    if (!accepted) {
+      return new Response(
+        JSON.stringify({ error: "Failed to send SMS", details: providerMessage }),
+        { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        provider: "smsstriker",
+        jobId: parsed?.["Job Id"] ?? null,
+        message: "Badge sent via SMS successfully",
+      }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  } catch (error: any) {
+    console.error("Error sending SMS badge:", error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+};
+
+serve(handler);
       },
       body: formData,
     });
