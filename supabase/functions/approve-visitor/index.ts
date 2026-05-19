@@ -513,10 +513,13 @@ const handler = async (req: Request): Promise<Response> => {
         const gateName = pick(visitor.gate?.name, "Main Entry");
         const hostName = pick(visitor.host?.name, "Host");
         const fromName = pick(visitor.department?.name, "RESUST");
-        const clickLink = `https://visiguard.sharvisoftwareservices.com/click/${cleanUrlPart(visitor.visitor_id)}`;
+        const smsBase = (Deno.env.get("PUBLIC_SMS_LINK_BASE")
+          || Deno.env.get("PUBLIC_SITE_URL")
+          || "https://vms.resustainability.com").replace(/\/+$/, "");
+        const qrLink = `${smsBase}/?qr${cleanUrlPart(visitor.visitor_id)}`;
 
-        // Synced with send-sms-badge: use Click: + /click/<code> short link on main domain.
-        const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. Click: ${clickLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
+        // DLT-approved template: QR Link variable carries the full short URL.
+        const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
 
         const loggedPayload = {
           to: strikerPhone,
@@ -524,7 +527,7 @@ const handler = async (req: Request): Promise<Response> => {
           type: "1",
           msg: strikerMsg,
           msgLen: strikerMsg.length,
-          clickLink,
+          qrLink,
           keyConfigured: true,
         };
         console.log("SMS Striker payload:", JSON.stringify(loggedPayload));

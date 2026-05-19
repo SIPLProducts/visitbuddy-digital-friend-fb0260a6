@@ -129,6 +129,18 @@ function RtlHandler() {
   return null;
 }
 
+// Handles SMS deep-link of the form `/?qr<VISITOR_CODE>` (no `=`).
+// Rewrites the URL to `/visitor/<CODE>` before the router matches.
+if (typeof window !== "undefined") {
+  const s = window.location.search;
+  if (s.startsWith("?qr") && s.length > 3) {
+    const code = s.slice(3).split("&")[0].toUpperCase();
+    if (code) {
+      window.history.replaceState({}, "", `/visitor/${code}`);
+    }
+  }
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
