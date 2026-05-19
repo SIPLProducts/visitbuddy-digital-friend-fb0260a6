@@ -147,7 +147,23 @@ export default function Dashboard() {
       .order('created_at', { ascending: false });
 
     if (visitorsData) {
-      setVisitors(visitorsData as unknown as Visitor[]);
+      const idsWithGuests = (visitorsData as any[])
+        .filter(v => (v.accompanying_count ?? 0) > 0)
+        .map(v => v.id);
+      const accMap: Record<string, any[]> = {};
+      if (idsWithGuests.length > 0) {
+        const { data: accRows } = await supabase
+          .from('accompanying_visitors')
+          .select('*')
+          .in('visitor_id', idsWithGuests);
+        if (accRows) {
+          for (const row of accRows as any[]) {
+            (accMap[row.visitor_id] ||= []).push(row);
+          }
+        }
+      }
+      const enriched = (visitorsData as any[]).map(v => ({ ...v, accompanying: accMap[v.id] || [] }));
+      setVisitors(enriched as unknown as Visitor[]);
 
       const todaysVisitors = visitorsData.filter(
         (v) => v.created_at.startsWith(today)
