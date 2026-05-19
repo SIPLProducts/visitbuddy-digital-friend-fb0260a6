@@ -113,11 +113,19 @@ export default function Dashboard() {
       })
       .subscribe();
 
+    const accompanyingChannel = supabase
+      .channel(`dashboard-accompanying-${safeRandomId()}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'accompanying_visitors' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+
     return () => {
       window.removeEventListener('locationChanged', handleLocationChange);
       supabase.removeChannel(visitorChannel);
       supabase.removeChannel(vehicleChannel);
       supabase.removeChannel(appointmentChannel);
+      supabase.removeChannel(accompanyingChannel);
     };
   }, [user, locationFilter]);
 
