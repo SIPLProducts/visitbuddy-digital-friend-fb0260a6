@@ -729,6 +729,34 @@ export default function Visitors() {
                       )}
                     </TableCell>
                     <TableCell>
+                      {(visitor.accompanying_count ?? 0) > 0 ? (
+                        <TooltipProvider delayDuration={150}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 cursor-help">
+                                <UsersRound className="h-3 w-3" />+{visitor.accompanying_count}
+                              </span>
+                            </TooltipTrigger>
+                            {visitor.accompanying && visitor.accompanying.length > 0 && (
+                              <TooltipContent className="max-w-xs">
+                                <p className="text-xs font-semibold mb-1">Accompanying ({visitor.accompanying.length})</p>
+                                <ul className="text-xs space-y-0.5">
+                                  {visitor.accompanying.slice(0, 5).map((a) => (
+                                    <li key={a.id}>• {a.name}{a.phone ? ` — ${a.phone}` : ''}</li>
+                                  ))}
+                                  {visitor.accompanying.length > 5 && (
+                                    <li className="text-muted-foreground">+{visitor.accompanying.length - 5} more</li>
+                                  )}
+                                </ul>
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <Badge
                         variant="outline"
                         className={cn('capitalize', getStatusColor(visitor.status))}
