@@ -569,6 +569,17 @@ export default function Visitors() {
               <X className="h-4 w-4" />
             </Button>
           )}
+          <div className="ml-auto inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Showing <span className="font-semibold text-foreground">{filteredVisitors.length}</span> visitor{filteredVisitors.length === 1 ? '' : 's'}</span>
+            {(() => {
+              const totalGuests = filteredVisitors.reduce((sum, v) => sum + ((v as any).accompanying_count || 0), 0);
+              return totalGuests > 0 ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-medium text-indigo-700">
+                  <UsersRound className="h-3 w-3" /> +{totalGuests} guest{totalGuests === 1 ? '' : 's'}
+                </span>
+              ) : null;
+            })()}
+          </div>
         </div>
 
         {/* Table */}
