@@ -107,7 +107,10 @@ const handler = async (req: Request): Promise<Response> => {
     });
     const cleanUrlPart = (s: string) => s.replace(/[^A-Za-z0-9-]/g, "").toUpperCase();
     const longQrUrl = `https://visiguard.sharvisoftwareservices.com/visitor/${cleanUrlPart(visitorId)}`;
-    const shortQrUrl = await shortenUrl(longQrUrl);
+    // DLT requires the URL domain to be pre-whitelisted with the telco.
+    // Using the registered domain directly; do NOT shorten via tinyurl/is.gd
+    // because those domains are not on the DLT whitelist and operators will drop the SMS.
+    const shortQrUrl = longQrUrl;
 
     const visitorNameSafe = (visitorName || "Visitor").trim();
     const companySafe = (company || "RESL").trim();
