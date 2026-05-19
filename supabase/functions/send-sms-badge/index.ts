@@ -8,6 +8,11 @@ const corsHeaders = {
 const SITE_URL =
   Deno.env.get("PUBLIC_SITE_URL") ||
   "https://visiguard.sharvisoftwareservices.com";
+const SMS_LINK_BASE = (
+  Deno.env.get("PUBLIC_SMS_LINK_BASE") ||
+  Deno.env.get("PUBLIC_SITE_URL") ||
+  "https://vms.resustainability.com"
+).replace(/\/+$/, "");
 
 interface BadgeRequest {
   visitorName: string;
@@ -73,9 +78,9 @@ const handler = async (req: Request): Promise<Response> => {
       day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
     });
     const cleanUrlPart = (s: string) => s.replace(/[^A-Za-z0-9-]/g, "").toUpperCase();
-    // Branded "click" link on the main (DLT-whitelisted) domain. The
-    // /click/<code> route redirects to /visitor/<code> in the SPA.
-    const clickUrl = `${SITE_URL}/click/${cleanUrlPart(visitorId)}`;
+    // DLT-whitelisted short URL: https://vms.resustainability.com/?qr<CODE>
+    // The SPA shortlink handler rewrites this to /visitor/<CODE> on load.
+    const qrUrl = `${SMS_LINK_BASE}/?qr${cleanUrlPart(visitorId)}`;
 
     const visitorNameSafe = (visitorName || "Visitor").trim();
     const companySafe = (company || "RESL").trim();
@@ -85,7 +90,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const message =
       `Dear ${visitorNameSafe}, Your visitor access for ${companySafe} is confirmed on ${visitDate} at ${gateSafe}. ` +
-      `Click: ${clickUrl} Host: ${hostSafe} FROM ${fromSafe} Regards: RE SUSTAINABILITY LIMITED`;
+      `QR Link: ${qrUrl} Host: ${hostSafe} FROM ${fromSafe} Regards: RE SUSTAINABILITY LIMITED`;
 
     console.log(`SMS message length: ${message.length} characters`);
 
