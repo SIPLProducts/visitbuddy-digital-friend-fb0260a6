@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const SITE_URL =
   Deno.env.get("PUBLIC_SITE_URL") ||
-  "https://visitbuddy-digital-friend.lovable.app";
+  "https://visiguard.sharvisoftwareservices.com";
 
 interface BadgeRequest {
   visitorName: string;
