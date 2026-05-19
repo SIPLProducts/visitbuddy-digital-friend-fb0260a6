@@ -215,6 +215,46 @@ export function RecentVisitors({ visitors, onRefresh }: RecentVisitorsProps) {
                           </span>
                         )}
                       </div>
+                      {guests.length > 0 && (
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedGuests((prev) => ({ ...prev, [visitor.id]: !prev[visitor.id] }));
+                            }}
+                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                          >
+                            <span className="truncate max-w-[260px]">
+                              With: {previewNames}{moreCount > 0 ? ` (+${moreCount} more)` : ''}
+                            </span>
+                            {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                          </button>
+                          {isExpanded && (
+                            <ul className="mt-1.5 space-y-1 pl-3 border-l-2 border-border">
+                              {guests.map((g) => (
+                                <li key={g.id} className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                  <User className="h-3 w-3" />
+                                  <span className="text-foreground font-medium">{g.name}</span>
+                                  {g.phone && <span>· {g.phone}</span>}
+                                  {g.has_laptop && (
+                                    <span className="flex items-center gap-1">
+                                      <Laptop className="h-3 w-3" />
+                                      {g.laptop_brand || 'Laptop'}
+                                    </span>
+                                  )}
+                                  {g.has_mobile && (
+                                    <span className="flex items-center gap-1">
+                                      <Smartphone className="h-3 w-3" />
+                                      {g.mobile_brand || 'Mobile'}
+                                    </span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
