@@ -60,21 +60,16 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const twilioSmsNumber = Deno.env.get("TWILIO_SMS_NUMBER");
-
-    if (!accountSid || !authToken || !twilioSmsNumber) {
-      console.error("Missing Twilio SMS credentials");
+    const smsStrikerKey = Deno.env.get("SMS_STRIKER_KEY");
+    if (!smsStrikerKey) {
+      console.error("SMS_STRIKER_KEY is missing");
       return new Response(
         JSON.stringify({ error: "SMS service not configured" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    console.log(`Using Twilio SMS From number: ${twilioSmsNumber}`);
-
-    const { 
+    const {
       visitorName, 
       visitorId, 
       phone, 
@@ -93,89 +88,81 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Format phone number for SMS (remove spaces, ensure + prefix)
-    let formattedPhone = phone.replace(/\s/g, "").replace(/-/g, "");
-    if (!formattedPhone.startsWith("+")) {
-      // Assume Indian number if no country code
-      formattedPhone = "+91" + formattedPhone.replace(/^0/, "");
-    }
-
-    console.log(`Sending SMS badge to ${formattedPhone} for visitor ${visitorName}`);
-
-    // Create the badge message (SMS has 160 char limit per segment, keep it concise)
-    const currentDate = new Date().toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      timeZone: "Asia/Kolkata",
-    });
-
-    const currentTime = new Date().toLocaleTimeString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "Asia/Kolkata",
-    });
-
-    // Build a concise SMS message
-    let message = `VisiGuard Badge\n`;
-    message += `Name: ${visitorName}\n`;
-    message += `ID: ${visitorId}\n`;
-    if (company) message += `Company: ${company}\n`;
-    if (hostName) message += `Host: ${hostName}\n`;
-    if (departmentName) message += `Dept: ${departmentName}\n`;
-    if (gateName) message += `Gate: ${gateName}\n`;
-    message += `Date: ${currentDate}\n`;
-    message += `Time: ${currentTime}\n`;
-
-    const longQrUrl = `${SITE_URL}/visitor/${visitorId}`;
-    const shortQrUrl = await shortenUrl(longQrUrl);
-    message += `QR: ${shortQrUrl}\n`;
-
-    message += `\nShow this at security desk.`;
-
-    console.log(`SMS message length: ${message.length} characters`);
-
-    // Send via Twilio SMS API
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    
-    const formData = new URLSearchParams();
-    formData.append("To", formattedPhone);
-    formData.append("From", twilioSmsNumber);
-    formData.append("Body", message);
-
-    const twilioResponse = await fetch(twilioUrl, {
-      method: "POST",
-      headers: {
-        "Authorization": "Basic " + btoa(`${accountSid}:${authToken}`),
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: formData,
-    });
-
-    const twilioResult = await twilioResponse.json();
-
-    if (!twilioResponse.ok) {
-      console.error("Twilio SMS error:", twilioResult);
+    // SMS Striker expects a clean 10-digit Indian mobile number (no +91).
+    const digits = String(phone).replace(/\D/g, "").replace(/^0+/, "");
+    const strikerPhone = digits.length >= 10 ? digits.slice(-10) : "";
+    if (!/^[6-9]\d{9}$/.test(strikerPhone)) {
+      console.error(`Invalid Indian mobile: '${phone}' -> '${strikerPhone}'`);
       return new Response(
-        JSON.stringify({ 
-          error: "Failed to send SMS",
-          details: twilioResult.message || "Unknown error"
-        }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        JSON.stringify({ error: "Invalid Indian mobile number" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    console.log("SMS badge sent successfully:", twilioResult.sid);
+    console.log(`Sending SMS badge to ${strikerPhone} for visitor ${visitorName}`);
+
+    // DLT-approved template (matches approve-visitor flow registered with SMS Striker).
+    const visitDate = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
+    });
+    const cleanUrlPart = (s: string) => s.replace(/[^A-Za-z0-9-]/g, "").toUpperCase();
+    const longQrUrl = `https://visiguard.sharvisoftwareservices.com/visitor/${cleanUrlPart(visitorId)}`;
+    const shortQrUrl = await shortenUrl(longQrUrl);
+
+    const visitorNameSafe = (visitorName || "Visitor").trim();
+    const companySafe = (company || "RESL").trim();
+    const gateSafe = (gateName || "Main Entry").trim();
+    const hostSafe = (hostName || "Host").trim();
+    const fromSafe = (departmentName || "RESUST").trim();
+
+    const message =
+      `Dear ${visitorNameSafe}, Your visitor access for ${companySafe} is confirmed on ${visitDate} at ${gateSafe}. ` +
+      `QR Link: ${shortQrUrl} Host: ${hostSafe} FROM ${fromSafe} Regards: RE SUSTAINABILITY LIMITED`;
+
+    console.log(`SMS message length: ${message.length} characters`);
+
+    // Send via SMS Striker (RESUST sender ID)
+    const strikerResp = await fetch("https://www.smsstriker.com/API/sendsmsapi.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        key: smsStrikerKey,
+        from: "RESUST",
+        to: strikerPhone,
+        msg: message,
+        type: "1",
+      }),
+    });
+
+    const strikerText = (await strikerResp.text()).trim();
+    let parsed: any = null;
+    try { parsed = JSON.parse(strikerText); } catch { /* not JSON */ }
+    const providerStatusCode = parsed?.statusCode ?? parsed?.status ?? null;
+    const providerMessage = parsed?.statusMessage ?? parsed?.message ?? strikerText;
+    const accepted = strikerResp.ok && (
+      providerStatusCode === 200 ||
+      providerStatusCode === "200" ||
+      /sent|success/i.test(providerMessage || "")
+    );
+
+    console.log("SMS Striker response:", JSON.stringify({ httpStatus: strikerResp.status, body: strikerText }));
+
+    if (!accepted) {
+      return new Response(
+        JSON.stringify({ error: "Failed to send SMS", details: providerMessage }),
+        { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        messageSid: twilioResult.sid,
-        message: "Badge sent via SMS successfully" 
+      JSON.stringify({
+        success: true,
+        provider: "smsstriker",
+        jobId: parsed?.["Job Id"] ?? null,
+        message: "Badge sent via SMS successfully",
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-
   } catch (error: any) {
     console.error("Error sending SMS badge:", error);
     return new Response(
