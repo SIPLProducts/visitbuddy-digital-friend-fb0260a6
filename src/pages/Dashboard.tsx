@@ -344,6 +344,15 @@ export default function Dashboard() {
     const pendingApproval = filteredVisitors.filter(v => v.status === 'pending_approval').length;
     const checkedOut = filteredVisitors.filter(v => v.status === 'checked_out').length;
 
+    // Accompanying guests aggregates
+    const guestsToday = filteredVisitors
+      .filter(v => isToday(new Date(v.created_at)))
+      .reduce((sum, v) => sum + ((v as any).accompanying_count || 0), 0);
+    const guestsInside = filteredVisitors
+      .filter(v => v.status === 'checked_in')
+      .reduce((sum, v) => sum + ((v as any).accompanying_count || 0), 0);
+    const totalPeopleInside = activeCheckIns + guestsInside;
+
     // Compute avg duration from filtered data
     const completedVisits = filteredVisitors.filter(v => v.check_in_time && v.check_out_time);
     let avgVisitDuration = '0h 0m';
@@ -371,6 +380,9 @@ export default function Dashboard() {
       scheduledAppointments: stats.scheduledAppointments,
       avgVisitDuration,
       overstayed,
+      guestsToday,
+      guestsInside,
+      totalPeopleInside,
     };
   }, [filteredVisitors, stats]);
 
