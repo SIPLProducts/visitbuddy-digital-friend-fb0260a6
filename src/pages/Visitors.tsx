@@ -32,7 +32,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen, Users } from 'lucide-react';
+import { Search, Filter, Plus, Building2, Laptop, Mail, Car, CalendarIcon, X, CheckSquare, LogOut, Printer, ChevronDown, MapPin, DoorOpen, Users, UsersRound } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -569,6 +569,17 @@ export default function Visitors() {
               <X className="h-4 w-4" />
             </Button>
           )}
+          <div className="ml-auto inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Showing <span className="font-semibold text-foreground">{filteredVisitors.length}</span> visitor{filteredVisitors.length === 1 ? '' : 's'}</span>
+            {(() => {
+              const totalGuests = filteredVisitors.reduce((sum, v) => sum + ((v as any).accompanying_count || 0), 0);
+              return totalGuests > 0 ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-medium text-indigo-700">
+                  <UsersRound className="h-3 w-3" /> +{totalGuests} guest{totalGuests === 1 ? '' : 's'}
+                </span>
+              ) : null;
+            })()}
+          </div>
         </div>
 
         {/* Table */}
@@ -591,6 +602,7 @@ export default function Visitors() {
                 <TableHead>{t('visitors.dateOfVisit')}</TableHead>
                 <TableHead>{t('visitors.vehicle')}</TableHead>
                 <TableHead>{t('visitors.laptop')}</TableHead>
+                <TableHead>Guests</TableHead>
                 <TableHead>{t('visitors.status')}</TableHead>
                 <TableHead>Checkout By</TableHead>
                 <TableHead>{t('visitors.checkInOut')}</TableHead>
@@ -600,13 +612,13 @@ export default function Visitors() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                   <TableCell colSpan={14} className="text-center py-8">
+                   <TableCell colSpan={15} className="text-center py-8">
                     {t('visitors.loading')}
                   </TableCell>
                 </TableRow>
               ) : filteredVisitors.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={14} className="text-center py-8">
+                  <TableCell colSpan={15} className="text-center py-8">
                     {t('visitors.noVisitors')}
                   </TableCell>
                 </TableRow>
@@ -725,6 +737,34 @@ export default function Visitors() {
                         </div>
                       ) : (
                         <span className="text-muted-foreground">No laptop</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {(visitor.accompanying_count ?? 0) > 0 ? (
+                        <TooltipProvider delayDuration={150}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 cursor-help">
+                                <UsersRound className="h-3 w-3" />+{visitor.accompanying_count}
+                              </span>
+                            </TooltipTrigger>
+                            {visitor.accompanying && visitor.accompanying.length > 0 && (
+                              <TooltipContent className="max-w-xs">
+                                <p className="text-xs font-semibold mb-1">Accompanying ({visitor.accompanying.length})</p>
+                                <ul className="text-xs space-y-0.5">
+                                  {visitor.accompanying.slice(0, 5).map((a) => (
+                                    <li key={a.id}>• {a.name}{a.phone ? ` — ${a.phone}` : ''}</li>
+                                  ))}
+                                  {visitor.accompanying.length > 5 && (
+                                    <li className="text-muted-foreground">+{visitor.accompanying.length - 5} more</li>
+                                  )}
+                                </ul>
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">—</span>
                       )}
                     </TableCell>
                     <TableCell>
