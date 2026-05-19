@@ -518,8 +518,8 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Stats Grid - 6 cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
             <StatCard
               title="Today's Visitors"
               value={filteredStats.todaysVisitors}
@@ -536,6 +536,13 @@ export default function Dashboard() {
               subtitle={filteredStats.overstayed > 0 ? `${filteredStats.overstayed} overstayed` : undefined}
               icon={<UserCheck className="h-5 w-5" />}
               iconColor="emerald"
+            />
+            <StatCard
+              title="Total People Inside"
+              value={filteredStats.totalPeopleInside}
+              subtitle={filteredStats.guestsInside > 0 ? `incl. ${filteredStats.guestsInside} guest${filteredStats.guestsInside === 1 ? '' : 's'}` : 'incl. accompanying'}
+              icon={<UsersRound className="h-5 w-5" />}
+              iconColor="teal"
             />
             <StatCard
               title="Pending Approval"
