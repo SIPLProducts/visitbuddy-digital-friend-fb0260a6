@@ -119,7 +119,6 @@ export default function CheckInOut() {
     const tasks: Promise<any>[] = [];
     if (payload.phone) {
       tasks.push(supabase.functions.invoke('send-whatsapp-badge', { body: payload }));
-      tasks.push(supabase.functions.invoke('send-sms-badge', { body: payload }));
     }
     if (payload.email) {
       tasks.push(supabase.functions.invoke('send-email-badge', { body: payload }));
