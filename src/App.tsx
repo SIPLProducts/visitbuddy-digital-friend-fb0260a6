@@ -38,6 +38,7 @@ import GateQRCodes from "./pages/GateQRCodes";
 import ApproveVisitor from "./pages/ApproveVisitor";
 import VisitorQrLink from "./pages/VisitorQrLink";
 import ClickRedirect from "./pages/ClickRedirect";
+import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 import ProposalDocument from "./pages/ProposalDocument";
 import ResourceRequirements from "./pages/ResourceRequirements";
 import ProductFeatures from "./pages/ProductFeatures";
@@ -77,6 +78,7 @@ function AppRoutes() {
       <Route path="/print-badge" element={<PrintBadge />} />
       <Route path="/visitor/:visitorCode" element={<VisitorQrLink />} />
       <Route path="/click/:code" element={<ClickRedirect />} />
+      <Route path="/s/:code" element={<ShortLinkRedirect />} />
       <Route path="/self-service" element={<SelfService />} />
       <Route path="/approve-visitor" element={<ApproveVisitor />} />
       <Route path="/install" element={<Install />} />
@@ -129,8 +131,9 @@ function RtlHandler() {
   return null;
 }
 
-// Handles SMS deep-link of the form `/?qr<VISITOR_CODE>` (no `=`).
-// Rewrites the URL to `/visitor/<CODE>` before the router matches.
+// Handles SMS deep-links:
+//  - `/?<8-10 char short_code>`  → `/s/<code>` (resolves via RPC to visitor id)
+//  - `/?qr<VISITOR_CODE>`        → `/visitor/<CODE>` (legacy long form)
 if (typeof window !== "undefined") {
   const s = window.location.search;
   if (s.startsWith("?qr") && s.length > 3) {
@@ -138,6 +141,9 @@ if (typeof window !== "undefined") {
     if (code) {
       window.history.replaceState({}, "", `/visitor/${code}`);
     }
+  } else if (/^\?[a-z0-9]{6,10}$/i.test(s)) {
+    const code = s.slice(1).toLowerCase();
+    window.history.replaceState({}, "", `/s/${code}`);
   }
 }
 

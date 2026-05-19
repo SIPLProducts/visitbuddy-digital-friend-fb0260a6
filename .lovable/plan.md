@@ -1,80 +1,44 @@
+Constraint: everything after `?` in the SMS link must be at most 10 characters. Today it sends `?qrVIS-78B8C42A-6138` (19 chars after `?`), which exceeds the limit.
 
-# Switch SMS link to `https://vms.resustainability.com/?qr<CODE>`
+## Approach
 
-## Goal
+Generate a short, unique 8-character code per visitor and use it in the SMS link. The frontend resolves that short code back to the full visitor record on first load.
 
-SMS body should contain a tappable link in the exact form:
+Resulting SMS link:
+```text
+https://vms.resustainability.com/?ab12cd34xy   (10 chars after ?)
 ```
-https://vms.resustainability.com/?qrVISXXXXXXXXXXXX
-```
-Tapping it opens the app and lands on the existing visitor QR page (`/visitor/<CODE>`).
 
-Confirmed inputs:
-- Format: `?qr<CODE>` (no `=` sign).
-- Domain `vms.resustainability.com` is the on-prem server already serving this app.
-- DLT QR Link variable length has been increased — full URL fits.
+## What changes
 
-## Changes
+1. Database
+   - Add column `short_code text` on `public.visitors` (unique, 8 chars, lowercase base36).
+   - Trigger generates it on insert if null, with retry on collision.
+   - Backfill existing visitors with a unique short_code.
+   - Add index on `short_code`.
 
-### 1. New SMS base URL (env-driven, no hardcoding)
-Add a new optional Supabase secret **`PUBLIC_SMS_LINK_BASE`** = `https://vms.resustainability.com`.
-- If unset, code falls back to `PUBLIC_SITE_URL`, then to `https://vms.resustainability.com`.
-- Keeps existing `PUBLIC_SITE_URL` untouched (still used for email / WhatsApp links and any non-SMS context).
+2. Edge functions (`approve-visitor`, `send-sms-badge`)
+   - Build `qrLink = ${PUBLIC_SMS_LINK_BASE}/?${visitor.short_code}` (no `qr` prefix, no `=`).
+   - Hard-enforce: if the part after `?` is >10 chars, regenerate / fail-safe abort SMS with a clear log line; never send a longer link.
+   - `sms_logs.message` and `loggedPayload` updated to the new link.
 
-### 2. `supabase/functions/approve-visitor/index.ts`
-Replace the current SMS-link block:
-```ts
-const clickLink = `${SITE_URL}/click/${cleanUrlPart(visitor.visitor_id)}`;
-const strikerMsg = `... Click: ${clickLink} ...`;
-```
-With:
-```ts
-const SMS_BASE = Deno.env.get("PUBLIC_SMS_LINK_BASE")
-  || Deno.env.get("PUBLIC_SITE_URL")
-  || "https://vms.resustainability.com";
-const code = cleanUrlPart(visitor.visitor_id);
-const qrLink = `${SMS_BASE.replace(/\/+$/, "")}/?qr${code}`;
-const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
-```
-Update `loggedPayload` and the `sms_logs.message` row to use the new `qrLink`.
+3. Frontend (`src/App.tsx` → `QrShortlinkHandler`)
+   - On first load, if `location.search` matches `^\?[a-z0-9]{6,10}$`, fetch the visitor by `short_code` (anon RLS public read by short_code only), then `window.history.replaceState` to `/visitor/${visitor_id}`.
+   - Keep backward-compat for the old `?qrVIS-…` format (existing SMS already out there): if it starts with `?qr`, strip `qr` and route to `/visitor/<code>` as before.
 
-### 3. `supabase/functions/send-sms-badge/index.ts`
-Same change: read `PUBLIC_SMS_LINK_BASE`, emit `${base}/?qr${code}`, rebuild the body with `QR Link:` (matches the DLT template now in use).
+4. RLS
+   - Add a narrow anon SELECT policy on `visitors` exposing only the row matching a provided `short_code` (or a SECURITY DEFINER RPC `get_visitor_by_short_code(text)` that returns the visitor_id only). Preferred: RPC, so we don’t broaden table-level access.
 
-### 4. Frontend redirect handler — `src/App.tsx`
-Add a tiny top-of-router effect that runs once on mount:
-```ts
-// Handles SMS deep link: https://vms.resustainability.com/?qrVIS-XXXX
-useEffect(() => {
-  const search = window.location.search; // e.g. "?qrVIS12345678ABCD"
-  if (search.startsWith("?qr") && search.length > 3) {
-    const code = search.slice(3).split("&")[0].toUpperCase();
-    if (code) {
-      window.history.replaceState({}, "", `/visitor/${code}`);
-      // Router will pick this up on first render.
-    }
-  }
-}, []);
-```
-This is placed inside a small `<QrShortlinkHandler/>` component rendered before `<AppRoutes/>` so it runs before route matching.
+## Technical notes
 
-Existing routes (`/visitor/:visitorCode`, `/click/:code`) stay untouched, so older WhatsApp/email links keep working.
-
-### 5. Verification after deploy
-1. Trigger an approval; check `approve-visitor` edge logs for `QR Link: https://vms.resustainability.com/?qrVIS-…`.
-2. Query `sms_logs` to confirm the stored message uses the new format.
-3. On phone, tap the SMS link → browser opens `…/?qrVIS-…` → app rewrites URL to `/visitor/VIS-…` → QR page renders.
+- Short code format: 8 chars from `[a-z0-9]`, generated with `encode(gen_random_bytes(5), 'base64')` trimmed/normalised, retried on unique violation.
+- 8 chars of base36 ≈ 2.8 trillion combinations — collision-safe for this scale.
+- Total tail length after `?` = exactly 8, well within the 10-char cap.
+- No TinyURL, no external shortener, no DLT template length change beyond the URL itself.
+- DLT QR Link variable: confirm it still accepts the new format (it’s shorter than current, so should pass).
 
 ## Out of scope
-- DLT portal re-registration (already done by the user).
-- Email / WhatsApp body changes (no length limit — leave as `/visitor/<code>`).
-- Domain DNS / nginx config for `vms.resustainability.com` (handled on the on-prem server).
-- `src/pages/ClickRedirect.tsx` (kept as-is for backward compatibility with already-sent SMS).
 
-## Files touched
-- `supabase/functions/approve-visitor/index.ts`
-- `supabase/functions/send-sms-badge/index.ts`
-- `src/App.tsx` (add `QrShortlinkHandler`)
-- Secret added via the secrets tool: `PUBLIC_SMS_LINK_BASE`
-
-No DB migration, no RLS changes, no other files modified.
+- Changing email/WhatsApp link format (no length limit there).
+- Changing the visitor detail page itself.
+- Domain/DNS work (on-prem).
