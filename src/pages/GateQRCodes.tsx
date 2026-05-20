@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { supabase } from '@/integrations/supabase/client';
 import { QrCode, Printer, Download, MapPin, Clock, Users, ExternalLink, Copy, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSelectedLocation } from '@/hooks/useSelectedLocation';
+import { useUserRoles } from '@/hooks/useUserRoles';
 interface Gate {
   id: string;
   name: string;
@@ -20,24 +22,52 @@ export default function GateQRCodes() {
   const [gates, setGates] = useState<Gate[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { selectedLocationId, isAllLocations, rolesLoading } = useSelectedLocation();
+  const { userRoles, isHoAdmin } = useUserRoles();
+  const [currentLocationName, setCurrentLocationName] = useState<string>('');
 
-  // Use the published URL for QR codes so visitors can access without auth
-  const baseUrl = import.meta.env.VITE_PUBLIC_URL || 'https://visitbuddy-digital-friend.lovable.app';
+  // Encode QR with the current origin so on-prem deployments stay on their own
+  // domain. Operators can still override via VITE_PUBLIC_URL when the admin UI
+  // and visitor self-service portal live on different hosts.
+  const baseUrl =
+    import.meta.env.VITE_PUBLIC_URL ||
+    (typeof window !== 'undefined' ? window.location.origin : '');
 
   useEffect(() => {
+    if (rolesLoading) return;
     fetchGates();
-  }, []);
+  }, [selectedLocationId, isAllLocations, rolesLoading]);
 
   const fetchGates = async () => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('gates')
         .select('id, name, building, operating_hours, current_visitors, status, location:locations(name)')
         .eq('status', 'active')
         .order('name');
 
+      if (!isAllLocations && selectedLocationId) {
+        query = query.eq('location_id', selectedLocationId);
+      } else if (!isHoAdmin) {
+        const accessibleIds = userRoles.map(r => r.location_id).filter(Boolean);
+        if (accessibleIds.length === 0) {
+          setGates([]);
+          setCurrentLocationName('');
+          return;
+        }
+        query = query.in('location_id', accessibleIds);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
       setGates(data || []);
+      if (!isAllLocations && data && data.length > 0) {
+        setCurrentLocationName(data[0].location?.name || '');
+      } else {
+        setCurrentLocationName('');
+      }
     } catch (error: any) {
       console.error('Error fetching gates:', error);
       toast.error('Failed to load gates');
@@ -215,7 +245,11 @@ export default function GateQRCodes() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Gate QR Codes</h1>
             <p className="text-muted-foreground">
-              Generate and print QR codes for visitor self check-in at each gate
+              {currentLocationName
+                ? `Showing gates for ${currentLocationName}`
+                : isAllLocations
+                ? 'Showing gates across all locations'
+                : 'Generate and print QR codes for visitor self check-in at each gate'}
             </p>
           </div>
         </div>
