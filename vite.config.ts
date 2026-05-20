@@ -20,9 +20,9 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt", "icons/*.png"],
       manifest: {
-        name: "VisiGuard VMS",
-        short_name: "VisiGuard",
-        description: "Enterprise Visitor Management System - Check-in, badge printing, and visitor tracking",
+        name: "Re Sustainability - Visitor Management",
+        short_name: "Re Sustainability",
+        description: "Re Sustainability Visitor Management System - Check-in, badge printing, and visitor tracking",
         theme_color: "#0891b2",
         background_color: "#f5f7fa",
         display: "standalone",
