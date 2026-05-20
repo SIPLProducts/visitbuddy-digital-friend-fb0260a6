@@ -1,28 +1,54 @@
-## Problem
+## Goal
+Rebrand user-facing "VisiGuard" / "VisiGuard VMS" / "Enterprise VMS" to **RE Sustainability** (RESL), scope the Gate QR Codes page to the currently selected location, and stop the QR from hard-coding the Lovable preview domain so on-prem builds (e.g. `vms.resustainability.com`) keep visitors on the same host.
 
-In the approval SMS, the gate currently shows as `Main Entry` (the hardcoded fallback) instead of the actual gate the user picked in the registration dropdown. The dropdown shows the gate as `Name — Building` (e.g. `Gate 1 — Admin Block`), but the SMS only ever falls back because either the gate name isn't being composed with its building, or `visitor.gate?.name` is empty.
+## 1. Replace "VisiGuard / VMS" branding everywhere visible to end users
 
-## Fix
+Replace strings in these files (proposal docs, internal READMEs, edge-function copy and `whatsapp-bridge/` are out of scope — they aren't visible to visitors/operators on-screen):
 
-Update `supabase/functions/approve-visitor/index.ts` (the only function that actually sends the approval SMS — `send-sms-badge` is no longer invoked post‑check‑in):
+- `index.html`
+  - `<title>` → `RE Sustainability - Visitor Management`
+  - `<meta name="author">` → `RE Sustainability`
+  - `<meta name="apple-mobile-web-app-title">` → `RE Sustainability`
+  - `og:title` / `twitter:title` → `RE Sustainability - Visitor Management`
+- `src/pages/Auth.tsx` line 120 — `Enterprise VMS` → `Re Sustainability`
+- `src/components/layout/Sidebar.tsx` line 163 — `Enterprise VMS` → `Re Sustainability`
+- `src/hooks/useTenantSettings.ts` — default `company_name: 'VisiGuard'` → `'Re Sustainability'`
+- `src/pages/GateQRCodes.tsx` print template line 166 — `<div class="title">VisiGuard</div>` → `RE Sustainability`
+- `src/components/onboarding/OnboardingTour.tsx` line 28 — `Welcome to VisiGuard` → `Welcome to Re Sustainability VMS`
+- `src/components/install/InstallButton.tsx` (lines 69, 99, 142) — replace `VisiGuard` with `Re Sustainability`
+- `src/components/install/InstallPromptBanner.tsx` (lines 94, 104) — same
+- `src/pages/Install.tsx` (lines 71, 89, 101, 103, 114, 126, 130, 188) — replace `VisiGuard` / `VisiGuard VMS` with `Re Sustainability`
+- `src/pages/Help.tsx` (lines 66, 93, 136) — same
 
-1. Build the gate label the same way the dropdown does:
-   ```ts
-   const gateNameOnly = (visitor.gate?.name ?? "").trim();
-   const gateBuilding = (visitor.gate?.building ?? "").trim();
-   const gateLabel = gateNameOnly
-     ? (gateBuilding ? `${gateNameOnly} — ${gateBuilding}` : gateNameOnly)
-     : "Main Entry";
-   ```
-2. Use `gateLabel` in the SMS Striker message instead of the current `pick(visitor.gate?.name, "Main Entry")`.
-3. Keep the existing DLT template wording and length budget — only the substituted value changes (note: SMS Striker counts characters; long building names could push past 160 chars, but the DLT variable itself is free‑form so it stays compliant).
+`ApproveVisitor.tsx` already renders `Re Sustainability` in the card header — no change needed there. The "VisiGuard VMS" the user sees on the approval screen is actually the **browser tab title** coming from `index.html`, which the change above fixes.
 
-No DB, RLS, or frontend changes required. WhatsApp/email already include the full gate name and stay untouched.
+## 2. Scope `/gate-qr-codes` to the currently selected location
 
-## Files changed
+In `src/pages/GateQRCodes.tsx`:
 
-- `supabase/functions/approve-visitor/index.ts` — compose `gateLabel` from `name` + `building` and use it in the SMS body.
+- Import and use `useSelectedLocation()` (the same hook used elsewhere for location scoping).
+- In `fetchGates()`, when `selectedLocationId !== 'all'`, add `.eq('location_id', selectedLocationId)` to the query. When it is `'all'`, restrict to the user's accessible locations via `accessibleIds` (`.in('location_id', accessibleIds)`) so non-HO admins never see other sites.
+- Re-run `fetchGates` whenever `selectedLocationId` changes.
+- Show the current location name in the page header so it's obvious which site the QR codes belong to.
 
-## Deploy
+## 3. Make QR codes open the same domain the app is served from
 
-Redeploy the `approve-visitor` edge function after the change.
+Today `GateQRCodes.tsx` hard-codes:
+```ts
+const baseUrl = import.meta.env.VITE_PUBLIC_URL || 'https://visitbuddy-digital-friend.lovable.app';
+```
+On the on-prem build (`vms.resustainability.com`) this still encodes the Lovable URL into every printed QR, so scanning sends visitors to the wrong host.
+
+Change to:
+```ts
+const baseUrl =
+  import.meta.env.VITE_PUBLIC_URL ||
+  (typeof window !== 'undefined' ? window.location.origin : '');
+```
+
+Effect: in the Lovable preview the QR encodes the Lovable origin, on `vms.resustainability.com` it encodes that origin, and on-prem operators can still pin a different public URL via `VITE_PUBLIC_URL` in `.env.production` if the admin UI is served from a different host than the visitor self-service portal.
+
+## Out of scope
+- Edge function SMS/WhatsApp/email body copy that says "VisiGuard" — separate ask if needed.
+- Proposal/User Manual/Resource Requirements pages (sales collateral, not the live VMS chrome).
+- Renaming the deployed Lovable subdomain or the on-prem domain itself (infra).
