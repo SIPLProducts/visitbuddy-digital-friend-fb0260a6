@@ -1,57 +1,23 @@
-## New visitor ID format
+## Issue
 
-Replace the current `VIS-XXXXXXXX-XXXX` random format with:
+The page title shown in the tab/title bar comes from `<title>` in `index.html` (already "Re Sustainability"), but the PWA manifest defined in `vite.config.ts` still says **"VisiGuard VMS"** / **"VisiGuard"**. When the app is installed as a PWA or when devices render the manifest name (Android install prompts, app switcher, opened-from-QR PWA shell), the user sees "VisiGuard VMS" instead of "Re Sustainability".
 
-```
-{PLANT_CODE}-{DDMMYY}-{NNNN}
-example:  CDHYD-201125-0001
-```
+Additionally, the in-DB tenant setting `tenant_settings.company_name` is `"VisiGuard"` — this drives any UI that uses `useTenantSettings().company_name`.
 
-- **PLANT_CODE** — short code per location (same value used on Gate QR codes today, e.g. `CDHYD`).
-- **DDMMYY** — date the visitor record is created (server time).
-- **NNNN** — 4-digit zero-padded sequence, **per plant**, never resets, increments for every new visitor at that plant.
-- Existing visitors keep their old `VIS-…` IDs — only new visitors use the new format.
+## Change
 
-## Database changes (one migration)
+1. **`vite.config.ts`** — update the PWA manifest:
+   - `name: "Re Sustainability - Visitor Management"`
+   - `short_name: "Re Sustainability"`
+   - `description: "Re Sustainability Visitor Management System - Check-in, badge printing, and visitor tracking"`
 
-1. **Add `plant_code` to `locations`**
-   - New `text` column, unique, nullable initially.
-   - Backfill with an uppercased compact form of `locations.name` (letters/digits only, max 6 chars) so existing rows get a sane default.
-   - HO Admin can edit it from the Locations screen.
+2. **Database** — one-line migration to update the tenant setting:
+   ```sql
+   update public.tenant_settings set company_name = 'Re Sustainability';
+   ```
 
-2. **Per-plant counter table** `public.visitor_id_counters`
-   - Columns: `location_id uuid PK`, `last_seq int not null default 0`, `updated_at timestamptz`.
-   - RLS: service role / definer only; not exposed to clients.
+That's it — no other source of "VisiGuard VMS" reaches the browser title bar. The proposal/manual/resource doc pages (`Proposal*`, `ProductFeatures`, `UserManual`, `ResourceRequirements`, `generateProposalDocx`) still contain the literal "VisiGuard VMS" in their printable content, but those are separate downloadable marketing/manual artifacts and were not in scope of the title-bar issue. Out of scope unless you want me to rebrand those documents too.
 
-3. **Replace `generate_visitor_id()` trigger function**
-   - New SECURITY DEFINER function that runs `BEFORE INSERT` on `public.visitors`:
-     - Resolve `plant_code`:
-       - From `gates.location_id → locations.plant_code` using `NEW.gate_id`.
-       - Fallback to a configurable default (`HO`) if no plant code is resolvable, so inserts never fail.
-     - Atomically bump the counter for that location (`INSERT … ON CONFLICT DO UPDATE … RETURNING last_seq`) to get the next sequence.
-     - Set `NEW.visitor_id = plant_code || '-' || to_char(now(),'DDMMYY') || '-' || lpad(seq::text,4,'0')`.
-   - Keep the existing trigger binding (it already runs on insert) — only the function body changes.
-   - Counter is per location and never resets, matching the chosen "Per plant only" rule.
+## Note on cached PWA
 
-4. **No change to `visitors.visitor_id` column type** — still `text`, still unique. Old `VIS-…` values coexist with new ones.
-
-## Frontend changes
-
-5. **Locations management (`src/pages/Locations.tsx`)**
-   - Add a `Plant Code` input next to Name (uppercase, max ~6 chars, required for new locations, editable for existing ones).
-   - Show the plant code in the locations list/table.
-
-6. **Display only** — anywhere we render `visitor.visitor_id` already works because it's just a string. No formatting changes needed in lists, badges, QR payloads, SMS/email templates.
-
-## Out of scope
-
-- Not backfilling/regenerating old `VIS-…` visitor IDs.
-- Not changing vehicle_id format.
-- Not changing QR code payload structure (still uses `visitor.visitor_id` as the identifier).
-- Not changing edge functions — they read whatever `visitor_id` was generated.
-
-## Technical notes
-
-- Counter table approach is concurrency-safe under Postgres `INSERT … ON CONFLICT DO UPDATE RETURNING`, avoiding the race conditions a naive `MAX(seq)+1` query would have when two visitors are created at the same instant.
-- If `gate_id` is null at insert time (rare — public self-service or HO-level inserts without a gate), the function falls back to plant code `HO` so the insert still succeeds and the ID stays readable.
-- Plant code is uppercased and stripped of spaces/punctuation server-side as a safety net even if an admin types `c&d hyd`.
+If the app is already installed on the user's device, the OS may keep the old manifest name until the PWA is reinstalled or the service worker refreshes the manifest. After deploying, uninstall + reinstall the PWA to see the new name.
