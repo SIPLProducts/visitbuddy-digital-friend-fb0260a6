@@ -1,0 +1,1 @@
+update public.tenant_settings set company_name = 'Re Sustainability' where company_name <> 'Re Sustainability';
