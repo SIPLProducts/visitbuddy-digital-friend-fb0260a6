@@ -1,23 +1,25 @@
-## Issue
+## Plan
 
-The page title shown in the tab/title bar comes from `<title>` in `index.html` (already "Re Sustainability"), but the PWA manifest defined in `vite.config.ts` still says **"VisiGuard VMS"** / **"VisiGuard"**. When the app is installed as a PWA or when devices render the manifest name (Android install prompts, app switcher, opened-from-QR PWA shell), the user sees "VisiGuard VMS" instead of "Re Sustainability".
+1. **Restore the database trigger**
+   - Add a migration that creates `generate_visitor_id_trigger` on `public.visitors`.
+   - This trigger will run before every new visitor insert and call the existing `generate_visitor_id()` function.
+   - Result: when the app does not send a `visitor_id`, the database will generate IDs like `CORPOR-200526-0001` or `CDHYD-200526-0001`.
 
-Additionally, the in-DB tenant setting `tenant_settings.company_name` is `"VisiGuard"` — this drives any UI that uses `useTenantSettings().company_name`.
+2. **Stop frontend manual VIS ID generation**
+   - Update `src/pages/NewVisitor.tsx` to stop generating `VIS-XXXXXXXX-XXXX` client-side.
+   - Remove `visitor_id` from the insert payload so the database trigger assigns the correct ID.
+   - Return `id, visitor_id` after insert so notifications and UI still work.
 
-## Change
+3. **Fix CSV/bulk visitor import**
+   - Update `src/pages/VisitorReport.tsx` to stop assigning `visitor_id: generateVisitorId()` during CSV import.
+   - Let each imported row receive the plant/date/sequence ID from the database.
 
-1. **`vite.config.ts`** — update the PWA manifest:
-   - `name: "Re Sustainability - Visitor Management"`
-   - `short_name: "Re Sustainability"`
-   - `description: "Re Sustainability Visitor Management System - Check-in, badge printing, and visitor tracking"`
+4. **Important note about old records**
+   - Existing `VIS-...` visitor IDs will remain unchanged, as requested earlier.
+   - Only newly created visitors after this fix will get the plant-code format.
 
-2. **Database** — one-line migration to update the tenant setting:
-   ```sql
-   update public.tenant_settings set company_name = 'Re Sustainability';
-   ```
+## Technical details
 
-That's it — no other source of "VisiGuard VMS" reaches the browser title bar. The proposal/manual/resource doc pages (`Proposal*`, `ProductFeatures`, `UserManual`, `ResourceRequirements`, `generateProposalDocx`) still contain the literal "VisiGuard VMS" in their printable content, but those are separate downloadable marketing/manual artifacts and were not in scope of the title-bar issue. Out of scope unless you want me to rebrand those documents too.
-
-## Note on cached PWA
-
-If the app is already installed on the user's device, the OS may keep the old manifest name until the PWA is reinstalled or the service worker refreshes the manifest. After deploying, uninstall + reinstall the PWA to see the new name.
+- Root cause: the migration updated the `generate_visitor_id()` function, but the live database currently has no trigger on `visitors`, and `NewVisitor.tsx` still manually inserts `VIS-...` IDs.
+- Existing self-service QR flow already omits `visitor_id`, so after the trigger is restored it will also receive the new format automatically.
+- Counter scope remains per plant code through `visitor_id_counters.location_key`.
