@@ -25,7 +25,7 @@ const onboardingSteps: OnboardingStep[] = [
   {
     id: 1,
     icon: LayoutDashboard,
-    title: 'Welcome to VisiGuard',
+    title: 'Welcome to Re Sustainability',
     description: 'Your enterprise visitor management system. Get a real-time overview of all visitor activity, gate status, and key metrics from your dashboard.',
     highlight: 'Dashboard',
   },

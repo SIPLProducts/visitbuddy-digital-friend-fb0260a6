@@ -160,7 +160,7 @@ export function Sidebar({ open, onOpenChange }: SidebarProps) {
           {(!collapsed || isMobile) && (
             <div>
               <h1 className="font-bold text-sidebar-foreground font-display text-base tracking-tight">Resustainability</h1>
-              <p className="text-[10px] text-sidebar-foreground/50 font-medium uppercase tracking-widest">Enterprise VMS</p>
+              <p className="text-[10px] text-sidebar-foreground/50 font-medium uppercase tracking-widest">Re Sustainability</p>
             </div>
           )}
         </div>
