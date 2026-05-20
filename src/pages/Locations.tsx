@@ -744,7 +744,14 @@ export default function Locations() {
                         <Building2 className="h-5 w-5" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">{location.name}</CardTitle>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          {location.name}
+                          {(location as any).plant_code && (
+                            <span className="text-xs font-mono px-2 py-0.5 rounded bg-primary/10 text-primary">
+                              {(location as any).plant_code}
+                            </span>
+                          )}
+                        </CardTitle>
                         <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                           <MapPin className="h-3 w-3" />
                           {location.city}, {location.country}
