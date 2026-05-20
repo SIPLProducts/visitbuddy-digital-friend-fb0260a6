@@ -132,6 +132,7 @@ export default function Locations() {
   // Form state
   const [formData, setFormData] = useState({
     name: '',
+    plant_code: '',
     address: '',
     city: '',
     country: 'India',
@@ -168,6 +169,7 @@ export default function Locations() {
   const resetForm = () => {
     setFormData({
       name: '',
+      plant_code: '',
       address: '',
       city: '',
       country: 'India',
@@ -196,6 +198,7 @@ export default function Locations() {
     setLoading(true);
     const { error } = await supabase.from('locations').insert({
       name: formData.name,
+      plant_code: formData.plant_code ? formData.plant_code.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) : null,
       address: formData.address || null,
       city: formData.city || null,
       country: formData.country || 'India',
@@ -236,6 +239,7 @@ export default function Locations() {
       .from('locations')
       .update({
         name: formData.name,
+        plant_code: formData.plant_code ? formData.plant_code.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) : null,
         address: formData.address || null,
         city: formData.city || null,
         country: formData.country || 'India',
@@ -445,6 +449,7 @@ export default function Locations() {
     setSelectedLocation(location);
     setFormData({
       name: location.name,
+      plant_code: (location as any).plant_code || '',
       address: location.address || '',
       city: location.city || '',
       country: location.country || 'India',
@@ -483,17 +488,27 @@ export default function Locations() {
           />
         </div>
         <div className="space-y-2">
-          <Label>Status</Label>
-          <Select value={formData.status} onValueChange={(v: 'active' | 'inactive') => setFormData({ ...formData, status: v })}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label>Plant Code *</Label>
+          <Input
+            placeholder="e.g., CDHYD"
+            maxLength={6}
+            value={formData.plant_code}
+            onChange={(e) => setFormData({ ...formData, plant_code: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
+          />
+          <p className="text-xs text-muted-foreground">Used as prefix in visitor IDs (e.g. CDHYD-201125-0001)</p>
         </div>
+      </div>
+      <div className="space-y-2">
+        <Label>Status</Label>
+        <Select value={formData.status} onValueChange={(v: 'active' | 'inactive') => setFormData({ ...formData, status: v })}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-2">
         <Label>Address</Label>
