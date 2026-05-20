@@ -570,6 +570,7 @@ export type Database = {
           longitude: number | null
           name: string
           phone: string | null
+          plant_code: string | null
           status: Database["public"]["Enums"]["location_status"] | null
           updated_at: string
           visitor_count: number | null
@@ -591,6 +592,7 @@ export type Database = {
           longitude?: number | null
           name: string
           phone?: string | null
+          plant_code?: string | null
           status?: Database["public"]["Enums"]["location_status"] | null
           updated_at?: string
           visitor_count?: number | null
@@ -612,6 +614,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           phone?: string | null
+          plant_code?: string | null
           status?: Database["public"]["Enums"]["location_status"] | null
           updated_at?: string
           visitor_count?: number | null
@@ -1197,6 +1200,24 @@ export type Database = {
           signature_data?: string | null
           signed_at?: string
           visitor_id?: string
+        }
+        Relationships: []
+      }
+      visitor_id_counters: {
+        Row: {
+          last_seq: number
+          location_key: string
+          updated_at: string
+        }
+        Insert: {
+          last_seq?: number
+          location_key: string
+          updated_at?: string
+        }
+        Update: {
+          last_seq?: number
+          location_key?: string
+          updated_at?: string
         }
         Relationships: []
       }
