@@ -407,7 +407,7 @@ export default function VisitorReport() {
         return;
       }
 
-      const { error } = await supabase.from('visitors').insert(visitorsToInsert);
+      const { error } = await supabase.from('visitors').insert(visitorsToInsert as any);
 
       if (error) {
         toast.error('Failed to import visitors: ' + error.message);
