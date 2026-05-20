@@ -510,7 +510,11 @@ const handler = async (req: Request): Promise<Response> => {
           : new Date().toLocaleDateString("en-GB", {
               day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Asia/Kolkata",
             });
-        const gateName = pick(visitor.gate?.name, "Main Entry");
+        const gateNameOnly = (visitor.gate?.name ?? "").toString().replace(/\s+/g, " ").trim();
+        const gateBuilding = (visitor.gate?.building ?? "").toString().replace(/\s+/g, " ").trim();
+        const gateName = gateNameOnly
+          ? (gateBuilding ? `${gateNameOnly} — ${gateBuilding}` : gateNameOnly)
+          : "Main Entry";
         const hostName = pick(visitor.host?.name, "Host");
         const fromName = pick(visitor.department?.name, "RESUST");
         const smsBase = (Deno.env.get("PUBLIC_SMS_LINK_BASE")
