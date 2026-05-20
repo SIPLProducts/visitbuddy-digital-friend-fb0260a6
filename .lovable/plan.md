@@ -1,54 +1,57 @@
-## Goal
-Rebrand user-facing "VisiGuard" / "VisiGuard VMS" / "Enterprise VMS" to **RE Sustainability** (RESL), scope the Gate QR Codes page to the currently selected location, and stop the QR from hard-coding the Lovable preview domain so on-prem builds (e.g. `vms.resustainability.com`) keep visitors on the same host.
+## New visitor ID format
 
-## 1. Replace "VisiGuard / VMS" branding everywhere visible to end users
+Replace the current `VIS-XXXXXXXX-XXXX` random format with:
 
-Replace strings in these files (proposal docs, internal READMEs, edge-function copy and `whatsapp-bridge/` are out of scope — they aren't visible to visitors/operators on-screen):
-
-- `index.html`
-  - `<title>` → `RE Sustainability - Visitor Management`
-  - `<meta name="author">` → `RE Sustainability`
-  - `<meta name="apple-mobile-web-app-title">` → `RE Sustainability`
-  - `og:title` / `twitter:title` → `RE Sustainability - Visitor Management`
-- `src/pages/Auth.tsx` line 120 — `Enterprise VMS` → `Re Sustainability`
-- `src/components/layout/Sidebar.tsx` line 163 — `Enterprise VMS` → `Re Sustainability`
-- `src/hooks/useTenantSettings.ts` — default `company_name: 'VisiGuard'` → `'Re Sustainability'`
-- `src/pages/GateQRCodes.tsx` print template line 166 — `<div class="title">VisiGuard</div>` → `RE Sustainability`
-- `src/components/onboarding/OnboardingTour.tsx` line 28 — `Welcome to VisiGuard` → `Welcome to Re Sustainability VMS`
-- `src/components/install/InstallButton.tsx` (lines 69, 99, 142) — replace `VisiGuard` with `Re Sustainability`
-- `src/components/install/InstallPromptBanner.tsx` (lines 94, 104) — same
-- `src/pages/Install.tsx` (lines 71, 89, 101, 103, 114, 126, 130, 188) — replace `VisiGuard` / `VisiGuard VMS` with `Re Sustainability`
-- `src/pages/Help.tsx` (lines 66, 93, 136) — same
-
-`ApproveVisitor.tsx` already renders `Re Sustainability` in the card header — no change needed there. The "VisiGuard VMS" the user sees on the approval screen is actually the **browser tab title** coming from `index.html`, which the change above fixes.
-
-## 2. Scope `/gate-qr-codes` to the currently selected location
-
-In `src/pages/GateQRCodes.tsx`:
-
-- Import and use `useSelectedLocation()` (the same hook used elsewhere for location scoping).
-- In `fetchGates()`, when `selectedLocationId !== 'all'`, add `.eq('location_id', selectedLocationId)` to the query. When it is `'all'`, restrict to the user's accessible locations via `accessibleIds` (`.in('location_id', accessibleIds)`) so non-HO admins never see other sites.
-- Re-run `fetchGates` whenever `selectedLocationId` changes.
-- Show the current location name in the page header so it's obvious which site the QR codes belong to.
-
-## 3. Make QR codes open the same domain the app is served from
-
-Today `GateQRCodes.tsx` hard-codes:
-```ts
-const baseUrl = import.meta.env.VITE_PUBLIC_URL || 'https://visitbuddy-digital-friend.lovable.app';
 ```
-On the on-prem build (`vms.resustainability.com`) this still encodes the Lovable URL into every printed QR, so scanning sends visitors to the wrong host.
-
-Change to:
-```ts
-const baseUrl =
-  import.meta.env.VITE_PUBLIC_URL ||
-  (typeof window !== 'undefined' ? window.location.origin : '');
+{PLANT_CODE}-{DDMMYY}-{NNNN}
+example:  CDHYD-201125-0001
 ```
 
-Effect: in the Lovable preview the QR encodes the Lovable origin, on `vms.resustainability.com` it encodes that origin, and on-prem operators can still pin a different public URL via `VITE_PUBLIC_URL` in `.env.production` if the admin UI is served from a different host than the visitor self-service portal.
+- **PLANT_CODE** — short code per location (same value used on Gate QR codes today, e.g. `CDHYD`).
+- **DDMMYY** — date the visitor record is created (server time).
+- **NNNN** — 4-digit zero-padded sequence, **per plant**, never resets, increments for every new visitor at that plant.
+- Existing visitors keep their old `VIS-…` IDs — only new visitors use the new format.
+
+## Database changes (one migration)
+
+1. **Add `plant_code` to `locations`**
+   - New `text` column, unique, nullable initially.
+   - Backfill with an uppercased compact form of `locations.name` (letters/digits only, max 6 chars) so existing rows get a sane default.
+   - HO Admin can edit it from the Locations screen.
+
+2. **Per-plant counter table** `public.visitor_id_counters`
+   - Columns: `location_id uuid PK`, `last_seq int not null default 0`, `updated_at timestamptz`.
+   - RLS: service role / definer only; not exposed to clients.
+
+3. **Replace `generate_visitor_id()` trigger function**
+   - New SECURITY DEFINER function that runs `BEFORE INSERT` on `public.visitors`:
+     - Resolve `plant_code`:
+       - From `gates.location_id → locations.plant_code` using `NEW.gate_id`.
+       - Fallback to a configurable default (`HO`) if no plant code is resolvable, so inserts never fail.
+     - Atomically bump the counter for that location (`INSERT … ON CONFLICT DO UPDATE … RETURNING last_seq`) to get the next sequence.
+     - Set `NEW.visitor_id = plant_code || '-' || to_char(now(),'DDMMYY') || '-' || lpad(seq::text,4,'0')`.
+   - Keep the existing trigger binding (it already runs on insert) — only the function body changes.
+   - Counter is per location and never resets, matching the chosen "Per plant only" rule.
+
+4. **No change to `visitors.visitor_id` column type** — still `text`, still unique. Old `VIS-…` values coexist with new ones.
+
+## Frontend changes
+
+5. **Locations management (`src/pages/Locations.tsx`)**
+   - Add a `Plant Code` input next to Name (uppercase, max ~6 chars, required for new locations, editable for existing ones).
+   - Show the plant code in the locations list/table.
+
+6. **Display only** — anywhere we render `visitor.visitor_id` already works because it's just a string. No formatting changes needed in lists, badges, QR payloads, SMS/email templates.
 
 ## Out of scope
-- Edge function SMS/WhatsApp/email body copy that says "VisiGuard" — separate ask if needed.
-- Proposal/User Manual/Resource Requirements pages (sales collateral, not the live VMS chrome).
-- Renaming the deployed Lovable subdomain or the on-prem domain itself (infra).
+
+- Not backfilling/regenerating old `VIS-…` visitor IDs.
+- Not changing vehicle_id format.
+- Not changing QR code payload structure (still uses `visitor.visitor_id` as the identifier).
+- Not changing edge functions — they read whatever `visitor_id` was generated.
+
+## Technical notes
+
+- Counter table approach is concurrency-safe under Postgres `INSERT … ON CONFLICT DO UPDATE RETURNING`, avoiding the race conditions a naive `MAX(seq)+1` query would have when two visitors are created at the same instant.
+- If `gate_id` is null at insert time (rare — public self-service or HO-level inserts without a gate), the function falls back to plant code `HO` so the insert still succeeds and the ID stays readable.
+- Plant code is uppercased and stripped of spaces/punctuation server-side as a safety net even if an admin types `c&d hyd`.
