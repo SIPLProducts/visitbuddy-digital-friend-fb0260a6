@@ -91,7 +91,7 @@ export function InstallPromptBanner() {
               <Smartphone className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <SheetTitle>Install VisiGuard</SheetTitle>
+              <SheetTitle>Install Re Sustainability</SheetTitle>
               <SheetDescription>Faster access, full-screen experience</SheetDescription>
             </div>
           </div>
@@ -101,7 +101,7 @@ export function InstallPromptBanner() {
           {isIOS ? (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                To install VisiGuard on your iPhone or iPad:
+                To install Re Sustainability on your iPhone or iPad:
               </p>
               <ol className="space-y-3">
                 <li className="flex items-start gap-3">

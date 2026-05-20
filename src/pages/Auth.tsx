@@ -117,7 +117,7 @@ export default function Auth() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white tracking-tight">Resustainability</h1>
-              <p className="text-sm text-white/60">Enterprise VMS</p>
+              <p className="text-sm text-white/60">Re Sustainability</p>
             </div>
           </div>
         </div>

@@ -68,7 +68,7 @@ export default function Install() {
             </div>
             <h2 className="text-xl font-bold">App Already Installed!</h2>
             <p className="text-muted-foreground">
-              You're viewing VisiGuard as an installed app.
+              You're viewing Re Sustainability as an installed app.
             </p>
             <Button onClick={() => window.location.href = '/'} className="w-full">
               Go to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
@@ -86,7 +86,7 @@ export default function Install() {
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <img src={reslLogo} alt="Logo" className="h-12 w-12 object-contain" />
           <div>
-            <h1 className="text-xl font-bold text-foreground">VisiGuard VMS</h1>
+            <h1 className="text-xl font-bold text-foreground">Re Sustainability</h1>
             <p className="text-sm text-muted-foreground">Visitor Management System</p>
           </div>
         </div>
@@ -98,9 +98,9 @@ export default function Install() {
           <div className="w-24 h-24 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto">
             <Smartphone className="h-12 w-12 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold">Install VisiGuard</h2>
+          <h2 className="text-2xl font-bold">Install Re Sustainability</h2>
           <p className="text-muted-foreground">
-            Install VisiGuard on your device for quick access and offline support.
+            Install Re Sustainability on your device for quick access and offline support.
           </p>
         </div>
 
@@ -111,7 +111,7 @@ export default function Install() {
               <CheckCircle2 className="h-12 w-12 text-success mx-auto" />
               <h3 className="text-lg font-semibold">Successfully Installed!</h3>
               <p className="text-muted-foreground">
-                VisiGuard is now installed on your device. You can find it on your home screen.
+                Re Sustainability is now installed on your device. You can find it on your home screen.
               </p>
             </CardContent>
           </Card>
@@ -123,11 +123,11 @@ export default function Install() {
                 Quick Install
               </CardTitle>
               <CardDescription>
-                One click to add VisiGuard to your device
+                One click to add Re Sustainability to your device
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <InstallButton size="lg" className="w-full h-12" label="Install VisiGuard" />
+              <InstallButton size="lg" className="w-full h-12" label="Install Re Sustainability" />
             </CardContent>
           </Card>
         ) : isIOS ? (
@@ -185,7 +185,7 @@ export default function Install() {
                 Install on Desktop
               </CardTitle>
               <CardDescription>
-                Add VisiGuard to your computer
+                Add Re Sustainability to your computer
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

@@ -66,7 +66,7 @@ export function InstallButton({
     if (prompt) {
       const result = await triggerNativeInstall();
       if (result === 'accepted') {
-        toast.success('Installing VisiGuard…');
+        toast.success('Installing Re Sustainability…');
         setInstalled(true);
       }
       return;
@@ -96,7 +96,7 @@ export function InstallButton({
                 <Smartphone className="h-6 w-6 text-primary" />
               </div>
               <div className="text-left">
-                <DialogTitle>Install VisiGuard</DialogTitle>
+                <DialogTitle>Install Re Sustainability</DialogTitle>
                 <DialogDescription>
                   {dialogMode === 'ios'
                     ? 'Add to your iPhone or iPad home screen'
@@ -139,7 +139,7 @@ export function InstallButton({
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
                 Your current browser does not expose a one-tap install. To install
-                VisiGuard:
+                Re Sustainability:
               </p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>

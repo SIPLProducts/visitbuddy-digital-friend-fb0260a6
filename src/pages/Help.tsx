@@ -63,7 +63,7 @@ const faqs = [
     category: 'Locations',
     question: 'Can I manage multiple locations?',
     answer:
-      'Yes! VisiGuard supports multiple locations. Go to the Locations page to add new facilities. Each location can have its own gates, departments, and visitor capacity settings.',
+      'Yes! Re Sustainability VMS supports multiple locations. Go to the Locations page to add new facilities. Each location can have its own gates, departments, and visitor capacity settings.',
   },
   {
     category: 'Gates',
@@ -90,7 +90,7 @@ export default function Help() {
             How can we help you?
           </h1>
           <p className="text-muted-foreground">
-            Find answers, guides, and get support for VisiGuard
+            Find answers, guides, and get support for Re Sustainability
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export default function Help() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-foreground">Product Proposal</h3>
-                  <p className="text-sm text-muted-foreground">Complete VisiGuard VMS proposal for presentations</p>
+                  <p className="text-sm text-muted-foreground">Complete Re Sustainability VMS proposal for presentations</p>
                 </div>
                 <Button onClick={() => navigate('/proposal-document')} size="sm" className="gap-2 shrink-0">
                   <FileText className="h-4 w-4" /> View

@@ -23,7 +23,7 @@ interface TenantSettings {
 
 const defaults: TenantSettings = {
   id: '',
-  company_name: 'VisiGuard',
+  company_name: 'Re Sustainability',
   logo_url: null,
   primary_color: '#0ea5e9',
   secondary_color: '#10b981',
