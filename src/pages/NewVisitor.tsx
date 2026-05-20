@@ -171,19 +171,10 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
     if (gateRes.data) setGates(gateRes.data as Gate[]);
   };
 
-  // Generate visitor ID client-side (matches the DB trigger pattern)
-  const generateVisitorId = () => {
-    const uuid1 = safeRandomId().replace(/-/g, '');
-    const uuid2 = safeRandomId().replace(/-/g, '');
-    return `VIS-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
-  };
-
   const onSubmit = async (data: VisitorFormData) => {
     setLoading(true);
-    const visitorId = generateVisitorId();
-    
+
     const { data: insertedVisitor, error } = await supabase.from('visitors').insert([{
-      visitor_id: visitorId,
       name: data.name,
       email: data.email || null,
       phone: data.phone || null,
@@ -205,7 +196,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       govt_id_number: data.govt_id_number || null,
       status: 'pending_approval' as const,
       created_by_user_id: user?.id || null,
-    }]).select('id').single();
+    }] as any).select('id, visitor_id').single();
 
     if (error) {
       setLoading(false);

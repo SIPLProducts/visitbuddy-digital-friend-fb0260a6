@@ -363,12 +363,6 @@ export default function VisitorReport() {
     toast.success('Template downloaded');
   };
 
-  const generateVisitorId = () => {
-    const uuid1 = safeRandomId().replace(/-/g, '');
-    const uuid2 = safeRandomId().replace(/-/g, '');
-    return `VIS-${uuid1.substring(0, 8).toUpperCase()}-${uuid2.substring(0, 4).toUpperCase()}`;
-  };
-
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -398,7 +392,6 @@ export default function VisitorReport() {
         if (values.length < 1 || !values[0]) continue;
         
         visitorsToInsert.push({
-          visitor_id: generateVisitorId(),
           name: values[0] || 'Unknown',
           email: values[1] || null,
           phone: values[2] || null,
