@@ -146,6 +146,7 @@ interface WhatsAppMessageOpts {
   companions?: any[];
   approveLink?: string | null;
   rejectLink?: string | null;
+  transferLink?: string | null;
   closingLine?: string | null;
 }
 
@@ -187,6 +188,9 @@ function buildWhatsAppMessage(opts: WhatsAppMessageOpts): string {
     lines.push("");
     lines.push(`✅ Approve: ${opts.approveLink}`);
     lines.push(`❌ Reject:  ${opts.rejectLink}`);
+    if (opts.transferLink) {
+      lines.push(`🔁 Transfer to another host: ${opts.transferLink}`);
+    }
   }
 
   if (opts.closingLine) {
