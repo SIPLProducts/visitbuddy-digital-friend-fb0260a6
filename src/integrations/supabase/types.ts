@@ -571,6 +571,7 @@ export type Database = {
           name: string
           phone: string | null
           plant_code: string | null
+          safety_short_code: string | null
           status: Database["public"]["Enums"]["location_status"] | null
           updated_at: string
           visitor_count: number | null
@@ -593,6 +594,7 @@ export type Database = {
           name: string
           phone?: string | null
           plant_code?: string | null
+          safety_short_code?: string | null
           status?: Database["public"]["Enums"]["location_status"] | null
           updated_at?: string
           visitor_count?: number | null
@@ -615,6 +617,7 @@ export type Database = {
           name?: string
           phone?: string | null
           plant_code?: string | null
+          safety_short_code?: string | null
           status?: Database["public"]["Enums"]["location_status"] | null
           updated_at?: string
           visitor_count?: number | null
@@ -1408,8 +1411,23 @@ export type Database = {
         Args: { _location_id: string; _user_id: string }
         Returns: boolean
       }
+      generate_location_safety_short_code: { Args: never; Returns: string }
       generate_visitor_short_code: { Args: never; Returns: string }
       get_admin_location_ids: { Args: { _user_id: string }; Returns: string[] }
+      get_location_safety_by_code: {
+        Args: { _code: string }
+        Returns: {
+          address: string
+          assembly_point: string
+          city: string
+          emergency_contact: string
+          geo_address: string
+          latitude: number
+          longitude: number
+          name: string
+          phone: string
+        }[]
+      }
       get_user_location_ids: { Args: { _user_id: string }; Returns: string[] }
       get_visitor_id_by_short_code: {
         Args: { _short_code: string }
