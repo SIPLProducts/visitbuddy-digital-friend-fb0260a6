@@ -508,7 +508,7 @@ export default function Settings() {
                         <Input
                           value={emailConfig.sender_name}
                           onChange={e => updateEmail('sender_name', e.target.value)}
-                          placeholder="VisiGuard VMS"
+                          placeholder="Re Sustainability VMS"
                         />
                       </div>
                       <div className="space-y-2">
@@ -622,12 +622,12 @@ export default function Settings() {
             <Card>
               <CardHeader>
                 <CardTitle>Help & Support</CardTitle>
-                <CardDescription>Get help and learn how to use VisiGuard</CardDescription>
+                <CardDescription>Get help and learn how to use Re Sustainability</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
                   <div><p className="font-medium">Product Tour</p><p className="text-sm text-muted-foreground">Restart the onboarding tour</p></div>
-                  <Button variant="outline" className="gap-2" onClick={() => { localStorage.removeItem('visiguard_onboarding_completed'); toast.success('Tour reset! Refresh the page to start the tour.'); }}>
+                  <Button variant="outline" className="gap-2" onClick={() => { localStorage.removeItem('re sustainability_onboarding_completed'); toast.success('Tour reset! Refresh the page to start the tour.'); }}>
                     <RotateCcw className="h-4 w-4" /> Restart Tour
                   </Button>
                 </div>
@@ -640,7 +640,7 @@ export default function Settings() {
                   <Button variant="outline">Contact Us</Button>
                 </div>
                 <div className="flex items-center justify-between p-4 rounded-lg border bg-gradient-to-r from-primary/5 to-info/5">
-                  <div><p className="font-medium">Product Proposal</p><p className="text-sm text-muted-foreground">View and download the VisiGuard VMS proposal document</p></div>
+                  <div><p className="font-medium">Product Proposal</p><p className="text-sm text-muted-foreground">View and download the Re Sustainability VMS proposal document</p></div>
                   <Button onClick={() => navigate('/proposal-document')} className="gap-2"><FileText className="h-4 w-4" /> View Proposal</Button>
                 </div>
               </CardContent>

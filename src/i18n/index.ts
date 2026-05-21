@@ -54,7 +54,7 @@ i18n
     fallbackLng: 'en',
     detection: {
       order: ['localStorage', 'navigator'],
-      lookupLocalStorage: 'visiguard_lang',
+      lookupLocalStorage: 're sustainability_lang',
       caches: ['localStorage'],
     },
     interpolation: {

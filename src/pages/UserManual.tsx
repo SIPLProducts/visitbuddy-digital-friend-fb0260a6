@@ -97,7 +97,7 @@ export default function UserManual() {
         }
       }
 
-      pdf.save('VisiGuard-User-Manual.pdf');
+      pdf.save('Re Sustainability-User-Manual.pdf');
       toast.success('PDF downloaded successfully!');
     } catch (err) {
       console.error('PDF generation error:', err);
@@ -132,7 +132,7 @@ export default function UserManual() {
             <div className="flex-1 flex flex-col items-center justify-center text-center p-12" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0891b2 100%)' }}>
               <div className="text-5xl mb-6 bg-white/90 rounded-lg px-6 py-3 font-bold" style={{ color: '#1e3a8a' }}>Sharvi</div>
               <h1 className="text-4xl font-bold text-white mb-4">User Manual</h1>
-              <h2 className="text-2xl text-white/90 mb-2">VisiGuard VMS</h2>
+              <h2 className="text-2xl text-white/90 mb-2">Re Sustainability VMS</h2>
               <p className="text-lg text-white/80 mb-8">Step-by-Step Guide for Every Module</p>
               <div className="grid grid-cols-3 gap-4 mt-6 max-w-md">
                 {['📊 Dashboard', '👥 Visitors', '🚛 Vehicles', '🔐 Check-In', '🏢 Locations', '⚙️ Settings'].map(item => (
@@ -175,7 +175,7 @@ export default function UserManual() {
           </div>
           <div className="mt-8 p-4 rounded-lg" style={{ background: '#f0f9ff', border: '1px solid #bae6fd' }}>
             <h4 className="text-sm font-bold mb-2" style={{ color: '#0369a1' }}>💡 How to Use This Manual</h4>
-            <p className="text-xs text-gray-600 leading-relaxed">Each chapter follows a <strong>storyline</strong> — a realistic scenario showing how your team uses VisiGuard daily. Screenshots illustrate every step so you can follow along. Look for the numbered steps and blue headers to navigate quickly.</p>
+            <p className="text-xs text-gray-600 leading-relaxed">Each chapter follows a <strong>storyline</strong> — a realistic scenario showing how your team uses Re Sustainability daily. Screenshots illustrate every step so you can follow along. Look for the numbered steps and blue headers to navigate quickly.</p>
           </div>
         </div>
 
@@ -188,12 +188,12 @@ export default function UserManual() {
 
           <div className="p-4 rounded-lg mb-5" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
             <p className="text-xs italic text-gray-700">
-              <strong>📖 Story:</strong> It's 8:00 AM. Ahmed, the Security Manager at Al Rajhi HQ, opens VisiGuard on his tablet. Before his morning coffee, he glances at the Dashboard to see overnight activity — how many visitors checked in, which gates are active, and any pending approvals. The Dashboard gives him a real-time pulse of the entire facility.
+              <strong>📖 Story:</strong> It's 8:00 AM. Ahmed, the Security Manager at Al Rajhi HQ, opens Re Sustainability on his tablet. Before his morning coffee, he glances at the Dashboard to see overnight activity — how many visitors checked in, which gates are active, and any pending approvals. The Dashboard gives him a real-time pulse of the entire facility.
             </p>
           </div>
 
           <StorySection stepNumber={1} title="Overview Stats" story="At the top, you'll see four stat cards showing today's total visitors, checked-in count, pending approvals, and vehicles on-site. These update in real-time.">
-            <ScreenMockup title="VisiGuard — Dashboard">
+            <ScreenMockup title="Re Sustainability — Dashboard">
               <div className="grid grid-cols-4 gap-2 mb-3">
                 {[{ label: 'Total Visitors', val: '147', color: '#3b82f6' }, { label: 'Checked In', val: '23', color: '#22c55e' }, { label: 'Pending', val: '5', color: '#f59e0b' }, { label: 'Vehicles', val: '12', color: '#8b5cf6' }].map(s => (
                   <div key={s.label} className="rounded-lg p-2 text-center" style={{ background: s.color + '15', border: `1px solid ${s.color}30` }}>
@@ -381,7 +381,7 @@ export default function UserManual() {
 
           <div className="p-4 rounded-lg mb-5" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
             <p className="text-xs italic text-gray-700">
-              <strong>📖 Story:</strong> The HR department is hosting interviews next Tuesday. The HR coordinator creates 6 appointments in VisiGuard, each with the candidate's name, time slot, and interviewer. On the day, each candidate checks in with their QR code — no waiting, no confusion, fully professional.
+              <strong>📖 Story:</strong> The HR department is hosting interviews next Tuesday. The HR coordinator creates 6 appointments in Re Sustainability, each with the candidate's name, time slot, and interviewer. On the day, each candidate checks in with their QR code — no waiting, no confusion, fully professional.
             </p>
           </div>
 
@@ -584,7 +584,7 @@ export default function UserManual() {
 
           <div className="p-4 rounded-lg mb-5" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
             <p className="text-xs italic text-gray-700">
-              <strong>📖 Story:</strong> The IT Admin is setting up VisiGuard for the first time. She starts by creating departments — Engineering, HR, Finance, Marketing — and then adds employees to each department. Each employee marked as a "Host" can receive visitors. This structure ensures visitors are always routed to the correct department and host.
+              <strong>📖 Story:</strong> The IT Admin is setting up Re Sustainability for the first time. She starts by creating departments — Engineering, HR, Finance, Marketing — and then adds employees to each department. Each employee marked as a "Host" can receive visitors. This structure ensures visitors are always routed to the correct department and host.
             </p>
           </div>
 
@@ -754,7 +754,7 @@ export default function UserManual() {
             </p>
           </div>
 
-          <StorySection stepNumber={1} title="User Roles & Access Control" story="VisiGuard has three roles: Admin (full access), Manager (location-level management), and Operator (gate-level operations). Each user can be assigned different roles at different locations.">
+          <StorySection stepNumber={1} title="User Roles & Access Control" story="Re Sustainability has three roles: Admin (full access), Manager (location-level management), and Operator (gate-level operations). Each user can be assigned different roles at different locations.">
             <ScreenMockup title="User Management">
               <table className="w-full text-[9px]">
                 <thead><tr className="border-b bg-gray-50"><th className="text-left p-1.5">User</th><th className="text-left p-1.5">Email</th><th className="text-left p-1.5">Role</th><th className="text-left p-1.5">Location</th></tr></thead>
@@ -803,7 +803,7 @@ export default function UserManual() {
 
           <div className="p-4 rounded-lg mb-5" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
             <p className="text-xs italic text-gray-700">
-              <strong>📖 Story:</strong> The lobby has a touchscreen kiosk running VisiGuard in self-service mode. Walk-in visitors can register themselves — enter their name, take a selfie, select the host from a directory, and print their badge — all without needing a receptionist. Meanwhile, security guards use the mobile PWA on their phones for quick QR scanning at the gate.
+              <strong>📖 Story:</strong> The lobby has a touchscreen kiosk running Re Sustainability in self-service mode. Walk-in visitors can register themselves — enter their name, take a selfie, select the host from a directory, and print their badge — all without needing a receptionist. Meanwhile, security guards use the mobile PWA on their phones for quick QR scanning at the gate.
             </p>
           </div>
 
@@ -822,8 +822,8 @@ export default function UserManual() {
             </ScreenMockup>
           </StorySection>
 
-          <StorySection stepNumber={2} title="Mobile PWA Installation" story="VisiGuard is a Progressive Web App. Install it on any phone or tablet from the browser. Go to /install for step-by-step instructions for iOS and Android.">
-            <ScreenMockup title="Install VisiGuard">
+          <StorySection stepNumber={2} title="Mobile PWA Installation" story="Re Sustainability is a Progressive Web App. Install it on any phone or tablet from the browser. Go to /install for step-by-step instructions for iOS and Android.">
+            <ScreenMockup title="Install Re Sustainability">
               <div className="flex gap-3">
                 <div className="flex-1 p-2 border rounded text-center">
                   <span className="text-xl">🍎</span>
@@ -839,7 +839,7 @@ export default function UserManual() {
             </ScreenMockup>
           </StorySection>
 
-          <StorySection stepNumber={3} title="Mobile-Optimized Interface" story="On mobile, VisiGuard shows a bottom navigation bar for quick access to Dashboard, Visitors, Check-In, Vehicles, and Settings. All screens are fully responsive and touch-optimized.">
+          <StorySection stepNumber={3} title="Mobile-Optimized Interface" story="On mobile, Re Sustainability shows a bottom navigation bar for quick access to Dashboard, Visitors, Check-In, Vehicles, and Settings. All screens are fully responsive and touch-optimized.">
             <ScreenMockup title="Mobile View">
               <div className="max-w-[160px] mx-auto">
                 <div className="h-24 border rounded mb-2 flex items-center justify-center text-[9px] text-gray-400">Mobile Dashboard View</div>
@@ -858,7 +858,7 @@ export default function UserManual() {
           <div className="h-full flex flex-col items-center justify-center text-center" style={{ minHeight: '297mm', background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0891b2 100%)' }}>
             <div className="text-5xl mb-8 bg-white/90 rounded-lg px-6 py-3 font-bold" style={{ color: '#1e3a8a' }}>Sharvi</div>
             <h1 className="text-4xl font-bold text-white mb-4">Thank You</h1>
-            <p className="text-lg text-white/80 mb-12">For choosing VisiGuard VMS</p>
+            <p className="text-lg text-white/80 mb-12">For choosing Re Sustainability VMS</p>
             <div className="bg-white/10 backdrop-blur rounded-xl p-8 max-w-md">
               <h3 className="text-xl font-semibold text-white mb-4">Sharvi Infotech Pvt Ltd</h3>
               <div className="space-y-3 text-white/80">

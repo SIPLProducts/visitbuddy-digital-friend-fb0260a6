@@ -328,7 +328,7 @@ export function ProposalTimeline() {
           color: '#94a3b8'
         }}
       >
-        VisiGuard VMS - Product Proposal | Powered by Sharvi Infotech
+        Re Sustainability VMS - Product Proposal | Powered by Sharvi Infotech
       </div>
     </div>
   );

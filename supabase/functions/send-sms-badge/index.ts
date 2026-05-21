@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const SITE_URL =
   Deno.env.get("PUBLIC_SITE_URL") ||
-  "https://visiguard.sharvisoftwareservices.com";
+  "https://re sustainability.sharvisoftwareservices.com";
 const SMS_LINK_BASE = (
   Deno.env.get("PUBLIC_SMS_LINK_BASE") ||
   Deno.env.get("PUBLIC_SITE_URL") ||

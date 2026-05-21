@@ -33,7 +33,7 @@ async function getBranding(supabase: any): Promise<Branding> {
       .limit(1)
       .maybeSingle();
     return {
-      companyName: data?.company_name && data.company_name !== "VisiGuard" ? data.company_name : DEFAULT_COMPANY,
+      companyName: data?.company_name && data.company_name !== "Re Sustainability" ? data.company_name : DEFAULT_COMPANY,
       logoUrl: data?.logo_url || DEFAULT_LOGO_URL,
       primaryColor: data?.primary_color || DEFAULT_PRIMARY,
     };
