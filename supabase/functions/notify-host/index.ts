@@ -568,6 +568,9 @@ const handler = async (req: Request): Promise<Response> => {
       const rejectLink = isPendingApproval
         ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`
         : null;
+      const transferLink = isPendingApproval
+        ? `${publicUrl}/transfer-approval?id=${visitor.id}`
+        : null;
 
       const hostMessage = buildWhatsAppMessage({
         branding,
@@ -590,6 +593,7 @@ const handler = async (req: Request): Promise<Response> => {
         companions,
         approveLink: isPendingApproval ? approveLink : null,
         rejectLink: isPendingApproval ? rejectLink : null,
+        transferLink: isPendingApproval ? transferLink : null,
         closingLine: isPendingApproval ? null : "Please proceed to the reception to receive your visitor.",
       });
       const hostMediaUrl = visitor.photo_url || branding.logoUrl;
