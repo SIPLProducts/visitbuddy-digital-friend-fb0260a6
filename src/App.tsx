@@ -50,6 +50,7 @@ import EmergencyEvacuation from "./pages/EmergencyEvacuation";
 import CameraMonitor from "./pages/CameraMonitor";
 import ComplianceReport from "./pages/ComplianceReport";
 import SafetyInfo from "./pages/SafetyInfo";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/print-badge" element={<PrintBadge />} />
       <Route path="/visitor/:visitorCode" element={<VisitorQrLink />} />
       <Route path="/click/:code" element={<ClickRedirect />} />
