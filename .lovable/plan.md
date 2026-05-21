@@ -1,61 +1,67 @@
-# Fix: Blank page after clicking password-reset link (self-hosted)
+# Fix: Blank page on reset link (self-hosted at https://vms.resustainability.com)
 
-## Root cause
+## Why env changes are needed even though the app is "already deployed"
 
-The reset email link is shaped like:
+The deployed URL `https://vms.resustainability.com` is your **React frontend**. But **GoTrue** (the Supabase Auth service running in Docker on your server) is a separate process that has no idea what URL the frontend uses. Every auth-related URL it puts in emails — and every `redirect_to` it accepts — comes from **its own env vars**, not from the frontend.
+
+Your reset-link landing URL proves this:
+
 ```
-http://10.100.4.36:8000/auth/v1/verify?token=...&type=recovery&redirect_to=http://10.100.4.36:8000/reset-password
+http://10.100.4.36:8000/auth/v1/verify?token=...&redirect_to=http://10.100.4.36
 ```
 
-GoTrue (Supabase Auth) validates `redirect_to` against its allow-list. If it's **not** allowed, GoTrue silently falls back to `GOTRUE_SITE_URL` and strips the path.
+Two things wrong, both purely env-config on the server:
 
-Your landing URL is `http://10.100.4.36` — no port, no `/reset-password` path. That's the signature of:
-1. `GOTRUE_SITE_URL` is set to `http://10.100.4.36` (bare, no port), AND
-2. `http://10.100.4.36:8000/reset-password` is not in `GOTRUE_URI_ALLOW_LIST` / `ADDITIONAL_REDIRECT_URLS`.
+1. `verify` host is `10.100.4.36:8000` → GoTrue's `API_EXTERNAL_URL` is set to the bare LAN IP. So every auth email points users at the IP (which won't work from outside the LAN, and isn't HTTPS).
+2. `redirect_to` is `http://10.100.4.36` (no path, no port) → GoTrue rejected the `redirect_to` the frontend sent (because it isn't in the allow-list) and fell back to its `SITE_URL`, which is the bare IP.
 
-The app code (`send-password-reset` edge function, `Auth.tsx`, `ResetPassword.tsx`) is correct and needs no changes.
+So we're not "adding a new URL" — we're **replacing the wrong IP-based URLs with the correct public domain**.
 
-## Fix — update self-hosted Supabase env
+## Fix — one .env file on the server, then restart auth
 
-On the server, edit the Supabase `.env` (typically `/opt/supabase/docker/.env` or wherever `docker-compose.yml` lives):
+On the deployed server, edit Supabase's `.env` (the one next to `docker-compose.yml`, typically `/opt/supabase/docker/.env`):
 
 ```env
-# The public URL where your frontend is reachable (include port if non-80/443)
-SITE_URL=http://10.100.4.36:8000
+# Public URL of the frontend — used as the default landing after auth actions
+SITE_URL=https://vms.resustainability.com
 
-# Comma-separated list of allowed redirect targets after auth actions.
-# Add every page that may receive a redirect: reset-password, approve-visitor, etc.
-ADDITIONAL_REDIRECT_URLS=http://10.100.4.36:8000/reset-password,http://10.100.4.36:8000/**
+# Public URL of the Supabase API (Kong) — used when building links inside emails
+API_EXTERNAL_URL=https://vms.resustainability.com
 
-# API_EXTERNAL_URL must also be the publicly reachable Supabase URL used in emails
-API_EXTERNAL_URL=http://10.100.4.36:8000
+# Allowed redirect targets after auth actions
+ADDITIONAL_REDIRECT_URLS=https://vms.resustainability.com/reset-password,https://vms.resustainability.com/**
 ```
 
-Note: in the Supabase Docker stack the GoTrue container reads these as `GOTRUE_SITE_URL`, `GOTRUE_URI_ALLOW_LIST`, `GOTRUE_API_EXTERNAL_URL`. The `.env` keys above are what the bundled `docker-compose.yml` maps them from. If your compose file uses different names, set the `GOTRUE_*` ones directly.
+If your compose file uses the `GOTRUE_*`-prefixed names directly, set these instead:
+```env
+GOTRUE_SITE_URL=https://vms.resustainability.com
+GOTRUE_API_EXTERNAL_URL=https://vms.resustainability.com
+GOTRUE_URI_ALLOW_LIST=https://vms.resustainability.com/reset-password,https://vms.resustainability.com/**
+```
 
-Then restart auth:
+Restart auth:
 ```bash
 cd /opt/supabase/docker
 docker compose up -d auth
-# or full restart: docker compose restart
 ```
+
+## Confirm Nginx already proxies the auth path
+
+Since the frontend points `VITE_SUPABASE_URL` at `https://vms.resustainability.com`, your Nginx must forward `/auth/v1/*` to the Supabase Kong container (the project ships `deploy/nginx/supabase-api.conf.tpl` for this — make sure it's enabled on the `vms.resustainability.com` server block). Quick check from your laptop:
+
+```bash
+curl -i https://vms.resustainability.com/auth/v1/health
+# expect: 200 OK with {"name":"GoTrue", ...}
+```
+
+If that 404s, the env fix alone won't be enough — Nginx needs the supabase-api config wired in too.
 
 ## Verify
 
-1. Request a password reset again from `/auth` → "Forgot password".
-2. Open the email link.
-3. You should land on `http://10.100.4.36:8000/reset-password#access_token=...&type=recovery` and see the "Reset your password" form.
+1. Open `https://vms.resustainability.com/auth` → click **Forgot password** → submit email.
+2. Open the email — the "Reset Password" button now points at `https://vms.resustainability.com/auth/v1/verify?...&redirect_to=https://vms.resustainability.com/reset-password`.
+3. Click it → you land on `https://vms.resustainability.com/reset-password#access_token=...&type=recovery` and see the "Reset your password" form.
 
-## If you use HTTPS / a real domain later
+## No app code changes
 
-When you put the app behind `https://vms.resustainability.com`, update the same three vars to that URL (and the matching `/reset-password` entry in `ADDITIONAL_REDIRECT_URLS`), then restart `auth` again.
-
-## What NOT to change
-
-- Don't touch `supabase/functions/send-password-reset/index.ts` — it already passes the right `redirectTo` from the browser.
-- Don't touch `src/pages/ResetPassword.tsx` — it already listens for `PASSWORD_RECOVERY` and `SIGNED_IN` events and parses the hash via `detectSessionInUrl` (default on).
-- Don't add a SPA redirect rule in Nginx for `/reset-password` specifically — your existing SPA fallback already serves `index.html` for unknown paths; the problem was that the URL never reached `/reset-password` in the first place.
-
-## Optional follow-up (later, not required for this fix)
-
-Add a small console.log in `ResetPassword.tsx` to log `window.location.hash` on mount — makes future debugging of similar redirect issues a one-glance check.
+`send-password-reset/index.ts`, `Auth.tsx`, and `ResetPassword.tsx` are all correct. This is purely a server-side env config fix.
