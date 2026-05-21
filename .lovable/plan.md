@@ -1,25 +1,34 @@
-## Plan
+## Goal
+Replace every occurrence of "VisiGuard" (and case variants like "VisiGuard VMS") with "Re Sustainability" across the codebase, including the files you listed plus all other files that still reference it.
 
-1. **Restore the database trigger**
-   - Add a migration that creates `generate_visitor_id_trigger` on `public.visitors`.
-   - This trigger will run before every new visitor insert and call the existing `generate_visitor_id()` function.
-   - Result: when the app does not send a `visitor_id`, the database will generate IDs like `CORPOR-200526-0001` or `CDHYD-200526-0001`.
+## Files to update
+All source files containing "VisiGuard":
 
-2. **Stop frontend manual VIS ID generation**
-   - Update `src/pages/NewVisitor.tsx` to stop generating `VIS-XXXXXXXX-XXXX` client-side.
-   - Remove `visitor_id` from the insert payload so the database trigger assigns the correct ID.
-   - Return `id, visitor_id` after insert so notifications and UI still work.
+**Proposal components** (`src/components/proposal/`)
+- ProposalCoverPage.tsx, ProposalExecutiveSummary.tsx, ProposalFeatureSection.tsx, ProposalPricing.tsx, ProposalTechStack.tsx, ProposalTimeline.tsx, ProposalContactPage.tsx
 
-3. **Fix CSV/bulk visitor import**
-   - Update `src/pages/VisitorReport.tsx` to stop assigning `visitor_id: generateVisitorId()` during CSV import.
-   - Let each imported row receive the plant/date/sequence ID from the database.
+**Pages** (`src/pages/`)
+- ProductFeatures.tsx, Settings.tsx, ResourceRequirements.tsx, GateQRCodes.tsx, SelfService.tsx, UserManual.tsx
 
-4. **Important note about old records**
-   - Existing `VIS-...` visitor IDs will remain unchanged, as requested earlier.
-   - Only newly created visitors after this fix will get the plant-code format.
+**Edge functions** (`supabase/functions/`)
+- notify-host, approve-visitor, send-email, send-email-badge, send-sms-badge, send-whatsapp-badge, send-vehicle-whatsapp, test-smtp
 
-## Technical details
+**Other**
+- src/components/settings/WhatsAppSettingsPanel.tsx
+- src/hooks/useOnboarding.ts
+- src/i18n/index.ts
+- src/utils/generateProposalDocx.ts
 
-- Root cause: the migration updated the `generate_visitor_id()` function, but the live database currently has no trigger on `visitors`, and `NewVisitor.tsx` still manually inserts `VIS-...` IDs.
-- Existing self-service QR flow already omits `visitor_id`, so after the trigger is restored it will also receive the new format automatically.
-- Counter scope remains per plant code through `visitor_id_counters.location_key`.
+## Replacement rules
+- `VisiGuard VMS` → `Re Sustainability VMS`
+- `VisiGuard` → `Re Sustainability`
+- Preserve any "Powered by Sharvi Infotech" footers as-is.
+- Email subjects, WhatsApp templates, document titles, and onboarding strings all updated consistently.
+
+## Out of scope
+- Will not touch `deploy/README*.md` or `whatsapp-bridge/` package metadata unless you also want those updated (these are deploy docs, not user-facing app).
+- Old database rows already storing "VisiGuard" remain unchanged (tenant_settings.company_name was already set to "Re Sustainability" in a prior migration).
+- After edge function changes, they will be redeployed automatically.
+
+## Verification
+Run `grep -ri "visiguard"` across `src/` and `supabase/functions/` and confirm zero matches.

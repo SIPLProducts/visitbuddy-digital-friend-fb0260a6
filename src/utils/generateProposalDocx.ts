@@ -57,7 +57,7 @@ export async function generateProposalDocx() {
             spacing: { before: 2000 },
             children: [
               new TextRun({
-                text: 'VisiGuard VMS',
+                text: 'Re Sustainability VMS',
                 bold: true,
                 size: 72,
                 color: '1e3a8a',
@@ -127,7 +127,7 @@ export async function generateProposalDocx() {
           // Executive Summary
           createHeading('Executive Summary'),
           createParagraph(
-            'VisiGuard VMS is a comprehensive, enterprise-grade Visitor Management System designed to streamline and secure the visitor experience across organizations of all sizes. Built with modern cloud technologies, VisiGuard provides seamless visitor tracking, automated notifications, and comprehensive analytics—all accessible from any device.'
+            'Re Sustainability VMS is a comprehensive, enterprise-grade Visitor Management System designed to streamline and secure the visitor experience across organizations of all sizes. Built with modern cloud technologies, Re Sustainability provides seamless visitor tracking, automated notifications, and comprehensive analytics—all accessible from any device.'
           ),
           createSubHeading('Key Value Propositions'),
           createBulletPoint('Reduce check-in time by up to 70% with QR-based rapid check-in'),
@@ -361,7 +361,7 @@ export async function generateProposalDocx() {
             spacing: { before: 1000 },
             children: [
               new TextRun({
-                text: 'Thank you for considering VisiGuard VMS',
+                text: 'Thank you for considering Re Sustainability VMS',
                 bold: true,
                 size: 28,
                 color: '1e3a8a',
@@ -374,5 +374,5 @@ export async function generateProposalDocx() {
   });
 
   const blob = await Packer.toBlob(doc);
-  saveAs(blob, `VisiGuard_VMS_Proposal_${new Date().toISOString().split('T')[0]}.docx`);
+  saveAs(blob, `Re Sustainability_VMS_Proposal_${new Date().toISOString().split('T')[0]}.docx`);
 }

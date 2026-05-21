@@ -193,7 +193,7 @@ export default function GateQRCodes() {
       </head>
       <body>
         <div class="container">
-          <div class="title">VisiGuard</div>
+          <div class="title">Re Sustainability</div>
           <div class="subtitle">Visitor Self Check-in</div>
           
           <div class="qr-container">

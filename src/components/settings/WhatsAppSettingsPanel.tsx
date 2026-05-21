@@ -75,7 +75,7 @@ export function WhatsAppSettingsPanel({ provider, onProviderChange }: Props) {
   const [lastError, setLastError] = useState<BridgeError | null>(null);
   const [testPhone, setTestPhone] = useState('9182686448');
   const [testMessage, setTestMessage] = useState(
-    '✅ VisiGuard test — WhatsApp Web bridge is connected and sending from your scanned number.',
+    '✅ Re Sustainability test — WhatsApp Web bridge is connected and sending from your scanned number.',
   );
   const [sending, setSending] = useState(false);
   const pollRef = useRef<number | null>(null);

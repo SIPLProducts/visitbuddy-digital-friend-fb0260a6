@@ -51,7 +51,7 @@ export function ProposalContactPage() {
             margin: 0
           }}
         >
-          Let's discuss how VisiGuard VMS can meet your organization's needs
+          Let's discuss how Re Sustainability VMS can meet your organization's needs
         </p>
       </div>
 
@@ -231,7 +231,7 @@ export function ProposalContactPage() {
             }}
           />
           <span style={{ color: 'white', fontSize: '14px', opacity: 0.9 }}>
-            VisiGuard VMS
+            Re Sustainability VMS
           </span>
         </div>
         <div style={{ color: 'white', fontSize: '12px', opacity: 0.8 }}>

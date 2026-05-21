@@ -66,7 +66,7 @@ export function ProposalCoverPage() {
             letterSpacing: '-1px'
           }}
         >
-          VisiGuard VMS
+          Re Sustainability VMS
         </h1>
         
         <h2 

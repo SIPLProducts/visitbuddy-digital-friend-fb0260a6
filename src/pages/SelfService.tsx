@@ -252,7 +252,7 @@ export default function SelfService() {
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <img src={reslLogo} alt="Logo" className="h-10 w-10 object-contain" />
           <div>
-            <h1 className="font-semibold text-foreground">VisiGuard</h1>
+            <h1 className="font-semibold text-foreground">Re Sustainability</h1>
             <p className="text-xs text-muted-foreground">Visitor Self Check-in</p>
           </div>
         </div>

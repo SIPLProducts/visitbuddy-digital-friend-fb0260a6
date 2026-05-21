@@ -90,7 +90,7 @@ const ProductFeatures = () => {
         pdf.text(`Page ${p} of ${totalPages}`, 105, 294, { align: 'center' });
       }
 
-      pdf.save('VisiGuard-Product-Features-Specifications.pdf');
+      pdf.save('Re Sustainability-Product-Features-Specifications.pdf');
       toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error('PDF generation error:', error);
@@ -127,7 +127,7 @@ const ProductFeatures = () => {
             <div className="flex-1 flex flex-col items-center justify-center text-center p-12" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0891b2 100%)' }}>
               <div className="text-5xl mb-6 bg-white/90 rounded-lg px-6 py-3 font-bold" style={{ color: '#1e3a8a' }}>Sharvi</div>
               <h1 className="text-4xl font-bold text-white mb-4">Product Features & Specifications</h1>
-              <h2 className="text-2xl text-white/90 mb-2">VisiGuard VMS</h2>
+              <h2 className="text-2xl text-white/90 mb-2">Re Sustainability VMS</h2>
               <p className="text-lg text-white/80 mb-8">Enterprise Visitor & Vehicle Management System</p>
               <div className="flex gap-6 mt-4">
                 {[

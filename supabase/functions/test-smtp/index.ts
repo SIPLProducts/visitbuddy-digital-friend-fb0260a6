@@ -58,14 +58,14 @@ Deno.serve(async (req) => {
       const info = await transporter.sendMail({
         from: fromAddr,
         to: [to_email],
-        subject: "VisiGuard Email Test — Configuration Verified ✅",
+        subject: "Re Sustainability Email Test — Configuration Verified ✅",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
             <div style="background: linear-gradient(135deg, #0891b2, #0e7490); padding: 20px; border-radius: 8px 8px 0 0; text-align: center;">
               <h2 style="color: white; margin: 0;">✅ Email Sending Working!</h2>
             </div>
             <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-              <p>This is a test email from <strong>VisiGuard VMS</strong> sent via SMTP.</p>
+              <p>This is a test email from <strong>Re Sustainability VMS</strong> sent via SMTP.</p>
               <p style="color: #6b7280; font-size: 14px;">
                 Sender: ${fromAddr}<br/>
                 Provider: SMTP (${smtp.smtp_host}:${smtp.smtp_port})

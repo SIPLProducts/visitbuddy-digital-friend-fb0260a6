@@ -81,9 +81,9 @@ export function ProposalExecutiveSummary() {
             margin: 0
           }}
         >
-          <strong>VisiGuard VMS</strong> is a comprehensive, enterprise-grade Visitor Management System 
+          <strong>Re Sustainability VMS</strong> is a comprehensive, enterprise-grade Visitor Management System 
           designed to modernize how organizations manage visitor access, vehicle entry, and facility 
-          security. Built with cutting-edge web technologies, VisiGuard delivers a seamless experience 
+          security. Built with cutting-edge web technologies, Re Sustainability delivers a seamless experience 
           across desktop and mobile devices while maintaining the highest standards of data security 
           and compliance.
         </p>
@@ -226,7 +226,7 @@ export function ProposalExecutiveSummary() {
           color: '#94a3b8'
         }}
       >
-        VisiGuard VMS - Product Proposal | Powered by Sharvi Infotech
+        Re Sustainability VMS - Product Proposal | Powered by Sharvi Infotech
       </div>
     </div>
   );

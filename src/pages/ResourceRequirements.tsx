@@ -89,7 +89,7 @@ const ResourceRequirements = () => {
         pdf.text(`Page ${p} of ${totalPages}`, 105, 294, { align: 'center' });
       }
 
-      pdf.save('VisiGuard-Resource-Requirements.pdf');
+      pdf.save('Re Sustainability-Resource-Requirements.pdf');
       toast.success('PDF downloaded successfully!');
     } catch (error) {
       console.error('PDF generation error:', error);
@@ -126,7 +126,7 @@ const ResourceRequirements = () => {
               <img src={reslLogo} alt="RESL Logo" className="h-20 mb-8 bg-white/90 rounded-lg p-3" />
               <h1 className="text-4xl font-bold text-white mb-4">Resource Requirements</h1>
               <h2 className="text-2xl text-white/90 mb-2">Server Configuration & Deployment Guide</h2>
-              <p className="text-lg text-white/80 mb-8">VisiGuard VMS — Enterprise Visitor Management System</p>
+              <p className="text-lg text-white/80 mb-8">Re Sustainability VMS — Enterprise Visitor Management System</p>
               <div className="flex gap-6 mt-4">
                 <div className="bg-white/20 rounded-lg p-4 text-white">
                   <Cloud className="h-8 w-8 mx-auto mb-2" />
@@ -156,7 +156,7 @@ const ResourceRequirements = () => {
             <h2 className="text-2xl font-bold text-foreground">Cloud Deployment Configuration</h2>
           </div>
           <p className="text-muted-foreground mb-6">
-            VisiGuard VMS is optimized for cloud-native deployment using modern PaaS/IaaS platforms. Below are the recommended configurations based on expected user load.
+            Re Sustainability VMS is optimized for cloud-native deployment using modern PaaS/IaaS platforms. Below are the recommended configurations based on expected user load.
           </p>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -214,7 +214,7 @@ const ResourceRequirements = () => {
           </h3>
           <div className="border rounded-lg p-4 mb-6 bg-muted/30">
             <p className="text-sm text-muted-foreground mb-3">
-              If the client already has an existing cloud or hosting vendor, VisiGuard VMS can be deployed on their current infrastructure provided it meets the minimum specifications listed above. Common existing vendors include:
+              If the client already has an existing cloud or hosting vendor, Re Sustainability VMS can be deployed on their current infrastructure provided it meets the minimum specifications listed above. Common existing vendors include:
             </p>
             <div className="grid grid-cols-2 gap-3 text-sm">
               {[
@@ -267,7 +267,7 @@ const ResourceRequirements = () => {
             <h2 className="text-2xl font-bold text-foreground">On-Premise / Rack Server Configuration</h2>
           </div>
           <p className="text-muted-foreground mb-6">
-            For organizations requiring data sovereignty or air-gapped environments, VisiGuard VMS can be deployed on physical or virtual rack servers.
+            For organizations requiring data sovereignty or air-gapped environments, Re Sustainability VMS can be deployed on physical or virtual rack servers.
           </p>
 
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -422,7 +422,7 @@ const ResourceRequirements = () => {
             <h2 className="text-2xl font-bold text-foreground">System Architecture & Hardware Connectivity</h2>
           </div>
           <p className="text-xs text-muted-foreground mb-4">
-            This diagram illustrates the complete infrastructure stack and gate-level hardware setup required to run VisiGuard VMS.
+            This diagram illustrates the complete infrastructure stack and gate-level hardware setup required to run Re Sustainability VMS.
           </p>
 
           {/* System Architecture Diagram */}
