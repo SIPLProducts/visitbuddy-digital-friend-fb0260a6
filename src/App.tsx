@@ -51,6 +51,7 @@ import CameraMonitor from "./pages/CameraMonitor";
 import ComplianceReport from "./pages/ComplianceReport";
 import SafetyInfo from "./pages/SafetyInfo";
 import ResetPassword from "./pages/ResetPassword";
+import TransferApproval from "./pages/TransferApproval";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ function AppRoutes() {
       <Route path="/safety/:code" element={<SafetyInfo />} />
       <Route path="/self-service" element={<SelfService />} />
       <Route path="/approve-visitor" element={<ApproveVisitor />} />
+      <Route path="/transfer-approval" element={<TransferApproval />} />
       <Route path="/install" element={<Install />} />
       <Route path="/proposal-document" element={<ProposalDocument />} />
       <Route path="/resource-requirements" element={<ResourceRequirements />} />
