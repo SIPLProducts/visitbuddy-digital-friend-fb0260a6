@@ -283,7 +283,8 @@ function generateHostApprovalEmail(
   rejectLink: string,
   accompanyingVisitors: any[] = [],
   branding: Branding,
-  isPendingApproval: boolean = true
+  isPendingApproval: boolean = true,
+  transferLink: string = ""
 ): string {
   const subtitle = isPendingApproval ? "Visitor Approval Required" : "Visitor Arrival Notification";
   const accent = branding.primaryColor;
@@ -337,8 +338,10 @@ function generateHostApprovalEmail(
       ` : ''}
 
       ${isPendingApproval ? `<div style="text-align:center;margin:24px 0;">
-        <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">✅ Approve Visit</a>
-        <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">❌ Reject Visit</a>
+        <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:4px;">✅ Approve Visit</a>
+        <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:4px;">❌ Reject Visit</a>
+        ${transferLink ? `<a href="${transferLink}" style="display:inline-block;background:#4f46e5;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:4px;">🔁 Transfer to Another Host</a>` : ""}
+        ${transferLink ? `<p style="margin:12px 0 0;color:#6b7280;font-size:12px;">Can't action this visit? Use <strong>Transfer</strong> to forward it to another host at your location.</p>` : ""}
       </div>` : `<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>`}
     </div>
     ${brandedFooter()}
