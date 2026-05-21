@@ -733,9 +733,10 @@ const handler = async (req: Request): Promise<Response> => {
     if (hostData.email && isPendingApproval && !skipHost) {
       const approveLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=approve`;
       const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
+      const transferLink = `${publicUrl}/transfer-approval?id=${visitor.id}`;
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, approveLink, rejectLink, companions, branding, true
+        currentDate, currentTime, approveLink, rejectLink, companions, branding, true, transferLink
       );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
