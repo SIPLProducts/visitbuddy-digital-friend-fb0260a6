@@ -146,6 +146,7 @@ interface WhatsAppMessageOpts {
   companions?: any[];
   approveLink?: string | null;
   rejectLink?: string | null;
+  transferLink?: string | null;
   closingLine?: string | null;
 }
 
@@ -187,6 +188,9 @@ function buildWhatsAppMessage(opts: WhatsAppMessageOpts): string {
     lines.push("");
     lines.push(`✅ Approve: ${opts.approveLink}`);
     lines.push(`❌ Reject:  ${opts.rejectLink}`);
+    if (opts.transferLink) {
+      lines.push(`🔁 Transfer to another host: ${opts.transferLink}`);
+    }
   }
 
   if (opts.closingLine) {
@@ -279,7 +283,8 @@ function generateHostApprovalEmail(
   rejectLink: string,
   accompanyingVisitors: any[] = [],
   branding: Branding,
-  isPendingApproval: boolean = true
+  isPendingApproval: boolean = true,
+  transferLink: string = ""
 ): string {
   const subtitle = isPendingApproval ? "Visitor Approval Required" : "Visitor Arrival Notification";
   const accent = branding.primaryColor;
@@ -333,8 +338,10 @@ function generateHostApprovalEmail(
       ` : ''}
 
       ${isPendingApproval ? `<div style="text-align:center;margin:24px 0;">
-        <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">✅ Approve Visit</a>
-        <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;margin:0 8px;">❌ Reject Visit</a>
+        <a href="${approveLink}" style="display:inline-block;background:#16a34a;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:4px;">✅ Approve Visit</a>
+        <a href="${rejectLink}" style="display:inline-block;background:#dc2626;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:4px;">❌ Reject Visit</a>
+        ${transferLink ? `<a href="${transferLink}" style="display:inline-block;background:#4f46e5;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;margin:4px;">🔁 Transfer to Another Host</a>` : ""}
+        ${transferLink ? `<p style="margin:12px 0 0;color:#6b7280;font-size:12px;">Can't action this visit? Use <strong>Transfer</strong> to forward it to another host at your location.</p>` : ""}
       </div>` : `<p style="text-align:center;color:#374151;font-size:14px;">Please proceed to the reception to receive your visitor.</p>`}
     </div>
     ${brandedFooter()}
@@ -561,6 +568,9 @@ const handler = async (req: Request): Promise<Response> => {
       const rejectLink = isPendingApproval
         ? `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`
         : null;
+      const transferLink = isPendingApproval
+        ? `${publicUrl}/transfer-approval?id=${visitor.id}`
+        : null;
 
       const hostMessage = buildWhatsAppMessage({
         branding,
@@ -583,6 +593,7 @@ const handler = async (req: Request): Promise<Response> => {
         companions,
         approveLink: isPendingApproval ? approveLink : null,
         rejectLink: isPendingApproval ? rejectLink : null,
+        transferLink: isPendingApproval ? transferLink : null,
         closingLine: isPendingApproval ? null : "Please proceed to the reception to receive your visitor.",
       });
       const hostMediaUrl = visitor.photo_url || branding.logoUrl;
@@ -722,9 +733,10 @@ const handler = async (req: Request): Promise<Response> => {
     if (hostData.email && isPendingApproval && !skipHost) {
       const approveLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=approve`;
       const rejectLink = `${publicUrl}/approve-visitor?id=${visitor.id}&action=reject`;
+      const transferLink = `${publicUrl}/transfer-approval?id=${visitor.id}`;
       const hostEmailHtml = generateHostApprovalEmail(
         visitor, hostData.name, gateName, departmentName,
-        currentDate, currentTime, approveLink, rejectLink, companions, branding, true
+        currentDate, currentTime, approveLink, rejectLink, companions, branding, true, transferLink
       );
       hostEmailSent = await sendSmtpEmail(
         supabase, hostData.email,
