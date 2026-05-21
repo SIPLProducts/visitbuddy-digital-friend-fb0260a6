@@ -1,30 +1,55 @@
-# Forgot Password + Hide "Create one"
+# Custom Password Reset via Existing SMTP
 
-## 1. Auth page (`src/pages/Auth.tsx`)
-- Replace the inert "Forgot password?" `<button>` with a working handler:
-  - Read email from `loginForm.getValues('email')`; validate via `loginSchema.shape.email`.
-  - If invalid/empty, toast: "Enter your email above first".
-  - Call `supabase.auth.resetPasswordForEmail(email, { redirectTo: \`${window.location.origin}/reset-password\` })`.
-  - Toast success: "Password reset link sent. Check your inbox." Toast error on failure.
-  - Add a `resetLoading` state to disable the link while in-flight.
-- Comment out the "Don't have an account? / Create one" toggle block at the bottom (keep code commented for easy re-enable). Also comment out the unused signup form section/`isLogin` toggle UI is left intact but the button to switch is hidden, so signup form will never render. Simplest: wrap the toggle `<p>` in `{false && (...)}` or just comment it out.
+Replace the GoTrue-based password reset with a custom edge function that uses your existing `email_config` SMTP (same one used by `send-email`, `send-email-badge`). Works identically in Lovable Cloud and self-hosted Supabase — zero GoTrue SMTP config needed.
 
-## 2. New route: Reset Password page (`src/pages/ResetPassword.tsx`)
-Public page that:
-- On mount, lets Supabase process the recovery hash (`onAuthStateChange` fires `PASSWORD_RECOVERY`); track a `canReset` flag.
-- Renders a form with `password` + `confirmPassword` (zod-validated, min 6, match).
-- Submits `supabase.auth.updateUser({ password })`. On success: toast, `signOut`, navigate to `/auth`.
-- Branded to match Auth page (RE Sustainability logo, same card style).
+## 1. New edge function: `supabase/functions/send-password-reset/index.ts`
 
-## 3. Routing (`src/App.tsx`)
-- Add public route `/reset-password` → `<ResetPassword />` (outside `ProtectedLayout`).
+Mirrors the pattern of `send-email`:
 
-## Out of scope
-- Email template customization (Supabase default recovery email is used).
-- Signup form code itself (left in file, just unreachable).
-- Any backend/edge function changes.
+- **Input**: `{ email, redirectTo }` — both required.
+- **Auth**: public (no JWT) — needs to work from the login page. Validates email format server-side.
+- **Generate recovery link** with the service role key:
+  ```ts
+  admin.auth.admin.generateLink({
+    type: "recovery",
+    email,
+    options: { redirectTo },
+  })
+  ```
+  This returns `properties.action_link` (the GoTrue recovery URL with the token) **without** sending any email.
+- **Load SMTP** from `email_config` (`is_active = true`, single row) — same query `send-email` uses.
+- **Send** via Nodemailer with the same branded HTML template style (RE logo via `cid:re-logo`, primary color from `tenant_settings`).
+- **Email contains**: greeting, "Reset Password" button → `action_link`, plain-text fallback link, 1-hour validity notice, "ignore if not you" footer.
+- **Privacy**: if the email doesn't exist or `generateLink` fails, still return `{ success: true }` (no enumeration leak). Only return 500 when SMTP config is missing.
+- **Log** to `email_logs` with `template: "password_reset"`.
+
+## 2. Frontend: `src/pages/Auth.tsx`
+
+Replace the `handleForgotPassword` body that currently calls `supabase.auth.resetPasswordForEmail(...)` with:
+
+```ts
+const { data, error } = await supabase.functions.invoke("send-password-reset", {
+  body: { email: parsed.data, redirectTo: `${window.location.origin}/reset-password` },
+});
+```
+
+Same UX (toast on success/error, `resetLoading` state, "Enter your email above first" guard). The existing `/reset-password` page works unchanged because `action_link` contains the same recovery token GoTrue would have emailed natively.
+
+## 3. Deployment notes
+
+- Edge function deploys automatically on save (Lovable Cloud + self-hosted via `deploy.sh`).
+- No new secrets needed — service role key is already in env.
+- No `email_config` schema changes.
+- Self-hosted servers must have outbound access to the SMTP host already configured for badge emails — which they do (badges already work).
+- GoTrue's own SMTP can stay on defaults (it's no longer used for recovery).
 
 ## Files touched
-- `src/pages/Auth.tsx` (edit)
-- `src/pages/ResetPassword.tsx` (new)
-- `src/App.tsx` (add route)
+
+- `supabase/functions/send-password-reset/index.ts` (new)
+- `src/pages/Auth.tsx` (edit `handleForgotPassword` only)
+
+## Out of scope
+
+- GoTrue SMTP env vars (Option A) — not needed.
+- Custom recovery token generation — using GoTrue's native token via admin API.
+- Changes to `/reset-password` page or any other edge function.
