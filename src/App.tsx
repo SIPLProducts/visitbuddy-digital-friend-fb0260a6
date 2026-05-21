@@ -49,6 +49,7 @@ import Watchlist from "./pages/Watchlist";
 import EmergencyEvacuation from "./pages/EmergencyEvacuation";
 import CameraMonitor from "./pages/CameraMonitor";
 import ComplianceReport from "./pages/ComplianceReport";
+import SafetyInfo from "./pages/SafetyInfo";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ function AppRoutes() {
       <Route path="/visitor/:visitorCode" element={<VisitorQrLink />} />
       <Route path="/click/:code" element={<ClickRedirect />} />
       <Route path="/s/:code" element={<ShortLinkRedirect />} />
+      <Route path="/safety/:code" element={<SafetyInfo />} />
       <Route path="/self-service" element={<SelfService />} />
       <Route path="/approve-visitor" element={<ApproveVisitor />} />
       <Route path="/install" element={<Install />} />
@@ -141,6 +143,9 @@ if (typeof window !== "undefined") {
     if (code) {
       window.history.replaceState({}, "", `/visitor/${code}`);
     }
+  } else if (/^\?s[a-z0-9]{4,8}$/i.test(s)) {
+    const code = s.slice(2).toLowerCase();
+    window.history.replaceState({}, "", `/safety/${code}`);
   } else if (/^\?[a-z0-9]{6,10}$/i.test(s)) {
     const code = s.slice(1).toLowerCase();
     window.history.replaceState({}, "", `/s/${code}`);
