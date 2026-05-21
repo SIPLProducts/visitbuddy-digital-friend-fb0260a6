@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Shield, Loader2 } from 'lucide-react';
 import reLogo from '@/assets/re-sustainability-logo.png';
@@ -45,6 +46,7 @@ export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
 
@@ -93,6 +95,25 @@ export default function Auth() {
     } else {
       toast.success('Account created successfully!');
       navigate('/');
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    const email = loginForm.getValues('email');
+    const parsed = z.string().email().safeParse(email);
+    if (!parsed.success) {
+      toast.error('Enter your email above first');
+      return;
+    }
+    setResetLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResetLoading(false);
+    if (error) {
+      toast.error(error.message || 'Failed to send reset link');
+    } else {
+      toast.success('Password reset link sent. Check your inbox.');
     }
   };
 
@@ -211,9 +232,11 @@ export default function Auth() {
                     </Label>
                     <button
                       type="button"
-                      className="text-sm text-primary hover:underline"
+                      onClick={handleForgotPassword}
+                      disabled={resetLoading}
+                      className="text-sm text-primary hover:underline disabled:opacity-60"
                     >
-                      Forgot password?
+                      {resetLoading ? 'Sending...' : 'Forgot password?'}
                     </button>
                   </div>
                   <div className="relative">
@@ -355,6 +378,7 @@ export default function Auth() {
           </div>
 
           {/* Toggle Auth Mode */}
+          {/* Signup disabled - admin-provisioned accounts only
           <p className="text-center mt-6 text-sm text-muted-foreground">
             {isLogin ? "Don't have an account? " : 'Already have an account? '}
             <button
@@ -365,6 +389,7 @@ export default function Auth() {
               {isLogin ? 'Create one' : 'Sign in'}
             </button>
           </p>
+          */}
 
           {/* Footer */}
           <p className="text-center mt-8 text-xs text-muted-foreground">
