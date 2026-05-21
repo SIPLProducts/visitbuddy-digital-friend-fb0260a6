@@ -106,12 +106,15 @@ export default function Auth() {
       return;
     }
     setResetLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data, {
-      redirectTo: `${window.location.origin}/reset-password`,
+    const { data, error } = await supabase.functions.invoke('send-password-reset', {
+      body: {
+        email: parsed.data,
+        redirectTo: `${window.location.origin}/reset-password`,
+      },
     });
     setResetLoading(false);
-    if (error) {
-      toast.error(error.message || 'Failed to send reset link');
+    if (error || (data as any)?.error) {
+      toast.error((data as any)?.error || error?.message || 'Failed to send reset link');
     } else {
       toast.success('Password reset link sent. Check your inbox.');
     }
