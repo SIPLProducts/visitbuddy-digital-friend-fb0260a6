@@ -102,15 +102,39 @@ const handler = async (req: Request): Promise<Response> => {
       ? `${SMS_LINK_BASE}/?${shortCode}`
       : `${SMS_LINK_BASE}/?${cleanUrlPart(visitorId).toLowerCase().slice(0, 10)}`;
 
+    // Look up the visitor's branch safety short code for the assembly-point URL.
+    let safetyLink = "";
+    try {
+      const supaUrl = Deno.env.get("SUPABASE_URL");
+      const supaKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (supaUrl && supaKey) {
+        const lookup = await fetch(
+          `${supaUrl}/rest/v1/visitors?select=gate:gates(location:locations(safety_short_code))&visitor_id=eq.${encodeURIComponent(cleanUrlPart(visitorId))}&limit=1`,
+          { headers: { apikey: supaKey, Authorization: `Bearer ${supaKey}` } }
+        );
+        if (lookup.ok) {
+          const rows = await lookup.json();
+          const raw = rows?.[0]?.gate?.location?.safety_short_code;
+          const safetyCode = raw
+            ? String(raw).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8)
+            : "";
+          if (safetyCode) safetyLink = `${SMS_LINK_BASE}/?s${safetyCode}`;
+        }
+      }
+    } catch (e) {
+      console.error("safety_short_code lookup failed:", e);
+    }
+
     const visitorNameSafe = (visitorName || "Visitor").trim();
     const companySafe = (company || "RESL").trim();
     const gateSafe = (gateName || "Main Entry").trim();
     const hostSafe = (hostName || "Host").trim();
     const fromSafe = (departmentName || "RESUST").trim();
 
+    const safetySegment = safetyLink ? ` safe to assembly point ${safetyLink}` : "";
     const message =
       `Dear ${visitorNameSafe}, Your visitor access for ${companySafe} is confirmed on ${visitDate} at ${gateSafe}. ` +
-      `QR Link: ${qrUrl} Host: ${hostSafe} FROM ${fromSafe} Regards: RE SUSTAINABILITY LIMITED`;
+      `QR Link: ${qrUrl} Host: ${hostSafe} FROM ${fromSafe}${safetySegment} Regards: RE SUSTAINABILITY LIMITED`;
 
     console.log(`SMS message length: ${message.length} characters`);
 
