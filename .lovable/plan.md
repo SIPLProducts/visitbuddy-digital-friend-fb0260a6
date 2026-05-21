@@ -1,56 +1,61 @@
-# Add Transfer Approval Option
+# Fix: Blank page after clicking password-reset link (self-hosted)
 
-Today, the host approval email has only **Approve** and **Reject**. We'll add a third action: **Transfer**, letting the host hand off the approval to another host at the same location. The new host receives a fresh approval email and is the one who must approve/reject.
+## Root cause
 
-## User flow
+The reset email link is shaped like:
+```
+http://10.100.4.36:8000/auth/v1/verify?token=...&type=recovery&redirect_to=http://10.100.4.36:8000/reset-password
+```
 
-1. Host receives approval email with three buttons: ✅ Approve, ❌ Reject, 🔁 Transfer.
-2. Clicking **Transfer** opens a public page (`/transfer-approval?id=<visitorId>`).
-3. The page shows visitor details and a searchable dropdown of other hosts at the visitor's location (employees where `is_host = true`, same `location_id`, excluding current host).
-4. Host picks a new host → clicks **Transfer Approval**.
-5. Backend updates `visitors.host_id` to the new host and sends a fresh approval email/WhatsApp to that new host. Visitor status stays `pending_approval`.
-6. Original host sees a confirmation screen: "Approval transferred to {name}".
-7. The new host's email contains the same three buttons and can also transfer again if needed.
+GoTrue (Supabase Auth) validates `redirect_to` against its allow-list. If it's **not** allowed, GoTrue silently falls back to `GOTRUE_SITE_URL` and strips the path.
 
-## Pieces to build
+Your landing URL is `http://10.100.4.36` — no port, no `/reset-password` path. That's the signature of:
+1. `GOTRUE_SITE_URL` is set to `http://10.100.4.36` (bare, no port), AND
+2. `http://10.100.4.36:8000/reset-password` is not in `GOTRUE_URI_ALLOW_LIST` / `ADDITIONAL_REDIRECT_URLS`.
 
-### 1. Edge function: `transfer-visitor-approval` (new, public, no JWT)
-- Input: `{ visitorId, newHostId }` — validated with Zod.
-- Loads visitor with service role; confirms `status = 'pending_approval'`.
-- Verifies `newHostId` is an employee with `is_host = true` at the same `location_id` as the visitor's gate.
-- Updates `visitors.host_id = newHostId` (keeps `pending_approval`).
-- Inserts an `audit_logs` row (`action: 'visitor_approval_transferred'`, details include previous and new host).
-- Invokes existing `notify-host` function with `{ visitorId, force: true }` so the new host gets the standard approval email + WhatsApp.
-- Returns `{ success, newHostName }`.
+The app code (`send-password-reset` edge function, `Auth.tsx`, `ResetPassword.tsx`) is correct and needs no changes.
 
-### 2. Public page: `src/pages/TransferApproval.tsx` (new route)
-- Reads `?id=` from query.
-- Public reads: visitors, employees, gates, locations all already allow public SELECT — no auth needed.
-- Fetches visitor (name, company, current host name, gate → location_id).
-- Fetches eligible hosts: `employees` where `location_id = visitorLocationId AND is_host = true AND id != currentHostId`, ordered by name. Searchable combobox (reuse pattern from `HostCombobox`).
-- Submit → calls `supabase.functions.invoke('transfer-visitor-approval', ...)`.
-- Success screen with the new host's name; error screen for invalid/already-processed visitor (status not pending).
-- Branded like `ApproveVisitor.tsx` (RE Sustainability card, logo).
+## Fix — update self-hosted Supabase env
 
-Add route `/transfer-approval` in `src/App.tsx`.
+On the server, edit the Supabase `.env` (typically `/opt/supabase/docker/.env` or wherever `docker-compose.yml` lives):
 
-### 3. Update `notify-host` email template
-- Add a third button **🔁 Transfer to Another Host** linking to `${publicUrl}/transfer-approval?id=${visitor.id}`.
-- Update the WhatsApp message builder to include a Transfer line alongside Approve/Reject.
+```env
+# The public URL where your frontend is reachable (include port if non-80/443)
+SITE_URL=http://10.100.4.36:8000
 
-### 4. Audit logging
-Use existing `audit_logs` table (no schema change). Entry on every transfer for traceability.
+# Comma-separated list of allowed redirect targets after auth actions.
+# Add every page that may receive a redirect: reset-password, approve-visitor, etc.
+ADDITIONAL_REDIRECT_URLS=http://10.100.4.36:8000/reset-password,http://10.100.4.36:8000/**
 
-## What is intentionally NOT changed
+# API_EXTERNAL_URL must also be the publicly reachable Supabase URL used in emails
+API_EXTERNAL_URL=http://10.100.4.36:8000
+```
 
-- No DB schema migration. `visitors.host_id` is reused; transfer history lives in `audit_logs`.
-- No change to the in-app dashboard `PendingApprovals` component (transfer is an email-flow action; could be added later if you want it in-app too — let me know).
-- Reject/approve flows untouched.
-- No limit on number of transfers.
+Note: in the Supabase Docker stack the GoTrue container reads these as `GOTRUE_SITE_URL`, `GOTRUE_URI_ALLOW_LIST`, `GOTRUE_API_EXTERNAL_URL`. The `.env` keys above are what the bundled `docker-compose.yml` maps them from. If your compose file uses different names, set the `GOTRUE_*` ones directly.
 
-## Files
+Then restart auth:
+```bash
+cd /opt/supabase/docker
+docker compose up -d auth
+# or full restart: docker compose restart
+```
 
-- New: `supabase/functions/transfer-visitor-approval/index.ts`
-- New: `src/pages/TransferApproval.tsx`
-- Edit: `src/App.tsx` (add route)
-- Edit: `supabase/functions/notify-host/index.ts` (add Transfer button + WhatsApp line)
+## Verify
+
+1. Request a password reset again from `/auth` → "Forgot password".
+2. Open the email link.
+3. You should land on `http://10.100.4.36:8000/reset-password#access_token=...&type=recovery` and see the "Reset your password" form.
+
+## If you use HTTPS / a real domain later
+
+When you put the app behind `https://vms.resustainability.com`, update the same three vars to that URL (and the matching `/reset-password` entry in `ADDITIONAL_REDIRECT_URLS`), then restart `auth` again.
+
+## What NOT to change
+
+- Don't touch `supabase/functions/send-password-reset/index.ts` — it already passes the right `redirectTo` from the browser.
+- Don't touch `src/pages/ResetPassword.tsx` — it already listens for `PASSWORD_RECOVERY` and `SIGNED_IN` events and parses the hash via `detectSessionInUrl` (default on).
+- Don't add a SPA redirect rule in Nginx for `/reset-password` specifically — your existing SPA fallback already serves `index.html` for unknown paths; the problem was that the URL never reached `/reset-password` in the first place.
+
+## Optional follow-up (later, not required for this fix)
+
+Add a small console.log in `ResetPassword.tsx` to log `window.location.hash` on mount — makes future debugging of similar redirect issues a one-glance check.
