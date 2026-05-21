@@ -533,8 +533,28 @@ const handler = async (req: Request): Promise<Response> => {
           console.error(`SMS abort — qr tail exceeds 10 chars: '${qrTail}' (len=${qrTail.length})`);
         }
 
-        // DLT-approved template: QR Link variable carries the full short URL.
-        const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName} Regards: RE SUSTAINABILITY LIMITED`;
+        // Look up per-location safety short code so we can append a "safe to assembly point" URL.
+        let safetyLink = "";
+        try {
+          const locId = visitor.gate?.location_id;
+          if (locId) {
+            const { data: locRow } = await supabase
+              .from("locations")
+              .select("safety_short_code")
+              .eq("id", locId)
+              .maybeSingle();
+            const safetyCode = locRow?.safety_short_code
+              ? String(locRow.safety_short_code).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8)
+              : "";
+            if (safetyCode) safetyLink = `${smsBase}/?s${safetyCode}`;
+          }
+        } catch (e) {
+          console.error("safety_short_code lookup failed:", e);
+        }
+
+        const safetySegment = safetyLink ? ` safe to assembly point ${safetyLink}` : "";
+        // DLT-approved template: QR Link + safety assembly URL variables carry the short URLs.
+        const strikerMsg = `Dear ${visitorName}, Your visitor access for ${companyName} is confirmed on ${visitDate} at ${gateName}. QR Link: ${qrLink} Host: ${hostName} FROM ${fromName}${safetySegment} Regards: RE SUSTAINABILITY LIMITED`;
 
         const loggedPayload = {
           to: strikerPhone,
