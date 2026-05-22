@@ -1,4 +1,34 @@
 ## Goal
+Fix Admin Head visibility: Admin Head currently can't see visitor data across pages because the `isRestrictedRole` check treats them as Manager/Operator (host-only). Make Admin Head a global plant-wise viewer (read-only) on every page.
+
+## Root cause
+`isRestrictedRole` in `Visitors.tsx`, `Dashboard.tsx`, `VisitorReport.tsx`, and `Analytics.tsx` only excludes `isHoAdmin`. Admin Head has no `admin`/`gate_security` role rows, so the memo returns `true` and the visitor list is filtered down to host-matched / creator-matched rows only — meaning Admin Head sees almost nothing.
+
+## Fix (frontend only)
+In each of the 4 files, change the `isRestrictedRole` memo from:
+```ts
+if (isHoAdmin) return false;
+```
+to:
+```ts
+if (isHoAdmin || isAdminHead) return false;
+```
+(and pull `isAdminHead` from `useUserRoles()` plus add to dep array).
+
+Files:
+- `src/pages/Visitors.tsx`
+- `src/pages/Dashboard.tsx`
+- `src/pages/VisitorReport.tsx`
+- `src/pages/Analytics.tsx`
+
+`useSelectedLocation` already treats Admin Head as a global viewer (All Locations + per-plant switching), and RLS already grants Admin Head SELECT on all visitor-related tables, so no DB or location-switcher changes are needed.
+
+## Result
+Admin Head sees full plant-wise visitor data on Dashboard, Visitors, Visitor Report, and Analytics — across All Locations or any single selected plant — while remaining strictly read-only (no new write controls introduced).
+
+---
+
+## (Previous read-only work — already shipped)
 Apply **strict read-only mode** across the **entire application** for the Admin Head role. Admin Head can only view plant-wise data (all plants) and download plant-wise reports. Every create / edit / approve / reject / delete / check-in / check-out / import / settings-write control is hidden across all pages.
 
 ## Already done
