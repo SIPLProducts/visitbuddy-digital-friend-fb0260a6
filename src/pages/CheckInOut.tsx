@@ -19,9 +19,11 @@ import { cn } from '@/lib/utils';
 import { QrScanner } from '@/components/checkin/QrScanner';
 import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { useNavigate } from 'react-router-dom';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 export default function CheckInOut() {
   const navigate = useNavigate();
+  const { isReadOnly } = useUserRoles();
   const [searchQuery, setSearchQuery] = useState('');
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
@@ -531,7 +533,7 @@ export default function CheckInOut() {
                   </div>
 
                   {/* Photo Capture Button */}
-                  {selectedVisitor.status === 'checked_in' && !selectedVisitor.photo_url && (
+                  {!isReadOnly && selectedVisitor.status === 'checked_in' && !selectedVisitor.photo_url && (
                     <Button
                       variant="outline"
                       className="w-full gap-2"
@@ -542,6 +544,7 @@ export default function CheckInOut() {
                     </Button>
                   )}
 
+                  {!isReadOnly && (
                   <div className="flex gap-2 flex-wrap">
                     {selectedVisitor.status === 'scheduled' ? (
                       <>
@@ -582,6 +585,7 @@ export default function CheckInOut() {
                       </>
                     )}
                   </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-12">
