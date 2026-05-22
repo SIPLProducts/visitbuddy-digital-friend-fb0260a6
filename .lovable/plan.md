@@ -1,39 +1,63 @@
 ## Goal
-Enforce **strict read-only UX** for the Admin Head role so they cannot trigger any write actions, matching the read-only DB permissions already in place.
+Apply **strict read-only mode** across the **entire application** for the Admin Head role. Admin Head can only view plant-wise data (all plants) and download plant-wise reports. Every create / edit / approve / reject / delete / check-in / check-out / import / settings-write control is hidden across all pages.
 
-## Scope of changes (frontend only)
+## Already done
+- `Visitors.tsx` — New Visitor button, bulk actions, Approve/Reject hidden
+- `PendingApprovals.tsx` dashboard card — hidden for Admin Head
+- DB RLS — Admin Head has SELECT-only at all locations
+- Location switcher — All Locations available
 
-### 1. `src/pages/Visitors.tsx`
-- Pull `isReadOnly` from `useUserRoles()`.
-- Hide the **"New Visitor"** button (and disable the inline form trigger) when `isReadOnly` is true.
-- Pass `canEdit={!isReadOnly}` to `<VisitorActions />`.
-- Hide the bulk-action toolbar buttons (bulk checkout / approve / print actions) when `isReadOnly`.
+## Remaining work (frontend only)
 
-### 2. `src/components/visitors/VisitorActions.tsx`
-- When `canEdit === false` (Admin Head):
-  - Do NOT render the quick **Approve** / **Reject** buttons.
-  - Do NOT pass `onApprove` / `onReject` items in the dropdown.
-  - Do NOT render **Check In**, **Check Out**, **Check-in & Print** quick buttons.
-  - Keep only **View Details** and **Print Badge** (read-only friendly).
+Single pattern everywhere:
+```ts
+const { isReadOnly } = useUserRoles();
+// then: {!isReadOnly && <Button>...</Button>}  or  disabled={isReadOnly}
+```
 
-### 3. `src/components/dashboard/PendingApprovals.tsx`
-- Hide the entire card for Admin Head (similar to the existing `isGateSecurityOnly` guard) — add an `isReadOnly` check so no Approve / Reject buttons are visible on the dashboard either.
+### 1. `src/components/visitors/VisitorActions.tsx`
+Honor `canEdit === false` strictly: hide quick Approve / Reject buttons, hide Check In / Check Out / Check-in & Print quick buttons, hide Approve / Reject / Check In / Check Out dropdown items. Keep only **View Details** and **Print Badge**.
 
-### 4. Other write-action surfaces to guard with `isReadOnly`
-- `src/pages/Vehicles.tsx` — hide "New Vehicle" / edit / delete buttons.
-- `src/pages/Appointments.tsx` — hide "New Appointment" + edit/cancel actions.
-- `src/pages/Employees.tsx`, `Departments.tsx`, `Gates.tsx`, `Locations.tsx`, `VehicleTypes.tsx`, `Watchlist.tsx`, `UserManagement.tsx`, `Settings.tsx` — hide Add / Edit / Delete / Import buttons.
-- `src/pages/CheckInOut.tsx` — hide check-in/out submit buttons.
-- `src/components/visitors/VisitorDetailsDialog.tsx` & `VisitorEditDialog.tsx` — disable Save and action buttons.
+### 2. Master data pages — hide Add / Edit / Delete / Import / Bulk buttons
+- `src/pages/Vehicles.tsx` (+ `AnprPanel` actions)
+- `src/pages/Appointments.tsx`
+- `src/pages/Employees.tsx`
+- `src/pages/Departments.tsx`
+- `src/pages/Gates.tsx`
+- `src/pages/Locations.tsx`
+- `src/pages/VehicleTypes.tsx`
+- `src/pages/Watchlist.tsx`
+- `src/pages/UserManagement.tsx`
+- `src/pages/GateQRCodes.tsx`
 
-For these I'll use a single pattern: `const { isReadOnly } = useUserRoles();` then wrap action buttons with `{!isReadOnly && (...)}` or set `disabled={isReadOnly}`.
+### 3. Operations pages — hide write controls
+- `src/pages/CheckInOut.tsx` — hide check-in/out submit buttons
+- `src/pages/NewVisitor.tsx` / `NewVehicle.tsx` — redirect away or render read-only notice
+- `src/pages/EmergencyEvacuation.tsx` — hide trigger/clear buttons
+- `src/pages/BadgePrinting.tsx` — keep print (read-only friendly), hide edits
+- `src/pages/Notifications.tsx` — keep view, hide delete/clear
 
-### 5. Sidebar / route-level safety
-- No new routes needed; `useScreenPermissions.canEditScreen` already returns `false` for Admin Head, but UI buttons don't currently consult it — the explicit `isReadOnly` checks above are the source of truth.
+### 4. Settings & admin
+- `src/pages/Settings.tsx` — disable all form Save buttons across General, Branding, Policies, SMTP, Security, WhatsApp tabs
+- `src/components/settings/WhatsAppSettingsPanel.tsx`
+
+### 5. Dialogs
+- `src/components/visitors/VisitorDetailsDialog.tsx` — hide action buttons (approve/reject/checkout)
+- `src/components/visitors/VisitorEditDialog.tsx` — disable Save
+- `src/components/visitors/CheckInDialog.tsx` & `CheckInCaptureDialog.tsx` — disable confirm
+
+### 6. Sidebar / nav safety
+- `src/components/layout/Sidebar.tsx` — quick "New Visitor" / "New Vehicle" shortcuts hidden when `isReadOnly`.
+- `src/components/dashboard/QuickActions.tsx` — hide write quick-actions.
+
+## Explicitly retained for Admin Head
+- Plant-wise data view (all plants, via existing "All Locations" + location filter)
+- Report download / CSV exports on `ComplianceReport`, `VisitorReport`, `VehicleReport`, `AuditLogs`, `Analytics`
+- Filters, search, view details, print badge
 
 ## Out of scope
-- No DB / RLS changes (already enforced).
-- No changes to viewing, filtering, exporting, or report download flows — Admin Head retains full plant-wise read & export access.
+- No DB / RLS changes
+- No changes to read, filter, or export flows
 
 ## Result
-Admin Head sees the same data as HO Admin but every create / edit / approve / reject / delete / check-in / check-out control is hidden or disabled across the app.
+Admin Head can navigate the whole app, see plant-wise data across all locations, filter and download reports — but cannot trigger any write action anywhere.
