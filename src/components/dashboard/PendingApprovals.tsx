@@ -26,7 +26,7 @@ interface PendingApprovalsProps {
 
 export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps) {
   const { user } = useAuth();
-  const { userRoles, isHoAdmin } = useUserRoles();
+  const { userRoles, isHoAdmin, isReadOnly } = useUserRoles();
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
   const isGateSecurityOnly = useMemo(() => {
@@ -106,7 +106,7 @@ export function PendingApprovals({ visitors, onRefresh }: PendingApprovalsProps)
     }
   };
 
-  if (pendingVisitors.length === 0 || isGateSecurityOnly) {
+  if (pendingVisitors.length === 0 || isGateSecurityOnly || isReadOnly) {
     return null;
   }
 
