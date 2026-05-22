@@ -45,7 +45,7 @@ export function VisitorActions({
   return (
     <div className="flex items-center gap-1">
       {/* Quick Check In & Print button for scheduled visitors */}
-      {canCheckInOut && visitor.status === 'scheduled' && isScheduledToday && onCheckInAndPrint && (
+      {canEdit && canCheckInOut && visitor.status === 'scheduled' && isScheduledToday && onCheckInAndPrint && (
         <Button
           size="sm"
           variant="default"
@@ -64,7 +64,7 @@ export function VisitorActions({
       )}
 
       {/* Quick Approve/Reject buttons for pending visitors */}
-      {visitor.status === 'pending_approval' && onApprove && (
+      {canEdit && visitor.status === 'pending_approval' && onApprove && (
         <Button
           size="sm"
           variant="default"
@@ -76,7 +76,7 @@ export function VisitorActions({
           Approve
         </Button>
       )}
-      {visitor.status === 'pending_approval' && onReject && (
+      {canEdit && visitor.status === 'pending_approval' && onReject && (
         <Button
           size="sm"
           variant="destructive"
@@ -111,25 +111,25 @@ export function VisitorActions({
             Print Badge
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {visitor.status === 'pending_approval' && onApprove && (
+          {canEdit && visitor.status === 'pending_approval' && onApprove && (
             <DropdownMenuItem onClick={() => onApprove(visitor)} disabled={isLoading}>
               <CheckCircle className="h-4 w-4 mr-2 text-emerald-600" />
               Approve
             </DropdownMenuItem>
           )}
-          {visitor.status === 'pending_approval' && onReject && (
+          {canEdit && visitor.status === 'pending_approval' && onReject && (
             <DropdownMenuItem onClick={() => onReject(visitor)} disabled={isLoading}>
               <XCircle className="h-4 w-4 mr-2 text-destructive" />
               Reject
             </DropdownMenuItem>
           )}
-          {canCheckInOut && visitor.status === 'checked_in' && (
+          {canEdit && canCheckInOut && visitor.status === 'checked_in' && (
             <DropdownMenuItem onClick={() => onCheckOut(visitor)}>
               <LogOut className="h-4 w-4 mr-2" />
               Check Out
             </DropdownMenuItem>
           )}
-          {canCheckInOut && isScheduledToday && visitor.status === 'scheduled' && (
+          {canEdit && canCheckInOut && isScheduledToday && visitor.status === 'scheduled' && (
             <DropdownMenuItem onClick={() => onCheckIn(visitor)}>
               <LogIn className="h-4 w-4 mr-2" />
               Check In

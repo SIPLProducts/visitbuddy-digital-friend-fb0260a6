@@ -7,9 +7,13 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 export function QuickActions() {
   const { t } = useTranslation();
+  const { isReadOnly } = useUserRoles();
+
+  if (isReadOnly) return null;
 
   const actions = [
     {

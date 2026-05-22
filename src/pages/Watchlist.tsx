@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { logAudit } from '@/lib/auditLog';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 interface WatchlistEntry {
   id: string;
@@ -40,6 +41,7 @@ const severityConfig: Record<string, { label: string; color: string; icon: typeo
 
 export default function Watchlist() {
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
+  const { isReadOnly } = useUserRoles();
   const [entries, setEntries] = useState<WatchlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -126,6 +128,7 @@ export default function Watchlist() {
             </h1>
             <p className="text-sm text-muted-foreground mt-1">Flag or block individuals for enhanced security screening</p>
           </div>
+          {!isReadOnly && (
           <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
             <DialogTrigger asChild>
               <Button className="gap-1.5"><Plus className="h-4 w-4" /> Add to Watchlist</Button>
@@ -171,6 +174,7 @@ export default function Watchlist() {
               </div>
             </DialogContent>
           </Dialog>
+          )}
         </div>
 
         {/* Stats */}
@@ -219,24 +223,26 @@ export default function Watchlist() {
                         <TableCell className="text-xs">{entry.govt_id_number || '—'}</TableCell>
                         <TableCell className="text-xs text-muted-foreground">{format(new Date(entry.created_at), 'dd/MM/yyyy')}</TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(entry)}><Edit2 className="h-3.5 w-3.5" /></Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Remove from Watchlist?</AlertDialogTitle>
-                                  <AlertDialogDescription>Remove {entry.name} from the watchlist. This action cannot be undone.</AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDelete(entry)}>Remove</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
+                          {!isReadOnly && (
+                            <div className="flex justify-end gap-1">
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(entry)}><Edit2 className="h-3.5 w-3.5" /></Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"><Trash2 className="h-3.5 w-3.5" /></Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Remove from Watchlist?</AlertDialogTitle>
+                                    <AlertDialogDescription>Remove {entry.name} from the watchlist. This action cannot be undone.</AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(entry)}>Remove</AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          )}
                         </TableCell>
                       </TableRow>
                     );

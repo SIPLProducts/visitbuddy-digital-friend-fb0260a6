@@ -46,9 +46,11 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 export default function Appointments() {
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
+  const { isReadOnly } = useUserRoles();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
@@ -310,10 +312,12 @@ export default function Appointments() {
             </h1>
             <p className="text-muted-foreground">Schedule and manage visitor appointments</p>
           </div>
-          <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-            <Plus className="h-4 w-4" />
-            Schedule Appointment
-          </Button>
+          {!isReadOnly && (
+            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+              <Plus className="h-4 w-4" />
+              Schedule Appointment
+            </Button>
+          )}
         </div>
 
         {/* Today's Stats */}
@@ -491,6 +495,7 @@ export default function Appointments() {
                               </div>
                             )}
                           </div>
+                          {!isReadOnly && (
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -522,6 +527,7 @@ export default function Appointments() {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          )}
                         </div>
                       </div>
                     ))

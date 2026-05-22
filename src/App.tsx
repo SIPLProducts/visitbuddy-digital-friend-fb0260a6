@@ -28,6 +28,7 @@ import UserManagement from "./pages/UserManagement";
 import Help from "./pages/Help";
 import Vehicles from "./pages/Vehicles";
 import NewVehicle from "./pages/NewVehicle";
+import { ReadOnlyGuard } from "./components/layout/ReadOnlyGuard";
 import VehicleGate from "./pages/VehicleGate";
 import VehicleReport from "./pages/VehicleReport";
 import VehicleTypes from "./pages/VehicleTypes";
@@ -97,7 +98,7 @@ function AppRoutes() {
       <Route element={<ProtectedLayout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/visitors" element={<Visitors />} />
-        <Route path="/visitors/new" element={<NewVisitor />} />
+        <Route path="/visitors/new" element={<ReadOnlyGuard to="/visitors"><NewVisitor /></ReadOnlyGuard>} />
         <Route path="/appointments" element={<Appointments />} />
         <Route path="/check-in-out" element={<CheckInOut />} />
         <Route path="/badge-printing" element={<BadgePrinting />} />
@@ -111,7 +112,7 @@ function AppRoutes() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/users" element={<UserManagement />} />
         <Route path="/vehicles" element={<Vehicles />} />
-        <Route path="/vehicles/new" element={<NewVehicle />} />
+        <Route path="/vehicles/new" element={<ReadOnlyGuard to="/vehicles"><NewVehicle /></ReadOnlyGuard>} />
         <Route path="/vehicles/gate" element={<VehicleGate />} />
         <Route path="/vehicles/report" element={<VehicleReport />} />
         <Route path="/vehicle-types" element={<VehicleTypes />} />

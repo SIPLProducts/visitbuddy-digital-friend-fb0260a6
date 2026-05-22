@@ -49,9 +49,11 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired, validateNumber, validateStatus } from '@/components/shared/CsvImportResult';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 export default function Gates() {
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
+  const { isReadOnly } = useUserRoles();
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
@@ -539,33 +541,35 @@ export default function Gates() {
             <h1 className="text-2xl font-bold text-foreground">Gates</h1>
             <p className="text-muted-foreground">Manage entry and exit points for your facilities</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
-              <Download className="h-4 w-4" />
-              Template
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              <Upload className="h-4 w-4" />
-              {uploading ? 'Importing...' : 'Import CSV'}
-            </Button>
-            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-              <Plus className="h-4 w-4" />
-              Add Gate
-            </Button>
-          </div>
+          {!isReadOnly && (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
+                <Download className="h-4 w-4" />
+                Template
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Upload className="h-4 w-4" />
+                {uploading ? 'Importing...' : 'Import CSV'}
+              </Button>
+              <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+                <Plus className="h-4 w-4" />
+                Add Gate
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Gates Grid */}
@@ -634,23 +638,25 @@ export default function Gates() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2">
-                      <Button variant="outline" className="flex-1 gap-2" onClick={() => openEditDialog(gate)}>
-                        <Edit className="h-4 w-4" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={cn(gate.status === 'active' ? 'text-amber-600 hover:text-amber-700' : 'text-emerald-600 hover:text-emerald-700')}
-                        onClick={() => toggleGateStatus(gate)}
-                      >
-                        <Power className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => openDeleteDialog(gate)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    {!isReadOnly && (
+                      <div className="flex gap-2">
+                        <Button variant="outline" className="flex-1 gap-2" onClick={() => openEditDialog(gate)}>
+                          <Edit className="h-4 w-4" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={cn(gate.status === 'active' ? 'text-amber-600 hover:text-amber-700' : 'text-emerald-600 hover:text-emerald-700')}
+                          onClick={() => toggleGateStatus(gate)}
+                        >
+                          <Power className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => openDeleteDialog(gate)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               );

@@ -37,9 +37,11 @@ import { Department, Employee, Location } from '@/types/database';
 import { toast } from 'sonner';
 import { CsvImportResult, ImportResult, ImportError, validateRequired } from '@/components/shared/CsvImportResult';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 export default function Departments() {
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
+  const { isReadOnly } = useUserRoles();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -298,33 +300,35 @@ export default function Departments() {
             <h1 className="text-2xl font-bold text-foreground">Departments</h1>
             <p className="text-muted-foreground">Manage departments and their employees</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
-              <Download className="h-4 w-4" />
-              Template
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              <Upload className="h-4 w-4" />
-              {uploading ? 'Importing...' : 'Import CSV'}
-            </Button>
-            <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
-              <Plus className="h-4 w-4" />
-              Add Department
-            </Button>
-          </div>
+          {!isReadOnly && (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
+                <Download className="h-4 w-4" />
+                Template
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Upload className="h-4 w-4" />
+                {uploading ? 'Importing...' : 'Import CSV'}
+              </Button>
+              <Button className="gap-2" onClick={() => { resetForm(); setIsAddDialogOpen(true); }}>
+                <Plus className="h-4 w-4" />
+                Add Department
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Search */}
@@ -420,15 +424,17 @@ export default function Departments() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2 pt-2">
-                      <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openEditDialog(dept)}>
-                        <Edit className="h-3 w-3" />
-                        Edit
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => openDeleteDialog(dept)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    {!isReadOnly && (
+                      <div className="flex gap-2 pt-2">
+                        <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => openEditDialog(dept)}>
+                          <Edit className="h-3 w-3" />
+                          Edit
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => openDeleteDialog(dept)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               );

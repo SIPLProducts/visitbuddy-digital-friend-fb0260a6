@@ -223,10 +223,12 @@ export default function Settings() {
             <h1 className="text-2xl font-bold flex items-center gap-2"><SettingsIcon className="h-6 w-6 text-primary" /> {t('settings.title')}</h1>
             <p className="text-sm text-muted-foreground mt-1">{t('settings.subtitle')}</p>
           </div>
-          <Button onClick={handleSave} disabled={saving} className="gap-1.5">
-            {saving ? <Check className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            {saving ? t('settings.saving') : t('settings.saveAll')}
-          </Button>
+          {isHoAdmin && (
+            <Button onClick={handleSave} disabled={saving} className="gap-1.5">
+              {saving ? <Check className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {saving ? t('settings.saving') : t('settings.saveAll')}
+            </Button>
+          )}
         </div>
 
         <Tabs defaultValue="general" className="space-y-6">
