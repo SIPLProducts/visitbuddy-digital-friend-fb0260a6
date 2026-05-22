@@ -1708,6 +1708,15 @@ export default function UserManagement() {
                 </div>
               </div>
               )}
+              {isHoAdmin && (
+              <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                <Checkbox id="assignAdminHead" checked={assignIsAdminHead} onCheckedChange={(checked) => setAssignIsAdminHead(checked === true)} />
+                <div className="grid gap-1.5 leading-none">
+                  <label htmlFor="assignAdminHead" className="text-sm font-medium cursor-pointer">Admin Head (Read-only)</label>
+                  <p className="text-xs text-muted-foreground">Can view data across all plants and download reports. Cannot add, edit, approve, or delete.</p>
+                </div>
+              </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAssignUserDialogOpen(false)}>Cancel</Button>
@@ -1756,6 +1765,15 @@ export default function UserManagement() {
                 <div className="grid gap-1.5 leading-none">
                   <label htmlFor="editHoAdmin" className="text-sm font-medium cursor-pointer">HO Admin</label>
                   <p className="text-xs text-muted-foreground">Can access all locations and manage user roles</p>
+                </div>
+              </div>
+              )}
+              {isHoAdmin && (
+              <div className="flex items-center space-x-2 p-3 rounded-lg border bg-muted/30">
+                <Checkbox id="editAdminHead" checked={editIsAdminHead} onCheckedChange={(checked) => setEditIsAdminHead(checked === true)} />
+                <div className="grid gap-1.5 leading-none">
+                  <label htmlFor="editAdminHead" className="text-sm font-medium cursor-pointer">Admin Head (Read-only)</label>
+                  <p className="text-xs text-muted-foreground">Can view data across all plants and download reports. Cannot add, edit, approve, or delete.</p>
                 </div>
               </div>
               )}
