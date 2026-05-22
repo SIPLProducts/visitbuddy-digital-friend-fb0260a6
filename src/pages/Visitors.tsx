@@ -444,7 +444,7 @@ export default function Visitors() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {selectedIds.size > 0 && (
+            {!isReadOnly && selectedIds.size > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="gap-1.5" disabled={bulkLoading}>
