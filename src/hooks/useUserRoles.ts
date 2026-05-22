@@ -30,7 +30,9 @@ export function useUserRoles() {
   const { user } = useAuth();
   const [userRoles, setUserRoles] = useState<UserLocationRole[]>([]);
   const [isHoAdmin, setIsHoAdmin] = useState(false);
+  const [isAdminHead, setIsAdminHead] = useState(false);
   const isLocationAdmin = userRoles.some(r => r.role === 'admin');
+  const isReadOnly = isAdminHead && !isHoAdmin && !isLocationAdmin;
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,6 +63,7 @@ export function useUserRoles() {
       const roles = (data || []) as unknown as UserLocationRole[];
       setUserRoles(roles);
       setIsHoAdmin(roles.some(r => r.is_ho_admin));
+      setIsAdminHead(roles.some(r => (r as any).is_admin_head));
     } catch (error) {
       console.error('Error fetching user roles:', error);
     } finally {
@@ -74,7 +77,7 @@ export function useUserRoles() {
   };
 
   const canAccessLocation = (locationId: string): boolean => {
-    if (isHoAdmin) return true;
+    if (isHoAdmin || isAdminHead) return true;
     return userRoles.some(r => r.location_id === locationId);
   };
 
@@ -91,6 +94,8 @@ export function useUserRoles() {
     userRoles,
     isHoAdmin,
     isLocationAdmin,
+    isAdminHead,
+    isReadOnly,
     loading,
     hasRoleAtLocation,
     canAccessLocation,
