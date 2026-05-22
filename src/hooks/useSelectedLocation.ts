@@ -16,7 +16,8 @@ const STORAGE_KEY = 'selectedLocationId';
  * that single location regardless of what's in localStorage (no "all" option).
  */
 export function useSelectedLocation() {
-  const { isHoAdmin, userRoles, loading: rolesLoading } = useUserRoles();
+  const { isHoAdmin, isAdminHead, userRoles, loading: rolesLoading } = useUserRoles();
+  const isGlobalViewer = isHoAdmin || isAdminHead;
   const [selectedLocationId, setSelectedLocationId] = useState<string>(() => {
     if (typeof window === 'undefined') return 'all';
     return localStorage.getItem(STORAGE_KEY) || 'all';
@@ -51,7 +52,7 @@ export function useSelectedLocation() {
   let effectiveId = selectedLocationId;
 
   if (!rolesLoading) {
-    if (!isHoAdmin) {
+    if (!isGlobalViewer) {
       // Non-HO: 'all' is not allowed.
       if (effectiveId === 'all' || !effectiveId) {
         effectiveId = accessibleIds[0] || '';
@@ -62,7 +63,7 @@ export function useSelectedLocation() {
     }
   }
 
-  const isAllLocations = isHoAdmin && (effectiveId === 'all' || !effectiveId);
+  const isAllLocations = isGlobalViewer && (effectiveId === 'all' || !effectiveId);
 
   /**
    * Apply `.eq('location_id', id)` to a Supabase query when a specific
