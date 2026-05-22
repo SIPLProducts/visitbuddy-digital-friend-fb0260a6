@@ -25,6 +25,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CsvImport, downloadCsvTemplate, parseCsvFile } from '@/components/shared/CsvImport';
 import { CsvImportResult, ImportResult, ImportError, validateRequired } from '@/components/shared/CsvImportResult';
+import { useUserRoles } from '@/hooks/useUserRoles';
 
 interface VehicleType {
   id: string;
@@ -35,6 +36,7 @@ interface VehicleType {
 }
 
 export default function VehicleTypes() {
+  const { isReadOnly } = useUserRoles();
   const [types, setTypes] = useState<VehicleType[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -269,16 +271,20 @@ export default function VehicleTypes() {
               <Download className="h-4 w-4" />
               Export
             </Button>
-            <CsvImport
-              onFileUpload={handleFileUpload}
-              onDownloadTemplate={handleDownloadTemplate}
-              uploading={uploading}
-              templateName="Vehicle Types"
-            />
-            <Button onClick={openAddDialog}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Vehicle Type
-            </Button>
+            {!isReadOnly && (
+              <>
+                <CsvImport
+                  onFileUpload={handleFileUpload}
+                  onDownloadTemplate={handleDownloadTemplate}
+                  uploading={uploading}
+                  templateName="Vehicle Types"
+                />
+                <Button onClick={openAddDialog}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Vehicle Type
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
@@ -320,14 +326,16 @@ export default function VehicleTypes() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => openEditDialog(type)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(type)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
+                        {!isReadOnly && (
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(type)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(type)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
