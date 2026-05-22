@@ -42,7 +42,8 @@ interface HeaderProps {
 export function Header({ onMenuClick }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { user, signOut } = useAuth();
-  const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { userRoles, isHoAdmin, isAdminHead, loading: rolesLoading } = useUserRoles();
+  const isGlobalViewer = isHoAdmin || isAdminHead;
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
   const isMobile = useIsMobile();
@@ -53,11 +54,9 @@ export function Header({ onMenuClick }: HeaderProps) {
   }, [userRoles, isHoAdmin]);
 
   useEffect(() => {
-    // Set default location from localStorage or first available.
-    // Non-HO users can NEVER have 'all' — force them to a specific location.
     const savedLocation = localStorage.getItem('selectedLocationId');
 
-    if (isHoAdmin) {
+    if (isGlobalViewer) {
       if (savedLocation === 'all') {
         setSelectedLocationId('all');
       } else if (savedLocation && locations.find(l => l.id === savedLocation)) {
@@ -76,11 +75,11 @@ export function Header({ onMenuClick }: HeaderProps) {
         window.dispatchEvent(new CustomEvent('locationChanged', { detail: { locationId: first } }));
       }
     }
-  }, [locations, isHoAdmin]);
+  }, [locations, isGlobalViewer]);
 
   const fetchLocations = async () => {
     try {
-      if (isHoAdmin) {
+      if (isGlobalViewer) {
         const { data, error } = await supabase
           .from('locations')
           .select('id, name, city')
@@ -143,7 +142,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         {/* Location Selector */}
         {!rolesLoading && locations.length > 0 && (
           <div className="flex items-center gap-2 flex-shrink-0">
-            {locations.length === 1 && !isHoAdmin ? (
+            {locations.length === 1 && !isGlobalViewer ? (
               <div className="flex items-center gap-2 text-sm px-3 h-10">
                 <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <span className="font-medium truncate">{locations[0].name}</span>
@@ -157,7 +156,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   </div>
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
-                  {isHoAdmin && (
+                  {isGlobalViewer && (
                     <SelectItem value="all">
                       <div className="flex items-center gap-2">
                         <Crown className="h-4 w-4 text-[#f59e0b]" />
@@ -228,10 +227,10 @@ export function Header({ onMenuClick }: HeaderProps) {
               </Avatar>
               <div className="text-left hidden lg:block">
                 <p className="text-sm font-medium">
-                  {isHoAdmin ? t('header.hoAdmin') : t('header.user')}
+                  {isHoAdmin ? t('header.hoAdmin') : isAdminHead ? 'Admin Head' : t('header.user')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {rolesLoading ? '...' : isHoAdmin ? t('header.allLocations') : (currentRole ? roleLabels[currentRole] : t('header.noRole'))}
+                  {rolesLoading ? '...' : (isHoAdmin || isAdminHead) ? t('header.allLocations') : (currentRole ? roleLabels[currentRole] : t('header.noRole'))}
                 </p>
               </div>
             </Button>
@@ -243,6 +242,14 @@ export function Header({ onMenuClick }: HeaderProps) {
                 <Badge className="bg-[#f59e0b] text-white gap-1">
                   <Crown className="h-3 w-3" />
                   {t('header.hoAdmin')}
+                </Badge>
+              </div>
+            )}
+            {!isHoAdmin && isAdminHead && (
+              <div className="px-2 py-1">
+                <Badge className="bg-emerald-600 text-white gap-1">
+                  <Crown className="h-3 w-3" />
+                  Admin Head (Read-only)
                 </Badge>
               </div>
             )}

@@ -950,6 +950,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_admin_head: boolean
           is_ho_admin: boolean
           location_id: string
           role: Database["public"]["Enums"]["app_role"]
@@ -959,6 +960,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_admin_head?: boolean
           is_ho_admin?: boolean
           location_id: string
           role?: Database["public"]["Enums"]["app_role"]
@@ -968,6 +970,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_admin_head?: boolean
           is_ho_admin?: boolean
           location_id?: string
           role?: Database["public"]["Enums"]["app_role"]
@@ -1441,6 +1444,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_head: { Args: { _user_id: string }; Returns: boolean }
       is_ho_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
