@@ -56,7 +56,7 @@ export default function Visitors() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { userRoles, isHoAdmin, isReadOnly, loading: rolesLoading } = useUserRoles();
   const { hostEmployeeId } = useHostEmployee();
   const [searchParams] = useSearchParams();
   const isGateSecurityOnly = useMemo(() => {
@@ -444,7 +444,7 @@ export default function Visitors() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            {selectedIds.size > 0 && (
+            {!isReadOnly && selectedIds.size > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="gap-1.5" disabled={bulkLoading}>
@@ -460,10 +460,12 @@ export default function Visitors() {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Button className="gap-2" onClick={() => setShowNewVisitorForm(true)}>
-              <Plus className="h-4 w-4" />
-              {t('visitors.newVisitor')}
-            </Button>
+            {!isReadOnly && (
+              <Button className="gap-2" onClick={() => setShowNewVisitorForm(true)}>
+                <Plus className="h-4 w-4" />
+                {t('visitors.newVisitor')}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -809,10 +811,10 @@ export default function Visitors() {
                         onCheckIn={handleCheckIn}
                         onCheckOut={handleCheckOut}
                         onCheckInAndPrint={handleCheckInAndPrint}
-                        onApprove={canApproveReject ? handleApprove : undefined}
-                        onReject={canApproveReject ? handleReject : undefined}
-                        canCheckInOut={isGateSecurity || (!!hostEmployeeId && visitor.host_id === hostEmployeeId)}
-                        canEdit={true}
+                        onApprove={!isReadOnly && canApproveReject ? handleApprove : undefined}
+                        onReject={!isReadOnly && canApproveReject ? handleReject : undefined}
+                        canCheckInOut={!isReadOnly && (isGateSecurity || (!!hostEmployeeId && visitor.host_id === hostEmployeeId))}
+                        canEdit={!isReadOnly}
                         actionLoadingId={actionLoadingId}
                       />
                     </TableCell>
