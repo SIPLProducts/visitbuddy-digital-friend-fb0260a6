@@ -128,6 +128,7 @@ interface UserRoleEntry {
   location_id: string;
   role: AppRole;
   is_ho_admin: boolean;
+  is_admin_head?: boolean;
   location: Location;
   profile?: Profile;
 }
@@ -288,6 +289,7 @@ export default function UserManagement() {
   const [assignLocationId, setAssignLocationId] = useState('');
   const [assignRole, setAssignRole] = useState<AppRole>('operator');
   const [assignIsHoAdmin, setAssignIsHoAdmin] = useState(false);
+  const [assignIsAdminHead, setAssignIsAdminHead] = useState(false);
   const [assigningRole, setAssigningRole] = useState(false);
 
   // Edit Role dialog
@@ -295,6 +297,7 @@ export default function UserManagement() {
   const [editingRole, setEditingRole] = useState<UserRoleEntry | null>(null);
   const [editRole, setEditRole] = useState<AppRole>('operator');
   const [editIsHoAdmin, setEditIsHoAdmin] = useState(false);
+  const [editIsAdminHead, setEditIsAdminHead] = useState(false);
   const [editLocationId, setEditLocationId] = useState('');
 
   // Role Permissions tab state
@@ -618,17 +621,19 @@ export default function UserManagement() {
           location_id: assignLocationId,
           role: assignRole,
           is_ho_admin: assignIsHoAdmin,
-        });
+          is_admin_head: assignIsAdminHead,
+        } as any);
 
       if (error) throw error;
       const profile = profiles.find(p => p.user_id === assignUserId);
-      logAudit({ action: 'user_role_changed', entityType: 'user', entityId: assignUserId, entityName: profile?.full_name || assignUserId, details: { change: 'assigned', role: assignRole, location_id: assignLocationId, is_ho_admin: assignIsHoAdmin }, locationId: assignLocationId });
+      logAudit({ action: 'user_role_changed', entityType: 'user', entityId: assignUserId, entityName: profile?.full_name || assignUserId, details: { change: 'assigned', role: assignRole, location_id: assignLocationId, is_ho_admin: assignIsHoAdmin, is_admin_head: assignIsAdminHead }, locationId: assignLocationId });
       toast.success('User assigned to role successfully!');
       setIsAssignUserDialogOpen(false);
       setAssignUserId('');
       setAssignLocationId('');
       setAssignRole('operator');
       setAssignIsHoAdmin(false);
+      setAssignIsAdminHead(false);
       fetchData();
     } catch (error: any) {
       toast.error(error.message || 'Failed to assign role');
@@ -642,6 +647,7 @@ export default function UserManagement() {
     setEditingRole(role);
     setEditRole(role.role);
     setEditIsHoAdmin(role.is_ho_admin);
+    setEditIsAdminHead(!!(role as any).is_admin_head);
     setEditLocationId(role.location_id);
     setIsEditRoleDialogOpen(true);
   };
@@ -651,11 +657,11 @@ export default function UserManagement() {
     try {
       const { error } = await supabase
         .from('user_location_roles')
-        .update({ role: editRole, is_ho_admin: editIsHoAdmin, location_id: editLocationId })
+        .update({ role: editRole, is_ho_admin: editIsHoAdmin, is_admin_head: editIsAdminHead, location_id: editLocationId } as any)
         .eq('id', editingRole.id);
       if (error) throw error;
       const profile = profiles.find(p => p.user_id === editingRole.user_id);
-      logAudit({ action: 'user_role_changed', entityType: 'user', entityId: editingRole.user_id, entityName: profile?.full_name || editingRole.user_id, details: { change: 'updated', oldRole: editingRole.role, newRole: editRole, is_ho_admin: editIsHoAdmin, location_id: editLocationId }, locationId: editLocationId });
+      logAudit({ action: 'user_role_changed', entityType: 'user', entityId: editingRole.user_id, entityName: profile?.full_name || editingRole.user_id, details: { change: 'updated', oldRole: editingRole.role, newRole: editRole, is_ho_admin: editIsHoAdmin, is_admin_head: editIsAdminHead, location_id: editLocationId }, locationId: editLocationId });
       toast.success('Role updated successfully!');
       setIsEditRoleDialogOpen(false);
       setEditingRole(null);
