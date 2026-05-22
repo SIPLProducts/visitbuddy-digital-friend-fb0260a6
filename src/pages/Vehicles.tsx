@@ -38,7 +38,7 @@ import { safeRandomId } from '@/lib/utils';
 
 export default function Vehicles() {
   const navigate = useNavigate();
-  const { userRoles, isHoAdmin } = useUserRoles();
+  const { userRoles, isHoAdmin, isReadOnly } = useUserRoles();
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const isGateSecurity = useMemo(() => {
     if (isHoAdmin) return true;
@@ -283,10 +283,12 @@ export default function Vehicles() {
               <QrCode className="h-4 w-4 mr-2" />
               Gate Entry
             </Button>
-            <Button onClick={() => setShowNewVehicleForm(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Vehicle
-            </Button>
+            {!isReadOnly && (
+              <Button onClick={() => setShowNewVehicleForm(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Vehicle
+              </Button>
+            )}
           </div>
         </div>
 
@@ -429,13 +431,15 @@ export default function Vehicles() {
                                 Check Out
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(vehicle)}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
+                            {!isReadOnly && (
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(vehicle)}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
