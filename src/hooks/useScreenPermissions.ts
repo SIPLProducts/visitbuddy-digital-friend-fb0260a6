@@ -9,15 +9,15 @@ interface ScreenPermission {
 }
 
 export function useScreenPermissions() {
-  const { userRoles, isHoAdmin, isLocationAdmin, loading: rolesLoading } = useUserRoles();
+  const { userRoles, isHoAdmin, isLocationAdmin, isAdminHead, loading: rolesLoading } = useUserRoles();
   const [permissions, setPermissions] = useState<ScreenPermission[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (rolesLoading) return;
 
-    // HO Admins and location admins get full access — skip fetching
-    if (isHoAdmin || isLocationAdmin) {
+    // HO Admins, Admin Heads, and Location Admins get full view access — skip fetching
+    if (isHoAdmin || isLocationAdmin || isAdminHead) {
       setPermissions([]);
       setLoading(false);
       return;
@@ -30,7 +30,7 @@ export function useScreenPermissions() {
     }
 
     fetchPermissions();
-  }, [userRoles, isHoAdmin, isLocationAdmin, rolesLoading]);
+  }, [userRoles, isHoAdmin, isLocationAdmin, isAdminHead, rolesLoading]);
 
   const fetchPermissions = async () => {
     setLoading(true);
@@ -71,20 +71,22 @@ export function useScreenPermissions() {
   };
 
   const canViewScreen = useCallback((path: string): boolean => {
-    // Admins always have access
-    if (isHoAdmin || isLocationAdmin) return true;
+    // Admins and Admin Heads always have view access to every screen
+    if (isHoAdmin || isLocationAdmin || isAdminHead) return true;
     // If no permissions configured at all, default to showing everything
     if (permissions.length === 0 && !loading) return true;
     const perm = permissions.find(p => p.path === path);
     return perm?.can_view ?? false;
-  }, [permissions, isHoAdmin, isLocationAdmin, loading]);
+  }, [permissions, isHoAdmin, isLocationAdmin, isAdminHead, loading]);
 
   const canEditScreen = useCallback((path: string): boolean => {
+    // Admin Head is strictly read-only
+    if (isAdminHead && !isHoAdmin && !isLocationAdmin) return false;
     if (isHoAdmin || isLocationAdmin) return true;
     if (permissions.length === 0 && !loading) return true;
     const perm = permissions.find(p => p.path === path);
     return perm?.can_edit ?? false;
-  }, [permissions, isHoAdmin, isLocationAdmin, loading]);
+  }, [permissions, isHoAdmin, isLocationAdmin, isAdminHead, loading]);
 
   return {
     canViewScreen,
