@@ -28,6 +28,7 @@ import UserManagement from "./pages/UserManagement";
 import Help from "./pages/Help";
 import Vehicles from "./pages/Vehicles";
 import NewVehicle from "./pages/NewVehicle";
+import { ReadOnlyGuard } from "./components/layout/ReadOnlyGuard";
 import VehicleGate from "./pages/VehicleGate";
 import VehicleReport from "./pages/VehicleReport";
 import VehicleTypes from "./pages/VehicleTypes";
