@@ -23,6 +23,8 @@ import { cn, safeRandomId } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useSelectedLocation } from '@/hooks/useSelectedLocation';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { Navigate } from 'react-router-dom';
 import { Department, Employee, Gate } from '@/types/database';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -74,6 +76,13 @@ interface NewVisitorProps {
 }
 
 export default function NewVisitor({ inline = false, onClose }: NewVisitorProps) {
+  const { isReadOnly } = useUserRoles();
+  if (isReadOnly && !inline) {
+    return <Navigate to="/visitors" replace />;
+  }
+  if (isReadOnly && inline) {
+    return null;
+  }
   const navigate = useNavigate();
   const { user } = useAuth();
   const { selectedLocationId, isAllLocations } = useSelectedLocation();

@@ -22,6 +22,8 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { safeRandomId } from '@/lib/utils';
+import { useUserRoles } from '@/hooks/useUserRoles';
+import { Navigate } from 'react-router-dom';
 
 const vehicleSchema = z.object({
   vehicle_number: z.string().min(4, 'Vehicle number must be at least 4 characters'),
@@ -51,6 +53,13 @@ interface NewVehicleProps {
 }
 
 export default function NewVehicle({ inline = false, onClose }: NewVehicleProps) {
+  const { isReadOnly } = useUserRoles();
+  if (isReadOnly && !inline) {
+    return <Navigate to="/vehicles" replace />;
+  }
+  if (isReadOnly && inline) {
+    return null;
+  }
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
