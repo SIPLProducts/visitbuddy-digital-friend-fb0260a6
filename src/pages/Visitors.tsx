@@ -56,7 +56,7 @@ export default function Visitors() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { userRoles, isHoAdmin, isReadOnly, loading: rolesLoading } = useUserRoles();
+  const { userRoles, isHoAdmin, isAdminHead, isReadOnly, loading: rolesLoading } = useUserRoles();
   const { hostEmployeeId } = useHostEmployee();
   const [searchParams] = useSearchParams();
   const isGateSecurityOnly = useMemo(() => {
@@ -70,10 +70,10 @@ export default function Visitors() {
   }, [userRoles, isHoAdmin]);
   const isRestrictedRole = useMemo(() => {
     if (rolesLoading) return false;
-    if (isHoAdmin) return false;
+    if (isHoAdmin || isAdminHead) return false;
     if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
     return true; // Manager or Operator
-  }, [userRoles, isHoAdmin, rolesLoading]);
+  }, [userRoles, isHoAdmin, isAdminHead, rolesLoading]);
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

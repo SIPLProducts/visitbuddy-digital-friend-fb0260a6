@@ -74,14 +74,14 @@ interface TrendData {
 
 export default function Analytics() {
   const { user } = useAuth();
-  const { userRoles, isHoAdmin, loading: rolesLoading } = useUserRoles();
+  const { userRoles, isHoAdmin, isAdminHead, loading: rolesLoading } = useUserRoles();
   const { hostEmployeeId } = useHostEmployee();
   const isRestrictedRole = useMemo(() => {
     if (rolesLoading) return false;
-    if (isHoAdmin) return false;
+    if (isHoAdmin || isAdminHead) return false;
     if (userRoles.some(r => r.role === 'admin' || r.role === 'gate_security')) return false;
     return true;
-  }, [userRoles, isHoAdmin, rolesLoading]);
+  }, [userRoles, isHoAdmin, isAdminHead, rolesLoading]);
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [locations, setLocations] = useState<Location[]>([]);
   const [locationStats, setLocationStats] = useState<LocationStats[]>([]);
