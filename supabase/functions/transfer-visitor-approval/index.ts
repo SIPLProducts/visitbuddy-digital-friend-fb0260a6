@@ -27,6 +27,10 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Capture the caller's app origin so notify-host can build approval links
+    // pointing at the live tenant instead of falling back to PUBLIC_URL env.
+    const callerOrigin =
+      req.headers.get("origin") || req.headers.get("referer") || "";
     const body: TransferRequest = await req.json().catch(() => ({}));
     const visitorId = (body.visitorId || "").trim();
     const newHostId = (body.newHostId || "").trim();

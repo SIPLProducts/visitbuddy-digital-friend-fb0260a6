@@ -1,48 +1,46 @@
 ## Problem
 
-When a visitor is approved, they receive an SMS like:
-
-```
-... QR Link: https://vms.resustainability.com/?a1cb059d ...
-```
-
-Clicking it opens the app shell (dashboard / login) instead of the visitor QR page.
+After a host transfers an approval, the new host's email contains Approve / Reject / Transfer buttons that link to `https://visiguard.sharvisoftwareservices.com/...` instead of the live tenant `https://vms.resustainability.com/...`.
 
 ## Root cause
 
-The redirect logic in `src/App.tsx`, the `/s/:code` route, the `get_visitor_id_by_short_code` RPC, and the anon read on `visitors` all work correctly when the URL is opened verbatim — verified end-to-end against the deployed `vms.resustainability.com` backend.
+`notify-host` builds approval links from `resolvePublicUrl(req, supabase)`, with this priority:
 
-The failure is in the URL **format itself**: `https://host.tld/?xxxxxxxx`.
+1. request `Origin` header
+2. request `Referer` header
+3. `tenant_settings.public_app_url`
+4. `PUBLIC_URL` env var
+5. `null`
 
-Many SMS / WhatsApp / native message previewers tokenize auto-linked URLs and stop at the `?` when it isn't followed by `key=value`. The user's device opens just `https://vms.resustainability.com/`, which lands on `/` (Dashboard → auth gate) — exactly the "routing to application" behavior the user reports. The cloud short code `?a1cb059d` was originally chosen to keep the URL tail ≤ 10 chars for an SMS Striker DLT template, but that constraint can be satisfied with a path segment too.
+When a user submits a transfer in the browser, `transfer-visitor-approval` runs with the correct browser `Origin` (`vms.resustainability.com`) — but it then invokes `notify-host` server-to-server via `supabase.functions.invoke(...)`, which sends **no Origin/Referer**. `notify-host` falls through to the next tier. On the deployed self-hosted backend we verified `tenant_settings.public_app_url IS NULL`, so it lands on the `PUBLIC_URL` env, which is set to the legacy Sharvi staging URL.
+
+The original (non-transfer) `notify-host` path works because it's invoked directly from the browser with a real Origin.
 
 ## Fix
 
-Send a **path-based** short link (`/s/<code>`) instead of a query-only link (`/?<code>`). That's the route `ShortLinkRedirect` already handles. The `?`-form rewrite in `App.tsx` stays as a backwards-compatibility fallback for SMSes already in flight.
+Forward the caller's origin into the secondary `notify-host` invocation, so transfer-triggered emails use the same host the browser is on. This restores parity with the non-transfer path and stays correct regardless of how the env / tenant_settings are configured on each deployment.
 
 ### Changes
 
-1. **`supabase/functions/approve-visitor/index.ts`** (around line 527–529)
-   - Change `qrLink` from `${smsBase}/?${shortCode}` to `${smsBase}/s/${shortCode}`.
-   - Same for the visitor-id fallback branch (`${smsBase}/s/${visitorIdTail}`).
-   - Remove the now-irrelevant "qr tail > 10 chars" abort (length check no longer needed; the path adds 2 chars but DLT template URL variable still resolves; the template was registered as a generic URL var).
-   - Apply the same change to the assembly-point safety URL: `${smsBase}/safety/${safetyCode}` (use the existing `/safety/:code` route) instead of `${smsBase}/?s${safetyCode}`.
+1. **`supabase/functions/transfer-visitor-approval/index.ts`**
+   - Capture `req.headers.get("origin")` (fallback `req.headers.get("referer")`) at the top of the handler.
+   - When invoking `notify-host`, pass an explicit `headers: { origin }` option (and include `referer` if origin is missing) so `resolvePublicUrl` resolves to the live tenant.
 
-2. **`supabase/functions/send-sms-badge/index.ts`** (around line 110–130 region in current file)
-   - Mirror the same two changes: `qrUrl = ${SMS_LINK_BASE}/s/${shortCode}` (fallback `/s/<visitor-id-tail>`), and `safetyLink = ${SMS_LINK_BASE}/safety/${safetyCode}`.
+   ```ts
+   const callerOrigin = req.headers.get("origin") || req.headers.get("referer") || "";
+   ...
+   await supabase.functions.invoke("notify-host", {
+     body: { visitorId, force: true },
+     headers: callerOrigin ? { origin: callerOrigin } : undefined,
+   });
+   ```
 
-3. **No frontend changes required.** `src/App.tsx` already supports `/s/:code` natively. The legacy `?code` rewriter stays intact so any SMS already delivered still works on the devices that *do* preserve the query string.
-
-### Out of scope / not changed
-
-- DB, RLS, RPC, visitor public-read policy — all already correct.
-- Email and WhatsApp flows — they embed a QR image directly, not a short link.
-- `src/pages/VisitorQrLink.tsx` and `src/pages/ShortLinkRedirect.tsx` — unchanged.
+2. **No changes** to `notify-host`, `approve-visitor`, frontend pages, RLS, DB schema, migrations, email templates, or the SMS QR-link flow shipped in the previous turn.
 
 ## Verification
 
-After deploy, approve a visitor and check:
+After deploy, transfer an approval from the live tenant:
 
-1. SMS body contains `QR Link: https://vms.resustainability.com/s/<code>` (and `safe to assembly point https://vms.resustainability.com/safety/<code>` if a safety code exists).
-2. Tapping the link from the phone's default SMS app opens the visitor QR page (the `VisitorQrLink` screen with the QR image), without any auth prompt.
-3. Old links of the form `/?<code>` continue to work via the fallback in `App.tsx`.
+1. New host's email Approve / Reject / Transfer buttons resolve to `https://vms.resustainability.com/approve-visitor?...` and `.../transfer-approval?...`.
+2. Clicking them lands on the actual approval pages, not the Sharvi staging domain.
+3. Original (non-transfer) host emails still build the same URLs as before — unchanged.
