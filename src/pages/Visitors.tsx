@@ -292,6 +292,14 @@ export default function Visitors() {
 
   const canApproveReject = !isGateSecurityOnly;
 
+  const canPerformGateOps = useMemo(() => {
+    if (isHoAdmin) return true;
+    if (isReadOnly) return false;
+    return userRoles.some(r =>
+      ['admin', 'manager', 'operator', 'gate_security'].includes(r.role)
+    );
+  }, [isHoAdmin, isReadOnly, userRoles]);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'checked_in':
@@ -813,7 +821,7 @@ export default function Visitors() {
                         onCheckInAndPrint={handleCheckInAndPrint}
                         onApprove={!isReadOnly && canApproveReject ? handleApprove : undefined}
                         onReject={!isReadOnly && canApproveReject ? handleReject : undefined}
-                        canCheckInOut={!isReadOnly && (isGateSecurity || (!!hostEmployeeId && visitor.host_id === hostEmployeeId))}
+                        canCheckInOut={!isReadOnly && (canPerformGateOps || (!!hostEmployeeId && visitor.host_id === hostEmployeeId))}
                         canEdit={!isReadOnly}
                         actionLoadingId={actionLoadingId}
                       />
