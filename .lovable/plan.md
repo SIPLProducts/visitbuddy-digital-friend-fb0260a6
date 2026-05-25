@@ -1,93 +1,61 @@
-## Goal
-Fix Admin Head visibility: Admin Head currently can't see visitor data across pages because the `isRestrictedRole` check treats them as Manager/Operator (host-only). Make Admin Head a global plant-wise viewer (read-only) on every page.
+## Problem
 
-## Root cause
-`isRestrictedRole` in `Visitors.tsx`, `Dashboard.tsx`, `VisitorReport.tsx`, and `Analytics.tsx` only excludes `isHoAdmin`. Admin Head has no `admin`/`gate_security` role rows, so the memo returns `true` and the visitor list is filtered down to host-matched / creator-matched rows only — meaning Admin Head sees almost nothing.
+Across **every plant**, after yesterday's Admin Head read-only rollout, the Visitors list no longer shows **Check In** / **Check In & Print** for plant security accounts (e.g. `security.piwmpl@resustainability.com`). HO Admin still sees the buttons. Same broken behaviour on PIWMPL, PIWHPL, every site.
 
-## Fix (frontend only)
-In each of the 4 files, change the `isRestrictedRole` memo from:
+## Why it broke (same cause for all plants)
+
+In `src/pages/Visitors.tsx` the row capability was tightened to:
+
 ```ts
-if (isHoAdmin) return false;
-```
-to:
-```ts
-if (isHoAdmin || isAdminHead) return false;
-```
-(and pull `isAdminHead` from `useUserRoles()` plus add to dep array).
-
-Files:
-- `src/pages/Visitors.tsx`
-- `src/pages/Dashboard.tsx`
-- `src/pages/VisitorReport.tsx`
-- `src/pages/Analytics.tsx`
-
-`useSelectedLocation` already treats Admin Head as a global viewer (All Locations + per-plant switching), and RLS already grants Admin Head SELECT on all visitor-related tables, so no DB or location-switcher changes are needed.
-
-## Result
-Admin Head sees full plant-wise visitor data on Dashboard, Visitors, Visitor Report, and Analytics — across All Locations or any single selected plant — while remaining strictly read-only (no new write controls introduced).
-
----
-
-## (Previous read-only work — already shipped)
-Apply **strict read-only mode** across the **entire application** for the Admin Head role. Admin Head can only view plant-wise data (all plants) and download plant-wise reports. Every create / edit / approve / reject / delete / check-in / check-out / import / settings-write control is hidden across all pages.
-
-## Already done
-- `Visitors.tsx` — New Visitor button, bulk actions, Approve/Reject hidden
-- `PendingApprovals.tsx` dashboard card — hidden for Admin Head
-- DB RLS — Admin Head has SELECT-only at all locations
-- Location switcher — All Locations available
-
-## Remaining work (frontend only)
-
-Single pattern everywhere:
-```ts
-const { isReadOnly } = useUserRoles();
-// then: {!isReadOnly && <Button>...</Button>}  or  disabled={isReadOnly}
+canCheckInOut = !isReadOnly && (isGateSecurity || hostMatch)
 ```
 
-### 1. `src/components/visitors/VisitorActions.tsx`
-Honor `canEdit === false` strictly: hide quick Approve / Reject buttons, hide Check In / Check Out / Check-in & Print quick buttons, hide Approve / Reject / Check In / Check Out dropdown items. Keep only **View Details** and **Print Badge**.
+`isGateSecurity` is only `true` when the user has a role row whose enum is literally `gate_security`. HO Admin is hard-coded true in the hook, which is why HO Admin is unaffected.
 
-### 2. Master data pages — hide Add / Edit / Delete / Import / Bulk buttons
-- `src/pages/Vehicles.tsx` (+ `AnprPanel` actions)
-- `src/pages/Appointments.tsx`
-- `src/pages/Employees.tsx`
-- `src/pages/Departments.tsx`
-- `src/pages/Gates.tsx`
-- `src/pages/Locations.tsx`
-- `src/pages/VehicleTypes.tsx`
-- `src/pages/Watchlist.tsx`
-- `src/pages/UserManagement.tsx`
-- `src/pages/GateQRCodes.tsx`
+Plant security accounts on the deployed server are provisioned with `role = 'operator'` (or `manager`) at the plant — not the enum `gate_security`. So on every plant:
 
-### 3. Operations pages — hide write controls
-- `src/pages/CheckInOut.tsx` — hide check-in/out submit buttons
-- `src/pages/NewVisitor.tsx` / `NewVehicle.tsx` — redirect away or render read-only notice
-- `src/pages/EmergencyEvacuation.tsx` — hide trigger/clear buttons
-- `src/pages/BadgePrinting.tsx` — keep print (read-only friendly), hide edits
-- `src/pages/Notifications.tsx` — keep view, hide delete/clear
+- `isGateSecurity = false`
+- security user is not the host → host-match false
+- → `canCheckInOut = false`
+- → Check In / Check In & Print hidden in the row + dropdown
 
-### 4. Settings & admin
-- `src/pages/Settings.tsx` — disable all form Save buttons across General, Branding, Policies, SMTP, Security, WhatsApp tabs
-- `src/components/settings/WhatsAppSettingsPanel.tsx`
+Before yesterday the dropdown's Check In item did not require `canEdit` / `canCheckInOut`, so these operator/manager security accounts could still check in. Yesterday's read-only work added `canEdit && canCheckInOut` to every quick action and dropdown item in `src/components/visitors/VisitorActions.tsx`, which silently disabled this path for all plants.
 
-### 5. Dialogs
-- `src/components/visitors/VisitorDetailsDialog.tsx` — hide action buttons (approve/reject/checkout)
-- `src/components/visitors/VisitorEditDialog.tsx` — disable Save
-- `src/components/visitors/CheckInDialog.tsx` & `CheckInCaptureDialog.tsx` — disable confirm
+## Fix (frontend only, applies uniformly to every plant)
 
-### 6. Sidebar / nav safety
-- `src/components/layout/Sidebar.tsx` — quick "New Visitor" / "New Vehicle" shortcuts hidden when `isReadOnly`.
-- `src/components/dashboard/QuickActions.tsx` — hide write quick-actions.
+Broaden "can perform gate operations" to cover the operational roles, while keeping Admin Head strictly read-only and not exposing Approve/Reject to security.
 
-## Explicitly retained for Admin Head
-- Plant-wise data view (all plants, via existing "All Locations" + location filter)
-- Report download / CSV exports on `ComplianceReport`, `VisitorReport`, `VehicleReport`, `AuditLogs`, `Analytics`
-- Filters, search, view details, print badge
+### 1. `src/pages/Visitors.tsx`
+Add a memo:
+```ts
+const canPerformGateOps = useMemo(() => {
+  if (isHoAdmin) return true;
+  if (isReadOnly) return false; // Admin Head stays read-only
+  return userRoles.some(r =>
+    ['admin', 'manager', 'operator', 'gate_security'].includes(r.role)
+  );
+}, [isHoAdmin, isReadOnly, userRoles]);
+```
+Update the row prop:
+```tsx
+canCheckInOut={!isReadOnly && (canPerformGateOps || (!!hostEmployeeId && visitor.host_id === hostEmployeeId))}
+```
+Leave `isGateSecurityOnly` (today-default filter) and `canApproveReject` unchanged.
 
-## Out of scope
-- No DB / RLS changes
-- No changes to read, filter, or export flows
+### 2. `src/pages/CheckInOut.tsx`
+Mirror the same `canPerformGateOps` memo and use it to enable check-in/out + photo-capture controls (kept under the existing `!isReadOnly` guard).
 
-## Result
-Admin Head can navigate the whole app, see plant-wise data across all locations, filter and download reports — but cannot trigger any write action anywhere.
+### 3. No changes to
+- `VisitorActions.tsx` internal logic
+- DB / RLS / migrations (UPDATE policies already allow location-scoped users on every plant)
+- Admin Head read-only behavior
+- HO Admin behavior
+- Approve / Reject visibility for security accounts
+
+## Verification (run per plant)
+
+Sign in as the plant security account (e.g. `security.piwmpl@resustainability.com`, then repeat for PIWHPL, etc.):
+- Approved visitor scheduled for today shows **Check In & Print** and the kebab menu shows **Check In**.
+- Approve / Reject remain hidden.
+- Admin Head account → still strictly read-only (no Check In anywhere).
+- HO Admin (`bala@…`) → unchanged.
