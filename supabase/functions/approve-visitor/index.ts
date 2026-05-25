@@ -513,7 +513,7 @@ const handler = async (req: Request): Promise<Response> => {
         const gateNameOnly = (visitor.gate?.name ?? "").toString().replace(/\s+/g, " ").trim();
         const gateBuilding = (visitor.gate?.building ?? "").toString().replace(/\s+/g, " ").trim();
         const gateName = gateNameOnly
-          ? (gateBuilding ? `${gateNameOnly} — ${gateBuilding}` : gateNameOnly)
+          ? (gateBuilding ? `${gateNameOnly} - ${gateBuilding}` : gateNameOnly)
           : "Main Entry";
         const hostName = pick(visitor.host?.name, "Host");
         const fromName = pick(visitor.department?.name, "RESUST");
@@ -525,8 +525,8 @@ const handler = async (req: Request): Promise<Response> => {
           ? String((visitor as any).short_code).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 10)
           : "";
         const qrLink = shortCode
-          ? `${smsBase}/s/${shortCode}`
-          : `${smsBase}/s/${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`;
+          ? `${smsBase}/?${shortCode}`
+          : `${smsBase}/?${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`;
 
         // Look up per-location safety short code so we can append a "safe to assembly point" URL.
         let safetyLink = "";
@@ -541,7 +541,7 @@ const handler = async (req: Request): Promise<Response> => {
             const safetyCode = locRow?.safety_short_code
               ? String(locRow.safety_short_code).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8)
               : "";
-            if (safetyCode) safetyLink = `${smsBase}/safety/${safetyCode}`;
+            if (safetyCode) safetyLink = `${smsBase}/?s${safetyCode}`;
           }
         } catch (e) {
           console.error("safety_short_code lookup failed:", e);

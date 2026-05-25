@@ -1,46 +1,61 @@
-## Problem
-
-After a host transfers an approval, the new host's email contains Approve / Reject / Transfer buttons that link to `https://visiguard.sharvisoftwareservices.com/...` instead of the live tenant `https://vms.resustainability.com/...`.
-
 ## Root cause
 
-`notify-host` builds approval links from `resolvePublicUrl(req, supabase)`, with this priority:
+SMS Striker returns `statusCode:200 / Messages has been sent`, but the operator drops the SMS because the body no longer matches the DLT-registered template under sender ID `RESUST`.
 
-1. request `Origin` header
-2. request `Referer` header
-3. `tenant_settings.public_app_url`
-4. `PUBLIC_URL` env var
-5. `null`
+Three deviations vs the registered template you shared:
 
-When a user submits a transfer in the browser, `transfer-visitor-approval` runs with the correct browser `Origin` (`vms.resustainability.com`) — but it then invokes `notify-host` server-to-server via `supabase.functions.invoke(...)`, which sends **no Origin/Referer**. `notify-host` falls through to the next tier. On the deployed self-hosted backend we verified `tenant_settings.public_app_url IS NULL`, so it lands on the `PUBLIC_URL` env, which is set to the legacy Sharvi staging URL.
+```
+Dear Pradeep, Your visitor access for Sharvi infotech private limited is confirmed on 25/05/2026 at Main Gate(3609) ? Admin Building. QR Link: https://vms.resustainability.com/?d953ffa6 Host: Vishal Singh FROM BD(3609) safe to assembly point https://vms.resustainability.com/?s4ff34d Regards: RE SUSTAINABILITY LIMITED
+```
 
-The original (non-transfer) `notify-host` path works because it's invoked directly from the browser with a real Origin.
+| # | Registered | Currently sent |
+|---|------------|----------------|
+| 1 | QR Link `https://vms.resustainability.com/?<code>` | `https://vms.resustainability.com/s/<code>` |
+| 2 | Safety URL `https://vms.resustainability.com/?s<code>` | `https://vms.resustainability.com/safety/<code>` |
+| 3 | Gate separator `?` / `-` (ASCII) | `—` (em-dash, non-ASCII) |
 
 ## Fix
 
-Forward the caller's origin into the secondary `notify-host` invocation, so transfer-triggered emails use the same host the browser is on. This restores parity with the non-transfer path and stays correct regardless of how the env / tenant_settings are configured on each deployment.
+### 1. `supabase/functions/approve-visitor/index.ts` (SMS block, ~lines 484–662)
 
-### Changes
+- Revert QR link to query-string form:
+  ```ts
+  const qrLink = shortCode
+    ? `${smsBase}/?${shortCode}`
+    : `${smsBase}/?${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`;
+  ```
+- Revert safety link to query-string form with `s` prefix:
+  ```ts
+  if (safetyCode) safetyLink = `${smsBase}/?s${safetyCode}`;
+  ```
+- Build gate label with ASCII `-` (hyphen), not `—`:
+  ```ts
+  const gateName = gateNameOnly
+    ? (gateBuilding ? `${gateNameOnly} - ${gateBuilding}` : gateNameOnly)
+    : "Main Entry";
+  ```
 
-1. **`supabase/functions/transfer-visitor-approval/index.ts`**
-   - Capture `req.headers.get("origin")` (fallback `req.headers.get("referer")`) at the top of the handler.
-   - When invoking `notify-host`, pass an explicit `headers: { origin }` option (and include `referer` if origin is missing) so `resolvePublicUrl` resolves to the live tenant.
+### 2. `supabase/functions/send-sms-badge/index.ts`
 
-   ```ts
-   const callerOrigin = req.headers.get("origin") || req.headers.get("referer") || "";
-   ...
-   await supabase.functions.invoke("notify-host", {
-     body: { visitorId, force: true },
-     headers: callerOrigin ? { origin: callerOrigin } : undefined,
-   });
-   ```
+Apply the identical three changes to the parallel block: `qrUrl`, `safetyLink`, and gate separator.
 
-2. **No changes** to `notify-host`, `approve-visitor`, frontend pages, RLS, DB schema, migrations, email templates, or the SMS QR-link flow shipped in the previous turn.
+### 3. `src/App.tsx` — keep query-string routing working
 
-## Verification
+Verify the existing `ClickRedirect`/`ShortLinkRedirect` route already resolves `/?<code>` (it was the original scheme before the path-based switch). If the `/s/<code>` path route is still present, leave it so old SMS links continue to work, but the **outgoing** template now uses `/?<code>`.
 
-After deploy, transfer an approval from the live tenant:
+### 4. Deploy & verify
 
-1. New host's email Approve / Reject / Transfer buttons resolve to `https://vms.resustainability.com/approve-visitor?...` and `.../transfer-approval?...`.
-2. Clicking them lands on the actual approval pages, not the Sharvi staging domain.
-3. Original (non-transfer) host emails still build the same URLs as before — unchanged.
+- `supabase--deploy_edge_functions` for `approve-visitor` and `send-sms-badge`.
+- On the on-prem box, run `sudo bash deploy/restart-edge-functions.sh` after pulling the new code.
+- Approve one test visitor; the log line `SMS Striker payload:` should now show:
+  ```
+  ...at Main Gate(3609) - Admin Building. QR Link: https://vms.resustainability.com/?<8char> Host: ... safe to assembly point https://vms.resustainability.com/?s<6char> Regards: ...
+  ```
+  byte-identical to the DLT template aside from the variable values.
+- Within ~30s the visitor's phone should receive the SMS. Click the QR link in the message — it must land on the QR page (covered by existing query-string route fallback).
+
+## Out of scope
+
+- Email and WhatsApp flows — unchanged.
+- Approve / reject / transfer routing fix from the previous task — unchanged.
+- DLT registration itself — no portal work needed; we are matching the existing approved template.
