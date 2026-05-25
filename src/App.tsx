@@ -75,6 +75,21 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
+  // Intercept SMS-style root query links (/?<8char> or /?s<6char>)
+  // sent in DLT-approved SMS templates and route them to the proper page
+  // before React Router resolves "/" (which is protected).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.pathname !== "/") return;
+    const raw = window.location.search.slice(1);
+    if (!raw || raw.includes("=") || raw.includes("&")) return;
+    if (raw.length === 7 && /^s[a-z0-9]{6}$/i.test(raw)) {
+      window.location.replace(`/safety/${raw.slice(1).toLowerCase()}`);
+    } else if (/^[a-z0-9]{6,10}$/i.test(raw)) {
+      window.location.replace(`/s/${raw.toLowerCase()}`);
+    }
+  }, []);
+
   return (
     <Routes>
       {/* Public routes */}
