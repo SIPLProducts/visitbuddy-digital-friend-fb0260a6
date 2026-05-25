@@ -145,6 +145,7 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       await supabase.functions.invoke("notify-host", {
         body: { visitorId, force: true },
+        headers: callerOrigin ? { origin: callerOrigin } : undefined,
       });
     } catch (e) {
       console.error("notify-host invoke failed:", e);
