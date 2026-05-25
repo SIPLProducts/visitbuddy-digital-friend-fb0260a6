@@ -99,8 +99,8 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("short_code lookup failed:", e);
     }
     const qrUrl = shortCode
-      ? `${SMS_LINK_BASE}/s/${shortCode}`
-      : `${SMS_LINK_BASE}/s/${cleanUrlPart(visitorId).toLowerCase().slice(0, 10)}`;
+      ? `${SMS_LINK_BASE}/?${shortCode}`
+      : `${SMS_LINK_BASE}/?${cleanUrlPart(visitorId).toLowerCase().slice(0, 10)}`;
 
     // Look up the visitor's branch safety short code for the assembly-point URL.
     let safetyLink = "";
@@ -118,7 +118,7 @@ const handler = async (req: Request): Promise<Response> => {
           const safetyCode = raw
             ? String(raw).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8)
             : "";
-          if (safetyCode) safetyLink = `${SMS_LINK_BASE}/safety/${safetyCode}`;
+          if (safetyCode) safetyLink = `${SMS_LINK_BASE}/?s${safetyCode}`;
         }
       }
     } catch (e) {
