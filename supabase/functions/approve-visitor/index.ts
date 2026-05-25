@@ -520,18 +520,13 @@ const handler = async (req: Request): Promise<Response> => {
         const smsBase = (Deno.env.get("PUBLIC_SMS_LINK_BASE")
           || Deno.env.get("PUBLIC_SITE_URL")
           || "https://vms.resustainability.com").replace(/\/+$/, "");
-        // Short code keeps the URL tail <= 10 chars after `?` (DLT constraint).
+        // Use a path-based short link (/s/<code>) so SMS clients don't strip the query string.
         const shortCode = (visitor as any).short_code
           ? String((visitor as any).short_code).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 10)
           : "";
         const qrLink = shortCode
-          ? `${smsBase}/?${shortCode}`
-          : `${smsBase}/?${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`;
-
-        const qrTail = qrLink.split("?")[1] ?? "";
-        if (qrTail.length > 10) {
-          console.error(`SMS abort — qr tail exceeds 10 chars: '${qrTail}' (len=${qrTail.length})`);
-        }
+          ? `${smsBase}/s/${shortCode}`
+          : `${smsBase}/s/${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`;
 
         // Look up per-location safety short code so we can append a "safe to assembly point" URL.
         let safetyLink = "";
@@ -546,7 +541,7 @@ const handler = async (req: Request): Promise<Response> => {
             const safetyCode = locRow?.safety_short_code
               ? String(locRow.safety_short_code).toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 8)
               : "";
-            if (safetyCode) safetyLink = `${smsBase}/?s${safetyCode}`;
+            if (safetyCode) safetyLink = `${smsBase}/safety/${safetyCode}`;
           }
         } catch (e) {
           console.error("safety_short_code lookup failed:", e);

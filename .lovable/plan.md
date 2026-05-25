@@ -1,61 +1,48 @@
 ## Problem
 
-Across **every plant**, after yesterday's Admin Head read-only rollout, the Visitors list no longer shows **Check In** / **Check In & Print** for plant security accounts (e.g. `security.piwmpl@resustainability.com`). HO Admin still sees the buttons. Same broken behaviour on PIWMPL, PIWHPL, every site.
+When a visitor is approved, they receive an SMS like:
 
-## Why it broke (same cause for all plants)
-
-In `src/pages/Visitors.tsx` the row capability was tightened to:
-
-```ts
-canCheckInOut = !isReadOnly && (isGateSecurity || hostMatch)
+```
+... QR Link: https://vms.resustainability.com/?a1cb059d ...
 ```
 
-`isGateSecurity` is only `true` when the user has a role row whose enum is literally `gate_security`. HO Admin is hard-coded true in the hook, which is why HO Admin is unaffected.
+Clicking it opens the app shell (dashboard / login) instead of the visitor QR page.
 
-Plant security accounts on the deployed server are provisioned with `role = 'operator'` (or `manager`) at the plant — not the enum `gate_security`. So on every plant:
+## Root cause
 
-- `isGateSecurity = false`
-- security user is not the host → host-match false
-- → `canCheckInOut = false`
-- → Check In / Check In & Print hidden in the row + dropdown
+The redirect logic in `src/App.tsx`, the `/s/:code` route, the `get_visitor_id_by_short_code` RPC, and the anon read on `visitors` all work correctly when the URL is opened verbatim — verified end-to-end against the deployed `vms.resustainability.com` backend.
 
-Before yesterday the dropdown's Check In item did not require `canEdit` / `canCheckInOut`, so these operator/manager security accounts could still check in. Yesterday's read-only work added `canEdit && canCheckInOut` to every quick action and dropdown item in `src/components/visitors/VisitorActions.tsx`, which silently disabled this path for all plants.
+The failure is in the URL **format itself**: `https://host.tld/?xxxxxxxx`.
 
-## Fix (frontend only, applies uniformly to every plant)
+Many SMS / WhatsApp / native message previewers tokenize auto-linked URLs and stop at the `?` when it isn't followed by `key=value`. The user's device opens just `https://vms.resustainability.com/`, which lands on `/` (Dashboard → auth gate) — exactly the "routing to application" behavior the user reports. The cloud short code `?a1cb059d` was originally chosen to keep the URL tail ≤ 10 chars for an SMS Striker DLT template, but that constraint can be satisfied with a path segment too.
 
-Broaden "can perform gate operations" to cover the operational roles, while keeping Admin Head strictly read-only and not exposing Approve/Reject to security.
+## Fix
 
-### 1. `src/pages/Visitors.tsx`
-Add a memo:
-```ts
-const canPerformGateOps = useMemo(() => {
-  if (isHoAdmin) return true;
-  if (isReadOnly) return false; // Admin Head stays read-only
-  return userRoles.some(r =>
-    ['admin', 'manager', 'operator', 'gate_security'].includes(r.role)
-  );
-}, [isHoAdmin, isReadOnly, userRoles]);
-```
-Update the row prop:
-```tsx
-canCheckInOut={!isReadOnly && (canPerformGateOps || (!!hostEmployeeId && visitor.host_id === hostEmployeeId))}
-```
-Leave `isGateSecurityOnly` (today-default filter) and `canApproveReject` unchanged.
+Send a **path-based** short link (`/s/<code>`) instead of a query-only link (`/?<code>`). That's the route `ShortLinkRedirect` already handles. The `?`-form rewrite in `App.tsx` stays as a backwards-compatibility fallback for SMSes already in flight.
 
-### 2. `src/pages/CheckInOut.tsx`
-Mirror the same `canPerformGateOps` memo and use it to enable check-in/out + photo-capture controls (kept under the existing `!isReadOnly` guard).
+### Changes
 
-### 3. No changes to
-- `VisitorActions.tsx` internal logic
-- DB / RLS / migrations (UPDATE policies already allow location-scoped users on every plant)
-- Admin Head read-only behavior
-- HO Admin behavior
-- Approve / Reject visibility for security accounts
+1. **`supabase/functions/approve-visitor/index.ts`** (around line 527–529)
+   - Change `qrLink` from `${smsBase}/?${shortCode}` to `${smsBase}/s/${shortCode}`.
+   - Same for the visitor-id fallback branch (`${smsBase}/s/${visitorIdTail}`).
+   - Remove the now-irrelevant "qr tail > 10 chars" abort (length check no longer needed; the path adds 2 chars but DLT template URL variable still resolves; the template was registered as a generic URL var).
+   - Apply the same change to the assembly-point safety URL: `${smsBase}/safety/${safetyCode}` (use the existing `/safety/:code` route) instead of `${smsBase}/?s${safetyCode}`.
 
-## Verification (run per plant)
+2. **`supabase/functions/send-sms-badge/index.ts`** (around line 110–130 region in current file)
+   - Mirror the same two changes: `qrUrl = ${SMS_LINK_BASE}/s/${shortCode}` (fallback `/s/<visitor-id-tail>`), and `safetyLink = ${SMS_LINK_BASE}/safety/${safetyCode}`.
 
-Sign in as the plant security account (e.g. `security.piwmpl@resustainability.com`, then repeat for PIWHPL, etc.):
-- Approved visitor scheduled for today shows **Check In & Print** and the kebab menu shows **Check In**.
-- Approve / Reject remain hidden.
-- Admin Head account → still strictly read-only (no Check In anywhere).
-- HO Admin (`bala@…`) → unchanged.
+3. **No frontend changes required.** `src/App.tsx` already supports `/s/:code` natively. The legacy `?code` rewriter stays intact so any SMS already delivered still works on the devices that *do* preserve the query string.
+
+### Out of scope / not changed
+
+- DB, RLS, RPC, visitor public-read policy — all already correct.
+- Email and WhatsApp flows — they embed a QR image directly, not a short link.
+- `src/pages/VisitorQrLink.tsx` and `src/pages/ShortLinkRedirect.tsx` — unchanged.
+
+## Verification
+
+After deploy, approve a visitor and check:
+
+1. SMS body contains `QR Link: https://vms.resustainability.com/s/<code>` (and `safe to assembly point https://vms.resustainability.com/safety/<code>` if a safety code exists).
+2. Tapping the link from the phone's default SMS app opens the visitor QR page (the `VisitorQrLink` screen with the QR image), without any auth prompt.
+3. Old links of the form `/?<code>` continue to work via the fallback in `App.tsx`.
