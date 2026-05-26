@@ -593,11 +593,11 @@ export default function Visitors() {
         </div>
 
         {/* Table */}
-        <div className="bg-card rounded-xl border border-border overflow-auto max-h-[calc(100vh-280px)]">
+        <div className="bg-card rounded-xl border border-border overflow-auto max-h-[calc(100vh-280px)] scrollbar-thin">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-card">
-              <TableRow>
-                <TableHead className="w-10">
+            <TableHeader className="sticky top-0 z-10 bg-sidebar [&_tr]:border-sidebar-border [&_th]:text-sidebar-foreground">
+              <TableRow className="hover:bg-sidebar">
+                <TableHead className="w-10 text-sidebar-foreground">
                   <Checkbox
                     checked={filteredVisitors.length > 0 && selectedIds.size === filteredVisitors.length}
                     onCheckedChange={toggleSelectAll}
