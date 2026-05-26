@@ -593,8 +593,7 @@ export default function Visitors() {
         </div>
 
         {/* Table */}
-        <div className="bg-card rounded-xl border border-border overflow-auto max-h-[calc(100vh-280px)] scrollbar-thin">
-          <Table>
+        <Table wrapperClassName="bg-card rounded-xl border border-border max-h-[calc(100vh-280px)] overflow-auto scrollbar-thin">
             <TableHeader className="sticky top-0 z-10 bg-sidebar [&_tr]:border-sidebar-border [&_th]:text-sidebar-foreground">
               <TableRow className="hover:bg-sidebar">
                 <TableHead className="w-10 text-sidebar-foreground">
@@ -831,7 +830,6 @@ export default function Visitors() {
               )}
             </TableBody>
           </Table>
-        </div>
           </>
         )}
         </div>
