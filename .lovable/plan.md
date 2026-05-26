@@ -1,9 +1,8 @@
-Update the Visitors table so the header stays fixed while only the data rows scroll.
+Change the Visitors table header from the dark sidebar color to a light color scheme.
 
-Plan:
-1. Update the shared `Table` component to accept an optional `wrapperClassName` prop for styling the built-in table wrapper.
-2. In `Visitors.tsx`, remove the extra outer scroll container around the table and move the max-height/overflow styling onto the actual `Table` wrapper.
-3. Keep the visitor table header styled with the sidebar color and sticky positioning so it remains visible while scrolling rows.
+In `src/pages/Visitors.tsx`, update the sticky `TableHeader` classes:
+- Replace `bg-sidebar [&_tr]:border-sidebar-border [&_th]:text-sidebar-foreground` with a light style: `bg-muted/60 [&_tr]:border-border [&_th]:text-foreground`
+- Update the `TableRow` hover from `hover:bg-sidebar` to `hover:bg-muted/60`
+- Update the checkbox `TableHead`'s explicit `text-sidebar-foreground` to `text-foreground`
 
-Technical detail:
-- The current issue is caused by nested scroll wrappers: the sticky header is inside the shadcn table wrapper, but the outer div is the one scrolling. Sticky positioning must be attached to the same container that scrolls.
+This gives the header a clean light-gray background with dark readable text, matching the rest of the app's light surfaces.

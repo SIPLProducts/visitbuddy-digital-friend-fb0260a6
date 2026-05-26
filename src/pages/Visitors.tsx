@@ -594,9 +594,9 @@ export default function Visitors() {
 
         {/* Table */}
         <Table wrapperClassName="bg-card rounded-xl border border-border max-h-[calc(100vh-280px)] overflow-auto scrollbar-thin">
-            <TableHeader className="sticky top-0 z-10 bg-sidebar [&_tr]:border-sidebar-border [&_th]:text-sidebar-foreground">
-              <TableRow className="hover:bg-sidebar">
-                <TableHead className="w-10 text-sidebar-foreground">
+            <TableHeader className="sticky top-0 z-10 bg-muted/60 [&_tr]:border-border [&_th]:text-foreground">
+              <TableRow className="hover:bg-muted/60">
+                <TableHead className="w-10 text-foreground">
                   <Checkbox
                     checked={filteredVisitors.length > 0 && selectedIds.size === filteredVisitors.length}
                     onCheckedChange={toggleSelectAll}
