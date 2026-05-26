@@ -830,7 +830,6 @@ export default function Visitors() {
               )}
             </TableBody>
           </Table>
-        </div>
           </>
         )}
         </div>
