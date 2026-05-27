@@ -100,7 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
     const qrUrl = shortCode
       ? `${SMS_LINK_BASE}/?${shortCode}`
-      : `${SMS_LINK_BASE}/?${cleanUrlPart(visitorId).toLowerCase().slice(0, 10)}`;
+      : `${SMS_LINK_BASE}/visitor/${cleanUrlPart(visitorId)}`;
 
     // Look up the visitor's branch safety short code for the assembly-point URL.
     let safetyLink = "";

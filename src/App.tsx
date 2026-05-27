@@ -83,10 +83,15 @@ function AppRoutes() {
     if (window.location.pathname !== "/") return;
     const raw = window.location.search.slice(1);
     if (!raw || raw.includes("=") || raw.includes("&")) return;
-    if (raw.length === 7 && /^s[a-z0-9]{6}$/i.test(raw)) {
+    if (/^s[a-z0-9]{6}$/i.test(raw)) {
       window.location.replace(`/safety/${raw.slice(1).toLowerCase()}`);
+    } else if (/^qr[a-z0-9-]+$/i.test(raw)) {
+      window.location.replace(`/visitor/${raw.slice(2).toUpperCase()}`);
     } else if (/^[a-z0-9]{6,10}$/i.test(raw)) {
       window.location.replace(`/s/${raw.toLowerCase()}`);
+    } else if (/^[a-z0-9-]{4,}$/i.test(raw)) {
+      // Defensive fallback for hyphenated visitor_id tails from legacy SMS.
+      window.location.replace(`/visitor/${raw.toUpperCase()}`);
     }
   }, []);
 
@@ -163,12 +168,17 @@ if (typeof window !== "undefined") {
     if (code) {
       window.history.replaceState({}, "", `/visitor/${code}`);
     }
-  } else if (/^\?s[a-z0-9]{4,8}$/i.test(s)) {
+  } else if (/^\?s[a-z0-9]{6}$/i.test(s)) {
+    // Safety short_code is exactly 6 alphanumerics (see generate_location_safety_short_code).
     const code = s.slice(2).toLowerCase();
     window.history.replaceState({}, "", `/safety/${code}`);
   } else if (/^\?[a-z0-9]{6,10}$/i.test(s)) {
     const code = s.slice(1).toLowerCase();
     window.history.replaceState({}, "", `/s/${code}`);
+  } else if (/^\?[a-z0-9-]{4,}$/i.test(s)) {
+    // Defensive fallback: hyphenated visitor_id tails from legacy SMS templates.
+    const code = s.slice(1).toUpperCase();
+    window.history.replaceState({}, "", `/visitor/${code}`);
   }
 }
 
