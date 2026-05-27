@@ -367,6 +367,7 @@ const handler = async (req: Request): Promise<Response> => {
     let smsSent = false;
     let whatsappSid: string | null = null;
     let smsSid: string | null = null;
+    let smsSkipReason: string | null = null;
     let whatsappProvider: 'twilio' | 'whatsapp_web' = 'twilio';
 
     // Read provider preference from tenant_settings (defaults to twilio)
@@ -484,17 +485,36 @@ const handler = async (req: Request): Promise<Response> => {
     // Send SMS via SMS Striker (RESUST) using the key-based API verified in Postman.
     const smsStrikerKey = Deno.env.get("SMS_STRIKER_KEY");
     if (!smsStrikerKey) {
-      console.error("SMS_STRIKER_KEY secret is missing — SMS not sent");
+      smsSkipReason = "SMS_STRIKER_KEY missing";
+      console.error(`[approve-visitor] SMS skipped: SMS_STRIKER_KEY missing (visitorId=${visitor.id}, host_id=${visitor.host_id})`);
     } else if (!visitor.phone) {
-      console.warn("Visitor has no phone number — SMS not sent");
+      smsSkipReason = "visitor.phone is empty";
+      console.warn(`[approve-visitor] SMS skipped: visitor.phone is empty (visitorId=${visitor.id}, host_id=${visitor.host_id})`);
     } else {
       // Match SMS Striker/Postman format: send a clean 10-digit Indian mobile number, no 91 prefix.
       const digits = String(visitor.phone).replace(/\D/g, "").replace(/^0+/, "");
       const strikerPhone = digits.length >= 10 ? digits.slice(-10) : "";
 
       if (!/^[6-9]\d{9}$/.test(strikerPhone)) {
-        console.error(`SMS Striker skipped — invalid Indian mobile: '${visitor.phone}' -> '${strikerPhone}'`);
+        smsSkipReason = `invalid Indian mobile '${visitor.phone}' -> '${strikerPhone}'`;
+        console.error(`[approve-visitor] SMS skipped: invalid Indian mobile '${visitor.phone}' -> '${strikerPhone}' (visitorId=${visitor.id})`);
       } else {
+        // Diagnostic: was this visitor's approval transferred recently?
+        let afterTransfer = false;
+        try {
+          const { data: auditRow } = await supabase
+            .from("audit_logs")
+            .select("id")
+            .eq("entity_type", "visitor")
+            .eq("entity_id", visitor.id)
+            .eq("action", "visitor_approval_transferred")
+            .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+            .limit(1)
+            .maybeSingle();
+          afterTransfer = !!auditRow;
+        } catch (_) { /* non-fatal */ }
+        console.log(`[approve-visitor] SMS attempt: visitorId=${visitor.id} phone=${strikerPhone} afterTransfer=${afterTransfer}`);
+
         const pick = (s: string | null | undefined, fallback: string) => {
           const v = (s == null ? "" : String(s)).replace(/\s+/g, " ").trim();
           return v.length > 0 ? v : fallback;
@@ -570,12 +590,26 @@ const handler = async (req: Request): Promise<Response> => {
             msg: strikerMsg,
             type: "1",
           };
-          const strikerResp = await fetch("https://www.smsstriker.com/API/sendsmsapi.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(strikerPayload),
-          });
-          const strikerText = (await strikerResp.text()).trim();
+          // One-shot retry on transient failures (5xx / network).
+          let strikerResp: Response;
+          let strikerText: string;
+          let attempt = 0;
+          while (true) {
+            attempt++;
+            try {
+              strikerResp = await fetch("https://www.smsstriker.com/API/sendsmsapi.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(strikerPayload),
+              });
+              strikerText = (await strikerResp.text()).trim();
+              if (strikerResp.ok || attempt >= 2) break;
+              console.warn(`[approve-visitor] SMS Striker non-OK (status=${strikerResp.status}) — retrying once`);
+            } catch (fetchErr) {
+              if (attempt >= 2) throw fetchErr;
+              console.warn(`[approve-visitor] SMS Striker fetch error — retrying once:`, fetchErr);
+            }
+          }
           console.log("SMS Striker response:", JSON.stringify({ httpStatus: strikerResp.status, body: strikerText }));
 
           let parsed: any = null;
@@ -614,6 +648,7 @@ const handler = async (req: Request): Promise<Response> => {
             smsSid = providerJobId ? String(providerJobId) : strikerText;
             console.log(`SMS Striker accepted (jobId=${smsSid}) — ${providerMessage}`);
           } else {
+            smsSkipReason = `provider rejected: ${providerMessage || `HTTP ${strikerResp.status}`}`;
             console.error(
               `SMS Striker rejected (httpStatus=${strikerResp.status}, providerStatus=${providerStatusCode}): ${providerMessage}`
             );
@@ -643,6 +678,7 @@ const handler = async (req: Request): Promise<Response> => {
             console.error("Failed to persist sms_logs row:", logErr);
           }
         } catch (smsError) {
+          smsSkipReason = `exception: ${(smsError as any)?.message ?? String(smsError)}`;
           console.error("Error calling SMS Striker:", smsError);
           try {
             await supabase.from("sms_logs").insert({
@@ -684,6 +720,7 @@ const handler = async (req: Request): Promise<Response> => {
           whatsappSid,
           sms: smsSent,
           smsSid,
+          smsSkipReason,
           email: emailSent,
         }
       }),
