@@ -526,7 +526,7 @@ const handler = async (req: Request): Promise<Response> => {
           : "";
         const qrLink = shortCode
           ? `${smsBase}/?${shortCode}`
-          : `${smsBase}/?${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`;
+          : `${smsBase}/visitor/${cleanUrlPart(visitor.visitor_id)}`;
 
         // Look up per-location safety short code so we can append a "safe to assembly point" URL.
         let safetyLink = "";

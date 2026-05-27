@@ -17,6 +17,26 @@ export function ProtectedLayout() {
   }
 
   if (!user) {
+    // Last-resort guard: if someone hits "/?<shortlink>" and the pre-React
+    // rewrite did not catch it, route them to the correct PUBLIC page
+    // instead of sending them to the login screen.
+    if (location.pathname === '/' && location.search.length > 1) {
+      const raw = location.search.slice(1);
+      if (!raw.includes('=') && !raw.includes('&')) {
+        if (/^s[a-z0-9]{6}$/i.test(raw)) {
+          return <Navigate to={`/safety/${raw.slice(1).toLowerCase()}`} replace />;
+        }
+        if (/^qr[a-z0-9-]+$/i.test(raw)) {
+          return <Navigate to={`/visitor/${raw.slice(2).toUpperCase()}`} replace />;
+        }
+        if (/^[a-z0-9]{6,10}$/i.test(raw)) {
+          return <Navigate to={`/s/${raw.toLowerCase()}`} replace />;
+        }
+        if (/^[a-z0-9-]{4,}$/i.test(raw)) {
+          return <Navigate to={`/visitor/${raw.toUpperCase()}`} replace />;
+        }
+      }
+    }
     return <Navigate to="/auth" replace />;
   }
 
