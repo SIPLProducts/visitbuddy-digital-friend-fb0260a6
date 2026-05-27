@@ -1,44 +1,63 @@
-## Goal
-After Host A transfers an approval to Host B and Host B approves from the email, the visitor must receive the SMS badge — same as a direct approval.
 
-## Why we can't see the cause directly
-Both the direct-approve and transfer-then-approve flows funnel through the same edge function (`approve-visitor`), and its SMS code path does not branch on whether a transfer happened — it only looks at `visitor.phone` + `SMS_STRIKER_KEY`. Yet you see the success screen, which means the function returned `200` but the SMS sub-step silently no-op'd or failed (it doesn't block the response). The UI also lies — it always says "Badge sent via WhatsApp & SMS" regardless of the `notifications.sms` flag the function returns.
+## What's actually happening
 
-So the plan is in two parts: **(A) instrument and surface the real status**, and **(B) add a safe fallback so SMS gets re-sent if the primary attempt didn't go out**.
+Same URL, same user, same selected location — but the installed PWA and a fresh web login show different dashboard counts. Two things together explain this:
 
-## Part A — Make the failure visible
+### 1. The PWA is serving an old bundle (primary cause)
 
-1. **`src/pages/ApproveVisitor.tsx`** — stop claiming success blindly. Read `data.notifications` from the edge-function response and:
-   - Show "Badge sent via WhatsApp & SMS" only if both flags are true.
-   - Show "Approved — SMS could not be sent automatically. Resending…" when `sms === false`, and trigger the fallback (Part B).
-   - Surface a small diagnostic line on the success screen: `SMS: sent / not sent`, `WhatsApp: sent / not sent`, `Email: sent / not sent` so the host can tell at a glance.
+`vite.config.ts` uses `VitePWA` with `registerType: "autoUpdate"` and the default Workbox precache (`globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"]`). That means:
 
-2. **`supabase/functions/approve-visitor/index.ts`** — add explicit, greppable log lines so on-prem logs make the cause obvious:
-   - `[approve-visitor] SMS skipped: SMS_STRIKER_KEY missing`
-   - `[approve-visitor] SMS skipped: visitor.phone is empty (visitorId=…, host_id=…)`
-   - `[approve-visitor] SMS skipped: invalid Indian mobile '<raw>' -> '<10digits>'`
-   - `[approve-visitor] SMS attempt: visitorId=… phone=… afterTransfer=<bool>` (compute `afterTransfer` by checking `audit_logs` for a `visitor_approval_transferred` row for this visitor in the last 24h — purely for diagnostics).
-   - Also include a `smsSkipReason` string in the JSON response when `sms === false`, so the UI can show it.
+- The installed PWA precaches `index.html` + the JS bundle from the day it was installed and serves them **cache-first** for every navigation.
+- A fresh browser tab on the same on-prem URL downloads the **latest** JS bundle.
+- Result: two clients running two different versions of the dashboard code (different filter logic, different fields fetched) against the same database → different counts.
 
-## Part B — Fallback re-send so the visitor always gets the SMS
+A new SW does get downloaded in the background, but with `autoUpdate` it only takes effect after the user fully closes every PWA window — which on Android/iOS PWAs almost never happens. So the installed app keeps showing yesterday's code indefinitely.
 
-3. **`src/pages/ApproveVisitor.tsx`** — when the response says `sms === false` (and the action was approve), automatically invoke the existing `send-sms-badge` edge function for the same `visitorId`. It already builds the same DLT-approved message and is the same code path the "Resend SMS" button uses elsewhere, so this is safe to call. Show the final toast based on whether the fallback succeeded.
+### 2. "Today" filter uses UTC, not local date (secondary cause)
 
-4. **`supabase/functions/approve-visitor/index.ts`** — when the SMS Striker call returns a non-accepted response or throws, do one immediate in-function retry (single attempt, fresh `fetch`) before recording failure. Most transient provider failures are a single 5xx blip.
+`src/pages/Dashboard.tsx:143` computes today as `new Date().toISOString().split('T')[0]` (UTC). After 6:30 PM IST every day, a visitor created locally "today" gets counted as "tomorrow" by this filter — and a device whose clock/timezone differs slightly can land on a different UTC date than another device, so two clients showing "Today's visitors" disagree by one day.
 
-## Part C — One real correctness fix in the transfer flow
+## Fix
 
-5. **`supabase/functions/transfer-visitor-approval/index.ts`** — when `notify-host` is invoked after transfer, also pass `force: true` (already passes it) **and** explicitly include the original caller's `origin` header so the email link in the new host's mail points back to the same on-prem deployment. If the origin is missing (e.g., called server-to-server), fall back to `tenant_settings.public_app_url`. This avoids the case where the new host clicks an approve link that lands on a different deployment whose `SMS_STRIKER_KEY` is not configured (which would also produce exactly the symptom you describe: success screen, no SMS). The current code already forwards origin — verify it isn't being dropped when the transfer is initiated from the public `/transfer-approval` page (anon session).
+### A. Force the installed PWA to always run the latest deployed bundle
 
-## What this gives you
-- Even before you find the root cause, every transferred-and-approved visitor will get the SMS (Part B fallback).
-- The next time it happens, the on-prem Edge Function logs will show one specific `[approve-visitor] SMS skipped:` line that names the exact reason, and the new host will see it on screen.
-- If the cause is the deployment-URL mismatch, Part C eliminates it.
+Edit `vite.config.ts` `VitePWA` block:
 
-## Files touched
-- `src/pages/ApproveVisitor.tsx`
-- `supabase/functions/approve-visitor/index.ts`
-- `supabase/functions/transfer-visitor-approval/index.ts`
+1. Add `registerType: "autoUpdate"` companion options `workbox.skipWaiting: true` and `workbox.clientsClaim: true` so a new SW takes over immediately instead of waiting for every tab to close.
+2. Add a runtime caching rule that handles HTML navigations with **NetworkFirst** (3 s timeout, fall back to cache only if offline). This guarantees the installed app pulls the newest `index.html` (which references the newest JS chunks) every time it has network — exactly matching what the web browser does.
+3. Keep the existing QR-code CacheFirst rule unchanged.
+4. Leave precache as-is for true offline fallback.
+
+### B. Ship a one-shot cleanup so currently-installed PWAs pick up the new SW
+
+Bump the existing `RELOAD_KEY` in `src/main.tsx:23` from `"qr-scanner-v2-reloaded"` to `"sw-networkfirst-v3-reloaded"`. Existing installs will, on next launch, unregister the old SW once and reload — after that they're on the new NetworkFirst SW and stay current automatically.
+
+### C. Make "Today" filtering timezone-correct
+
+In `src/pages/Dashboard.tsx`:
+
+- Replace the UTC `today` string at line 143 with a local-date helper (use the existing `date-fns` `format(new Date(), 'yyyy-MM-dd')`, already imported indirectly via `isToday`).
+- Use that local date for the appointments query (`scheduled_date` is a `date` column — local date is what users mean) and for the vehicles `gte`/`lte` window (compute start/end of local day with `startOfDay` / `endOfDay` and send as ISO).
+- The `filteredVisitors` "today" chip already uses `isToday(new Date(v.created_at))` (local) — leave it.
+
+This makes the counts identical regardless of when the device's clock crosses UTC midnight.
+
+### D. No DB / RLS / business-logic changes
+
+Counts mismatch is purely a client-side caching + date-bucket issue. RLS, edge functions, and the visitors/appointments/vehicles tables are not touched.
+
+## Files changed
+
+- `vite.config.ts` — add `skipWaiting`/`clientsClaim`, NetworkFirst rule for navigations
+- `src/main.tsx` — bump reload key so existing PWAs upgrade once
+- `src/pages/Dashboard.tsx` — use local-timezone date for the three "today" queries
+
+## What the user will see
+
+- After redeploying on the Linux server, the installed PWA will reload itself once on next open and from then on always run the same bundle the web shows.
+- Today's-visitors / today's-vehicles / today's-appointments counts will match between PWA and web for the rest of the day, including after 6:30 PM IST.
 
 ## Out of scope
-No DB schema changes, no UI redesign, no changes to the transfer page itself, no changes to `notify-host` beyond what Part C requires (and only if needed).
+
+- No changes to authentication, RLS, edge functions, realtime channels, or the visitors table schema.
+- No UI redesign of the dashboard cards or chips.
