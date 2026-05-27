@@ -36,7 +36,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn, safeRandomId } from '@/lib/utils';
-import { subDays, startOfDay, isToday, isThisWeek, format } from 'date-fns';
+import { subDays, startOfDay, endOfDay, isToday, isThisWeek, format } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 
 export default function Dashboard() {
@@ -140,8 +140,13 @@ export default function Dashboard() {
   };
 
   const fetchDashboardData = async () => {
-    const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    // Use LOCAL date (not UTC) so counts match what users mean by "today"
+    // regardless of the device's timezone or the time of day.
+    const now = new Date();
+    const today = format(now, 'yyyy-MM-dd');
+    const yesterday = format(subDays(now, 1), 'yyyy-MM-dd');
+    const todayStartIso = startOfDay(now).toISOString();
+    const todayEndIso = endOfDay(now).toISOString();
 
     const { data: visitorsData } = await supabase
       .from('visitors')
@@ -243,12 +248,12 @@ export default function Dashboard() {
     if (locationFilter !== 'all') vehicleInsideQ = vehicleInsideQ.eq('location_id', locationFilter);
     const { count: vehicleCount } = await vehicleInsideQ;
 
-    // Get today's vehicles
+    // Get today's vehicles (local-day window)
     let todayVehQ = supabase
       .from('vehicles')
       .select('*', { count: 'exact', head: true })
-      .gte('created_at', `${today}T00:00:00`)
-      .lte('created_at', `${today}T23:59:59`);
+      .gte('created_at', todayStartIso)
+      .lte('created_at', todayEndIso);
     if (locationFilter !== 'all') todayVehQ = todayVehQ.eq('location_id', locationFilter);
     const { count: todaysVehicleCount } = await todayVehQ;
 

@@ -87,7 +87,25 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit
         navigateFallbackDenylist: [/^\/~oauth/],
+        // Activate a new SW immediately so installed PWAs don't get stuck
+        // on a stale bundle until every tab/window is closed.
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
+          {
+            // HTML navigations: always try the network first so the installed
+            // PWA picks up the latest deployed bundle, falling back to cache
+            // only when offline.
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-navigations",
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 10,
+              },
+            },
+          },
           {
             urlPattern: /^https:\/\/api\.qrserver\.com\/.*/i,
             handler: "CacheFirst",
