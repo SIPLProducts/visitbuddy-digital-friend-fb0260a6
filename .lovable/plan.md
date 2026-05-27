@@ -1,61 +1,44 @@
-# Fix: SMS QR link sometimes opens login page
+## Goal
+After Host A transfers an approval to Host B and Host B approves from the email, the visitor must receive the SMS badge — same as a direct approval.
 
-## Root cause
+## Why we can't see the cause directly
+Both the direct-approve and transfer-then-approve flows funnel through the same edge function (`approve-visitor`), and its SMS code path does not branch on whether a transfer happened — it only looks at `visitor.phone` + `SMS_STRIKER_KEY`. Yet you see the success screen, which means the function returned `200` but the SMS sub-step silently no-op'd or failed (it doesn't block the response). The UI also lies — it always says "Badge sent via WhatsApp & SMS" regardless of the `notifications.sms` flag the function returns.
 
-SMS links sent after approval look like `https://<domain>/?<shortcode>` (DLT-approved short URL). For this to open the QR page, an inline script at the bottom of `src/App.tsx` must rewrite the URL to `/s/<shortcode>` **before React mounts**. If the rewrite fails to match, the browser stays at `/`, which is inside `ProtectedLayout`, and the user is sent to `/auth` (the login page).
+So the plan is in two parts: **(A) instrument and surface the real status**, and **(B) add a safe fallback so SMS gets re-sent if the primary attempt didn't go out**.
 
-There are several real cases where the rewrite silently fails today, and they tend to correlate with specific locations / specific visitors:
+## Part A — Make the failure visible
 
-1. **Short-code missing → fallback uses a hyphenated slice.**
-   `approve-visitor` and `send-sms-badge` fall back to `cleanUrlPart(visitor_id).toLowerCase().slice(0, 10)`. `cleanUrlPart` keeps hyphens, so for IDs like `HO-271125-0001` the URL tail becomes `ho-271125-` — the regex `/^\?[a-z0-9]{6,10}$/i` rejects hyphens, the rewrite is skipped, and `/` resolves to the login page. Whether the fallback fires depends on the visitor's location/plant prefix and whether the row has a `short_code`, which is why the user sees it only "for some locations".
+1. **`src/pages/ApproveVisitor.tsx`** — stop claiming success blindly. Read `data.notifications` from the edge-function response and:
+   - Show "Badge sent via WhatsApp & SMS" only if both flags are true.
+   - Show "Approved — SMS could not be sent automatically. Resending…" when `sms === false`, and trigger the fallback (Part B).
+   - Surface a small diagnostic line on the success screen: `SMS: sent / not sent`, `WhatsApp: sent / not sent`, `Email: sent / not sent` so the host can tell at a glance.
 
-2. **Short-code that starts with `s` is misrouted to `/safety/...`.**
-   `/^\?s[a-z0-9]{4,8}$/i` is tested before the generic short-code regex, so an 8-char visitor short-code beginning with `s` (e.g. `s1a2b3c4`) is sent to `SafetyInfo`, which then errors out. No current visitor matches this in the cloud DB, but it can happen on the on-prem DB.
+2. **`supabase/functions/approve-visitor/index.ts`** — add explicit, greppable log lines so on-prem logs make the cause obvious:
+   - `[approve-visitor] SMS skipped: SMS_STRIKER_KEY missing`
+   - `[approve-visitor] SMS skipped: visitor.phone is empty (visitorId=…, host_id=…)`
+   - `[approve-visitor] SMS skipped: invalid Indian mobile '<raw>' -> '<10digits>'`
+   - `[approve-visitor] SMS attempt: visitorId=… phone=… afterTransfer=<bool>` (compute `afterTransfer` by checking `audit_logs` for a `visitor_approval_transferred` row for this visitor in the last 24h — purely for diagnostics).
+   - Also include a `smsSkipReason` string in the JSON response when `sms === false`, so the UI can show it.
 
-3. **Stale deployed bundle on the Linux server.**
-   If the on-prem build predates the `/s/<code>` short-link rewrite, every `/?<code>` URL falls through to `/` → `/auth`. A redeploy is required regardless once the code below changes.
+## Part B — Fallback re-send so the visitor always gets the SMS
 
-In all three cases the symptom is identical: the protected `/` route redirects to `/auth`.
+3. **`src/pages/ApproveVisitor.tsx`** — when the response says `sms === false` (and the action was approve), automatically invoke the existing `send-sms-badge` edge function for the same `visitorId`. It already builds the same DLT-approved message and is the same code path the "Resend SMS" button uses elsewhere, so this is safe to call. Show the final toast based on whether the fallback succeeded.
 
-## Fix
+4. **`supabase/functions/approve-visitor/index.ts`** — when the SMS Striker call returns a non-accepted response or throws, do one immediate in-function retry (single attempt, fresh `fetch`) before recording failure. Most transient provider failures are a single 5xx blip.
 
-Make the public short-link routing robust so an unauthenticated hit on `/?<anything-shortlinkish>` is **never** allowed to reach `ProtectedLayout`.
+## Part C — One real correctness fix in the transfer flow
 
-### 1. `src/App.tsx` — harden the pre-React rewrite
+5. **`supabase/functions/transfer-visitor-approval/index.ts`** — when `notify-host` is invoked after transfer, also pass `force: true` (already passes it) **and** explicitly include the original caller's `origin` header so the email link in the new host's mail points back to the same on-prem deployment. If the origin is missing (e.g., called server-to-server), fall back to `tenant_settings.public_app_url`. This avoids the case where the new host clicks an approve link that lands on a different deployment whose `SMS_STRIKER_KEY` is not configured (which would also produce exactly the symptom you describe: success screen, no SMS). The current code already forwards origin — verify it isn't being dropped when the transfer is initiated from the public `/transfer-approval` page (anon session).
 
-Replace the inline `if (typeof window !== "undefined")` block with logic that:
+## What this gives you
+- Even before you find the root cause, every transferred-and-approved visitor will get the SMS (Part B fallback).
+- The next time it happens, the on-prem Edge Function logs will show one specific `[approve-visitor] SMS skipped:` line that names the exact reason, and the new host will see it on screen.
+- If the cause is the deployment-URL mismatch, Part C eliminates it.
 
-- Detects `?qr<CODE>` → `/visitor/<CODE>` (legacy, unchanged).
-- Detects `?s<4-8 alnum>` **only when total length matches a safety code exactly** (`raw.length` between 5 and 9 AND not also a valid visitor short-code length of 8). To remove ambiguity, anchor safety on the existing `safety_short_code` length (6) used by `generate_location_safety_short_code`: require `^\?s[a-z0-9]{6}$` (7 chars total). This eliminates the "short-code starts with s" collision.
-- Detects `?<6-10 alnum>` → `/s/<code>` (visitor short link).
-- Detects `?<token-with-hyphens-or-uppercase>` that looks like a visitor_id tail → `/visitor/<UPPERCASED>` as a defensive fallback so the broken hyphenated SMS fallback still resolves.
-
-Mirror the same matching set in the `AppRoutes` `useEffect` so client-side navigations are consistent.
-
-### 2. `src/components/layout/ProtectedLayout.tsx` — last-resort guard
-
-Before the `if (!user) return <Navigate to="/auth" />` line, inspect `location.pathname === "/"` and `location.search`. If the search string matches any short-link pattern, render `<Navigate to="/s/<code>" replace />` (or `/visitor/...` / `/safety/...`) instead of `/auth`. This guarantees that even an outdated/edge-case URL never lands on the login page.
-
-### 3. `supabase/functions/approve-visitor/index.ts` and `supabase/functions/send-sms-badge/index.ts` — fix the hyphenated fallback
-
-In the `qrLink` construction, replace:
-
-```ts
-`${smsBase}/?${cleanUrlPart(visitor.visitor_id).toLowerCase().slice(0, 10)}`
-```
-
-with a path-based fallback that does not depend on the SPA rewrite at all:
-
-```ts
-`${smsBase}/visitor/${cleanUrlPart(visitor.visitor_id)}`
-```
-
-(`cleanUrlPart` already uppercases and strips unsafe chars; `/visitor/:visitorCode` is a public route that uppercases the param.) The short-code path is unchanged.
-
-### 4. Redeploy the frontend on the Linux server
-
-After the changes ship, run `deploy/redeploy.sh` (or the user's normal deploy step) so the on-prem nginx serves the updated `index.html` + JS bundle. Without this, fix #1 and #2 will not reach end users.
+## Files touched
+- `src/pages/ApproveVisitor.tsx`
+- `supabase/functions/approve-visitor/index.ts`
+- `supabase/functions/transfer-visitor-approval/index.ts`
 
 ## Out of scope
-
-No database changes. No design changes. No new routes — only the `/` query-string handling and a hardened SMS fallback URL.
+No DB schema changes, no UI redesign, no changes to the transfer page itself, no changes to `notify-host` beyond what Part C requires (and only if needed).
