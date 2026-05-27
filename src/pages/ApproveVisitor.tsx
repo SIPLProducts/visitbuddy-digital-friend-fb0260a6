@@ -27,6 +27,13 @@ export default function ApproveVisitor() {
   const [status, setStatus] = useState<ApprovalStatus>('loading');
   const [visitor, setVisitor] = useState<Visitor | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [deliveryInfo, setDeliveryInfo] = useState<{
+    whatsapp: boolean;
+    sms: boolean;
+    email: boolean;
+    smsSkipReason?: string | null;
+    smsFallback?: 'pending' | 'sent' | 'failed' | null;
+  } | null>(null);
   const autoActionRanRef = useRef(false);
 
   const visitorId = searchParams.get('id');
@@ -99,11 +106,40 @@ export default function ApproveVisitor() {
 
       if (data.success) {
         setStatus(actionType === 'approve' ? 'approved' : 'rejected');
-        toast.success(
-          actionType === 'approve'
-            ? 'Visitor approved! Badge sent via WhatsApp & SMS.'
-            : 'Visitor rejected.'
-        );
+        if (actionType === 'approve') {
+          const n = data.notifications || {};
+          const info = {
+            whatsapp: !!n.whatsapp,
+            sms: !!n.sms,
+            email: !!n.email,
+            smsSkipReason: n.smsSkipReason ?? null,
+            smsFallback: null as 'pending' | 'sent' | 'failed' | null,
+          };
+          setDeliveryInfo(info);
+
+          if (info.sms) {
+            toast.success('Visitor approved! Badge sent via SMS.');
+          } else {
+            // Fallback: try send-sms-badge so the visitor always gets the SMS.
+            setDeliveryInfo({ ...info, smsFallback: 'pending' });
+            toast.message('Visitor approved. Resending SMS…');
+            try {
+              const { data: smsData, error: smsErr } = await supabase.functions.invoke('send-sms-badge', {
+                body: { visitorId },
+              });
+              const ok = !smsErr && (smsData?.success === true || smsData?.sent === true || smsData?.sms === true);
+              setDeliveryInfo({ ...info, smsFallback: ok ? 'sent' : 'failed' });
+              if (ok) toast.success('SMS sent to visitor.');
+              else toast.error('Approved, but SMS could not be sent. Please resend manually.');
+            } catch (fbErr) {
+              console.error('SMS fallback failed:', fbErr);
+              setDeliveryInfo({ ...info, smsFallback: 'failed' });
+              toast.error('Approved, but SMS could not be sent. Please resend manually.');
+            }
+          }
+        } else {
+          toast.success('Visitor rejected.');
+        }
       } else {
         throw new Error(data.error || 'Failed to process approval');
       }
@@ -222,6 +258,47 @@ export default function ApproveVisitor() {
               <p className="mt-4 text-sm">
                 <span className="font-medium">{visitor.name}</span> ({visitor.visitor_id})
               </p>
+            )}
+            {deliveryInfo && (
+              <div className="mt-5 mx-auto max-w-xs text-left bg-muted/40 rounded-lg p-3 text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">WhatsApp</span>
+                  <span className={deliveryInfo.whatsapp ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}>
+                    {deliveryInfo.whatsapp ? 'Sent' : 'Not sent'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">SMS</span>
+                  <span className={
+                    deliveryInfo.sms || deliveryInfo.smsFallback === 'sent'
+                      ? 'text-emerald-600 font-medium'
+                      : deliveryInfo.smsFallback === 'pending'
+                        ? 'text-amber-600 font-medium'
+                        : 'text-destructive font-medium'
+                  }>
+                    {deliveryInfo.sms
+                      ? 'Sent'
+                      : deliveryInfo.smsFallback === 'pending'
+                        ? 'Resending…'
+                        : deliveryInfo.smsFallback === 'sent'
+                          ? 'Sent (fallback)'
+                          : deliveryInfo.smsFallback === 'failed'
+                            ? 'Failed'
+                            : 'Not sent'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Email</span>
+                  <span className={deliveryInfo.email ? 'text-emerald-600 font-medium' : 'text-muted-foreground'}>
+                    {deliveryInfo.email ? 'Sent' : 'Not sent'}
+                  </span>
+                </div>
+                {!deliveryInfo.sms && deliveryInfo.smsSkipReason && (
+                  <div className="pt-1 text-[11px] text-muted-foreground border-t">
+                    SMS reason: {deliveryInfo.smsSkipReason}
+                  </div>
+                )}
+              </div>
             )}
           </div>
         );
