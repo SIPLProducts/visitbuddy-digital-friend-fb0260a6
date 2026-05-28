@@ -1,43 +1,33 @@
-# VisiGuard End-User Training PPT
+## Why the host wasn't getting the pre-scheduling email
 
-A polished `.pptx` deck (~18 slides) for end-user training, branded with VisiGuard / Sharvi Infotech (Indigo #4F46E5 + Emerald #10B981, Inter typography), with real screenshots of the live app embedded.
+By design, when a visitor is pre-registered for a **future date**, `notify-host` defers the host email (only the visitor confirmation goes out immediately). On the **morning of the visit**, the cron job `send-pending-approval-reminders-daily` re-invokes `notify-host` with `force:true`, which sends the host the approval email.
 
-## Approach
+The cron is currently scheduled at `30 2 * * *` UTC = **8:00 AM IST**. (Earlier in this chat it was incorrectly described as "2:30 AM" — pg_cron runs in UTC, so 02:30 UTC is actually 08:00 IST.)
 
-1. **Capture screenshots** of the running preview using browser tools — log in as the primary admin (`bala@sharviinfotech.com`) and navigate each key screen. Save to `/tmp/screens/`.
-2. **Build the deck** with `pptxgenjs` (Node) using a consistent master: indigo header bar, emerald accent, Sharvi footer, Inter font, slide page counters.
-3. **Embed images as base64** (so PDF QA conversion works).
-4. **QA pass**: convert to PDF → JPGs → visually inspect every slide for overflow, contrast, alignment, low-res screenshots; fix and re-render.
-5. Output `/mnt/documents/VisiGuard_User_Training.pptx` + emit a `presentation-artifact` tag.
+You confirmed you want to **keep the defer-until-morning behavior** but **change the send time**. I'll move it earlier to **7:00 AM IST** (a sensible default for "first thing in the morning, before work starts") so hosts see the approval request as soon as they check email.
 
-## Slide outline (~18 slides)
+## Change
 
-1. **Cover** — "VisiGuard VMS — User Training", Sharvi logo, indigo gradient hero
-2. **What is VisiGuard?** — One-paragraph intro + 4 benefit icons (Security, Speed, Compliance, Insights)
-3. **Roles at a glance** — HO Admin, Location Admin, Security, Host, Self-Service visitor (table)
-4. **Logging in** — Screenshot of `/auth` + demo credentials note + role-based landing
-5. **Dashboard tour** — Annotated screenshot: stat tiles, quick filters (Today / Inside / Pending / Checked Out), 7-day trend
-6. **Workflow 1 — Pre-registering a visitor (Host)** — Steps: New Visitor → fill form → auto-notify host
-7. **Workflow 2 — Host approval** — Email/WhatsApp with Approve / Reject / Transfer links; reminder at 2:30 AM IST if still pending
-8. **Workflow 3 — Self-service kiosk (Visitor)** — 4-step wizard screenshot + QR badge delivered via WhatsApp/Email
-9. **Workflow 4 — Security check-in** — Search/scan QR → photo + NDA → print badge; accompanying visitors + devices captured
-10. **Workflow 5 — Vehicle entry & ANPR** — Vehicles page + ANPR panel; auto-allow employee plates, commercial vehicle passes
-11. **Workflow 6 — Check-out** — Security checkout, Self checkout (QR `action: checkout`), System auto-checkout 6 PM
-12. **Workflow 7 — Appointments** — Command Center calendar, color-coded day view
-13. **Workflow 8 — Emergency / Evacuation** — Real-time headcount + map of checked-in visitors
-14. **Notifications & reminders** — WhatsApp + Email + in-app bell; auto-checkout alerts; daily 2:30 AM follow-ups
-15. **Reports & analytics** — Frequent visitors, gate analytics, compliance metrics (screenshot of Reports page)
-16. **Settings & masters** — Locations, Departments, Employees, Vehicle types, SMTP/Branding/Policies tabs
-17. **Mobile / PWA experience** — Bottom nav, swipe gestures, pull-to-refresh; installed app screenshot
-18. **Support & next steps** — Primary admin contact, training resources, Sharvi footer
+Update the existing pg_cron job to fire at **01:30 UTC = 07:00 AM IST**:
 
-## Visual style
+```sql
+-- 1. unschedule the current job
+SELECT cron.unschedule('send-pending-approval-reminders-daily');
 
-- Indigo `#4F46E5` headers, Emerald `#10B981` accent chips, white body, slate `#1E293B` text
-- Inter font (header bold, body regular)
-- Each workflow slide: numbered steps (left, ~40%) + screenshot in rounded frame with subtle shadow (right, ~60%)
-- Footer: "VisiGuard VMS · Powered by Sharvi Infotech" + page number
+-- 2. reschedule at 01:30 UTC (07:00 IST)
+SELECT cron.schedule(
+  'send-pending-approval-reminders-daily',
+  '30 1 * * *',
+  $$ ... existing net.http_post call to send-pending-approval-reminders ... $$
+);
+```
 
-## Deliverable
+No edge-function code changes. No frontend changes. The deferral logic in `notify-host` (`skipHost = !force && visitDateStr > todayIST`) stays exactly as is.
 
-`/mnt/documents/VisiGuard_User_Training.pptx` — opens in PowerPoint/Google Slides/Keynote.
+## Verification
+
+- Re-query `cron.job` to confirm the new schedule is `30 1 * * *`.
+- Tomorrow's `cron.job_run_details` row for this job should show `start_time` at `01:30 UTC`.
+- Any pending-approval visitor whose `scheduled_date` equals that day will trigger a host approval email at 7:00 AM IST.
+
+If you'd prefer a different time (e.g. 8:30 AM or 9:00 AM IST), tell me the exact HH:MM and I'll adjust the cron expression.
