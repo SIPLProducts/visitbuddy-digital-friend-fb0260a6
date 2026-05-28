@@ -1,16 +1,13 @@
-## Goal
-Show **all** gates (in current location scope) inside the Dashboard's "Gate Status" panel, not just the first 4.
+Add Active Locations and Inactive Locations stat cards to the Dashboard.
 
-## Change
-`src/components/dashboard/GateStatus.tsx`
-- Remove `gates.slice(0, 4)` → render the full `gates` array passed in.
-- Wrap the list in a scrollable container (`max-h-[360px] overflow-y-auto`) so the panel stays the same visual height as today but lets the user scroll through every gate.
-- Keep existing row markup, status dot, badge, and capacity counter unchanged.
+1. Compute counts from existing `locations` state:
+   - `activeLocationsCount` = locations.filter(l => l.status === 'active').length
+   - `inactiveLocationsCount` = locations.filter(l => l.status === 'inactive').length
 
-## Scope notes
-- `Dashboard.tsx` already passes `filteredGates` to `<GateStatus />`, so location-scoping is preserved automatically.
-- No DB / backend / styling-token changes. Pure presentation tweak.
+2. Add two new `StatCard` components to the stats grid:
+   - "Active Locations" with `Building2` icon, `emerald` color
+   - "Inactive Locations" with `Building2` icon, `amber` color
 
-## Out of scope
-- Pagination, search, or sorting inside the panel.
-- Changes to the new "Active Gates" stat card.
+3. Adjust the stats grid layout. Currently `xl:grid-cols-8` with 8 cards. Adding 2 cards makes 10 total. Change the grid to `xl:grid-cols-5` so 10 cards fit evenly across 2 rows on extra-large screens. Keep smaller breakpoints as-is (`grid-cols-2 md:grid-cols-3 lg:grid-cols-4`).
+
+No backend changes needed — the Dashboard already fetches all locations.
