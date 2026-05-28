@@ -415,6 +415,15 @@ export default function Dashboard() {
     return loc && loc.status === 'active' ? 1 : 0;
   }, [locations, locationFilter]);
 
+  const activeLocationsCount = useMemo(
+    () => locations.filter(l => l.status === 'active').length,
+    [locations]
+  );
+  const inactiveLocationsCount = useMemo(
+    () => locations.filter(l => l.status === 'inactive').length,
+    [locations]
+  );
+
   return (
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="space-y-5">
@@ -533,7 +542,7 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             <StatCard
               title="Today's Visitors"
               value={filteredStats.todaysVisitors}
@@ -595,6 +604,20 @@ export default function Dashboard() {
               subtitle={`across ${activePlantsCount} active plant${activePlantsCount === 1 ? '' : 's'}`}
               icon={<DoorOpen className="h-5 w-5" />}
               iconColor="teal"
+            />
+            <StatCard
+              title="Active Locations"
+              value={activeLocationsCount}
+              subtitle={`of ${locations.length} total`}
+              icon={<Building2 className="h-5 w-5" />}
+              iconColor="emerald"
+            />
+            <StatCard
+              title="Inactive Locations"
+              value={inactiveLocationsCount}
+              subtitle={`of ${locations.length} total`}
+              icon={<Building2 className="h-5 w-5" />}
+              iconColor="amber"
             />
           </div>
 
