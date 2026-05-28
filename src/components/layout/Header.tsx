@@ -83,6 +83,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         const { data, error } = await supabase
           .from('locations')
           .select('id, name, city')
+          .eq('status', 'active')
           .order('name');
         if (error) throw error;
         setLocations(data || []);
@@ -96,6 +97,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           .from('locations')
           .select('id, name, city')
           .in('id', assignedLocationIds)
+          .eq('status', 'active')
           .order('name');
         if (error) throw error;
         setLocations(data || []);
