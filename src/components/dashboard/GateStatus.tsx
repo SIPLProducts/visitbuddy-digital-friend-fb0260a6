@@ -23,13 +23,13 @@ export function GateStatus({ gates }: GateStatusProps) {
           </Button>
         </Link>
       </div>
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border max-h-[360px] overflow-y-auto">
         {gates.length === 0 ? (
           <div className="p-6 text-center text-muted-foreground">
             No gates configured
           </div>
         ) : (
-          gates.slice(0, 4).map((gate) => (
+          gates.map((gate) => (
             <div
               key={gate.id}
               className="flex items-center justify-between p-4 hover:bg-accent/50 transition-colors"
