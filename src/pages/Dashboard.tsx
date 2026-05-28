@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, AlertTriangle, UsersRound } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, UserCheck, Clock, MapPin, Zap, CalendarDays, Building2, Truck, ShieldAlert, Activity, AlertTriangle, UsersRound, DoorOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { useHostEmployee } from '@/hooks/useHostEmployee';
@@ -406,6 +406,15 @@ export default function Dashboard() {
 
   const totalGateCapacity = filteredGates.reduce((sum, g) => sum + (g.capacity || 0), 0);
 
+  const activeGatesCount = filteredGates.filter(g => g.status === 'active').length;
+  const activePlantsCount = useMemo(() => {
+    if (locationFilter === 'all') {
+      return locations.filter(l => l.status === 'active').length;
+    }
+    const loc = locations.find(l => l.id === locationFilter);
+    return loc && loc.status === 'active' ? 1 : 0;
+  }, [locations, locationFilter]);
+
   return (
       <PullToRefresh onRefresh={handleRefresh}>
         <div className="space-y-5">
@@ -524,7 +533,7 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
             <StatCard
               title="Today's Visitors"
               value={filteredStats.todaysVisitors}
@@ -579,6 +588,13 @@ export default function Dashboard() {
               value={filteredStats.avgVisitDuration}
               icon={<Clock className="h-5 w-5" />}
               iconColor="rose"
+            />
+            <StatCard
+              title="Active Gates"
+              value={activeGatesCount}
+              subtitle={`across ${activePlantsCount} active plant${activePlantsCount === 1 ? '' : 's'}`}
+              icon={<DoorOpen className="h-5 w-5" />}
+              iconColor="teal"
             />
           </div>
 
