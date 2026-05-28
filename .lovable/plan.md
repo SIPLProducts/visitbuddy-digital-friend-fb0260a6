@@ -1,33 +1,28 @@
-## Why the host wasn't getting the pre-scheduling email
+## Goal
+Show on the dashboard how many **active gates** exist across how many **active plants (locations)**, respecting the currently selected location.
 
-By design, when a visitor is pre-registered for a **future date**, `notify-host` defers the host email (only the visitor confirmation goes out immediately). On the **morning of the visit**, the cron job `send-pending-approval-reminders-daily` re-invokes `notify-host` with `force:true`, which sends the host the approval email.
+## What the user will see
+A new stat card in the top stats grid:
 
-The cron is currently scheduled at `30 2 * * *` UTC = **8:00 AM IST**. (Earlier in this chat it was incorrectly described as "2:30 AM" — pg_cron runs in UTC, so 02:30 UTC is actually 08:00 IST.)
+- **Title:** "Active Gates"
+- **Value:** number of gates with `status = 'active'` in scope
+- **Subtitle:** "across N active plants" (N = number of active locations in scope)
 
-You confirmed you want to **keep the defer-until-morning behavior** but **change the send time**. I'll move it earlier to **7:00 AM IST** (a sensible default for "first thing in the morning, before work starts") so hosts see the approval request as soon as they check email.
+Scope rules:
+- When "All Locations" is selected → count all active gates across all active plants the user can see.
+- When a specific location is selected → count active gates at that one plant; subtitle shows "across 1 active plant" (or hides the count and shows the plant name).
 
-## Change
+## Where it goes
+`src/pages/Dashboard.tsx`, inside the existing Stats Grid (the `grid ... xl:grid-cols-7` block). The grid will become `xl:grid-cols-8` to fit one more card cleanly, keeping the responsive layout for smaller breakpoints intact.
 
-Update the existing pg_cron job to fire at **01:30 UTC = 07:00 AM IST**:
+## Technical notes
+- `gates` is already fetched in `fetchDashboardData`; derive `activeGatesCount` from `filteredGates.filter(g => g.status === 'active')`.
+- `locations` is already fetched via `fetchLocations`; derive `activePlantsCount`:
+  - All Locations → `locations.filter(l => l.status === 'active').length`
+  - Single location → `1` if that location is active, else `0`.
+- Add one `<StatCard>` (icon: `DoorOpen` from lucide-react, color e.g. `indigo`/`teal`) — pure presentation, no schema or backend changes.
 
-```sql
--- 1. unschedule the current job
-SELECT cron.unschedule('send-pending-approval-reminders-daily');
-
--- 2. reschedule at 01:30 UTC (07:00 IST)
-SELECT cron.schedule(
-  'send-pending-approval-reminders-daily',
-  '30 1 * * *',
-  $$ ... existing net.http_post call to send-pending-approval-reminders ... $$
-);
-```
-
-No edge-function code changes. No frontend changes. The deferral logic in `notify-host` (`skipHost = !force && visitDateStr > todayIST`) stays exactly as is.
-
-## Verification
-
-- Re-query `cron.job` to confirm the new schedule is `30 1 * * *`.
-- Tomorrow's `cron.job_run_details` row for this job should show `start_time` at `01:30 UTC`.
-- Any pending-approval visitor whose `scheduled_date` equals that day will trigger a host approval email at 7:00 AM IST.
-
-If you'd prefer a different time (e.g. 8:30 AM or 9:00 AM IST), tell me the exact HH:MM and I'll adjust the cron expression.
+## Out of scope
+- No DB migrations.
+- No changes to the existing `GateStatus` panel at the bottom.
+- No changes to filtering logic or other cards.
