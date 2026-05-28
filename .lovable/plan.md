@@ -1,13 +1,18 @@
-Add Active Locations and Inactive Locations stat cards to the Dashboard.
+## Problem
+Inactive (deactivated) locations currently appear in the top bar location dropdown filter, allowing users to select a location that is no longer operational.
 
-1. Compute counts from existing `locations` state:
-   - `activeLocationsCount` = locations.filter(l => l.status === 'active').length
-   - `inactiveLocationsCount` = locations.filter(l => l.status === 'inactive').length
+## Solution
+Filter the `fetchLocations` query in `Header.tsx` so only `status = 'active'` locations are returned, for all user types (global viewers and location-scoped users alike).
 
-2. Add two new `StatCard` components to the stats grid:
-   - "Active Locations" with `Building2` icon, `emerald` color
-   - "Inactive Locations" with `Building2` icon, `amber` color
+## Changes
+1. In `src/components/layout/Header.tsx`, within the `fetchLocations` function:
+   - Add `.eq('status', 'active')` to the global-viewer query (line ~85).
+   - Add `.eq('status', 'active')` to the location-scoped query (line ~97).
 
-3. Adjust the stats grid layout. Currently `xl:grid-cols-8` with 8 cards. Adding 2 cards makes 10 total. Change the grid to `xl:grid-cols-5` so 10 cards fit evenly across 2 rows on extra-large screens. Keep smaller breakpoints as-is (`grid-cols-2 md:grid-cols-3 lg:grid-cols-4`).
+## Acceptance Criteria
+- Inactive locations do not appear in the top bar dropdown for any user role.
+- Active locations continue to appear as before.
+- HO Admins/Admin Heads can still manage inactive locations via the Locations management page.
 
-No backend changes needed — the Dashboard already fetches all locations.
+## No backend changes needed
+The `locations` table already has a `status` column. Only frontend query filters are added.
