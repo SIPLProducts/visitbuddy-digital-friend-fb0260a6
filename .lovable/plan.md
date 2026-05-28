@@ -1,63 +1,43 @@
+# VisiGuard End-User Training PPT
 
-## What's actually happening
+A polished `.pptx` deck (~18 slides) for end-user training, branded with VisiGuard / Sharvi Infotech (Indigo #4F46E5 + Emerald #10B981, Inter typography), with real screenshots of the live app embedded.
 
-Same URL, same user, same selected location — but the installed PWA and a fresh web login show different dashboard counts. Two things together explain this:
+## Approach
 
-### 1. The PWA is serving an old bundle (primary cause)
+1. **Capture screenshots** of the running preview using browser tools — log in as the primary admin (`bala@sharviinfotech.com`) and navigate each key screen. Save to `/tmp/screens/`.
+2. **Build the deck** with `pptxgenjs` (Node) using a consistent master: indigo header bar, emerald accent, Sharvi footer, Inter font, slide page counters.
+3. **Embed images as base64** (so PDF QA conversion works).
+4. **QA pass**: convert to PDF → JPGs → visually inspect every slide for overflow, contrast, alignment, low-res screenshots; fix and re-render.
+5. Output `/mnt/documents/VisiGuard_User_Training.pptx` + emit a `presentation-artifact` tag.
 
-`vite.config.ts` uses `VitePWA` with `registerType: "autoUpdate"` and the default Workbox precache (`globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"]`). That means:
+## Slide outline (~18 slides)
 
-- The installed PWA precaches `index.html` + the JS bundle from the day it was installed and serves them **cache-first** for every navigation.
-- A fresh browser tab on the same on-prem URL downloads the **latest** JS bundle.
-- Result: two clients running two different versions of the dashboard code (different filter logic, different fields fetched) against the same database → different counts.
+1. **Cover** — "VisiGuard VMS — User Training", Sharvi logo, indigo gradient hero
+2. **What is VisiGuard?** — One-paragraph intro + 4 benefit icons (Security, Speed, Compliance, Insights)
+3. **Roles at a glance** — HO Admin, Location Admin, Security, Host, Self-Service visitor (table)
+4. **Logging in** — Screenshot of `/auth` + demo credentials note + role-based landing
+5. **Dashboard tour** — Annotated screenshot: stat tiles, quick filters (Today / Inside / Pending / Checked Out), 7-day trend
+6. **Workflow 1 — Pre-registering a visitor (Host)** — Steps: New Visitor → fill form → auto-notify host
+7. **Workflow 2 — Host approval** — Email/WhatsApp with Approve / Reject / Transfer links; reminder at 2:30 AM IST if still pending
+8. **Workflow 3 — Self-service kiosk (Visitor)** — 4-step wizard screenshot + QR badge delivered via WhatsApp/Email
+9. **Workflow 4 — Security check-in** — Search/scan QR → photo + NDA → print badge; accompanying visitors + devices captured
+10. **Workflow 5 — Vehicle entry & ANPR** — Vehicles page + ANPR panel; auto-allow employee plates, commercial vehicle passes
+11. **Workflow 6 — Check-out** — Security checkout, Self checkout (QR `action: checkout`), System auto-checkout 6 PM
+12. **Workflow 7 — Appointments** — Command Center calendar, color-coded day view
+13. **Workflow 8 — Emergency / Evacuation** — Real-time headcount + map of checked-in visitors
+14. **Notifications & reminders** — WhatsApp + Email + in-app bell; auto-checkout alerts; daily 2:30 AM follow-ups
+15. **Reports & analytics** — Frequent visitors, gate analytics, compliance metrics (screenshot of Reports page)
+16. **Settings & masters** — Locations, Departments, Employees, Vehicle types, SMTP/Branding/Policies tabs
+17. **Mobile / PWA experience** — Bottom nav, swipe gestures, pull-to-refresh; installed app screenshot
+18. **Support & next steps** — Primary admin contact, training resources, Sharvi footer
 
-A new SW does get downloaded in the background, but with `autoUpdate` it only takes effect after the user fully closes every PWA window — which on Android/iOS PWAs almost never happens. So the installed app keeps showing yesterday's code indefinitely.
+## Visual style
 
-### 2. "Today" filter uses UTC, not local date (secondary cause)
+- Indigo `#4F46E5` headers, Emerald `#10B981` accent chips, white body, slate `#1E293B` text
+- Inter font (header bold, body regular)
+- Each workflow slide: numbered steps (left, ~40%) + screenshot in rounded frame with subtle shadow (right, ~60%)
+- Footer: "VisiGuard VMS · Powered by Sharvi Infotech" + page number
 
-`src/pages/Dashboard.tsx:143` computes today as `new Date().toISOString().split('T')[0]` (UTC). After 6:30 PM IST every day, a visitor created locally "today" gets counted as "tomorrow" by this filter — and a device whose clock/timezone differs slightly can land on a different UTC date than another device, so two clients showing "Today's visitors" disagree by one day.
+## Deliverable
 
-## Fix
-
-### A. Force the installed PWA to always run the latest deployed bundle
-
-Edit `vite.config.ts` `VitePWA` block:
-
-1. Add `registerType: "autoUpdate"` companion options `workbox.skipWaiting: true` and `workbox.clientsClaim: true` so a new SW takes over immediately instead of waiting for every tab to close.
-2. Add a runtime caching rule that handles HTML navigations with **NetworkFirst** (3 s timeout, fall back to cache only if offline). This guarantees the installed app pulls the newest `index.html` (which references the newest JS chunks) every time it has network — exactly matching what the web browser does.
-3. Keep the existing QR-code CacheFirst rule unchanged.
-4. Leave precache as-is for true offline fallback.
-
-### B. Ship a one-shot cleanup so currently-installed PWAs pick up the new SW
-
-Bump the existing `RELOAD_KEY` in `src/main.tsx:23` from `"qr-scanner-v2-reloaded"` to `"sw-networkfirst-v3-reloaded"`. Existing installs will, on next launch, unregister the old SW once and reload — after that they're on the new NetworkFirst SW and stay current automatically.
-
-### C. Make "Today" filtering timezone-correct
-
-In `src/pages/Dashboard.tsx`:
-
-- Replace the UTC `today` string at line 143 with a local-date helper (use the existing `date-fns` `format(new Date(), 'yyyy-MM-dd')`, already imported indirectly via `isToday`).
-- Use that local date for the appointments query (`scheduled_date` is a `date` column — local date is what users mean) and for the vehicles `gte`/`lte` window (compute start/end of local day with `startOfDay` / `endOfDay` and send as ISO).
-- The `filteredVisitors` "today" chip already uses `isToday(new Date(v.created_at))` (local) — leave it.
-
-This makes the counts identical regardless of when the device's clock crosses UTC midnight.
-
-### D. No DB / RLS / business-logic changes
-
-Counts mismatch is purely a client-side caching + date-bucket issue. RLS, edge functions, and the visitors/appointments/vehicles tables are not touched.
-
-## Files changed
-
-- `vite.config.ts` — add `skipWaiting`/`clientsClaim`, NetworkFirst rule for navigations
-- `src/main.tsx` — bump reload key so existing PWAs upgrade once
-- `src/pages/Dashboard.tsx` — use local-timezone date for the three "today" queries
-
-## What the user will see
-
-- After redeploying on the Linux server, the installed PWA will reload itself once on next open and from then on always run the same bundle the web shows.
-- Today's-visitors / today's-vehicles / today's-appointments counts will match between PWA and web for the rest of the day, including after 6:30 PM IST.
-
-## Out of scope
-
-- No changes to authentication, RLS, edge functions, realtime channels, or the visitors table schema.
-- No UI redesign of the dashboard cards or chips.
+`/mnt/documents/VisiGuard_User_Training.pptx` — opens in PowerPoint/Google Slides/Keynote.
