@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Building2, ChevronDown, Crown, Menu, Globe, Download } from 'lucide-react';
+import { Search, Plus, Building2, ChevronDown, Crown, Menu, Globe, Download, Check } from 'lucide-react';
 import { NotificationDropdown } from '@/components/layout/NotificationDropdown';
 import { InstallButton } from '@/components/install/InstallButton';
 import { Input } from '@/components/ui/input';
@@ -14,13 +14,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRoles } from '@/hooks/useUserRoles';
 import { Link } from 'react-router-dom';
@@ -46,6 +49,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const isGlobalViewer = isHoAdmin || isAdminHead;
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+  const [locationPopoverOpen, setLocationPopoverOpen] = useState(false);
   const isMobile = useIsMobile();
   const { t, i18n } = useTranslation();
 
@@ -150,29 +154,84 @@ export function Header({ onMenuClick }: HeaderProps) {
                 <span className="font-medium truncate">{locations[0].name}</span>
               </div>
             ) : (
-              <Select value={selectedLocationId} onValueChange={handleLocationChange}>
-                <SelectTrigger className="w-[120px] md:w-[200px] bg-background h-10">
-                  <div className="flex items-center gap-2 truncate">
-                    <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    <SelectValue placeholder="Location" className="truncate" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  {isGlobalViewer && (
-                    <SelectItem value="all">
-                      <div className="flex items-center gap-2">
-                        <Crown className="h-4 w-4 text-[#f59e0b]" />
-                        All Locations
-                      </div>
-                    </SelectItem>
-                  )}
-                  {locations.map((location) => (
-                    <SelectItem key={location.id} value={location.id}>
-                      {location.name} {location.city && `(${location.city})`}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={locationPopoverOpen} onOpenChange={setLocationPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={locationPopoverOpen}
+                    className="w-[140px] md:w-[220px] bg-background h-10 justify-between font-normal"
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      {selectedLocationId === 'all' ? (
+                        <Crown className="h-4 w-4 text-[#f59e0b] flex-shrink-0" />
+                      ) : (
+                        <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      )}
+                      <span className="truncate">
+                        {selectedLocationId === 'all'
+                          ? 'All Locations'
+                          : currentLocation
+                            ? currentLocation.name
+                            : 'Location'}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 opacity-50 flex-shrink-0 ml-1" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[260px] p-0 bg-popover z-50" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search locations..." />
+                    <CommandList>
+                      <CommandEmpty>No locations found.</CommandEmpty>
+                      <CommandGroup>
+                        {isGlobalViewer && (
+                          <CommandItem
+                            value="all locations"
+                            onSelect={() => {
+                              handleLocationChange('all');
+                              setLocationPopoverOpen(false);
+                            }}
+                          >
+                            <Crown className="h-4 w-4 text-[#f59e0b] mr-2" />
+                            <span>All Locations</span>
+                            <Check
+                              className={cn(
+                                'ml-auto h-4 w-4',
+                                selectedLocationId === 'all' ? 'opacity-100' : 'opacity-0',
+                              )}
+                            />
+                          </CommandItem>
+                        )}
+                        {locations.map((location) => (
+                          <CommandItem
+                            key={location.id}
+                            value={`${location.name} ${location.city ?? ''}`}
+                            onSelect={() => {
+                              handleLocationChange(location.id);
+                              setLocationPopoverOpen(false);
+                            }}
+                          >
+                            <Building2 className="h-4 w-4 text-muted-foreground mr-2" />
+                            <span className="truncate">
+                              {location.name}
+                              {location.city && (
+                                <span className="text-muted-foreground"> ({location.city})</span>
+                              )}
+                            </span>
+                            <Check
+                              className={cn(
+                                'ml-auto h-4 w-4',
+                                selectedLocationId === location.id ? 'opacity-100' : 'opacity-0',
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             )}
           </div>
         )}
