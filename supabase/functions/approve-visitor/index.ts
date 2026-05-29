@@ -704,6 +704,46 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    // ---- Server-side SMS fallback ----
+    // If the direct Striker call didn't succeed, invoke send-sms-badge as a fallback so
+    // a transient blip on this code path doesn't prevent the visitor from getting the QR.
+    let smsFallback: 'sent' | 'failed' | 'skipped' = 'skipped';
+    if (!smsSent && visitor.phone) {
+      try {
+        const fbUrl = `${supabaseUrl}/functions/v1/send-sms-badge`;
+        const fbResp = await fetch(fbUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseServiceKey}`,
+            'apikey': supabaseServiceKey,
+          },
+          body: JSON.stringify({
+            visitorName: visitor.name,
+            visitorId: visitor.visitor_id,
+            phone: visitor.phone,
+            company: visitor.company ?? undefined,
+            purpose: visitor.purpose ?? undefined,
+            hostName: visitor.host?.name ?? undefined,
+            departmentName: visitor.department?.name ?? undefined,
+            gateName: visitor.gate?.name ?? undefined,
+          }),
+        });
+        const fbBody = await fbResp.json().catch(() => ({}));
+        const ok = fbResp.ok && (fbBody?.success === true);
+        smsFallback = ok ? 'sent' : 'failed';
+        if (ok) {
+          smsSent = true;
+          smsSid = fbBody?.jobId ? String(fbBody.jobId) : (smsSid ?? 'fallback');
+        }
+        const _locId = visitor.gate?.location_id ?? null;
+        console.log(`[approve-visitor] SMS fallback: result=${smsFallback} locationId=${_locId} httpStatus=${fbResp.status}`);
+      } catch (fbErr: any) {
+        smsFallback = 'failed';
+        console.error('[approve-visitor] SMS fallback threw:', fbErr?.message ?? fbErr);
+      }
+    }
+
     // ---- Email to visitor on approval ----
     let emailSent = false;
     if (visitor.email) {
@@ -728,6 +768,7 @@ const handler = async (req: Request): Promise<Response> => {
           sms: smsSent,
           smsSid,
           smsSkipReason,
+          smsFallback,
           email: emailSent,
         }
       }),
