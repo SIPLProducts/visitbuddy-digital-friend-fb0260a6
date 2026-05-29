@@ -413,6 +413,8 @@ const handler = async (req: Request): Promise<Response> => {
     };
 
     // ---- WhatsApp Web (DEMO) path via bridge ----
+    // Wrapped in an outer try/catch so a WhatsApp failure can never skip the SMS block below.
+    try {
     if (whatsappProvider === 'whatsapp_web' && visitor.phone) {
       try {
         const bridgeUrl = Deno.env.get("WHATSAPP_BRIDGE_URL");
@@ -480,6 +482,9 @@ const handler = async (req: Request): Promise<Response> => {
       } catch (whatsappError) {
         console.error("Error sending WhatsApp:", whatsappError);
       }
+    }
+    } catch (waOuterErr) {
+      console.error("[approve-visitor] WhatsApp block failed unexpectedly, continuing to SMS:", waOuterErr);
     }
 
     // Send SMS via SMS Striker (RESUST) using the key-based API verified in Postman.
