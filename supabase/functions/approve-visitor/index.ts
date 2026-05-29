@@ -518,7 +518,9 @@ const handler = async (req: Request): Promise<Response> => {
             .maybeSingle();
           afterTransfer = !!auditRow;
         } catch (_) { /* non-fatal */ }
-        console.log(`[approve-visitor] SMS attempt: visitorId=${visitor.id} phone=${strikerPhone} afterTransfer=${afterTransfer}`);
+        const _locId = visitor.gate?.location_id ?? null;
+        const _gateName = visitor.gate?.name ?? null;
+        console.log(`[approve-visitor] SMS attempt: visitorId=${visitor.id} phone=${strikerPhone} locationId=${_locId} gate=${_gateName} afterTransfer=${afterTransfer}`);
 
         const pick = (s: string | null | undefined, fallback: string) => {
           const v = (s == null ? "" : String(s)).replace(/\s+/g, " ").trim();
