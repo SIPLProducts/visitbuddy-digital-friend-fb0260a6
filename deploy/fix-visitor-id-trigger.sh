@@ -56,7 +56,7 @@ BEGIN
   WHERE g.id = NEW.gate_id;
 
   IF v_plant IS NULL OR length(v_plant) = 0 THEN
-    v_name_token := UPPER(SUBSTRING(COALESCE(v_name, '') FROM '^\s*([A-Za-z0-9]+)'));
+    v_name_token := UPPER(SUBSTRING(COALESCE(v_name, '') FROM '^[[:space:]]*([A-Za-z0-9]+)'));
     v_plant := COALESCE(
       NULLIF(v_name_token, ''),
       NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(v_name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6)), '')
@@ -90,7 +90,7 @@ SELECT
   l.id AS location_id,
   l.name AS location_name,
   l.plant_code,
-  COALESCE(NULLIF(UPPER(REGEXP_REPLACE(COALESCE(l.plant_code, ''), '[^A-Za-z0-9]', '', 'g')), ''), NULLIF(UPPER(SUBSTRING(COALESCE(l.name, '') FROM '^\\s*([A-Za-z0-9]+)')), ''), NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(l.name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6)), ''), 'HO') AS resolved_prefix
+  COALESCE(NULLIF(UPPER(REGEXP_REPLACE(COALESCE(l.plant_code, ''), '[^A-Za-z0-9]', '', 'g')), ''), NULLIF(UPPER(SUBSTRING(COALESCE(l.name, '') FROM '^[[:space:]]*([A-Za-z0-9]+)')), ''), NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(l.name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6)), ''), 'HO') AS resolved_prefix
 FROM public.gates g
 LEFT JOIN public.locations l ON l.id = g.location_id
 ORDER BY l.name, g.name, g.building;
