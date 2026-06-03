@@ -9,7 +9,8 @@
 # This script:
 #   1. Shows current plant_code values
 #   2. Backfills missing values from the location name
-#      (uppercase, alphanumeric only, max 6 chars)
+#      (leading plant token like 3802 from "3802- BMW", otherwise
+#       uppercase alphanumeric name fallback, max 6 chars)
 #   3. De-duplicates collisions by appending 2, 3, …
 #   4. Shows the resulting values
 #
@@ -46,9 +47,15 @@ echo "==> Backfilling missing plant_code values (and de-duplicating)..."
 "${PSQL[@]}" <<'SQL'
 BEGIN;
 
--- 1. Backfill NULL / empty plant_code from name
+-- 1. Backfill NULL / empty plant_code from name.
+-- Prefer a leading plant token such as 3802 from "3802- BMW -MADURANTHAGAM".
+-- If the name does not start with a code, fall back to first 6 alphanumeric chars.
 UPDATE public.locations
-SET plant_code = UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(name, ''), '[^a-zA-Z0-9]', '', 'g') FROM 1 FOR 6))
+SET plant_code = COALESCE(
+  NULLIF(UPPER(SUBSTRING(COALESCE(name, '') FROM '^\s*([A-Za-z0-9]+)')), ''),
+  NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(name, ''), '[^a-zA-Z0-9]', '', 'g') FROM 1 FOR 6)), ''),
+  'HO'
+)
 WHERE plant_code IS NULL OR plant_code = '';
 
 -- 2. De-duplicate any collisions by appending 2, 3, ...
