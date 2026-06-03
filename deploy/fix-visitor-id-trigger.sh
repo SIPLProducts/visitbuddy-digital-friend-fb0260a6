@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Patch the on-prem public.generate_visitor_id() function so that when a
 # location's plant_code is NULL/empty the visitor-id prefix is derived from
-# the location name (first 6 alphanumeric chars, uppercased) instead of the
-# hard-coded 'HO' fallback.
+# the location name (prefer leading plant token like 3802 from "3802- BMW",
+# otherwise first 6 alphanumeric chars) instead of the hard-coded 'HO' fallback.
 #
 # Idempotent — safe to re-run. Pair with ./backfill-plant-codes.sh to also
 # clean up any NULL plant_code rows already in the table.
@@ -41,6 +41,7 @@ AS $function$
 DECLARE
   v_plant text;
   v_name  text;
+  v_name_token text;
   v_seq   int;
 BEGIN
   IF NEW.visitor_id IS NOT NULL AND length(NEW.visitor_id) > 0 THEN
@@ -55,7 +56,11 @@ BEGIN
   WHERE g.id = NEW.gate_id;
 
   IF v_plant IS NULL OR length(v_plant) = 0 THEN
-    v_plant := UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(v_name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6));
+    v_name_token := UPPER(SUBSTRING(COALESCE(v_name, '') FROM '^\s*([A-Za-z0-9]+)'));
+    v_plant := COALESCE(
+      NULLIF(v_name_token, ''),
+      NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(v_name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6)), '')
+    );
   END IF;
 
   IF v_plant IS NULL OR length(v_plant) = 0 THEN
