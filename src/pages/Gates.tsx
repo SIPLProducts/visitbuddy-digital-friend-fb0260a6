@@ -365,7 +365,7 @@ export default function Gates() {
     return Math.round((current / capacity) * 100);
   };
 
-  const GateForm = () => (
+  const gateFormContent = (
     <div className="space-y-4 py-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
@@ -672,7 +672,7 @@ export default function Gates() {
             <DialogTitle>Add Gate</DialogTitle>
             <DialogDescription>Create a new entry/exit point</DialogDescription>
           </DialogHeader>
-          <GateForm />
+          {gateFormContent}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleAdd} disabled={loading}>{loading ? 'Adding...' : 'Add Gate'}</Button>
@@ -687,7 +687,7 @@ export default function Gates() {
             <DialogTitle>Edit Gate</DialogTitle>
             <DialogDescription>Update gate details</DialogDescription>
           </DialogHeader>
-          <GateForm />
+          {gateFormContent}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleEdit} disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
