@@ -1,42 +1,53 @@
 ## Problem
 
-On the on-prem Linux server (`vms.resustainability.com`), newly generated visitor IDs start with `HO-` instead of the location's plant code (e.g. `3604-`).
+On `vms.resustainability.com`, the first visitor gets the correct plant-code prefix (e.g. `3604-…`) but subsequent visitors fall back to `HO-…`.
 
-Root cause: the `generate_visitor_id` trigger reads `locations.plant_code` and falls back to `'HO'` when it's NULL or empty. The seed file `deploy/seed/10_locations.sql` used during on-prem import does **not** include the `plant_code` column, so every location was imported with `plant_code = NULL`. Only locations the user later edited through the Locations UI (which sets `plant_code`) generate correct IDs — that's why one row in your screenshot shows `3604-…` while the rest show `HO-…`.
+Root cause: the `generate_visitor_id` trigger reads `locations.plant_code` via the chosen gate. Most on-prem locations were imported from `deploy/seed/10_locations.sql` with `plant_code = NULL`. The one location whose `plant_code` was filled in via the UI works correctly; everything else falls through to the hard-coded `'HO'`. The "1st OK / 2nd HO" pattern matches the user picking different gates/locations between the two registrations — one happens to be the only fixed row.
 
-This is purely a data issue on the server. No app code or trigger changes are needed.
+The `deploy/backfill-plant-codes.sh` script created in the last turn would fix this, but the user hasn't run it yet, and there's no safety net inside the trigger itself if a new location is ever added without a plant code.
 
 ## Fix
 
-1. **New script `deploy/backfill-plant-codes.sh`** — one-shot script the user runs on the Linux server. It connects via `psql` (using `deploy/.env`) and:
-   - Backfills `plant_code` for every location where it is NULL or empty, using the same rule as migration `20260520083425` (uppercase, alphanumeric only, first 6 chars of the location name).
-   - Then runs the same de-duplication loop from that migration so two locations never collide on `plant_code` (appends `2`, `3`, … if needed).
-   - Prints a before/after table of `id | name | plant_code` so the user can verify.
-   - Idempotent — safe to re-run; only touches rows with missing codes.
+Two layers — DB-level safety net + on-prem data backfill.
 
-2. **Update `deploy/seed/10_locations.sql`** — add `plant_code` to the column list and inline an `UPDATE … SET plant_code = …` block at the bottom so future fresh imports don't reproduce this. (Values derived from each location name with the same rule.)
+### 1. Harden the trigger (migration, runs on cloud DB)
 
-3. **Update `deploy/generate-seed-files.sh`** (if it builds `10_locations.sql` from a template) so re-exports always include `plant_code`. If the file is hand-maintained, skip this step.
+Change `public.generate_visitor_id` so that when `locations.plant_code` is NULL/empty, instead of falling back to the literal `'HO'`, it derives the prefix from the location name the same way the Locations UI does:
 
-After running the script on the server, all existing visitor IDs already stored stay as-is (they're historical), but every new visitor will get the correct plant-code prefix, e.g. `3604-030626-0080`.
+```text
+UPPER(SUBSTRING(REGEXP_REPLACE(name, '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6))
+```
 
-## Out of scope
+Only if both `plant_code` AND `name` are empty (or the gate has no `location_id` at all) does it fall back to `'HO'`. This guarantees every location with a real name produces a real prefix, even if an admin forgets to set `plant_code`.
 
-- No changes to the `generate_visitor_id` trigger, `visitor_id_counters`, or any app code.
-- No retroactive renaming of already-issued `HO-…` visitor IDs.
-- Unrelated to the SMS / reminder-cron / header search work already shipped.
+No schema changes — just a `CREATE OR REPLACE FUNCTION`.
 
-## Files
+### 2. Apply the same fix on the on-prem server
 
-- `deploy/backfill-plant-codes.sh` (new, executable)
-- `deploy/seed/10_locations.sql` (edit)
-- `deploy/generate-seed-files.sh` (edit only if it generates the locations seed)
+The cloud migration doesn't reach the on-prem Postgres. Two things for the Linux box:
 
-## Post-deploy steps for the user
+- **New `deploy/fix-visitor-id-trigger.sh`** — runs the same `CREATE OR REPLACE FUNCTION` against the on-prem DB via `psql` (uses `deploy/.env`, same pattern as `backfill-plant-codes.sh`). One-shot, idempotent.
+- **Update `deploy/init-schema.sql`** with the new trigger body so any fresh install gets it.
+
+User runs in this order on the server:
 
 ```bash
 cd /path/to/deploy
-./backfill-plant-codes.sh
+./fix-visitor-id-trigger.sh    # patches the trigger (permanent safety net)
+./backfill-plant-codes.sh      # cleans up existing NULL plant_code rows
 ```
 
-Then create one test visitor at each location and confirm the new ID starts with that location's plant code instead of `HO-`. Existing locations can also be fine-tuned from **Settings → Locations** (Plant Code field) if you want a shorter/custom code.
+After that, every gate produces a real prefix and `HO-` only appears for the literal "Corporate Headquarters" / HO location (which is correct).
+
+## Out of scope
+
+- Renaming already-issued `HO-…` visitor IDs (historical).
+- Any UI / form changes — the registration form is fine.
+- `visitor_id_counters` cleanup.
+
+## Files
+
+- New migration on cloud DB: `CREATE OR REPLACE FUNCTION public.generate_visitor_id …` (trigger logic only).
+- `deploy/fix-visitor-id-trigger.sh` (new, executable).
+- `deploy/init-schema.sql` (update the function body to match).
+- `deploy/backfill-plant-codes.sh` (already created last turn — unchanged).
