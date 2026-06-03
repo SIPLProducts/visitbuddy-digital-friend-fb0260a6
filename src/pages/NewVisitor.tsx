@@ -690,8 +690,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Gate</Label>
-                  <Select onValueChange={(value) => form.setValue('gate_id', value)}>
+                  <Label>Gate *</Label>
+                  <Select
+                    value={form.watch('gate_id') || ''}
+                    onValueChange={(value) => form.setValue('gate_id', value, { shouldValidate: true })}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select entry gate" />
                     </SelectTrigger>
@@ -703,6 +706,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                       ))}
                     </SelectContent>
                   </Select>
+                  {form.formState.errors.gate_id && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.gate_id.message}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
