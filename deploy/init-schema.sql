@@ -133,9 +133,39 @@ CREATE FUNCTION public.generate_visitor_id() RETURNS trigger
     LANGUAGE plpgsql
     SET search_path TO 'public'
     AS $$
+DECLARE
+  v_plant text;
+  v_name  text;
+  v_seq   int;
 BEGIN
-    NEW.visitor_id = 'VIS-' || UPPER(SUBSTRING(MD5(gen_random_uuid()::text) FOR 8)) || '-' || UPPER(SUBSTRING(MD5(gen_random_uuid()::text) FOR 4));
+  IF NEW.visitor_id IS NOT NULL AND length(NEW.visitor_id) > 0 THEN
     RETURN NEW;
+  END IF;
+
+  SELECT UPPER(REGEXP_REPLACE(COALESCE(l.plant_code, ''), '[^A-Za-z0-9]', '', 'g')),
+         COALESCE(l.name, '')
+    INTO v_plant, v_name
+  FROM public.gates g
+  LEFT JOIN public.locations l ON l.id = g.location_id
+  WHERE g.id = NEW.gate_id;
+
+  IF v_plant IS NULL OR length(v_plant) = 0 THEN
+    v_plant := UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(v_name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6));
+  END IF;
+
+  IF v_plant IS NULL OR length(v_plant) = 0 THEN
+    v_plant := 'HO';
+  END IF;
+
+  INSERT INTO public.visitor_id_counters (location_key, last_seq, updated_at)
+  VALUES (v_plant, 1, now())
+  ON CONFLICT (location_key) DO UPDATE
+    SET last_seq = public.visitor_id_counters.last_seq + 1,
+        updated_at = now()
+  RETURNING last_seq INTO v_seq;
+
+  NEW.visitor_id := v_plant || '-' || to_char(now(), 'DDMMYY') || '-' || lpad(v_seq::text, 4, '0');
+  RETURN NEW;
 END;
 $$;
 
