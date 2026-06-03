@@ -48,11 +48,11 @@ echo "==> Backfilling missing plant_code values (and de-duplicating)..."
 BEGIN;
 
 -- 1. Backfill NULL / empty plant_code from name.
--- Prefer a leading plant token such as 3802 from "3802- BMW -MADURANTHAGAM".
+-- Prefer a leading numeric plant code such as 3802 from "3802- BMW -MADURANTHAGAM".
 -- If the name does not start with a code, fall back to first 6 alphanumeric chars.
 UPDATE public.locations
 SET plant_code = COALESCE(
-  NULLIF(UPPER(SUBSTRING(COALESCE(name, '') FROM '^[[:space:]]*([A-Za-z0-9]+)')), ''),
+  NULLIF(UPPER(SUBSTRING(COALESCE(name, '') FROM '^[[:space:]]*([0-9]+)')), ''),
   NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(name, ''), '[^a-zA-Z0-9]', '', 'g') FROM 1 FOR 6)), ''),
   'HO'
 )

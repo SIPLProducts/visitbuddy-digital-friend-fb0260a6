@@ -151,7 +151,7 @@ BEGIN
   WHERE g.id = NEW.gate_id;
 
   IF v_plant IS NULL OR length(v_plant) = 0 THEN
-    v_name_token := UPPER(SUBSTRING(COALESCE(v_name, '') FROM '^[[:space:]]*([A-Za-z0-9]+)'));
+    v_name_token := UPPER(SUBSTRING(COALESCE(v_name, '') FROM '^[[:space:]]*([0-9]+)'));
     v_plant := COALESCE(
       NULLIF(v_name_token, ''),
       NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(v_name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6)), '')
