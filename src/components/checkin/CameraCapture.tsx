@@ -534,7 +534,6 @@ export function CameraCapture({ onCapture, onCancel, className, autoStart = true
                     ref={fileInputRef}
                     type="file"
                     accept="image/*"
-                    capture="user"
                     className="hidden"
                     onChange={handleFileUpload}
                   />
