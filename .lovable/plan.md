@@ -1,82 +1,42 @@
-# Plan (on-prem Linux Supabase deployment)
+## Problem
 
-Three independent fixes. All run against your self-hosted server — no hosted-Supabase assumptions.
+On the on-prem Linux server (`vms.resustainability.com`), newly generated visitor IDs start with `HO-` instead of the location's plant code (e.g. `3604-`).
 
-## 1. Approval SMS reliability (visitor QR + assembly-point link)
+Root cause: the `generate_visitor_id` trigger reads `locations.plant_code` and falls back to `'HO'` when it's NULL or empty. The seed file `deploy/seed/10_locations.sql` used during on-prem import does **not** include the `plant_code` column, so every location was imported with `plant_code = NULL`. Only locations the user later edited through the Locations UI (which sets `plant_code`) generate correct IDs — that's why one row in your screenshot shows `3604-…` while the rest show `HO-…`.
 
-Today's flow in `supabase/functions/approve-visitor/index.ts` calls SMS Striker once. If anything in that single attempt fails (transient network blip, provider 5xx after the existing one retry, or an exception thrown before the SMS block runs), the visitor receives nothing — and there is **no server-side fallback**. The browser-side fallback in `ApproveVisitor.tsx` only fires when the host approves from inside the app, not when they tap the email/WhatsApp Approve link (the common path).
+This is purely a data issue on the server. No app code or trigger changes are needed.
 
-Changes (all in `supabase/functions/approve-visitor/index.ts`):
-- Wrap the WhatsApp block in its own try/catch so a WhatsApp exception can never skip the SMS block.
-- After the Striker block, if `smsSent === false` and `visitor.phone` exists, automatically invoke the existing `send-sms-badge` edge function server-side with the full payload it expects (`visitorName, visitorId, phone, company, purpose, hostName, departmentName, gateName`). Capture result as `smsFallback` in the JSON response.
-- Add `location_id` and `gate.name` to every SMS log line so future location-specific failures show up clearly in your edge-runtime logs.
-- No template/DLT change. No change to `PUBLIC_SMS_LINK_BASE` (you confirmed it already points at your app domain).
+## Fix
 
-After deploy, redeploy both functions on the server:
+1. **New script `deploy/backfill-plant-codes.sh`** — one-shot script the user runs on the Linux server. It connects via `psql` (using `deploy/.env`) and:
+   - Backfills `plant_code` for every location where it is NULL or empty, using the same rule as migration `20260520083425` (uppercase, alphanumeric only, first 6 chars of the location name).
+   - Then runs the same de-duplication loop from that migration so two locations never collide on `plant_code` (appends `2`, `3`, … if needed).
+   - Prints a before/after table of `id | name | plant_code` so the user can verify.
+   - Idempotent — safe to re-run; only touches rows with missing codes.
 
-```text
-supabase functions deploy approve-visitor --no-verify-jwt
-supabase functions deploy send-sms-badge --no-verify-jwt
-```
+2. **Update `deploy/seed/10_locations.sql`** — add `plant_code` to the column list and inline an `UPDATE … SET plant_code = …` block at the bottom so future fresh imports don't reproduce this. (Values derived from each location name with the same rule.)
 
-## 2. Search inside the header Location dropdown
+3. **Update `deploy/generate-seed-files.sh`** (if it builds `10_locations.sql` from a template) so re-exports always include `plant_code`. If the file is hand-maintained, skip this step.
 
-In `src/components/layout/Header.tsx`, replace the plain `Select` of locations with a `Popover` + shadcn `Command` (already used elsewhere e.g. `HostCombobox`):
-- Trigger button stays visually identical (Building2 icon + current location name + chevron).
-- Popover opens with `CommandInput` ("Search locations…") and a scrollable `CommandList`.
-- HO Admin / Admin Head still get the first "All Locations" item (Crown icon).
-- Items show `name (city)` and filter as the user types.
-- Selection calls the existing `handleLocationChange` — same `locationChanged` event, no other behaviour change.
-- Single-location read-only display path is unchanged.
-
-UI-only change; no backend.
-
-## 3. Morning host-approval reminders (cron not scheduled on server)
-
-The `send-pending-approval-reminders` edge function is correct and runs across **all** locations (no per-location filter), calling `notify-host` for every visitor with `status='pending_approval'` and `scheduled_date = today (IST)`. The missing piece is the daily trigger on your on-prem Postgres.
-
-Because the function URL and anon key are deployment-specific, I'll add a one-shot install script — `deploy/install-reminder-cron.sh` — that:
-1. Reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` from `deploy/.env` (same pattern as your existing `deploy/*.sh`).
-2. Connects via `psql` and:
-   - `CREATE EXTENSION IF NOT EXISTS pg_cron;`
-   - `CREATE EXTENSION IF NOT EXISTS pg_net;`
-   - Unschedules any pre-existing job named `send-pending-approval-reminders-daily` (idempotent re-run).
-   - Schedules it for **08:00 IST = 02:30 UTC** to POST to `<SUPABASE_URL>/functions/v1/send-pending-approval-reminders`.
-
-Cron SQL shape (values come from your `deploy/.env`):
-
-```text
-select cron.schedule(
-  'send-pending-approval-reminders-daily',
-  '30 2 * * *',
-  $$ select net.http_post(
-       url := '<SUPABASE_URL>/functions/v1/send-pending-approval-reminders',
-       headers := jsonb_build_object(
-         'Content-Type','application/json',
-         'Authorization','Bearer <SUPABASE_ANON_KEY>',
-         'apikey','<SUPABASE_ANON_KEY>'
-       ),
-       body := '{}'::jsonb
-     ); $$
-);
-```
-
-I'll also add a sibling `deploy/diagnose-reminder-cron.sh` that runs:
-- `SELECT jobid, schedule, command, active FROM cron.job WHERE jobname='send-pending-approval-reminders-daily';`
-- Last 10 rows from `cron.job_run_details` for that job (status, return_message, start/end time).
-
-So after install you can verify the job is firing.
+After running the script on the server, all existing visitor IDs already stored stay as-is (they're historical), but every new visitor will get the correct plant-code prefix, e.g. `3604-030626-0080`.
 
 ## Out of scope
 
-- Domain change for SMS links (already declined).
-- DLT template / SMS provider migration.
-- Any RLS or schema changes — none needed.
-- Auto-redeploy of edge functions; you'll redeploy with your existing `deploy/redeploy.sh` after the code change.
+- No changes to the `generate_visitor_id` trigger, `visitor_id_counters`, or any app code.
+- No retroactive renaming of already-issued `HO-…` visitor IDs.
+- Unrelated to the SMS / reminder-cron / header search work already shipped.
 
-## Files touched
+## Files
 
-- `supabase/functions/approve-visitor/index.ts` — fallback + WhatsApp try/catch isolation + log location_id.
-- `src/components/layout/Header.tsx` — searchable Command popover for locations.
-- `deploy/install-reminder-cron.sh` (new) — one-shot cron installer for on-prem server.
-- `deploy/diagnose-reminder-cron.sh` (new) — verify the job + recent runs.
+- `deploy/backfill-plant-codes.sh` (new, executable)
+- `deploy/seed/10_locations.sql` (edit)
+- `deploy/generate-seed-files.sh` (edit only if it generates the locations seed)
+
+## Post-deploy steps for the user
+
+```bash
+cd /path/to/deploy
+./backfill-plant-codes.sh
+```
+
+Then create one test visitor at each location and confirm the new ID starts with that location's plant code instead of `HO-`. Existing locations can also be fine-tuned from **Settings → Locations** (Plant Code field) if you want a shorter/custom code.

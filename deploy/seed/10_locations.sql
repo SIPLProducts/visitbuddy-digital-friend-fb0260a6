@@ -7,4 +7,10 @@ INSERT INTO public.locations (id, name, address, city, country, status, gate_cou
 INSERT INTO public.locations (id, name, address, city, country, status, gate_count, department_count, visitor_count, capacity_usage, email, phone, created_at, updated_at, latitude, longitude, geo_address, emergency_contact, assembly_point) VALUES ('013e5f3f-0fee-45a8-a1a8-c625ef9e53bb', 'HWMP', 'Sy.No:684/1,Dundigal(V),', 'Hyderabad', 'India', 'active', 0, 0, 0, 0, 'abdul.firoz@resustainability.com', '9000959530', '2026-04-14 06:55:09.531598+00', '2026-04-14 06:55:09.531598+00', 17.59319417, 78.38826085, 'Hyderabad Waste Management Project', 'NA', 'Near Admin Building');
 INSERT INTO public.locations (id, name, address, city, country, status, gate_count, department_count, visitor_count, capacity_usage, email, phone, created_at, updated_at, latitude, longitude, geo_address, emergency_contact, assembly_point) VALUES ('046824dc-4324-404c-b5e7-73195fe149dd', 'C&D HYD', 'Hyderabad C&D - Fathulguda Sy No.34, Circle # 3 (Hayathnagar) Nagole, Hyderabad 500068', 'Hyderabad', 'India', 'active', 0, 0, 0, 0, 'narsimulu.n@resustainability.com', '+91 7842789023', '2026-04-17 07:08:42.083371+00', '2026-04-17 12:05:20.159562+00', NULL, NULL, 'C&D Fathulguda Hyderabad', 'na', 'Near Admin Building');
 INSERT INTO public.locations (id, name, address, city, country, status, gate_count, department_count, visitor_count, capacity_usage, email, phone, created_at, updated_at, latitude, longitude, geo_address, emergency_contact, assembly_point) VALUES ('00000000-0000-0000-0000-000000000001', 'Corporate Headquarters', NULL, 'Hyderabad', 'India', 'active', 0, 0, 0, 0, 'bala@sharviinfotech.com', '+918897646530', '2026-04-14 07:14:43.516301+00', '2026-04-18 06:34:26.613576+00', NULL, NULL, NULL, NULL, NULL);
+
+-- Backfill plant_code from name so visitor IDs don't default to 'HO-'.
+-- (Mirrors deploy/backfill-plant-codes.sh — safe to re-run.)
+UPDATE public.locations
+SET plant_code = UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(name, ''), '[^a-zA-Z0-9]', '', 'g') FROM 1 FOR 6))
+WHERE plant_code IS NULL OR plant_code = '';
 COMMIT;
