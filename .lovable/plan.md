@@ -1,28 +1,28 @@
-## Issue
-The screenshot still shows `HO-030626-0084` for location `3802- BMW -MADURANTHAGAM`.
+## Problem
 
-That means the visitor ID trigger is still unable to resolve a real plant code at insert time. The most likely causes are:
-1. the on-prem patch/backfill scripts were not run on the Linux server, or
-2. the visitor is being inserted with `gate_id = null` / wrong gate, so the trigger cannot find `gate -> location -> plant_code` and falls back to `HO`.
+On the Gates screen, typing in any field of the Add/Edit Gate dialog loses focus after every keystroke, forcing the user to re-click the field for each character.
 
-## Plan
-1. **Harden visitor creation in the app**
-   - Make `gate_id` required on `NewVisitor` so a visitor cannot be created without a gate.
-   - Add a clear validation message if no gate is selected.
-   - Keep the existing location-based gate filtering.
+## Root cause
 
-2. **Improve the on-prem repair script**
-   - Update `deploy/fix-visitor-id-trigger.sh` so it prints a diagnostic table showing every gate with its location and resolved plant code.
-   - Add a warning query for gates with missing `location_id` or missing location rows.
-   - This will confirm immediately why any visitor would still become `HO`.
+In `src/pages/Gates.tsx`, the form is defined as a nested component `GateForm` **inside** the `Gates` component:
 
-3. **Provide exact Linux commands after implementation**
-   - Run the scripts from the server’s `deploy/` folder:
-     ```bash
-     ./fix-visitor-id-trigger.sh
-     ./backfill-plant-codes.sh
-     ```
-   - Then create a new visitor at the same `3802- BMW -MADURANTHAGAM` location and verify the ID starts with `3802-`, not `HO-`.
+```tsx
+const GateForm = () => ( ... <Input ... /> ... );
+```
 
-## Important note
-Existing old visitor IDs like `HO-030626-0084` will not automatically change. The fix affects newly created visitors after the trigger/backfill is applied on the on-prem server.
+Every time `formData` state changes (i.e. every keystroke), `Gates` re-renders, which creates a brand-new `GateForm` function reference. React sees a different component type at that position and unmounts/remounts the entire form subtree, including the `<Input>` that currently has focus. That is why the cursor jumps out after each character.
+
+## Fix
+
+Stop treating the form as a nested component. Inline the form JSX directly inside both the Add dialog and the Edit dialog (or assign it to a plain `const gateFormContent = (...)` JSX expression evaluated during render, not a component). Keep all existing fields, layout, labels, placeholders, validation, and handlers exactly as they are — purely a structural refactor, no behavior change.
+
+Specifically:
+- Remove the `const GateForm = () => (...)` definition.
+- Render the same JSX inline inside the Add Gate `<DialogContent>` and the Edit Gate `<DialogContent>` (extracted once into a local `const` JSX variable to avoid duplication).
+
+This preserves DOM identity for the inputs across re-renders, so the cursor stays in place while typing.
+
+## Scope
+
+- File: `src/pages/Gates.tsx` only.
+- No changes to data flow, Supabase calls, validation, CSV import, styles, or other pages.

@@ -365,7 +365,7 @@ export default function Gates() {
     return Math.round((current / capacity) * 100);
   };
 
-  const GateForm = () => (
+  const gateFormContent = (
     <div className="space-y-4 py-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
