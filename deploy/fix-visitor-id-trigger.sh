@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Patch the on-prem public.generate_visitor_id() function so that when a
 # location's plant_code is NULL/empty the visitor-id prefix is derived from
-# the location name (first 6 alphanumeric chars, uppercased) instead of the
-# hard-coded 'HO' fallback.
+# the location name (prefer leading numeric plant code like 3802 from "3802- BMW",
+# otherwise first 6 alphanumeric chars) instead of the hard-coded 'HO' fallback.
 #
 # Idempotent — safe to re-run. Pair with ./backfill-plant-codes.sh to also
 # clean up any NULL plant_code rows already in the table.
@@ -41,6 +41,7 @@ AS $function$
 DECLARE
   v_plant text;
   v_name  text;
+  v_name_token text;
   v_seq   int;
 BEGIN
   IF NEW.visitor_id IS NOT NULL AND length(NEW.visitor_id) > 0 THEN
@@ -55,7 +56,11 @@ BEGIN
   WHERE g.id = NEW.gate_id;
 
   IF v_plant IS NULL OR length(v_plant) = 0 THEN
-    v_plant := UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(v_name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6));
+    v_name_token := UPPER(SUBSTRING(COALESCE(v_name, '') FROM '^[[:space:]]*([0-9]+)'));
+    v_plant := COALESCE(
+      NULLIF(v_name_token, ''),
+      NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(v_name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6)), '')
+    );
   END IF;
 
   IF v_plant IS NULL OR length(v_plant) = 0 THEN
@@ -76,7 +81,32 @@ $function$;
 SQL
 
 echo
-echo "Done. New visitors will now use the location's plant_code (or first 6"
-echo "alphanumeric chars of the location name) as the visitor-id prefix."
+echo "==> Gate/location plant-code diagnostics:"
+"${PSQL[@]}" -c "
+SELECT
+  g.id AS gate_id,
+  g.name AS gate_name,
+  g.building,
+  l.id AS location_id,
+  l.name AS location_name,
+  l.plant_code,
+  COALESCE(NULLIF(UPPER(REGEXP_REPLACE(COALESCE(l.plant_code, ''), '[^A-Za-z0-9]', '', 'g')), ''), NULLIF(UPPER(SUBSTRING(COALESCE(l.name, '') FROM '^[[:space:]]*([0-9]+)')), ''), NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(l.name, ''), '[^A-Za-z0-9]', '', 'g') FROM 1 FOR 6)), ''), 'HO') AS resolved_prefix
+FROM public.gates g
+LEFT JOIN public.locations l ON l.id = g.location_id
+ORDER BY l.name, g.name, g.building;
+"
+
+echo
+echo "==> Gates that would still fall back to HO because location data is missing:"
+"${PSQL[@]}" -c "
+SELECT g.id AS gate_id, g.name AS gate_name, g.location_id
+FROM public.gates g
+LEFT JOIN public.locations l ON l.id = g.location_id
+WHERE g.location_id IS NULL OR l.id IS NULL OR COALESCE(l.name, '') = '';
+"
+
+echo
+echo "Done. New visitors will now use the location's plant_code (or leading"
+echo "plant token / alphanumeric chars of the location name) as the visitor-id prefix."
 echo "Run ./backfill-plant-codes.sh as well to fix locations whose plant_code"
 echo "is still NULL/empty in the database."

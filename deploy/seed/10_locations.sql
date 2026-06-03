@@ -11,6 +11,10 @@ INSERT INTO public.locations (id, name, address, city, country, status, gate_cou
 -- Backfill plant_code from name so visitor IDs don't default to 'HO-'.
 -- (Mirrors deploy/backfill-plant-codes.sh — safe to re-run.)
 UPDATE public.locations
-SET plant_code = UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(name, ''), '[^a-zA-Z0-9]', '', 'g') FROM 1 FOR 6))
+SET plant_code = COALESCE(
+  NULLIF(UPPER(SUBSTRING(COALESCE(name, '') FROM '^[[:space:]]*([0-9]+)')), ''),
+  NULLIF(UPPER(SUBSTRING(REGEXP_REPLACE(COALESCE(name, ''), '[^a-zA-Z0-9]', '', 'g') FROM 1 FOR 6)), ''),
+  'HO'
+)
 WHERE plant_code IS NULL OR plant_code = '';
 COMMIT;

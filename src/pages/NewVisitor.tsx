@@ -38,7 +38,7 @@ const visitorSchema = z.object({
   purpose: z.string().optional(),
   host_id: z.string().optional(),
   department_id: z.string().optional(),
-  gate_id: z.string().optional(),
+  gate_id: z.string().min(1, 'Please select an entry gate'),
   vehicle_type: z.string().default('by_walk'),
   vehicle_number: z.string().optional(),
   has_laptop: z.boolean().default(false),
@@ -92,6 +92,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       phone: '',
       company: '',
       purpose: '',
+      gate_id: '',
       vehicle_type: 'by_walk',
       vehicle_number: '',
       has_laptop: false,
@@ -174,6 +175,14 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
   const onSubmit = async (data: VisitorFormData) => {
     setLoading(true);
 
+    const selectedGate = gates.find((gate) => gate.id === data.gate_id);
+    if (!selectedGate) {
+      form.setError('gate_id', { message: 'Please select a valid entry gate' });
+      toast.error('Please select a valid entry gate');
+      setLoading(false);
+      return;
+    }
+
     const { data: insertedVisitor, error } = await supabase.from('visitors').insert([{
       name: data.name,
       email: data.email || null,
@@ -182,7 +191,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       purpose: data.purpose || null,
       host_id: data.host_id || null,
       department_id: data.department_id || null,
-      gate_id: data.gate_id || null,
+      gate_id: selectedGate.id,
       vehicle_type: data.vehicle_type || 'by_walk',
       vehicle_number: (data.vehicle_type && data.vehicle_type !== 'by_walk') ? data.vehicle_number || null : null,
       has_laptop: data.has_laptop,
@@ -681,8 +690,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Gate</Label>
-                  <Select onValueChange={(value) => form.setValue('gate_id', value)}>
+                  <Label>Gate *</Label>
+                  <Select
+                    value={form.watch('gate_id') || ''}
+                    onValueChange={(value) => form.setValue('gate_id', value, { shouldValidate: true })}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select entry gate" />
                     </SelectTrigger>
@@ -694,6 +706,11 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                       ))}
                     </SelectContent>
                   </Select>
+                  {form.formState.errors.gate_id && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.gate_id.message}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
