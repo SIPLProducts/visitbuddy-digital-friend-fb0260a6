@@ -1,35 +1,22 @@
-## Problem
+## Add "Export CSV" button to Locations and Gates screens
 
-On tablet and mobile, after a host approves a visitor and the security clicks **Check-In**, the "Upload" tab inside the photo capture dialog does not let the user pick an image from their device. On desktop it works fine.
+Add a new **Export CSV** button (next to the existing **Template** / **Import** buttons) on:
+- `src/pages/Locations.tsx`
+- `src/pages/Gates.tsx`
 
-## Root cause
+### Visibility
+Show the Export button only when `isHoAdmin || isAdminHead` (both read from `useUserRoles`). Other roles (Location Admin, Operator, Security, etc.) will not see it.
 
-In `src/components/checkin/CameraCapture.tsx`, the file input on the **Upload** tab is declared as:
+### Behavior
+- Clicking Export downloads a `.csv` file of the currently loaded records on that page (respects the active location filter for Gates, exports all locations for HO Admin on Locations screen).
+- File names: `locations-YYYYMMDD.csv` and `gates-YYYYMMDD.csv`.
+- Columns mirror the existing CSV import template columns so the same file can round-trip back through Import:
+  - **Locations**: name, address, city, country, phone, email, plant_code, emergency_contact, assembly_point, capacity, latitude, longitude, geo_address, status
+  - **Gates**: name, location (name), building, gate_type, capacity, operating_hours_start, operating_hours_end, has_qr, status
+- CSV values are quoted/escaped properly (commas, quotes, newlines).
+- Toast success/error messages using existing `sonner` toast.
 
-```tsx
-<input
-  ref={fileInputRef}
-  type="file"
-  accept="image/*"
-  capture="user"   // <-- problem
-  className="hidden"
-  onChange={handleFileUpload}
-/>
-```
-
-The `capture="user"` attribute is a mobile-specific HTML hint. On phones and tablets, it forces the browser to bypass the file picker and open the **front camera** directly. That defeats the entire purpose of the Upload tab (which exists specifically as a fallback when the camera flow doesn't work), and on many tablets the capture handoff fails silently — so nothing happens when the user taps "Click to upload photo". Desktop browsers ignore `capture`, which is why the same code works there.
-
-## Fix
-
-Remove the `capture="user"` attribute from the Upload tab's `<input type="file">` so mobile and tablet browsers open the native file/gallery picker — identical to desktop behavior. The Camera tab is untouched and still uses `getUserMedia` for live capture; only the explicit "Upload" fallback is changed.
-
-No other files, no business logic, no styling changes.
-
-## Files
-
-- `src/components/checkin/CameraCapture.tsx` — delete the `capture="user"` line on the upload input (≈ line 537).
-
-## Verification
-
-1. On a tablet/mobile, approve a visitor, click **Check-In**, switch to the **Upload** tab, tap the upload area → the OS file/gallery picker opens, image can be selected, preview shows, **Use Photo** completes check-in.
-2. On desktop, same flow still opens the standard file picker (unchanged).
+### Scope guardrails
+- UI-only change; no DB / RLS / business-logic changes.
+- No new dependencies — use a small inline CSV serializer + Blob download.
+- `Gates.tsx` currently wraps the toolbar in `!isReadOnly`; the Export button will be rendered outside that wrapper so Admin Head (read-only) still sees Export.
