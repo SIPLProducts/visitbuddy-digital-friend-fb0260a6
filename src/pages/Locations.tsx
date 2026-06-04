@@ -108,7 +108,7 @@ function parseAndValidateCoordinate(
 }
 
 export default function Locations() {
-  const { isHoAdmin } = useUserRoles();
+  const { isHoAdmin, isAdminHead } = useUserRoles();
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -332,6 +332,35 @@ export default function Locations() {
     a.click();
     window.URL.revokeObjectURL(url);
     toast.success('Template downloaded');
+  };
+
+  const csvEscape = (val: any): string => {
+    if (val === null || val === undefined) return '';
+    const s = String(val);
+    if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+
+  const handleExport = () => {
+    if (!locations.length) {
+      toast.error('No locations to export');
+      return;
+    }
+    const headers = ['Name', 'Plant Code', 'Address', 'City', 'Country', 'Email', 'Phone', 'Emergency Contact', 'Assembly Point', 'Capacity', 'Latitude', 'Longitude', 'Geo Address', 'Status'];
+    const rows = locations.map((l: any) => [
+      l.name, l.plant_code, l.address, l.city, l.country, l.email, l.phone,
+      l.emergency_contact, l.assembly_point, l.capacity, l.latitude, l.longitude, l.geo_address, l.status,
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map(csvEscape).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    a.href = url;
+    a.download = `locations-${ts}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Locations exported');
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
