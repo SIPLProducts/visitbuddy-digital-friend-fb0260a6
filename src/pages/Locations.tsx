@@ -723,6 +723,12 @@ export default function Locations() {
               <Download className="h-4 w-4" />
               Template
             </Button>
+            {(isHoAdmin || isAdminHead) && (
+              <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Button>
+            )}
             {isHoAdmin && (
               <>
                 <input
