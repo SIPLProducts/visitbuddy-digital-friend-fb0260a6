@@ -572,12 +572,20 @@ export default function Gates() {
             <h1 className="text-2xl font-bold text-foreground">Gates</h1>
             <p className="text-muted-foreground">Manage entry and exit points for your facilities</p>
           </div>
-          {!isReadOnly && (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {!isReadOnly && (
               <Button variant="outline" size="sm" className="gap-2" onClick={downloadTemplate}>
                 <Download className="h-4 w-4" />
                 Template
               </Button>
+            )}
+            {(isHoAdmin || isAdminHead) && (
+              <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Button>
+            )}
+            {!isReadOnly && (<>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -599,8 +607,8 @@ export default function Gates() {
                 <Plus className="h-4 w-4" />
                 Add Gate
               </Button>
-            </div>
-          )}
+            </>)}
+          </div>
         </div>
 
         {/* Gates Grid */}
