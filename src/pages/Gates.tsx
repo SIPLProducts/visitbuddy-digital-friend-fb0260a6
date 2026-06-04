@@ -53,7 +53,7 @@ import { useUserRoles } from '@/hooks/useUserRoles';
 
 export default function Gates() {
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
-  const { isReadOnly } = useUserRoles();
+  const { isReadOnly, isHoAdmin, isAdminHead } = useUserRoles();
   const [gates, setGates] = useState<Gate[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
@@ -260,6 +260,37 @@ export default function Gates() {
     a.click();
     window.URL.revokeObjectURL(url);
     toast.success('Template downloaded');
+  };
+
+  const csvEscape = (val: any): string => {
+    if (val === null || val === undefined) return '';
+    const s = String(val);
+    if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+
+  const handleExport = () => {
+    const visible = gates.filter((g: any) => isAllLocations || g.location_id === selectedLocationId);
+    if (!visible.length) {
+      toast.error('No gates to export');
+      return;
+    }
+    const locMap = new Map(locations.map((l) => [l.id, l.name]));
+    const headers = ['Name', 'Building', 'Location Name', 'Gate Type', 'Capacity', 'Operating Hours Start', 'Operating Hours End', 'QR Enabled', 'Status'];
+    const rows = visible.map((g: any) => [
+      g.name, g.building, locMap.get(g.location_id) || '', g.gate_type, g.capacity,
+      g.operating_hours_start, g.operating_hours_end, g.has_qr ? 'yes' : 'no', g.status,
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map(csvEscape).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    a.href = url;
+    a.download = `gates-${ts}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success('Gates exported');
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
