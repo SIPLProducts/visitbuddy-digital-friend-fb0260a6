@@ -573,6 +573,12 @@ export default function CheckInOut() {
                       <span className="text-muted-foreground">Purpose</span>
                       <span className="font-medium">{selectedVisitor.purpose || '—'}</span>
                     </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Date of Visit</span>
+                      <span className="font-medium">
+                        {formatVisitDate((selectedVisitor as any).scheduled_date)}
+                      </span>
+                    </div>
                     {selectedVisitor.has_laptop && (
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Laptop</span>
