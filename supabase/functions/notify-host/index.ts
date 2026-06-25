@@ -470,12 +470,9 @@ const handler = async (req: Request): Promise<Response> => {
     // visitor knows their request was received. The cron job
     // `send-pending-approval-reminders` re-invokes this function with
     // `force: true` on the morning of the visit.
-    const todayIST = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); // YYYY-MM-DD
-    const visitDateStr = visitor.scheduled_date ? String(visitor.scheduled_date).slice(0, 10) : todayIST;
-    const skipHost = !force && visitDateStr > todayIST;
-    if (skipHost) {
-      console.log(`[notify-host] visit date ${visitDateStr} is in the future (today=${todayIST}) — deferring host notification`);
-    }
+    // Always notify the host immediately, even for future-dated visits.
+    // The morning cron `send-pending-approval-reminders` remains as a same-day safety net.
+    const skipHost = false;
 
     if (!visitor.host_id) {
       console.log("No host assigned to this visitor");
