@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install the daily "send-pending-approval-reminders" cron job on the on-prem
 # Supabase Postgres so future-dated visitor approvals trigger the host email
-# in the morning of the visit date (08:00 IST = 02:30 UTC).
+# in the morning of the visit date (06:00 IST = 00:30 UTC).
 #
 # Usage:  ./deploy/install-reminder-cron.sh
 # Requires: deploy/.env with SUPABASE_URL, SUPABASE_ANON_KEY, and DATABASE_URL
@@ -23,12 +23,12 @@ fi
 : "${SUPABASE_ANON_KEY:?SUPABASE_ANON_KEY must be set (in deploy/.env or environment)}"
 
 JOB_NAME="send-pending-approval-reminders-daily"
-# 08:00 IST == 02:30 UTC, every day
-SCHEDULE="30 2 * * *"
+# 06:00 IST == 00:30 UTC, every day
+SCHEDULE="30 0 * * *"
 ENDPOINT="${SUPABASE_URL%/}/functions/v1/send-pending-approval-reminders"
 
 echo "Installing pg_cron job '${JOB_NAME}'"
-echo "  schedule : ${SCHEDULE}  (08:00 IST)"
+echo "  schedule : ${SCHEDULE}  (06:00 IST)"
 echo "  endpoint : ${ENDPOINT}"
 
 PSQL_CMD=(psql -v ON_ERROR_STOP=1)
