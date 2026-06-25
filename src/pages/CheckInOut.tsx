@@ -671,6 +671,9 @@ export default function CheckInOut() {
               <div className="bg-card rounded-xl border border-border p-4 text-center">
                 <p className="text-3xl font-bold text-info">{stats.scheduled}</p>
                 <p className="text-sm text-muted-foreground">Scheduled</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.scheduledToday} today · {stats.scheduledUpcoming} upcoming
+                </p>
               </div>
             </div>
           </div>
