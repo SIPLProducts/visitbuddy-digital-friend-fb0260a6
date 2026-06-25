@@ -38,14 +38,12 @@ export function VisitorActions({
   canEdit = true,
   actionLoadingId,
 }: VisitorActionsProps) {
-  const today = new Date().toISOString().split('T')[0];
-  const isScheduledToday = !visitor.scheduled_date || visitor.scheduled_date === today;
   const isLoading = actionLoadingId === visitor.id;
 
   return (
     <div className="flex items-center gap-1">
       {/* Quick Check In & Print button for scheduled visitors */}
-      {canEdit && canCheckInOut && visitor.status === 'scheduled' && isScheduledToday && onCheckInAndPrint && (
+      {canEdit && canCheckInOut && visitor.status === 'scheduled' && onCheckInAndPrint && (
         <Button
           size="sm"
           variant="default"
@@ -129,7 +127,7 @@ export function VisitorActions({
               Check Out
             </DropdownMenuItem>
           )}
-          {canEdit && canCheckInOut && isScheduledToday && visitor.status === 'scheduled' && (
+          {canEdit && canCheckInOut && visitor.status === 'scheduled' && (
             <DropdownMenuItem onClick={() => onCheckIn(visitor)}>
               <LogIn className="h-4 w-4 mr-2" />
               Check In
