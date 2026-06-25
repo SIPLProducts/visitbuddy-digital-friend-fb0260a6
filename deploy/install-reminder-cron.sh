@@ -31,6 +31,20 @@ echo "Installing pg_cron job '${JOB_NAME}'"
 echo "  schedule : ${SCHEDULE}  (06:00 IST)"
 echo "  endpoint : ${ENDPOINT}"
 
+# Sanity warning: the endpoint must be reachable from inside the Postgres
+# container, not just from this shell. localhost / 127.0.0.1 typically will
+# NOT work because pg_net runs inside the DB container.
+case "${SUPABASE_URL}" in
+  *localhost*|*127.0.0.1*)
+    echo
+    echo "WARNING: SUPABASE_URL points at localhost/127.0.0.1."
+    echo "         pg_net runs inside the Postgres container and cannot reach"
+    echo "         the host's loopback. Use the public/internal hostname instead"
+    echo "         (e.g. http://kong:8000 or https://vms.resustainability.com)."
+    echo
+    ;;
+esac
+
 PSQL_CMD=(psql -v ON_ERROR_STOP=1)
 if [[ -n "${DATABASE_URL:-}" ]]; then
   PSQL_CMD+=("${DATABASE_URL}")
@@ -40,16 +54,17 @@ fi
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
--- Remove any prior schedule with the same name so this script is idempotent.
+-- Remove ANY prior schedule with the same name regardless of old timing,
+-- so re-running this script always lands the job at ${SCHEDULE}.
 DO \$do\$
 DECLARE
   v_jobid bigint;
 BEGIN
-  SELECT jobid INTO v_jobid FROM cron.job WHERE jobname = '${JOB_NAME}';
-  IF v_jobid IS NOT NULL THEN
+  FOR v_jobid IN SELECT jobid FROM cron.job WHERE jobname = '${JOB_NAME}'
+  LOOP
     PERFORM cron.unschedule(v_jobid);
     RAISE NOTICE 'Unscheduled existing job % (id=%)', '${JOB_NAME}', v_jobid;
-  END IF;
+  END LOOP;
 END
 \$do\$;
 
@@ -74,4 +89,23 @@ FROM   cron.job
 WHERE  jobname = '${JOB_NAME}';
 SQL
 
-echo "Done. Verify firing with:  ./deploy/diagnose-reminder-cron.sh"
+cat <<EOF
+
+Done.
+
+Next steps to confirm reminders actually fire:
+  1. ./deploy/diagnose-reminder-cron.sh
+     (writes a full report to /tmp/reminder-diagnose.log)
+
+  2. Manually fire the function once, independent of cron:
+       curl -sS -X POST \\
+         -H "Authorization: Bearer \$SUPABASE_ANON_KEY" \\
+         -H "apikey: \$SUPABASE_ANON_KEY" \\
+         -H "Content-Type: application/json" \\
+         -d '{}' \\
+         "${ENDPOINT}" | jq .
+
+     If this returns success with results=[], no visitors are scheduled for
+     today (IST). Replay a specific date with:
+         -d '{"date":"YYYY-MM-DD"}'
+EOF
