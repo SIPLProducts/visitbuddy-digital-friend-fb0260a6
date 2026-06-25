@@ -70,18 +70,18 @@ export default function CheckInOut() {
       
       const checkedIn = typedData.filter((v) => v.status === 'checked_in').length;
       const scheduled = typedData.filter((v) => v.status === 'scheduled').length;
-      const today = todayIST();
+      const todayStr = todayIST();
       const scheduledToday = typedData.filter(
         (v) =>
           v.status === 'scheduled' &&
           (!(v as any).scheduled_date ||
-            String((v as any).scheduled_date).slice(0, 10) === today),
+            String((v as any).scheduled_date).slice(0, 10) === todayStr),
       ).length;
       const scheduledUpcoming = typedData.filter(
         (v) =>
           v.status === 'scheduled' &&
           (v as any).scheduled_date &&
-          String((v as any).scheduled_date).slice(0, 10) > today,
+          String((v as any).scheduled_date).slice(0, 10) > todayStr,
       ).length;
 
       // Fetch checked out count for today
