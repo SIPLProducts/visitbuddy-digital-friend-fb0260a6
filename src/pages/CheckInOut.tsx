@@ -21,6 +21,17 @@ import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { useNavigate } from 'react-router-dom';
 import { useUserRoles } from '@/hooks/useUserRoles';
 
+const todayIST = () =>
+  new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
+const formatVisitDate = (d?: string | null) => {
+  if (!d) return '—';
+  const ds = String(d).slice(0, 10);
+  const [y, m, day] = ds.split('-');
+  if (!y || !m || !day) return ds;
+  return `${day}/${m}/${y}`;
+};
+
 export default function CheckInOut() {
   const navigate = useNavigate();
   const { isReadOnly } = useUserRoles();
@@ -34,6 +45,8 @@ export default function CheckInOut() {
     checkedIn: 0,
     checkedOut: 0,
     scheduled: 0,
+    scheduledToday: 0,
+    scheduledUpcoming: 0,
   });
 
   useEffect(() => {
@@ -57,6 +70,19 @@ export default function CheckInOut() {
       
       const checkedIn = typedData.filter((v) => v.status === 'checked_in').length;
       const scheduled = typedData.filter((v) => v.status === 'scheduled').length;
+      const todayStr = todayIST();
+      const scheduledToday = typedData.filter(
+        (v) =>
+          v.status === 'scheduled' &&
+          (!(v as any).scheduled_date ||
+            String((v as any).scheduled_date).slice(0, 10) === todayStr),
+      ).length;
+      const scheduledUpcoming = typedData.filter(
+        (v) =>
+          v.status === 'scheduled' &&
+          (v as any).scheduled_date &&
+          String((v as any).scheduled_date).slice(0, 10) > todayStr,
+      ).length;
 
       // Fetch checked out count for today
       const today = new Date().toISOString().split('T')[0];
@@ -70,6 +96,8 @@ export default function CheckInOut() {
         checkedIn,
         scheduled,
         checkedOut: checkedOutCount || 0,
+        scheduledToday,
+        scheduledUpcoming,
       });
     }
   };
@@ -385,12 +413,27 @@ export default function CheckInOut() {
       .slice(0, 2);
   };
 
-  const filteredVisitors = visitors.filter(
-    (v) =>
-      v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.visitor_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      v.company?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const today = todayIST();
+  const filteredVisitors = visitors
+    .filter(
+      (v) =>
+        v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.visitor_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.company?.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
+    .sort((a, b) => {
+      const ad = (a as any).scheduled_date
+        ? String((a as any).scheduled_date).slice(0, 10)
+        : '';
+      const bd = (b as any).scheduled_date
+        ? String((b as any).scheduled_date).slice(0, 10)
+        : '';
+      const aRank = !ad || ad === today ? 0 : ad > today ? 1 : 2;
+      const bRank = !bd || bd === today ? 0 : bd > today ? 1 : 2;
+      if (aRank !== bRank) return aRank - bRank;
+      if (aRank === 1 && ad !== bd) return ad < bd ? -1 : 1;
+      return (b.created_at || '').localeCompare(a.created_at || '');
+    });
 
   return (
     <>
@@ -460,6 +503,14 @@ export default function CheckInOut() {
                           <p className="text-sm text-muted-foreground">
                             {visitor.company || visitor.visitor_id}
                           </p>
+                          {(visitor as any).scheduled_date && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Visit: {formatVisitDate((visitor as any).scheduled_date)}
+                              {String((visitor as any).scheduled_date).slice(0, 10) > today && (
+                                <span className="ml-1 text-info">(upcoming)</span>
+                              )}
+                            </p>
+                          )}
                         </div>
                         <Badge
                           variant="outline"
@@ -521,6 +572,12 @@ export default function CheckInOut() {
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Purpose</span>
                       <span className="font-medium">{selectedVisitor.purpose || '—'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Date of Visit</span>
+                      <span className="font-medium">
+                        {formatVisitDate((selectedVisitor as any).scheduled_date)}
+                      </span>
                     </div>
                     {selectedVisitor.has_laptop && (
                       <div className="flex justify-between text-sm">
@@ -614,6 +671,9 @@ export default function CheckInOut() {
               <div className="bg-card rounded-xl border border-border p-4 text-center">
                 <p className="text-3xl font-bold text-info">{stats.scheduled}</p>
                 <p className="text-sm text-muted-foreground">Scheduled</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.scheduledToday} today · {stats.scheduledUpcoming} upcoming
+                </p>
               </div>
             </div>
           </div>
