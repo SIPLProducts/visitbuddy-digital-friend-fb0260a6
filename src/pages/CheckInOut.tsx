@@ -503,6 +503,14 @@ export default function CheckInOut() {
                           <p className="text-sm text-muted-foreground">
                             {visitor.company || visitor.visitor_id}
                           </p>
+                          {(visitor as any).scheduled_date && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Visit: {formatVisitDate((visitor as any).scheduled_date)}
+                              {String((visitor as any).scheduled_date).slice(0, 10) > today && (
+                                <span className="ml-1 text-info">(upcoming)</span>
+                              )}
+                            </p>
+                          )}
                         </div>
                         <Badge
                           variant="outline"
