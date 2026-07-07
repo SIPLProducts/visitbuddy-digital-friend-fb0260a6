@@ -1,20 +1,26 @@
-## Problem
+Fill the uploaded VAPT questionnaire, leaving all server / network / wireless / config / architecture sections marked **"Not in scope"**, and populating only the **Web Application Security** rows for both Internal and External sheets. Mobile Application sections marked **"No – Not applicable (no native mobile app; PWA covered under Web scope)"**.
 
-After a host approves a visitor with a **future visit date**, the visitor's status becomes `scheduled`, but the **Check In** action is hidden in the Visitors list. This is because `VisitorActions.tsx` gates the Check‑In controls behind `isScheduledToday` (only visible if `scheduled_date === today`). The Check‑In/Out page itself works, but the per‑row action on the Visitors table doesn't.
+## Values to enter
 
-## Fix
+**Sheet: Internal VA & PT**
+- Server VAPT rows (workstations, servers, config review): `Not in scope`
+- Web Application Security (Internal): `Yes`
+  - Application details row: `Internal Applications / VisiGuard VMS (Admin/Security/Host Portal) / 60 / 5 / White box / Onsite`
+  - Remarks: `5 roles = HO Admin, Location Admin, Security Guard, Host/Employee, Self-Service Visitor. React 18 + Vite SPA on Supabase (PostgREST + Edge Functions).`
+- Mobile Application Security (Internal): `No – Not applicable (PWA; covered under Web scope)`
+- Wireless PT + Other Devices (switches, firewalls): `Not in scope`
 
-Update `src/components/visitors/VisitorActions.tsx`:
+**Sheet: External VA & PT**
+- Server VAPT (No of external IPs): `Not in scope`
+- Web Application Security (External): `Yes`
+  - Application details row: `External (Internet Facing) Applications / VisiGuard VMS / 60 / 5 / White box / Offsite`
+  - Remarks: `URLs: https://visiguard.sharvisoftwareservices.com and https://visitbuddy-digital-friend.lovable.app. Same codebase as internal. Testers will be given credentials for all 5 roles plus source code access.`
+- Mobile Application Security (External): `No – Not applicable`
+- Other Devices (Routers/IDS/IPS): `Not in scope`
 
-1. Remove the `isScheduledToday` restriction so that any visitor with `status === 'scheduled'` shows:
-   - The quick **"Check In & Print"** button
-   - The **Check In** dropdown menu item
-2. Keep all other logic untouched (Approve/Reject for `pending_approval`, Check Out for `checked_in`, edit/print, etc.).
-3. Drop the now-unused `isScheduledToday`/`today` constants.
+**Sheet: Config Review** — every row: `Not in scope`
+**Sheet: Architecture Review** — every row: `Not in scope` (leave existing 0s replaced with the text)
 
-No backend or RLS changes — `CheckInOut.tsx` already loads all `scheduled` visitors regardless of date, so future‑dated approved visits will appear consistently in both places.
+## Deliverable
 
-## Technical notes
-
-- File touched: `src/components/visitors/VisitorActions.tsx` only.
-- Behavior: from the moment a host approves (status → `scheduled`), the security/admin user can Check In the visitor on any day — both on the Visitors page row actions and on the Check‑In/Out screen.
+Write filled workbook to `/mnt/documents/VAPT_questionnaire_VisiGuard_filled.xlsx` (preserving original formatting via openpyxl load/save) and surface it with a `<presentation-artifact>` tag for download.
