@@ -36,7 +36,7 @@ const visitorSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   company: z.string().optional(),
   purpose: z.string().optional(),
-  host_id: z.string().optional(),
+  host_id: z.string().min(1, 'Please select a host'),
   department_id: z.string().optional(),
   gate_id: z.string().min(1, 'Please select an entry gate'),
   vehicle_type: z.string().default('by_walk'),
