@@ -36,7 +36,7 @@ const visitorSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   company: z.string().optional(),
   purpose: z.string().optional(),
-  host_id: z.string().optional(),
+  host_id: z.string().min(1, 'Please select a host'),
   department_id: z.string().optional(),
   gate_id: z.string().min(1, 'Please select an entry gate'),
   vehicle_type: z.string().default('by_walk'),
@@ -652,21 +652,26 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Host</Label>
+                  <Label>Host *</Label>
                   <HostCombobox
                     value={form.watch('host_id') || ''}
                     options={employees as any}
                     onChange={(id, opt) => {
-                      form.setValue('host_id', id);
+                      form.setValue('host_id', id, { shouldValidate: true });
                       if (opt?.department?.id) {
                         form.setValue('department_id', opt.department.id);
                       }
                     }}
                     onClear={() => {
-                      form.setValue('host_id', '');
+                      form.setValue('host_id', '', { shouldValidate: true });
                       form.setValue('department_id', '');
                     }}
                   />
+                  {form.formState.errors.host_id && (
+                    <p className="text-sm text-destructive">
+                      {form.formState.errors.host_id.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Department</Label>
