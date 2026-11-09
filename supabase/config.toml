@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.whatsapp-bridge]
 verify_jwt = false
+
+[functions.capture-visitor-signature]
+verify_jwt = false

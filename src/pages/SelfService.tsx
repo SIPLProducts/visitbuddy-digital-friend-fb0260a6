@@ -15,6 +15,9 @@ import { CameraCapture } from '@/components/checkin/CameraCapture';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { HostCombobox } from '@/components/visitors/HostCombobox';
+import { useTranslation } from 'react-i18next';
+import { languages } from '@/i18n';
+import { DpdpNoticeSignature, type DpdpCaptureState } from '@/components/shared/DpdpNoticeSignature';
 
 interface Department {
   id: string;
@@ -31,6 +34,7 @@ interface Gate {
   id: string;
   name: string;
   building?: string | null;
+  location_id?: string | null;
 }
 
 export default function SelfService() {
@@ -40,6 +44,8 @@ export default function SelfService() {
   const [showCamera, setShowCamera] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [visitorId, setVisitorId] = useState<string | null>(null);
+  const { t, i18n } = useTranslation();
+  const [dpdp, setDpdp] = useState<DpdpCaptureState>({ noticeId: null, acknowledged: false, signature: null });
   
   // Form data
   const [formData, setFormData] = useState({
@@ -98,7 +104,7 @@ export default function SelfService() {
   };
 
   const fetchGates = async () => {
-    const { data } = await supabase.from('gates').select('id, name, building').eq('status', 'active').order('name');
+    const { data } = await supabase.from('gates').select('id, name, building, location_id').eq('status', 'active').order('name');
     if (data) setGates(data as Gate[]);
   };
 
@@ -148,49 +154,52 @@ export default function SelfService() {
       return;
     }
 
+    if (!selectedGateId) {
+      toast.error('Please select an entry gate');
+      return;
+    }
+    if (!dpdp.noticeId || !dpdp.acknowledged) { toast.error(t('dpdp.ackRequired')); return; }
+    if (!dpdp.signature) { toast.error(t('dpdp.signatureRequired')); return; }
+
     setIsSubmitting(true);
     try {
-      const insertData: any = {
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email || null,
-        company: formData.company || null,
-        purpose: formData.purpose || null,
-        department_id: formData.departmentId || null,
-        host_id: formData.hostId || null,
-        gate_id: selectedGateId || null,
-        vehicle_type: formData.vehicleType || 'by_walk',
-        vehicle_number: (formData.vehicleType && formData.vehicleType !== 'by_walk') ? formData.vehicleNumber || null : null,
-        has_laptop: formData.hasLaptop,
-        laptop_brand: formData.hasLaptop ? formData.laptopBrand : null,
-        laptop_serial: formData.hasLaptop ? formData.laptopSerial : null,
-        accompanying_count: formData.accompanyingCount,
-        photo_url: formData.photoUrl || null,
-        status: 'pending_approval',
-      };
+      // Submitted through the secure server function: it validates the details, records the
+      // approved notice version, stores the signature privately and notifies the host.
+      const { data, error } = await supabase.functions.invoke('capture-visitor-signature', {
+        body: {
+          mode: 'self_service',
+          notice_id: dpdp.noticeId,
+          acknowledged: true,
+          signature_png: dpdp.signature,
+          visitor: {
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            company: formData.company || null,
+            purpose: formData.purpose || null,
+            department_id: formData.departmentId || null,
+            host_id: formData.hostId || null,
+            gate_id: selectedGateId,
+            vehicle_type: formData.vehicleType || 'by_walk',
+            vehicle_number: (formData.vehicleType && formData.vehicleType !== 'by_walk') ? formData.vehicleNumber || null : null,
+            has_laptop: formData.hasLaptop,
+            laptop_brand: formData.hasLaptop ? formData.laptopBrand || null : null,
+            laptop_serial: formData.hasLaptop ? formData.laptopSerial || null : null,
+            accompanying_count: Number(formData.accompanyingCount) || 0,
+            photo_url: formData.photoUrl || null,
+          },
+        },
+      });
 
-      const { data, error } = await supabase
-        .from('visitors')
-        .insert(insertData)
-        .select('id, visitor_id')
-        .single();
+      if (error || !(data as any)?.success) {
+        let msg = t('dpdp.saveFailed');
+        try { const b = await (error as any)?.context?.json?.(); if (b?.error) msg = b.error; } catch { /* ignore */ }
+        throw new Error(msg);
+      }
 
-      if (error) throw error;
-
-      setVisitorId(data.visitor_id);
+      setVisitorId((data as any).visitor_id);
       setIsSuccess(true);
       toast.success('Check-in request submitted! Awaiting host approval.');
-
-      // Notify host if selected
-      if (formData.hostId) {
-        try {
-          await supabase.functions.invoke('notify-host', {
-            body: { visitorId: data.id }
-          });
-        } catch (notifyError) {
-          console.log('Host notification skipped:', notifyError);
-        }
-      }
     } catch (error: any) {
       console.error('Submission error:', error);
       toast.error(error.message || 'Failed to submit check-in request');
@@ -254,6 +263,14 @@ export default function SelfService() {
           <div>
             <h1 className="font-semibold text-foreground">Re Sustainability</h1>
             <p className="text-xs text-muted-foreground">Visitor Self Check-in</p>
+          </div>
+          <div className="ml-auto w-36">
+            <Select value={(i18n.language || 'en').split('-')[0]} onValueChange={(v) => i18n.changeLanguage(v)}>
+              <SelectTrigger className="h-9" aria-label="Language"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {languages.map(l => <SelectItem key={l.code} value={l.code}>{l.nativeName}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </header>
@@ -618,13 +635,25 @@ export default function SelfService() {
                 </div>
               </div>
 
+              {/* DPDP Privacy Notice & Signature */}
+              <div className="space-y-2 pt-2">
+                <h4 className="font-medium flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> {t('dpdp.sectionTitle')}</h4>
+                <p className="text-xs text-muted-foreground">{t('dpdp.sectionDesc')}</p>
+                <DpdpNoticeSignature
+                  key={`${i18n.language}-${isSuccess}`}
+                  locationId={gates.find(g => g.id === selectedGateId)?.location_id ?? null}
+                  onChange={setDpdp}
+                  disabled={isSubmitting}
+                />
+              </div>
+
               <div className="flex gap-3 mt-4">
                 <Button variant="outline" onClick={prevStep} className="flex-1 h-12">
                   <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
                 <Button 
                   onClick={handleSubmit} 
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !dpdp.noticeId || !dpdp.acknowledged || !dpdp.signature}
                   className="flex-1 h-12"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit'}

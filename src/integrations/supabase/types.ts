@@ -283,6 +283,104 @@ export type Database = {
           },
         ]
       }
+      dpdp_deletion_log: {
+        Row: {
+          actor_kind: string
+          actor_user_id: string | null
+          agreements_deleted: number
+          created_at: string
+          id: string
+          note: string | null
+          reason: string
+        }
+        Insert: {
+          actor_kind: string
+          actor_user_id?: string | null
+          agreements_deleted: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason: string
+        }
+        Update: {
+          actor_kind?: string
+          actor_user_id?: string | null
+          agreements_deleted?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason?: string
+        }
+        Relationships: []
+      }
+      dpdp_privacy_notices: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          language: string
+          location_id: string | null
+          title: string
+          version: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          language: string
+          location_id?: string | null
+          title: string
+          version: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          location_id?: string | null
+          title?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dpdp_privacy_notices_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dpdp_rate_limits: {
+        Row: {
+          rate_key: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          rate_key: string
+          request_count: number
+          window_start: string
+        }
+        Update: {
+          rate_key?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       email_config: {
         Row: {
           created_at: string
@@ -1178,36 +1276,80 @@ export type Database = {
       }
       visitor_agreements: {
         Row: {
+          acknowledged: boolean | null
           agreement_text: string
           agreement_type: string
+          capture_channel: string | null
+          captured_by_user_id: string | null
           created_at: string
+          hash_algorithm: string | null
           id: string
           ip_address: string | null
+          notice_id: string | null
+          notice_language: string | null
+          notice_version: string | null
           signature_data: string | null
+          signature_hash: string | null
+          signature_height: number | null
+          signature_width: number | null
           signed_at: string
+          storage_path: string | null
+          user_agent: string | null
           visitor_id: string
         }
         Insert: {
+          acknowledged?: boolean | null
           agreement_text: string
           agreement_type?: string
+          capture_channel?: string | null
+          captured_by_user_id?: string | null
           created_at?: string
+          hash_algorithm?: string | null
           id?: string
           ip_address?: string | null
+          notice_id?: string | null
+          notice_language?: string | null
+          notice_version?: string | null
           signature_data?: string | null
+          signature_hash?: string | null
+          signature_height?: number | null
+          signature_width?: number | null
           signed_at?: string
+          storage_path?: string | null
+          user_agent?: string | null
           visitor_id: string
         }
         Update: {
+          acknowledged?: boolean | null
           agreement_text?: string
           agreement_type?: string
+          capture_channel?: string | null
+          captured_by_user_id?: string | null
           created_at?: string
+          hash_algorithm?: string | null
           id?: string
           ip_address?: string | null
+          notice_id?: string | null
+          notice_language?: string | null
+          notice_version?: string | null
           signature_data?: string | null
+          signature_hash?: string | null
+          signature_height?: number | null
+          signature_width?: number | null
           signed_at?: string
+          storage_path?: string | null
+          user_agent?: string | null
           visitor_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "visitor_agreements_notice_id_fkey"
+            columns: ["notice_id"]
+            isOneToOne: false
+            referencedRelation: "dpdp_privacy_notices"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       visitor_id_counters: {
         Row: {
@@ -1414,6 +1556,26 @@ export type Database = {
         Args: { _location_id: string; _user_id: string }
         Returns: boolean
       }
+      can_view_signature_object: {
+        Args: { _name: string; _user_id: string }
+        Returns: boolean
+      }
+      can_view_visitor_agreement: {
+        Args: { _user_id: string; _visitor_id: string }
+        Returns: boolean
+      }
+      dpdp_check_rate_limit: {
+        Args: { _key: string; _max: number; _window_seconds: number }
+        Returns: boolean
+      }
+      dpdp_purge_agreements_by_staff: {
+        Args: { _note?: string; _reason: string; _visitor_ids: string[] }
+        Returns: number
+      }
+      dpdp_purge_agreements_for_retention: {
+        Args: { _visitor_ids: string[] }
+        Returns: number
+      }
       generate_location_safety_short_code: { Args: never; Returns: string }
       generate_visitor_short_code: { Args: never; Returns: string }
       get_admin_location_ids: { Args: { _user_id: string }; Returns: string[] }
@@ -1446,6 +1608,7 @@ export type Database = {
       }
       is_admin_head: { Args: { _user_id: string }; Returns: boolean }
       is_ho_admin: { Args: { _user_id: string }; Returns: boolean }
+      visitor_location_id: { Args: { _visitor_id: string }; Returns: string }
     }
     Enums: {
       app_role: "admin" | "manager" | "operator" | "gate_security" | "visitor"
