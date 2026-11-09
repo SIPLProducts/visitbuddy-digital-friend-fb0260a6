@@ -283,7 +283,21 @@ export default function Locations() {
 
         if (visitorIds.length > 0) {
           await supabase.from('accompanying_visitors').delete().in('visitor_id', visitorIds);
-          await supabase.from('visitor_agreements').delete().in('visitor_id', visitorIds);
+          // DPDP: remove signature files, then agreement rows through the audited purge function
+          const { data: sigRows } = await supabase
+            .from('visitor_agreements')
+            .select('storage_path')
+            .in('visitor_id', visitorIds)
+            .not('storage_path', 'is', null);
+          const paths = (sigRows || []).map((r: any) => r.storage_path as string);
+          if (paths.length > 0) {
+            const { error: rmErr } = await supabase.storage.from('visitor-signatures').remove(paths);
+            if (rmErr) throw new Error('Could not remove visitor signature files: ' + rmErr.message);
+          }
+          const { error: purgeErr } = await supabase.rpc('dpdp_purge_agreements_by_staff', {
+            _visitor_ids: visitorIds, _reason: 'location_deleted', _note: null,
+          });
+          if (purgeErr) throw new Error('Could not remove visitor agreements: ' + purgeErr.message);
         }
         await supabase.from('visitors').delete().in('gate_id', gateIds);
       }

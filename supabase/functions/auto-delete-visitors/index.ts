@@ -54,25 +54,42 @@ Deno.serve(async (req) => {
       .from("accompanying_visitors")
       .delete()
       .in("visitor_id", visitorIds);
+    // (accompanying rows are re-created never; safe to remove for all expired visitors)
 
     if (accError) {
       console.error("Error deleting accompanying_visitors:", accError.message);
     }
 
-    const { error: agrError } = await supabase
+    // DPDP: remove signature files first, then agreement rows via the audited purge function.
+    // Visitors whose signature files could not be removed are kept for the next run (no orphans).
+    const { data: sigRows } = await supabase
       .from("visitor_agreements")
-      .delete()
-      .in("visitor_id", visitorIds);
+      .select("visitor_id, storage_path")
+      .in("visitor_id", visitorIds)
+      .not("storage_path", "is", null);
 
+    const blocked = new Set<string>();
+    const paths = (sigRows || []).map((r: any) => r.storage_path as string);
+    for (let i = 0; i < paths.length; i += 100) {
+      const chunk = paths.slice(i, i + 100);
+      const { error: rmErr } = await supabase.storage.from("visitor-signatures").remove(chunk);
+      if (rmErr) {
+        console.error("Signature file removal failed, deferring:", rmErr.message);
+        (sigRows || []).filter((r: any) => chunk.includes(r.storage_path)).forEach((r: any) => blocked.add(r.visitor_id));
+      }
+    }
+    const purgeIds = visitorIds.filter((id) => !blocked.has(id));
+
+    const { error: agrError } = await supabase.rpc("dpdp_purge_agreements_for_retention", { _visitor_ids: purgeIds });
     if (agrError) {
-      console.error("Error deleting visitor_agreements:", agrError.message);
+      throw new Error(`Failed to purge visitor agreements: ${agrError.message}`);
     }
 
     // Delete the visitors
     const { error: delError } = await supabase
       .from("visitors")
       .delete()
-      .in("id", visitorIds);
+      .in("id", purgeIds);
 
     if (delError) {
       throw new Error(`Failed to delete visitors: ${delError.message}`);
