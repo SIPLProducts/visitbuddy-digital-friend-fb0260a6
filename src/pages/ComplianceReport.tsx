@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { FileText, Download, AlertTriangle, Clock, ShieldCheck, Users, Calendar, BarChart3 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
+import { agreementMetrics } from '@/lib/agreementMetrics';
 
 export default function ComplianceReport() {
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
@@ -43,15 +44,14 @@ export default function ComplianceReport() {
   const stats = useMemo(() => {
     const total = visitors.length;
     const withId = visitors.filter(v => v.govt_id_number).length;
-    const withNda = agreements.length;
+    const { withNda, ndaComplianceRate, withNotice, noticeComplianceRate } = agreementMetrics(agreements, total);
     const overstayed = visitors.filter(v => {
       if (v.status !== 'checked_in' || !v.check_in_time) return false;
       return (Date.now() - new Date(v.check_in_time).getTime()) / (1000 * 60 * 60) > 8;
     }).length;
     const noCheckout = visitors.filter(v => v.status === 'checked_in' && v.check_in_time).length;
     const idComplianceRate = total > 0 ? Math.round((withId / total) * 100) : 0;
-    const ndaComplianceRate = total > 0 ? Math.round((withNda / total) * 100) : 0;
-    return { total, withId, withNda, overstayed, noCheckout, idComplianceRate, ndaComplianceRate };
+    return { total, withId, withNda, withNotice, overstayed, noCheckout, idComplianceRate, ndaComplianceRate, noticeComplianceRate };
   }, [visitors, agreements]);
 
   const violations = useMemo(() => {
@@ -72,7 +72,7 @@ export default function ComplianceReport() {
 
   const exportReport = () => {
     let csv = 'Compliance Report\nPeriod: Last ' + period + ' days\nGenerated: ' + format(new Date(), 'dd/MM/yyyy HH:mm') + '\n\n';
-    csv += 'SUMMARY\nTotal Visitors,' + stats.total + '\nWith ID,' + stats.withId + '\nNDA Signed,' + stats.withNda + '\nOverstayed,' + stats.overstayed + '\nID Compliance,' + stats.idComplianceRate + '%\n\n';
+    csv += 'SUMMARY\nTotal Visitors,' + stats.total + '\nWith ID,' + stats.withId + '\nNDA Signed,' + stats.withNda + '\nDPDP Notice Acknowledged,' + stats.withNotice + '\nOverstayed,' + stats.overstayed + '\nID Compliance,' + stats.idComplianceRate + '%\n\n';
     csv += 'VIOLATIONS\nType,Severity,Visitor,Detail,Date\n';
     violations.forEach(v => { csv += `"${v.type}","${v.severity}","${v.visitor}","${v.detail}","${format(new Date(v.date), 'dd/MM/yyyy')}"\n`; });
     csv += '\nVISITOR DETAILS\nName,Purpose,Date of Visit,Created Date,Status,ID Verified,Accompanying Count,Accompanying Names\n';
@@ -112,6 +112,7 @@ export default function ComplianceReport() {
           <Card><CardContent className="p-4"><div className="flex items-center gap-2"><Users className="h-4 w-4 text-primary" /><p className="text-xs text-muted-foreground">Total Visitors</p></div><p className="text-2xl font-bold mt-1">{stats.total}</p></CardContent></Card>
           <Card><CardContent className="p-4"><div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-600" /><p className="text-xs text-muted-foreground">ID Compliance</p></div><p className="text-2xl font-bold mt-1">{stats.idComplianceRate}%</p><Progress value={stats.idComplianceRate} className="mt-2 h-1.5" /></CardContent></Card>
           <Card><CardContent className="p-4"><div className="flex items-center gap-2"><FileText className="h-4 w-4 text-blue-600" /><p className="text-xs text-muted-foreground">NDA Compliance</p></div><p className="text-2xl font-bold mt-1">{stats.ndaComplianceRate}%</p><Progress value={stats.ndaComplianceRate} className="mt-2 h-1.5" /></CardContent></Card>
+          <Card><CardContent className="p-4"><div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" /><p className="text-xs text-muted-foreground">DPDP Notice Acknowledged</p></div><p className="text-2xl font-bold mt-1">{stats.noticeComplianceRate}%</p><Progress value={stats.noticeComplianceRate} className="mt-2 h-1.5" /></CardContent></Card>
           <Card><CardContent className="p-4"><div className="flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-600" /><p className="text-xs text-muted-foreground">Violations</p></div><p className="text-2xl font-bold mt-1 text-amber-600">{violations.length}</p></CardContent></Card>
         </div>
 
