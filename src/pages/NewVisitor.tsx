@@ -28,6 +28,9 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import { ShieldCheck } from 'lucide-react';
+import { DpdpNoticeSignature, type DpdpCaptureState } from '@/components/shared/DpdpNoticeSignature';
 import { HostCombobox } from '@/components/visitors/HostCombobox';
 
 const visitorSchema = z.object({
@@ -173,6 +176,8 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
   };
 
   const onSubmit = async (data: VisitorFormData) => {
+    if (!dpdp.noticeId || !dpdp.acknowledged) { toast.error(t('dpdp.ackRequired')); return; }
+    if (!dpdp.signature) { toast.error(t('dpdp.signatureRequired')); return; }
     setLoading(true);
 
     const selectedGate = gates.find((gate) => gate.id === data.gate_id);
@@ -211,6 +216,27 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       setLoading(false);
       toast.error('Failed to register visitor');
       return;
+    }
+
+    // DPDP: record notice acknowledgement + signature server-side; undo the registration if it fails
+    {
+      const { data: sigRes, error: sigErr } = await supabase.functions.invoke('capture-visitor-signature', {
+        body: {
+          mode: 'staff',
+          visitor_id: insertedVisitor.id,
+          notice_id: dpdp.noticeId,
+          acknowledged: true,
+          signature_png: dpdp.signature,
+        },
+      });
+      if (sigErr || !(sigRes as any)?.success) {
+        await supabase.from('visitors').delete().eq('id', insertedVisitor.id);
+        setLoading(false);
+        let msg = t('dpdp.saveFailed');
+        try { const b = await (sigErr as any)?.context?.json?.(); if (b?.error) msg = b.error; } catch { /* ignore */ }
+        toast.error(msg);
+        return;
+      }
     }
 
     // Save accompanying visitors
@@ -811,12 +837,30 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
             </CardContent>
           </Card>
 
+          {/* DPDP Privacy Notice & Signature */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5" />
+                {t('dpdp.sectionTitle')}
+              </CardTitle>
+              <CardDescription>{t('dpdp.sectionDesc')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DpdpNoticeSignature
+                locationId={gates.find(g => g.id === form.watch('gate_id'))?.location_id ?? null}
+                onChange={setDpdp}
+                disabled={loading}
+              />
+            </CardContent>
+          </Card>
+
           {/* Actions */}
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={() => navigate(-1)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || !dpdp.noticeId || !dpdp.acknowledged || !dpdp.signature}>
               {loading ? 'Registering...' : 'Register Visitor'}
             </Button>
           </div>
