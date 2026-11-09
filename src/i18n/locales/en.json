@@ -439,5 +439,27 @@
     "hasAccount": "Already have an account?",
     "signInWith": "Sign in with",
     "orContinueWith": "Or continue with"
+  },
+  "dpdp": {
+    "sectionTitle": "Privacy Notice & Signature",
+    "sectionDesc": "Please read the notice, tick the box and sign below.",
+    "loadingNotice": "Loading privacy notice…",
+    "noticeUnavailable": "The privacy notice is not available. Please contact reception.",
+    "noticeFallback": "The notice is not yet available in your language, so it is shown in English.",
+    "version": "Version",
+    "acknowledgeNotice": "I have read and understood this privacy notice.",
+    "acknowledgeFirst": "Tick the box above to enable signing.",
+    "signatureTitle": "Visitor signature",
+    "signHere": "Sign here",
+    "signatureInstructions": "Sign with your finger, a stylus or the mouse.",
+    "clearSignature": "Clear Signature",
+    "confirmSignature": "Confirm Signature",
+    "redrawSignature": "Redraw Signature",
+    "signatureConfirmed": "Signature confirmed. Thank you.",
+    "signatureLocked": "Locked",
+    "signatureTooShort": "Signature is too short. Please sign your full signature.",
+    "ackRequired": "Please acknowledge the privacy notice.",
+    "signatureRequired": "Please sign and confirm your signature.",
+    "saveFailed": "Could not save the signature. Please try again."
   }
 }
