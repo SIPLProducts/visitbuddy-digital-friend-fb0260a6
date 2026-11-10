@@ -8,6 +8,13 @@
       "when": 1794235709840,
       "tag": "0000_dpdp_privacy_notice_esignature",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794315830228,
+      "tag": "0001_visitor_privacy_declarations",
+      "breakpoints": true
     }
   ]
 }

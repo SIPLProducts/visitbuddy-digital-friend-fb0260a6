@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
 import { DpdpNoticeSignature, type DpdpCaptureState } from '@/components/shared/DpdpNoticeSignature';
 import { HostCombobox } from '@/components/visitors/HostCombobox';
+import { createEmptyPrivacyDeclarations } from '@/lib/privacyDeclarations';
 
 const visitorSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -82,7 +83,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
   const { selectedLocationId, isAllLocations } = useSelectedLocation();
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
-  const [dpdp, setDpdp] = useState<DpdpCaptureState>({ noticeId: null, acknowledged: false, signature: null });
+  const [dpdp, setDpdp] = useState<DpdpCaptureState>({ noticeId: null, acknowledged: false, signature: null, declarations: createEmptyPrivacyDeclarations() });
   const [sendWhatsApp, setSendWhatsApp] = useState(true);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
