@@ -108,7 +108,7 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
 
       <div className="space-y-3" aria-label={t('dpdp.declarationsTitle')}>
         <p className="text-sm font-medium">{t('dpdp.declarationsTitle')}</p>
-        {fallback && <p className="text-xs text-muted-foreground">{t('dpdp.declarationsEnglishOnly')}</p>}
+        <p className="text-xs text-muted-foreground">{t('dpdp.declarationsEnglishOnly')}</p>
         {PRIVACY_DECLARATION_IDS.map((id) => (
           <DeclarationCheckbox
             key={id}
