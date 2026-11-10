@@ -320,6 +320,7 @@ export type Database = {
           body: string
           created_at: string
           created_by: string | null
+          declarations: Json | null
           id: string
           is_active: boolean
           language: string
@@ -333,6 +334,7 @@ export type Database = {
           body: string
           created_at?: string
           created_by?: string | null
+          declarations?: Json | null
           id?: string
           is_active?: boolean
           language: string
@@ -346,6 +348,7 @@ export type Database = {
           body?: string
           created_at?: string
           created_by?: string | null
+          declarations?: Json | null
           id?: string
           is_active?: boolean
           language?: string
@@ -1282,6 +1285,8 @@ export type Database = {
           capture_channel: string | null
           captured_by_user_id: string | null
           created_at: string
+          declarations: Json | null
+          declarations_version: string | null
           hash_algorithm: string | null
           id: string
           ip_address: string | null
@@ -1304,6 +1309,8 @@ export type Database = {
           capture_channel?: string | null
           captured_by_user_id?: string | null
           created_at?: string
+          declarations?: Json | null
+          declarations_version?: string | null
           hash_algorithm?: string | null
           id?: string
           ip_address?: string | null
@@ -1326,6 +1333,8 @@ export type Database = {
           capture_channel?: string | null
           captured_by_user_id?: string | null
           created_at?: string
+          declarations?: Json | null
+          declarations_version?: string | null
           hash_algorithm?: string | null
           id?: string
           ip_address?: string | null
