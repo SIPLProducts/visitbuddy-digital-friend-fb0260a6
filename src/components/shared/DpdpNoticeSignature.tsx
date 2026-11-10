@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShieldCheck } from 'lucide-react';
+import type { TFunction } from 'i18next';
 import { SignaturePad } from './SignaturePad';
 import {
   areAllPrivacyDeclarationsAccepted,
@@ -72,6 +73,19 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
   const notice = pickNotice(notices, i18n.language || 'en', locationId);
   const acknowledged = areAllPrivacyDeclarationsAccepted(declarations);
 
+  const handleDeclarationChange = (id: PrivacyDeclarationId, checked: boolean) => {
+    const next = { ...declarations, [id]: checked };
+    const allAccepted = areAllPrivacyDeclarationsAccepted(next);
+    setDeclarations(next);
+    if (!allAccepted) setSignature(null);
+    onChange({
+      noticeId: notice?.id ?? null,
+      acknowledged: allAccepted,
+      signature: allAccepted ? signature : null,
+      declarations: next,
+    });
+  };
+
   useEffect(() => {
     onChange({ noticeId: notice?.id ?? null, acknowledged, signature, declarations });
   }, [notice?.id, acknowledged, signature, declarations, onChange]);
@@ -115,7 +129,7 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
             id={id}
             checked={declarations[id]}
             disabled={disabled}
-            onCheckedChange={(checked) => setDeclarations((current) => ({ ...current, [id]: checked }))}
+            onCheckedChange={(checked) => handleDeclarationChange(id, checked)}
             t={t}
           />
         ))}
@@ -139,7 +153,7 @@ interface DeclarationCheckboxProps {
   checked: boolean;
   disabled?: boolean;
   onCheckedChange: (checked: boolean) => void;
-  t: ReturnType<typeof useTranslation>['t'];
+  t: TFunction;
 }
 
 function DeclarationCheckbox({ id, checked, disabled, onCheckedChange, t }: DeclarationCheckboxProps) {
