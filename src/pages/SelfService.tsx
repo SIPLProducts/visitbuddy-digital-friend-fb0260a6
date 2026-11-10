@@ -18,6 +18,7 @@ import { HostCombobox } from '@/components/visitors/HostCombobox';
 import { useTranslation } from 'react-i18next';
 import { languages } from '@/i18n';
 import { DpdpNoticeSignature, type DpdpCaptureState } from '@/components/shared/DpdpNoticeSignature';
+import { createEmptyPrivacyDeclarations } from '@/lib/privacyDeclarations';
 
 interface Department {
   id: string;
@@ -45,7 +46,7 @@ export default function SelfService() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [visitorId, setVisitorId] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
-  const [dpdp, setDpdp] = useState<DpdpCaptureState>({ noticeId: null, acknowledged: false, signature: null });
+  const [dpdp, setDpdp] = useState<DpdpCaptureState>({ noticeId: null, acknowledged: false, signature: null, declarations: createEmptyPrivacyDeclarations() });
   
   // Form data
   const [formData, setFormData] = useState({

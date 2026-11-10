@@ -6,11 +6,19 @@ import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShieldCheck } from 'lucide-react';
 import { SignaturePad } from './SignaturePad';
+import {
+  areAllPrivacyDeclarationsAccepted,
+  createEmptyPrivacyDeclarations,
+  PRIVACY_DECLARATION_IDS,
+  type PrivacyDeclarationId,
+  type PrivacyDeclarationSelection,
+} from '@/lib/privacyDeclarations';
 
 export interface DpdpCaptureState {
   noticeId: string | null;
   acknowledged: boolean;
   signature: string | null;
+  declarations: PrivacyDeclarationSelection;
 }
 
 interface Notice {
@@ -44,7 +52,7 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
   const { t, i18n } = useTranslation();
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [acknowledged, setAcknowledged] = useState(false);
+  const [declarations, setDeclarations] = useState(createEmptyPrivacyDeclarations);
   const [signature, setSignature] = useState<string | null>(null);
 
   useEffect(() => {
@@ -62,14 +70,21 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
   }, []);
 
   const notice = pickNotice(notices, i18n.language || 'en', locationId);
+  const acknowledged = areAllPrivacyDeclarationsAccepted(declarations);
 
   useEffect(() => {
-    onChange({ noticeId: notice?.id ?? null, acknowledged, signature });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notice?.id, acknowledged, signature]);
+    onChange({ noticeId: notice?.id ?? null, acknowledged, signature, declarations });
+  }, [notice?.id, acknowledged, signature, declarations, onChange]);
 
-  // A different notice (language/location change) must be acknowledged again.
-  useEffect(() => { setAcknowledged(false); }, [notice?.id]);
+  // A different notice (language/location change) must be acknowledged and signed again.
+  useEffect(() => {
+    setDeclarations(createEmptyPrivacyDeclarations());
+    setSignature(null);
+  }, [notice?.id]);
+
+  useEffect(() => {
+    if (!acknowledged) setSignature(null);
+  }, [acknowledged]);
 
   if (loading) return <p className="text-sm text-muted-foreground">{t('dpdp.loadingNotice')}</p>;
   if (!notice) return <p className="text-sm text-destructive">{t('dpdp.noticeUnavailable')}</p>;
@@ -91,24 +106,69 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
         </ScrollArea>
       </div>
 
-      <div className="flex items-start gap-3">
-        <Checkbox
-          id="dpdp-ack"
-          checked={acknowledged}
-          disabled={disabled}
-          onCheckedChange={(v) => setAcknowledged(v === true)}
-          className="mt-0.5"
-        />
-        <Label htmlFor="dpdp-ack" className="text-sm leading-snug font-normal cursor-pointer">
-          {t('dpdp.acknowledgeNotice')} <span className="text-destructive">*</span>
-        </Label>
+      <div className="space-y-3" aria-label={t('dpdp.declarationsTitle')}>
+        <p className="text-sm font-medium">{t('dpdp.declarationsTitle')}</p>
+        {fallback && <p className="text-xs text-muted-foreground">{t('dpdp.declarationsEnglishOnly')}</p>}
+        {PRIVACY_DECLARATION_IDS.map((id) => (
+          <DeclarationCheckbox
+            key={id}
+            id={id}
+            checked={declarations[id]}
+            disabled={disabled}
+            onCheckedChange={(checked) => setDeclarations((current) => ({ ...current, [id]: checked }))}
+            t={t}
+          />
+        ))}
       </div>
 
       <div className="space-y-2">
         <Label className="text-sm font-medium">{t('dpdp.signatureTitle')} <span className="text-destructive">*</span></Label>
-        <SignaturePad onSignatureChange={setSignature} disabled={disabled || !acknowledged} />
+        <SignaturePad
+          key={`${notice.id}-${acknowledged}`}
+          onSignatureChange={setSignature}
+          disabled={disabled || !acknowledged}
+        />
         {!acknowledged && <p className="text-xs text-muted-foreground">{t('dpdp.acknowledgeFirst')}</p>}
       </div>
+    </div>
+  );
+}
+
+interface DeclarationCheckboxProps {
+  id: PrivacyDeclarationId;
+  checked: boolean;
+  disabled?: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  t: ReturnType<typeof useTranslation>['t'];
+}
+
+function DeclarationCheckbox({ id, checked, disabled, onCheckedChange, t }: DeclarationCheckboxProps) {
+  const checkboxId = `dpdp-${id}`;
+  return (
+    <div className="flex items-start gap-3">
+      <Checkbox
+        id={checkboxId}
+        checked={checked}
+        disabled={disabled}
+        onCheckedChange={(value) => onCheckedChange(value === true)}
+        className="mt-0.5"
+        aria-required="true"
+      />
+      <Label htmlFor={checkboxId} className="text-sm leading-relaxed font-normal cursor-pointer">
+        {id === 'privacyPolicyTerms' ? (
+          <>
+            {t('dpdp.declarationPrivacyPolicyLead')}{' '}
+            <a href="https://re.one/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+              {t('dpdp.privacyPolicyLink')}
+            </a>{' '}
+            {t('dpdp.declarationAnd')}{' '}
+            <a href="https://re.one/terms-of-service/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+              {t('dpdp.termsOfServiceLink')}
+            </a>.
+          </>
+        ) : t(`dpdp.declaration${id.charAt(0).toUpperCase()}${id.slice(1)}`)}
+        <span className="text-destructive"> *</span>
+      </Label>
     </div>
   );
 }

@@ -1,1 +1,2 @@
 - Visitor privacy-notice signatures are written only by the `capture-visitor-signature` edge function (service role); `visitor_agreements` rows are immutable and may only be deleted via the `dpdp_purge_agreements_*` SECURITY DEFINER functions, because a trigger blocks every other update/delete.
+ - Shared visitor privacy declarations live in `src/lib/privacyDeclarations.ts` so both registration flows use the same required set and validation rule.
