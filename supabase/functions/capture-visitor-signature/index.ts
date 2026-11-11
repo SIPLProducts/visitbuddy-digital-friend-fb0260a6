@@ -31,6 +31,7 @@ const MIN_INK_PIXELS = 150;
 
 const uuid = z.string().uuid();
 const optText = (n: number) => z.string().trim().max(n).optional().nullable();
+const isReOneEmail = (email: string) => email.trim().toLowerCase().endsWith("@re.one");
 
 const VisitorSchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -50,21 +51,34 @@ const VisitorSchema = z.object({
   photo_url: z.string().url().max(500).optional().nullable(),
 }).strict();
 
-const BodySchema = z.discriminatedUnion("mode", [
-  z.object({
-    mode: z.literal("self_service"),
-    visitor: VisitorSchema,
-    notice_id: uuid,
-    acknowledged: z.literal(true),
-    signature_png: z.string().min(100).max(MAX_B64),
-  }).strict(),
-  z.object({
-    mode: z.literal("staff"),
-    visitor_id: uuid,
-    notice_id: uuid,
-    acknowledged: z.literal(true),
-    signature_png: z.string().min(100).max(MAX_B64),
-  }).strict(),
+const SelfServiceWithSignatureSchema = z.object({
+  mode: z.literal("self_service"),
+  visitor: VisitorSchema,
+  notice_id: uuid,
+  acknowledged: z.literal(true),
+  signature_png: z.string().min(100).max(MAX_B64),
+}).strict();
+
+const SelfServiceWithoutSignatureSchema = z.object({
+  mode: z.literal("self_service"),
+  visitor: VisitorSchema.refine((visitor) => isReOneEmail(visitor.email), {
+    message: "A valid @re.one email is required to skip the privacy notice and signature.",
+    path: ["email"],
+  }),
+}).strict();
+
+const StaffSignatureSchema = z.object({
+  mode: z.literal("staff"),
+  visitor_id: uuid,
+  notice_id: uuid,
+  acknowledged: z.literal(true),
+  signature_png: z.string().min(100).max(MAX_B64),
+}).strict();
+
+const BodySchema = z.union([
+  SelfServiceWithSignatureSchema,
+  SelfServiceWithoutSignatureSchema,
+  StaffSignatureSchema,
 ]);
 
 async function sha256Hex(data: Uint8Array | string): Promise<string> {
@@ -142,10 +156,13 @@ Deno.serve(async (req) => {
   if (rlErr) { console.error("rate limit error", rlErr.message); return reply(503, { error: "Service busy, please try again shortly." }); }
   if (allowed !== true) return reply(429, { error: "Too many attempts. Please wait a few minutes and try again." });
 
-  // ---- Signature ----
-  let sig: { bytes: Uint8Array; width: number; height: number };
-  try { sig = sanitizeSignature(body.signature_png); } catch (e) { return reply(400, { error: (e as Error).message }); }
-  const signatureHash = await sha256Hex(sig.bytes);
+  // ---- Optional signature (only absent for the validated @re.one kiosk path) ----
+  let sig: { bytes: Uint8Array; width: number; height: number } | null = null;
+  let signatureHash: string | null = null;
+  if ("signature_png" in body) {
+    try { sig = sanitizeSignature(body.signature_png); } catch (e) { return reply(400, { error: (e as Error).message }); }
+    signatureHash = await sha256Hex(sig.bytes);
+  }
 
   // ---- Resolve location ----
   let locationId: string | null = null;
@@ -183,10 +200,14 @@ Deno.serve(async (req) => {
   }
 
   // ---- Notice: must be active and for this location (or global) ----
-  const { data: notice } = await admin.from("dpdp_privacy_notices")
-    .select("id, location_id, language, version, title, body, is_active").eq("id", body.notice_id).maybeSingle();
-  if (!notice || !notice.is_active || (notice.location_id && notice.location_id !== locationId)) {
-    return reply(422, { error: "The privacy notice has changed. Please reload and review it again." });
+  let notice: { id: string; location_id: string | null; language: string; version: string; title: string; body: string; is_active: boolean } | null = null;
+  if ("notice_id" in body) {
+    const { data } = await admin.from("dpdp_privacy_notices")
+      .select("id, location_id, language, version, title, body, is_active").eq("id", body.notice_id).maybeSingle();
+    notice = data;
+    if (!notice || !notice.is_active || (notice.location_id && notice.location_id !== locationId)) {
+      return reply(422, { error: "The privacy notice has changed. Please reload and review it again." });
+    }
   }
 
   // ---- Create visitor (self-service only) ----
@@ -210,45 +231,47 @@ Deno.serve(async (req) => {
     visitorId = data.id;
   }
 
-  const storagePath = `${visitorId}/privacy-notice-${crypto.randomUUID()}.png`;
-  let uploaded = false;
-  try {
-    const { error: upErr } = await admin.storage.from("visitor-signatures")
-      .upload(storagePath, sig.bytes, { contentType: "image/png", upsert: false });
-    if (upErr) throw new Error("upload: " + upErr.message);
-    uploaded = true;
+  if (sig && signatureHash && notice) {
+    const storagePath = `${visitorId}/privacy-notice-${crypto.randomUUID()}.png`;
+    let uploaded = false;
+    try {
+      const { error: upErr } = await admin.storage.from("visitor-signatures")
+        .upload(storagePath, sig.bytes, { contentType: "image/png", upsert: false });
+      if (upErr) throw new Error("upload: " + upErr.message);
+      uploaded = true;
 
-    const ua = req.headers.get("user-agent");
-    const { error: agErr } = await admin.from("visitor_agreements").insert({
-      visitor_id: visitorId,
-      agreement_type: "privacy_notice",
-      agreement_text: `${notice.title}\n\n${notice.body}`,
-      notice_id: notice.id,
-      notice_version: notice.version,
-      notice_language: notice.language,
-      acknowledged: true,
-      storage_path: storagePath,
-      signature_hash: signatureHash,
-      hash_algorithm: "SHA-256",
-      signature_width: sig.width,
-      signature_height: sig.height,
-      user_agent: ua ? ua.slice(0, 300) : null,
-      captured_by_user_id: staffUserId,
-      capture_channel: body.mode === "staff" ? "staff_desk" : "self_service",
-      signed_at: new Date().toISOString(),
-    });
-    if (agErr) throw new Error("agreement: " + agErr.message);
-  } catch (e) {
-    console.error("signature capture failed, cleaning up:", (e as Error).message);
-    if (uploaded) {
-      const { error } = await admin.storage.from("visitor-signatures").remove([storagePath]);
-      if (error) console.error("CLEANUP FAILED (orphan file):", storagePath, error.message);
+      const ua = req.headers.get("user-agent");
+      const { error: agErr } = await admin.from("visitor_agreements").insert({
+        visitor_id: visitorId,
+        agreement_type: "privacy_notice",
+        agreement_text: `${notice.title}\n\n${notice.body}`,
+        notice_id: notice.id,
+        notice_version: notice.version,
+        notice_language: notice.language,
+        acknowledged: true,
+        storage_path: storagePath,
+        signature_hash: signatureHash,
+        hash_algorithm: "SHA-256",
+        signature_width: sig.width,
+        signature_height: sig.height,
+        user_agent: ua ? ua.slice(0, 300) : null,
+        captured_by_user_id: staffUserId,
+        capture_channel: body.mode === "staff" ? "staff_desk" : "self_service",
+        signed_at: new Date().toISOString(),
+      });
+      if (agErr) throw new Error("agreement: " + agErr.message);
+    } catch (e) {
+      console.error("signature capture failed, cleaning up:", (e as Error).message);
+      if (uploaded) {
+        const { error } = await admin.storage.from("visitor-signatures").remove([storagePath]);
+        if (error) console.error("CLEANUP FAILED (orphan file):", storagePath, error.message);
+      }
+      if (createdVisitor) {
+        const { error } = await admin.from("visitors").delete().eq("id", createdVisitor.id);
+        if (error) console.error("CLEANUP FAILED (orphan visitor):", createdVisitor.id, error.message);
+      }
+      return reply(500, { error: "Could not save the signature. Please try again." });
     }
-    if (createdVisitor) {
-      const { error } = await admin.from("visitors").delete().eq("id", createdVisitor.id);
-      if (error) console.error("CLEANUP FAILED (orphan visitor):", createdVisitor.id, error.message);
-    }
-    return reply(500, { error: "Could not save the signature. Please try again." });
   }
 
   if (createdVisitor && body.mode === "self_service" && body.visitor.host_id) {
@@ -260,7 +283,7 @@ Deno.serve(async (req) => {
     success: true,
     id: visitorId,
     visitor_id: createdVisitor?.visitor_id ?? null,
-    notice_version: notice.version,
+    notice_version: notice?.version ?? null,
     signature_hash: signatureHash,
   });
 });

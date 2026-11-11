@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
 import { DpdpNoticeSignature, type DpdpCaptureState } from '@/components/shared/DpdpNoticeSignature';
 import { HostCombobox } from '@/components/visitors/HostCombobox';
-import { createEmptyPrivacyDeclarations } from '@/lib/privacyDeclarations';
+import { createEmptyPrivacyDeclarations, isReOneEmail, requiresPrivacyNotice } from '@/lib/privacyDeclarations';
 
 const visitorSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -116,7 +116,15 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
   const hasMobile = form.watch('has_mobile');
   const vehicleType = form.watch('vehicle_type');
   const phoneValue = form.watch('phone');
+  const emailValue = form.watch('email');
+  const needsPrivacyNotice = requiresPrivacyNotice(emailValue);
   const [returningInfo, setReturningInfo] = useState<{ visit_count: number } | null>(null);
+
+  useEffect(() => {
+    if (isReOneEmail(emailValue)) {
+      setDpdp({ noticeId: null, acknowledged: false, signature: null, declarations: createEmptyPrivacyDeclarations() });
+    }
+  }, [emailValue]);
 
   // Auto-fill from frequent_visitors table when phone is entered
   useEffect(() => {
@@ -179,8 +187,10 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
   };
 
   const onSubmit = async (data: VisitorFormData) => {
-    if (!dpdp.noticeId || !dpdp.acknowledged) { toast.error(t('dpdp.ackRequired')); return; }
-    if (!dpdp.signature) { toast.error(t('dpdp.signatureRequired')); return; }
+    if (requiresPrivacyNotice(data.email)) {
+      if (!dpdp.noticeId || !dpdp.acknowledged) { toast.error(t('dpdp.ackRequired')); return; }
+      if (!dpdp.signature) { toast.error(t('dpdp.signatureRequired')); return; }
+    }
     setLoading(true);
 
     const selectedGate = gates.find((gate) => gate.id === data.gate_id);
@@ -221,8 +231,8 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
       return;
     }
 
-    // DPDP: record notice acknowledgement + signature server-side; undo the registration if it fails
-    {
+    // Record notice acknowledgement and signature for non-company email visitors.
+    if (requiresPrivacyNotice(data.email)) {
       const { data: sigRes, error: sigErr } = await supabase.functions.invoke('capture-visitor-signature', {
         body: {
           mode: 'staff',
@@ -378,7 +388,13 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                       type="email"
                       placeholder="john@company.com"
                       className="pl-10"
-                      {...form.register('email')}
+                      {...form.register('email', {
+                        onChange: (event) => {
+                          if (isReOneEmail(event.target.value) !== isReOneEmail(emailValue)) {
+                            setDpdp({ noticeId: null, acknowledged: false, signature: null, declarations: createEmptyPrivacyDeclarations() });
+                          }
+                        },
+                      })}
                     />
                   </div>
                   {form.formState.errors.email && (
@@ -841,7 +857,7 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
           </Card>
 
           {/* DPDP Privacy Notice & Signature */}
-          <Card>
+          {needsPrivacyNotice && <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5" />
@@ -856,14 +872,14 @@ export default function NewVisitor({ inline = false, onClose }: NewVisitorProps)
                 disabled={loading}
               />
             </CardContent>
-          </Card>
+          </Card>}
 
           {/* Actions */}
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={() => navigate(-1)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !dpdp.noticeId || !dpdp.acknowledged || !dpdp.signature}>
+            <Button type="submit" disabled={loading || (needsPrivacyNotice && (!dpdp.noticeId || !dpdp.acknowledged || !dpdp.signature))}>
               {loading ? 'Registering...' : 'Register Visitor'}
             </Button>
           </div>

@@ -3,7 +3,9 @@ import {
   acceptCombinedSharingAndPolicyDeclaration,
   areAllPrivacyDeclarationsAccepted,
   createEmptyPrivacyDeclarations,
+  isReOneEmail,
   PRIVACY_DECLARATION_IDS,
+  requiresPrivacyNotice,
 } from './privacyDeclarations';
 
 describe('required visitor privacy declarations', () => {
@@ -35,5 +37,19 @@ describe('required visitor privacy declarations', () => {
     expect(combined.personalData).toBe(false);
     expect(combined.withdrawal).toBe(false);
     expect(areAllPrivacyDeclarationsAccepted(combined)).toBe(false);
+  });
+
+  it('matches only the exact @re.one domain, ignoring surrounding whitespace and case', () => {
+    expect(isReOneEmail(' employee@re.one ')).toBe(true);
+    expect(isReOneEmail('EMPLOYEE@RE.ONE')).toBe(true);
+    expect(isReOneEmail('employee@sub.re.one')).toBe(false);
+    expect(isReOneEmail('employee@resustainability.com')).toBe(false);
+    expect(isReOneEmail('employee@re.one.example')).toBe(false);
+    expect(isReOneEmail('')).toBe(false);
+  });
+
+  it('requires the privacy notice for addresses outside @re.one', () => {
+    expect(requiresPrivacyNotice('staff@re.one')).toBe(false);
+    expect(requiresPrivacyNotice('visitor@example.com')).toBe(true);
   });
 });

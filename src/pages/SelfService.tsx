@@ -18,7 +18,7 @@ import { HostCombobox } from '@/components/visitors/HostCombobox';
 import { useTranslation } from 'react-i18next';
 import { languages } from '@/i18n';
 import { DpdpNoticeSignature, type DpdpCaptureState } from '@/components/shared/DpdpNoticeSignature';
-import { createEmptyPrivacyDeclarations } from '@/lib/privacyDeclarations';
+import { createEmptyPrivacyDeclarations, isReOneEmail, requiresPrivacyNotice } from '@/lib/privacyDeclarations';
 
 interface Department {
   id: string;
@@ -65,6 +65,7 @@ export default function SelfService() {
     accompanyingCount: 0,
     photoUrl: '',
   });
+  const needsPrivacyNotice = requiresPrivacyNotice(formData.email);
   
   // Dropdown data
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -159,8 +160,10 @@ export default function SelfService() {
       toast.error('Please select an entry gate');
       return;
     }
-    if (!dpdp.noticeId || !dpdp.acknowledged) { toast.error(t('dpdp.ackRequired')); return; }
-    if (!dpdp.signature) { toast.error(t('dpdp.signatureRequired')); return; }
+    if (requiresPrivacyNotice(formData.email)) {
+      if (!dpdp.noticeId || !dpdp.acknowledged) { toast.error(t('dpdp.ackRequired')); return; }
+      if (!dpdp.signature) { toast.error(t('dpdp.signatureRequired')); return; }
+    }
 
     setIsSubmitting(true);
     try {
@@ -169,9 +172,11 @@ export default function SelfService() {
       const { data, error } = await supabase.functions.invoke('capture-visitor-signature', {
         body: {
           mode: 'self_service',
-          notice_id: dpdp.noticeId,
-          acknowledged: true,
-          signature_png: dpdp.signature,
+          ...(requiresPrivacyNotice(formData.email) ? {
+            notice_id: dpdp.noticeId,
+            acknowledged: true,
+            signature_png: dpdp.signature,
+          } : {}),
           visitor: {
             name: formData.name,
             phone: formData.phone,
@@ -210,6 +215,9 @@ export default function SelfService() {
   };
 
   const updateField = (field: string, value: any) => {
+    if (field === 'email' && isReOneEmail(value) !== isReOneEmail(formData.email)) {
+      setDpdp({ noticeId: null, acknowledged: false, signature: null, declarations: createEmptyPrivacyDeclarations() });
+    }
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -637,7 +645,7 @@ export default function SelfService() {
               </div>
 
               {/* DPDP Privacy Notice & Signature */}
-              <div className="space-y-2 pt-2">
+              {needsPrivacyNotice && <div className="space-y-2 pt-2">
                 <h4 className="font-medium flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> {t('dpdp.sectionTitle')}</h4>
                 <p className="text-xs text-muted-foreground">{t('dpdp.sectionDesc')}</p>
                 <DpdpNoticeSignature
@@ -646,7 +654,7 @@ export default function SelfService() {
                   onChange={setDpdp}
                   disabled={isSubmitting}
                 />
-              </div>
+              </div>}
 
               <div className="flex gap-3 mt-4">
                 <Button variant="outline" onClick={prevStep} className="flex-1 h-12">
@@ -654,7 +662,7 @@ export default function SelfService() {
                 </Button>
                 <Button 
                   onClick={handleSubmit} 
-                  disabled={isSubmitting || !dpdp.noticeId || !dpdp.acknowledged || !dpdp.signature}
+                  disabled={isSubmitting || (needsPrivacyNotice && (!dpdp.noticeId || !dpdp.acknowledged || !dpdp.signature))}
                   className="flex-1 h-12"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit'}

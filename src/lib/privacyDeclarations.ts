@@ -43,3 +43,11 @@ export function areAllPrivacyDeclarationsAccepted(
 ): boolean {
   return PRIVACY_DECLARATION_IDS.every((id) => declarations[id] === true);
 }
+
+export function isReOneEmail(email: string | null | undefined): boolean {
+  return (email ?? '').trim().toLowerCase().endsWith('@re.one');
+}
+
+export function requiresPrivacyNotice(email: string | null | undefined): boolean {
+  return !isReOneEmail(email);
+}
