@@ -130,7 +130,7 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
           <span className="text-xs text-muted-foreground">{t('dpdp.version')} {notice.version}</span>
         </div>
         {fallback && <p className="px-4 pt-2 text-xs text-muted-foreground">{t('dpdp.noticeFallback')}</p>}
-        <ScrollArea className="h-48 px-4 py-3">
+        <ScrollArea className="h-32 px-4 py-3">
           <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">{notice.body}</p>
         </ScrollArea>
       </div>
@@ -188,16 +188,21 @@ function CombinedDeclarationRadio({ checked, disabled, onValueChange, t }: Combi
       <div className="flex items-start gap-3">
         <RadioGroupItem id={radioId} value="combined" className="mt-0.5" />
         <Label htmlFor={radioId} className="text-sm leading-relaxed font-normal cursor-pointer">
-          {t('dpdp.declarationServiceProviders')}{' '}
-          {t('dpdp.declarationPrivacyPolicyLead')}{' '}
-          <a href="https://re.one/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
-            {t('dpdp.privacyPolicyLink')}
-          </a>{' '}
-          {t('dpdp.declarationAnd')}{' '}
-          <a href="https://re.one/terms-of-service/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
-            {t('dpdp.termsOfServiceLink')}
-          </a>.
-          <span className="text-destructive"> *</span>
+          <span className="flex flex-col gap-2">
+            <span>{t('dpdp.declarationServiceProviders')}</span>
+            <span className="font-medium">Privacy Policy &amp; Terms</span>
+            <span>
+              I have read and accept the{' '}
+              <a href="https://re.one/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+                Privacy Policy of ReSL
+              </a>{' '}
+              and{' '}
+              <a href="https://re.one/terms-of-service/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+                Terms of Service
+              </a>. (Accept)
+              <span className="text-destructive"> *</span>
+            </span>
+          </span>
         </Label>
       </div>
     </RadioGroup>
