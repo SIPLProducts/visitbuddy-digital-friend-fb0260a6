@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShieldCheck } from 'lucide-react';
 import type { TFunction } from 'i18next';
 import { SignaturePad } from './SignaturePad';
 import {
+  acceptCombinedSharingAndPolicyDeclaration,
   areAllPrivacyDeclarationsAccepted,
   createEmptyPrivacyDeclarations,
   PRIVACY_DECLARATION_IDS,
@@ -86,6 +88,19 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
     });
   };
 
+  const handleCombinedDeclarationChange = (value: string) => {
+    if (value !== 'combined') return;
+    const next = acceptCombinedSharingAndPolicyDeclaration(declarations);
+    const allAccepted = areAllPrivacyDeclarationsAccepted(next);
+    setDeclarations(next);
+    onChange({
+      noticeId: notice?.id ?? null,
+      acknowledged: allAccepted,
+      signature: allAccepted ? signature : null,
+      declarations: next,
+    });
+  };
+
   useEffect(() => {
     onChange({ noticeId: notice?.id ?? null, acknowledged, signature, declarations });
   }, [notice?.id, acknowledged, signature, declarations, onChange]);
@@ -123,7 +138,7 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
       <div className="space-y-3" aria-label={t('dpdp.declarationsTitle')}>
         <p className="text-sm font-medium">{t('dpdp.declarationsTitle')}</p>
         <p className="text-xs text-muted-foreground">{t('dpdp.declarationsEnglishOnly')}</p>
-        {PRIVACY_DECLARATION_IDS.map((id) => (
+        {PRIVACY_DECLARATION_IDS.slice(0, 2).map((id) => (
           <DeclarationCheckbox
             key={id}
             id={id}
@@ -133,6 +148,12 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
             t={t}
           />
         ))}
+        <CombinedDeclarationRadio
+          checked={declarations.serviceProviders && declarations.privacyPolicyTerms}
+          disabled={disabled}
+          onValueChange={handleCombinedDeclarationChange}
+          t={t}
+        />
       </div>
 
       <div className="space-y-2">
@@ -145,6 +166,41 @@ export function DpdpNoticeSignature({ locationId, onChange, disabled }: Props) {
         {!acknowledged && <p className="text-xs text-muted-foreground">{t('dpdp.acknowledgeFirst')}</p>}
       </div>
     </div>
+  );
+}
+
+interface CombinedDeclarationRadioProps {
+  checked: boolean;
+  disabled?: boolean;
+  onValueChange: (value: string) => void;
+  t: TFunction;
+}
+
+function CombinedDeclarationRadio({ checked, disabled, onValueChange, t }: CombinedDeclarationRadioProps) {
+  const radioId = 'dpdp-combined-sharing-policy';
+  return (
+    <RadioGroup
+      value={checked ? 'combined' : ''}
+      onValueChange={onValueChange}
+      disabled={disabled}
+      aria-required="true"
+    >
+      <div className="flex items-start gap-3">
+        <RadioGroupItem id={radioId} value="combined" className="mt-0.5" />
+        <Label htmlFor={radioId} className="text-sm leading-relaxed font-normal cursor-pointer">
+          {t('dpdp.declarationServiceProviders')}{' '}
+          {t('dpdp.declarationPrivacyPolicyLead')}{' '}
+          <a href="https://re.one/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+            {t('dpdp.privacyPolicyLink')}
+          </a>{' '}
+          {t('dpdp.declarationAnd')}{' '}
+          <a href="https://re.one/terms-of-service/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+            {t('dpdp.termsOfServiceLink')}
+          </a>.
+          <span className="text-destructive"> *</span>
+        </Label>
+      </div>
+    </RadioGroup>
   );
 }
 

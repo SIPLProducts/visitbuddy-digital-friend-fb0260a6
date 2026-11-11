@@ -28,6 +28,16 @@ export function createEmptyPrivacyDeclarations(): PrivacyDeclarationSelection {
   };
 }
 
+export function acceptCombinedSharingAndPolicyDeclaration(
+  declarations: PrivacyDeclarationSelection,
+): PrivacyDeclarationSelection {
+  return {
+    ...declarations,
+    serviceProviders: true,
+    privacyPolicyTerms: true,
+  };
+}
+
 export function areAllPrivacyDeclarationsAccepted(
   declarations: Partial<PrivacyDeclarationSelection>,
 ): boolean {

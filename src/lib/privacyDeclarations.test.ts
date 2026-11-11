@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  acceptCombinedSharingAndPolicyDeclaration,
   areAllPrivacyDeclarationsAccepted,
   createEmptyPrivacyDeclarations,
   PRIVACY_DECLARATION_IDS,
@@ -24,5 +25,15 @@ describe('required visitor privacy declarations', () => {
     for (const id of PRIVACY_DECLARATION_IDS) {
       expect(areAllPrivacyDeclarationsAccepted({ ...accepted, [id]: false })).toBe(false);
     }
+  });
+
+  it('records both combined sharing and policy acknowledgements together', () => {
+    const combined = acceptCombinedSharingAndPolicyDeclaration(createEmptyPrivacyDeclarations());
+
+    expect(combined.serviceProviders).toBe(true);
+    expect(combined.privacyPolicyTerms).toBe(true);
+    expect(combined.personalData).toBe(false);
+    expect(combined.withdrawal).toBe(false);
+    expect(areAllPrivacyDeclarationsAccepted(combined)).toBe(false);
   });
 });
